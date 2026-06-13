@@ -976,11 +976,13 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
 
 /* ── DASHBOARD PRESTATAIRE MOBILE — LAYOUT COLONNE DÉFINITIF ── */
 @media(max-width:768px){
+  /* Conteneur principal : colonne */
   #page-dashboard .dash-layout{
     display:flex!important;
     flex-direction:column!important;
     min-height:100vh!important;
   }
+  /* Sidebar : statique, pleine largeur, hauteur auto */
   #page-dashboard .sidebar{
     position:static!important;
     transform:none!important;
@@ -990,6 +992,31 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
     z-index:auto!important;
     flex-shrink:0!important;
   }
+  /* Logo sidebar compact */
+  #page-dashboard .sidebar-logo{
+    padding:10px 16px!important;
+  }
+  /* Nav en grille 2 colonnes pour réduire la hauteur */
+  #page-dashboard .sidebar-nav{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:4px!important;
+    padding:8px!important;
+    flex-direction:unset!important;
+  }
+  /* Items compacts */
+  #page-dashboard .sidebar .nav-item{
+    padding:10px 8px!important;
+    font-size:12.5px!important;
+    border-radius:8px!important;
+    gap:6px!important;
+  }
+  /* Déconnexion pleine largeur */
+  #page-dashboard .sidebar .btn-deconnexion{
+    margin:4px 8px 8px!important;
+    width:calc(100% - 16px)!important;
+  }
+  /* Contenu principal en dessous */
   #page-dashboard .main{
     margin-left:0!important;
     width:100%!important;
