@@ -3537,7 +3537,6 @@ function toggleDashSidebar() {
   } else {
     sidebar.classList.add('open');
     sidebar.style.transform = 'translateX(0)';
-    // Overlay pour fermer en cliquant en dehors
     const overlay = document.createElement('div');
     overlay.id = 'dashSidebarOverlay';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);';
@@ -6665,11 +6664,47 @@ function navigate(page) {
       const el = document.getElementById('page-'+page);
       if (el) { el.classList.add('active'); el.style.cssText = 'display:block!important;'; }
     }
-    if (page === 'dashboard') document.body.classList.add('on-dashboard');
+    if (page === 'dashboard') {
+      document.body.classList.add('on-dashboard');
+      // Reset sidebar état à chaque navigation vers dashboard
+      setTimeout(applyDashboardLayout, 0);
+    }
     window.scrollTo(0,0);
   }
 }
 window._realNavigate = navigate;
+
+/* ── DASHBOARD LAYOUT JS — surclasse tout le CSS ── */
+function applyDashboardLayout() {
+  const sidebar = document.querySelector('#page-dashboard .sidebar');
+  const main = document.querySelector('#page-dashboard .main');
+  const hamburger = document.querySelector('.dash-hamburger');
+  if (!sidebar || !main) return;
+
+  // Fermer le sidebar drawer s'il était ouvert
+  sidebar.classList.remove('open');
+  const overlay = document.getElementById('dashSidebarOverlay');
+  if (overlay) overlay.remove();
+
+  if (window.innerWidth > 1024) {
+    // DESKTOP : sidebar visible en permanence
+    sidebar.style.cssText = 'transform:none;position:fixed;top:0;left:0;width:220px;height:100vh;z-index:200;display:flex;flex-direction:column;';
+    main.style.cssText = 'margin-left:220px;width:calc(100vw - 220px);min-height:100vh;';
+    if (hamburger) hamburger.style.cssText = 'display:none;';
+  } else {
+    // MOBILE/TABLETTE : drawer caché par défaut
+    sidebar.style.cssText = 'transform:translateX(-100%);position:fixed;top:0;left:0;width:min(280px,85vw);height:100vh;z-index:9999;transition:transform .3s ease;overflow-y:auto;';
+    main.style.cssText = 'margin-left:0;width:100%;min-height:100vh;';
+    if (hamburger) hamburger.style.cssText = 'display:flex;flex-shrink:0;';
+  }
+}
+
+// Appliquer au redimensionnement
+window.addEventListener('resize', function() {
+  if (document.getElementById('page-dashboard').classList.contains('active')) {
+    applyDashboardLayout();
+  }
+});
 
 window.addEventListener('load', async function() {
   const hash = location.hash.replace('#','').toLowerCase().trim();
