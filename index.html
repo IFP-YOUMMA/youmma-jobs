@@ -962,6 +962,30 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
   .btn-mp-wa,.btn-mp-call,.btn-mp-maps{font-size:12.5px!important;padding:11px!important}
   .form-row-2{gap:8px!important}
 }
+
+/* ── DASHBOARD PRESTATAIRE MOBILE — LAYOUT COLONNE DÉFINITIF ── */
+@media(max-width:768px){
+  #page-dashboard .dash-layout{
+    display:flex!important;
+    flex-direction:column!important;
+    min-height:100vh!important;
+  }
+  #page-dashboard .sidebar{
+    position:static!important;
+    transform:none!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:unset!important;
+    z-index:auto!important;
+    flex-shrink:0!important;
+  }
+  #page-dashboard .main{
+    margin-left:0!important;
+    width:100%!important;
+    min-height:unset!important;
+    flex:1!important;
+  }
+}
 </style>
 </head>
 <body>
