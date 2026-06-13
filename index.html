@@ -963,6 +963,17 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
   .form-row-2{gap:8px!important}
 }
 
+/* ── PAGES NON-ACTIVES — TOUJOURS CACHÉES ── */
+#page-dashboard:not(.active),
+#page-login:not(.active),
+#page-inscription:not(.active),
+#page-admin:not(.active),
+#page-soon-hub:not(.active){
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
 /* ── DASHBOARD PRESTATAIRE MOBILE — LAYOUT COLONNE DÉFINITIF ── */
 @media(max-width:768px){
   #page-dashboard .dash-layout{
