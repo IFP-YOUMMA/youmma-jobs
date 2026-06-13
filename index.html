@@ -264,15 +264,15 @@ body.admin-mode #page-admin.logged #adminWrap{
 /* ════════════════════════════════════════════════════════
    DASHBOARD PRESTATAIRE — RESPONSIVE MOBILE
    ════════════════════════════════════════════════════════ */
-@media(max-width:768px){
+@media(max-width:1024px){
 /* Layout sidebar → cachée par défaut */
 #page-dashboard .sidebar{
-  transform:translateX(-100%);
+  transform:translateX(-100%)!important;
   position:fixed!important;
   top:0!important;left:0!important;
   height:100vh!important;
   z-index:9999!important;
-  transition:transform .3s ease;
+  transition:transform .3s ease!important;
 }
 #page-dashboard .sidebar.open{
   transform:translateX(0)!important;
@@ -424,7 +424,7 @@ body.admin-mode #page-admin.logged #adminWrap{
   width:calc(100vw - 220px)!important;
   box-sizing:border-box!important;
 }
-@media(max-width:768px){
+@media(max-width:1024px){
   #page-dashboard .sidebar {
     transform:translateX(-100%)!important;
     transition:transform .3s ease!important;
@@ -432,7 +432,11 @@ body.admin-mode #page-admin.logged #adminWrap{
   #page-dashboard .sidebar.open {
     transform:translateX(0)!important;
   }
-  /* dashboard main mobile reset moved to @media */
+  #page-dashboard .main{
+    margin-left:0!important;
+    width:100%!important;
+  }
+  .dash-hamburger{display:flex!important;}
 }
 
 
@@ -974,14 +978,12 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
   pointer-events:none!important;
 }
 
-/* ── DASHBOARD PRESTATAIRE MOBILE — DRAWER DÉFINITIF ── */
-@media(max-width:768px){
-  /* Conteneur : block normal, pas de flex-column */
+/* ── DASHBOARD PRESTATAIRE — DRAWER DÉFINITIF (≤1024px) ── */
+@media(max-width:1024px){
+  /* Sidebar : TOUJOURS cachée hors écran sur mobile+tablette */
   #page-dashboard .dash-layout{
     display:block!important;
-    position:relative!important;
   }
-  /* Sidebar : cachée hors écran par défaut */
   #page-dashboard .sidebar{
     position:fixed!important;
     top:0!important;
@@ -993,17 +995,14 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
     z-index:9999!important;
     overflow-y:auto!important;
   }
-  /* Sidebar ouverte via hamburger */
   #page-dashboard .sidebar.open{
     transform:translateX(0)!important;
   }
-  /* Contenu principal : toujours pleine largeur */
   #page-dashboard .main{
     margin-left:0!important;
     width:100%!important;
     min-height:100vh!important;
   }
-  /* Hamburger visible */
   .dash-hamburger{
     display:flex!important;
   }
