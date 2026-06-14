@@ -1202,23 +1202,25 @@ function renderProviderCards() {
 function filterProviders() {
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
   const cat = document.getElementById('catFilter')?.value || '';
-  const ville = document.getElementById('villeFilter')?.value || '';
+  const locVal = (document.getElementById('villeFilter')?.value || '').toLowerCase();
   const noteMin = parseFloat(document.getElementById('noteFilter')?.value || '0');
   const dispoFilter = document.getElementById('dispoFilter')?.value || '';
 
   filteredData = PRESTATAIRES.filter(p => {
-    const mq = !q || p.nom.toLowerCase().includes(q) || p.metier.toLowerCase().includes(q)
-      || p.ville.toLowerCase().includes(q) || (p.skills||[]).some(s=>s.toLowerCase().includes(q))
+    const mq = !q || (p.nom||'').toLowerCase().includes(q) || (p.metier||'').toLowerCase().includes(q)
+      || (p.ville||'').toLowerCase().includes(q) || (p.commune||'').toLowerCase().includes(q)
+      || (p.skills||[]).some(s=>s.toLowerCase().includes(q))
       || (p.desc||'').toLowerCase().includes(q);
-    const mc = !cat || p.cat === cat || p.cat.includes(cat);
-    const mv = !ville || p.ville.toLowerCase().includes(ville.toLowerCase());
+    const mc = !cat || p.cat === cat || (p.cat||'').includes(cat);
+    // Filtre localisation : cherche dans ville, commune ET quartier
+    const pLoc = ((p.ville||'') + ' ' + (p.commune||'') + ' ' + (p.quartier||'')).toLowerCase();
+    const mv = !locVal || pLoc.includes(locVal);
     const mn = !noteMin || p.note >= noteMin;
     const md = !dispoFilter
       || (dispoFilter === 'maintenant' && p.dispo && (p.dispo.includes('maintenant')||p.dispo.includes("aujourd'hui")))
       || (dispoFilter === 'semaine' && p.dispo)
       || dispoFilter === 'all';
 
-    // Chip filters
     const mchip = activeFilter === 'all' ? true
       : activeFilter === 'express' ? p.badge_express
       : activeFilter === 'verifie' ? p.badge_verifie
@@ -1230,18 +1232,26 @@ function filterProviders() {
     return mq && mc && mv && mn && md && mchip;
   });
 
+  // Si GPS actif : trier par distance croissante (sans distance en dernier)
+  if (_gpsPosition) {
+    filteredData.sort((a, b) => {
+      if (a._distance != null && b._distance != null) return a._distance - b._distance;
+      if (a._distance != null) return -1;
+      if (b._distance != null) return 1;
+      return 0;
+    });
+  }
+
   displayedCount = 9;
   renderProviders();
 
-  // Update count badge
   const countEl = document.getElementById('resultsCount');
   if (countEl) countEl.textContent = filteredData.length + ' artisan' + (filteredData.length > 1 ? 's' : '');
-  // Show/hide reset button
   const rb = document.getElementById('resetBtn');
   if (rb) {
     const hasFilter = ['searchInput','catFilter','villeFilter','dispoFilter','noteFilter'].some(id=>{
       const el = document.getElementById(id); return el && el.value;
-    }) || activeFilter !== 'all';
+    }) || activeFilter !== 'all' || _gpsPosition != null;
     rb.style.display = hasFilter ? 'block' : 'none';
   }
 }
@@ -1665,14 +1675,34 @@ async function verifierSession() {
         <input type="text" id="searchInput" placeholder="Métier, artisan, service..." oninput="filterProviders()"/>
       </div>
       <div class="search-divider"></div>
-      <div class="search-field">
+      <div class="search-field" style="gap:6px;">
         <span class="search-field-icon"><i class="fa-solid fa-location-dot"></i></span>
-        <select id="villeFilter" onchange="filterProviders()">
+        <select id="villeFilter" onchange="filterProviders()" style="flex:1;min-width:0;">
           <option value="">Toutes les villes</option>
-          <option>Kaloum</option><option>Ratoma</option><option>Matam</option>
-          <option>Dixinn</option><option>Lambanyi</option><option>Kipé</option>
-          <option>Dubréka</option><option>Coyah</option>
+          <optgroup label="— Communes de Conakry —">
+            <option value="Kaloum">Kaloum</option>
+            <option value="Dixinn">Dixinn</option>
+            <option value="Matam">Matam</option>
+            <option value="Ratoma">Ratoma</option>
+            <option value="Matoto">Matoto</option>
+            <option value="Lambanyi">Lambanyi</option>
+            <option value="Kipé">Kipé</option>
+          </optgroup>
+          <optgroup label="— Villes de Guinée —">
+            <option value="Kindia">Kindia</option>
+            <option value="Kankan">Kankan</option>
+            <option value="Labé">Labé</option>
+            <option value="Mamou">Mamou</option>
+            <option value="Boké">Boké</option>
+            <option value="Faranah">Faranah</option>
+            <option value="Nzérékoré">Nzérékoré</option>
+            <option value="Siguiri">Siguiri</option>
+            <option value="Guéckédou">Guéckédou</option>
+          </optgroup>
         </select>
+        <button id="btnGeoLocate" onclick="geoLocateUser()" title="Trouver les prestataires près de moi" style="flex-shrink:0;padding:5px 10px;border:1.5px solid var(--bordure);border-radius:8px;background:#fff;color:var(--gris);font-size:11.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;">
+          <i class="fa-solid fa-location-dot"></i> Me localiser
+        </button>
       </div>
       <div class="search-divider"></div>
       <div class="search-field">
@@ -2560,18 +2590,41 @@ if (typeof connexionPrestataire === 'undefined') {
     <div id="i-err3" style="display:none;background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:10px;padding:10px 14px;font-size:13px;color:#DC2626;margin-bottom:14px;"></div>
     <div style="font-family:'Libre Baskerville',serif;font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E5E7EB;">Localisation</div>
     <div style="margin-bottom:12px;"><label style="display:block;font-size:11.5px;font-weight:700;color:#0F1020;margin-bottom:5px;">Ville *</label>
-      <select id="i-ville" style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;background:#fff;">
-        <option value="Conakry">Conakry</option><option>Kindia</option><option>Labé</option><option>Kankan</option><option>Nzérékoré</option><option>Boké</option><option>Faranah</option>
+      <select id="i-ville" style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;background:#fff;" onchange="_incrVilleChange(this.value)">
+        <option value="">Choisir votre ville</option>
+        <optgroup label="— Conakry —">
+          <option value="Conakry" selected>Conakry</option>
+        </optgroup>
+        <optgroup label="— Autres villes de Guinée —">
+          <option>Kindia</option><option>Kankan</option><option>Labé</option><option>Mamou</option>
+          <option>Boké</option><option>Faranah</option><option>Nzérékoré</option><option>Siguiri</option><option>Guéckédou</option>
+        </optgroup>
       </select>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
-      <div><label style="display:block;font-size:11.5px;font-weight:700;color:#0F1020;margin-bottom:5px;">Commune</label>
+    <div id="i-commune-wrap" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div><label style="display:block;font-size:11.5px;font-weight:700;color:#0F1020;margin-bottom:5px;">Commune *</label>
         <select id="i-commune" style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;background:#fff;">
-          <option value="">Choisir</option><option>Kaloum</option><option>Dixinn</option><option>Matam</option><option>Ratoma</option><option>Matoto</option><option>Lambanyi</option><option>Kipé</option>
+          <option value="">Choisir</option>
+          <option>Kaloum</option><option>Dixinn</option><option>Matam</option>
+          <option>Ratoma</option><option>Matoto</option><option>Lambanyi</option><option>Kipé</option>
         </select>
       </div>
-      <div><label style="display:block;font-size:11.5px;font-weight:700;color:#0F1020;margin-bottom:5px;">Quartier</label><input id="i-quartier" type="text" placeholder="Ex: Hamdallaye..." style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;box-sizing:border-box;"/></div>
+      <div><label style="display:block;font-size:11.5px;font-weight:700;color:#0F1020;margin-bottom:5px;">Quartier</label>
+        <input id="i-quartier" type="text" placeholder="Ex: Hamdallaye..." style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;box-sizing:border-box;"/>
+      </div>
     </div>
+
+    <!-- GPS enregistrement position -->
+    <div style="margin-bottom:20px;">
+      <label style="display:block;font-size:11.5px;font-weight:700;color:#0F1020;margin-bottom:6px;">Position GPS (optionnelle)</label>
+      <button id="i-btn-gps" type="button" onclick="_inscrGeoLocate()" style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;background:#F4F6FB;color:#1A1A4E;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'DM Sans',sans-serif;transition:all .2s;">
+        <i class="fa-solid fa-location-crosshairs" style="color:#E85D04;"></i> Enregistrer ma position GPS
+      </button>
+      <div id="i-gps-status" style="font-size:11px;color:#9CA3AF;margin-top:5px;text-align:center;"></div>
+      <input type="hidden" id="i-lat" value=""/>
+      <input type="hidden" id="i-lng" value=""/>
+    </div>
+
     <div style="display:flex;gap:10px;">
       <button id="i-back3" onclick="document.getElementById('i-step3').style.display='none';document.getElementById('i-step2').style.display='block';" style="flex:1;padding:13px;background:#F4F6FB;border:none;border-radius:12px;color:#1A1A4E;font-size:13.5px;font-weight:700;cursor:pointer;">← Retour</button>
       <button id="i-submit" style="flex:2;padding:13px;background:#1A1A4E;border:none;border-radius:12px;color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;">Créer mon compte</button>
@@ -2673,6 +2726,8 @@ if (typeof connexionPrestataire === 'undefined') {
               + ((document.getElementById('i-pin2')||{}).value||'')
               + ((document.getElementById('i-pin3')||{}).value||'')
               + ((document.getElementById('i-pin4')||{}).value||'');
+      var latEl = document.getElementById('i-lat');
+      var lngEl = document.getElementById('i-lng');
       var fd = {
         prenom:      (document.getElementById('i-prenom')  || {}).value || '',
         nom:         (document.getElementById('i-nom')     || {}).value || '',
@@ -2684,6 +2739,8 @@ if (typeof connexionPrestataire === 'undefined') {
         ville:       (document.getElementById('i-ville')   || {}).value || 'Conakry',
         commune:     (document.getElementById('i-commune') || {}).value || null,
         quartier:    (document.getElementById('i-quartier')|| {}).value || null,
+        latitude:    latEl && latEl.value ? parseFloat(latEl.value) : null,
+        longitude:   lngEl && lngEl.value ? parseFloat(lngEl.value) : null,
         skills: []
       };
       try {
@@ -2726,6 +2783,41 @@ if (typeof connexionPrestataire === 'undefined') {
 </script>
 
 <script>
+// ── GPS inscription prestataire ──
+function _inscrGeoLocate() {
+  var btn = document.getElementById('i-btn-gps');
+  var status = document.getElementById('i-gps-status');
+  if (!navigator.geolocation) {
+    if (status) status.textContent = 'Géolocalisation non supportée par ce navigateur.';
+    return;
+  }
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:#E85D04;"></i> Localisation en cours...'; }
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      var lat = pos.coords.latitude.toFixed(6);
+      var lng = pos.coords.longitude.toFixed(6);
+      var latEl = document.getElementById('i-lat');
+      var lngEl = document.getElementById('i-lng');
+      if (latEl) latEl.value = lat;
+      if (lngEl) lngEl.value = lng;
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-location-dot" style="color:#16A34A;"></i> Position enregistrée !'; btn.style.borderColor='#16A34A'; btn.style.color='#16A34A'; }
+      if (status) status.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#16A34A;"></i> GPS : ' + lat + ', ' + lng + ' · Les clients pourront calculer la distance pour vous trouver.';
+    },
+    function() {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-location-crosshairs" style="color:#E85D04;"></i> Enregistrer ma position GPS'; }
+      if (status) status.textContent = 'Impossible d\'accéder au GPS. Vous pouvez continuer sans.';
+    },
+    { timeout: 10000, enableHighAccuracy: true }
+  );
+}
+
+function _incrVilleChange(val) {
+  var wrap = document.getElementById('i-commune-wrap');
+  if (!wrap) return;
+  // Afficher le champ commune uniquement pour Conakry
+  wrap.style.display = (!val || val === 'Conakry') ? 'grid' : 'none';
+}
+
 // Définition locale de inscrirePrestataire (fallback)
 if (typeof inscrirePrestataire === 'undefined') {
   window.inscrirePrestataire = async function(formData) {
@@ -2737,7 +2829,9 @@ if (typeof inscrirePrestataire === 'undefined') {
         metier: formData.metier, categorie: formData.categorie,
         description: formData.description, ville: formData.ville,
         commune: formData.commune || null, quartier: formData.quartier || null,
-        statut: 'en_attente', skills: formData.skills || []
+        statut: 'en_attente', skills: formData.skills || [],
+        latitude: formData.latitude || null,
+        longitude: formData.longitude || null
       };
       var res = await sb.from('providers').insert([row]);
       if (res.error) return { success: false, message: res.error.message };
@@ -3319,8 +3413,67 @@ let displayedCount = 9;
 let filteredData = [];
 let favorites = [];
 let activeFilter = 'all';
+let _gpsPosition = null; // { lat, lng } quand GPS activé
 
 try { favorites = JSON.parse(localStorage.getItem('yj_fav') || '[]'); } catch(e) {}
+
+// ── GÉOLOCALISATION ──
+function calcDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function geoLocateUser() {
+  const btn = document.getElementById('btnGeoLocate');
+  if (!navigator.geolocation) {
+    showToast("La géolocalisation n'est pas supportée par votre navigateur", 'error');
+    return;
+  }
+  if (btn) { btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Localisation...'; btn.disabled = true; }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      _gpsPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-location-dot" style="color:#16A34A;"></i> Localisé !';
+        btn.disabled = false;
+        btn.style.borderColor = '#16A34A';
+        btn.style.color = '#16A34A';
+      }
+      PRESTATAIRES.forEach(p => {
+        if (p.latitude && p.longitude) {
+          p._distance = calcDistance(_gpsPosition.lat, _gpsPosition.lng, parseFloat(p.latitude), parseFloat(p.longitude));
+        } else {
+          p._distance = null;
+        }
+      });
+      // Trier : prestataires avec distance d'abord (les plus proches), puis sans GPS
+      filteredData = [...filteredData].sort((a, b) => {
+        if (a._distance != null && b._distance != null) return a._distance - b._distance;
+        if (a._distance != null) return -1;
+        if (b._distance != null) return 1;
+        return 0;
+      });
+      renderProviders();
+      const nb = PRESTATAIRES.filter(p => p._distance != null).length;
+      showToast(`Position détectée ! ${nb} prestataire${nb>1?'s':''} géolocalisé${nb>1?'s':''}. Tri par distance activé.`, 'success');
+    },
+    () => {
+      if (btn) { btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> Me localiser'; btn.disabled = false; btn.style.borderColor=''; btn.style.color=''; }
+      showToast("Impossible d'accéder à votre position. Vérifiez les permissions du navigateur.", 'error');
+    },
+    { timeout: 10000, enableHighAccuracy: true }
+  );
+}
+
+function resetGpsLocate() {
+  _gpsPosition = null;
+  PRESTATAIRES.forEach(p => { delete p._distance; });
+  const btn = document.getElementById('btnGeoLocate');
+  if (btn) { btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> Me localiser'; btn.style.borderColor=''; btn.style.color=''; btn.disabled = false; }
+}
 
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
@@ -3481,8 +3634,10 @@ function renderProviders() {
           </div>
           
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px;">
-            <div style="font-size:12px;color:var(--gris);display:flex;align-items:center;gap:4px;">
-              <i class="fa-solid fa-location-dot" style="color:var(--orange);font-size:11px;"></i> ${p.ville}
+            <div style="font-size:12px;color:var(--gris);display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+              <i class="fa-solid fa-location-dot" style="color:var(--orange);font-size:11px;"></i>
+              <span>${p.commune && p.commune !== p.ville ? p.commune + ', ' + (p.ville||'Conakry') : (p.ville||'Conakry')}</span>
+              ${p._distance != null ? `<span style="font-size:10px;font-weight:700;color:#2563EB;background:#EFF6FF;padding:1px 7px;border-radius:20px;white-space:nowrap;"><i class="fa-solid fa-bullseye" style="font-size:9px;"></i> ${p._distance < 1 ? Math.round(p._distance*1000)+'m' : p._distance.toFixed(1)+'km'}</span>` : ''}
             </div>
             <div style="display:flex;align-items:center;gap:3px;">
               ${stars5}<span style="font-size:12px;font-weight:700;color:var(--bleu);margin-left:3px;">${p.note}</span>
@@ -3552,6 +3707,7 @@ function resetFilters() {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  resetGpsLocate();
   const rb = document.getElementById('resetBtn');
   if (rb) rb.style.display = 'none';
   filterProviders();
@@ -6328,7 +6484,9 @@ async function loadProvidersFromSupabase() {
       ini: ((p.prenom||p.nom||'?')[0] + (p.nom||p.prenom||'?')[0]).toUpperCase(),
       metier: p.metier,
       cat: p.categorie,
-      ville: p.commune || p.ville,
+      ville: p.ville || 'Conakry',
+      commune: p.commune || '',
+      quartier: p.quartier || '',
       tel: p.telephone,
       wa: p.telephone,
       note: parseFloat(p.note_moyenne) > 0 ? parseFloat(p.note_moyenne) : 4.0,
@@ -6340,8 +6498,8 @@ async function loadProvidersFromSupabase() {
       skills: p.skills||[],
       pb: 'pb-'+(catClass[p.categorie]||'artisan'),
       photo_url: p.photo_url||null,
-      latitude: p.latitude,
-      longitude: p.longitude,
+      latitude: p.latitude || null,
+      longitude: p.longitude || null,
       // Champs requis par openModal
       badge_verifie: p.statut === 'valide' || p.doc_cni_statut === 'valide',
       badge_top: p.doc_diplome_statut === 'valide' || (p.note_moyenne||0) >= 4.8,
