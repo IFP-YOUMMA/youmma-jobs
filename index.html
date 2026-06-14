@@ -1053,6 +1053,109 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
     display:flex!important;
   }
 }
+
+/* ══ OVERRIDE : nav dashboard + nav pages légales ══
+   Le sélecteur global nav{position:fixed} casse ces navs intérieures.
+   On les remet en statique avec des valeurs neutres. */
+#page-dashboard .sidebar-nav,
+#page-cgu nav, #page-confidentialite nav, #page-mentions nav {
+  position:static!important;
+  top:auto!important; left:auto!important; right:auto!important;
+  z-index:auto!important;
+  background:none!important;
+  backdrop-filter:none!important;
+  width:auto!important;
+  height:auto!important;
+  border-bottom:none!important;
+  box-shadow:none!important;
+  transition:none!important;
+}
+#page-cgu nav, #page-confidentialite nav, #page-mentions nav {
+  position:sticky!important;
+  top:0!important;
+  left:0!important;
+  right:0!important;
+  z-index:100!important;
+  background:rgba(13,13,46,.97)!important;
+  backdrop-filter:blur(16px)!important;
+  height:64px!important;
+  width:100%!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+}
+
+/* ══ LOADING STATES GLOBAUX ══ */
+button[data-loading], button.loading {
+  opacity:.65!important;
+  cursor:not-allowed!important;
+  pointer-events:none!important;
+}
+button[data-loading]::after, button.loading::after {
+  content:'';
+  display:inline-block;
+  width:12px; height:12px;
+  border:2px solid currentColor;
+  border-top-color:transparent;
+  border-radius:50%;
+  animation:spin .65s linear infinite;
+  margin-left:8px;
+  vertical-align:middle;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* Boutons désactivés pendant loading */
+button:disabled:not(.btn-deconnexion):not([style*="display:none"]) {
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+/* ══ TOAST NOTIFICATIONS ══ */
+#yj-toast-container {
+  position:fixed; bottom:24px; right:24px;
+  z-index:99999;
+  display:flex; flex-direction:column; gap:10px;
+  pointer-events:none;
+}
+.yj-toast {
+  display:flex; align-items:center; gap:10px;
+  padding:13px 18px;
+  border-radius:12px;
+  font-size:13.5px; font-weight:600;
+  color:#fff;
+  box-shadow:0 8px 32px rgba(0,0,0,.18);
+  pointer-events:auto;
+  animation:toastIn .3s cubic-bezier(.34,1.56,.64,1) both;
+  max-width:340px;
+}
+.yj-toast.removing { animation:toastOut .25s ease forwards; }
+.yj-toast.success { background:linear-gradient(135deg,#059669,#047857); }
+.yj-toast.error   { background:linear-gradient(135deg,#DC2626,#B91C1C); }
+.yj-toast.info    { background:linear-gradient(135deg,#1A1A4E,#2D2D6B); }
+.yj-toast.warning { background:linear-gradient(135deg,#D97706,#B45309); }
+@keyframes toastIn  { from { opacity:0; transform:translateX(60px) scale(.9); } to { opacity:1; transform:translateX(0) scale(1); } }
+@keyframes toastOut { to   { opacity:0; transform:translateX(60px) scale(.9); } }
+@media(max-width:600px){
+  #yj-toast-container { bottom:80px; left:12px; right:12px; }
+  .yj-toast { max-width:100%; }
+}
+
+/* ══ SKELETON LOADING CARDS ══ */
+.skeleton {
+  background:linear-gradient(90deg,#F4F6FB 25%,#eaedf2 50%,#F4F6FB 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s infinite;
+  border-radius:10px;
+}
+@keyframes shimmer { to { background-position:-200% 0; } }
+
+/* ══ PROVIDER CARD HOVER amélioré ══ */
+.pc2-card {
+  transition:transform .22s cubic-bezier(.4,0,.2,1), box-shadow .22s cubic-bezier(.4,0,.2,1)!important;
+  will-change:transform;
+}
+.pc2-card:hover {
+  transform:translateY(-6px)!important;
+  box-shadow:0 20px 48px rgba(26,26,78,.13), 0 4px 12px rgba(232,93,4,.08)!important;
+}
 </style>
 </head>
 <body>
@@ -2192,7 +2295,7 @@ async function verifierSession() {
           <ul>
             <li><span onclick="ouvrirInscription()">📝 Inscription</span></li>
             <li><a href="#login" onclick="navigate && navigate('login')"><i class="fa-solid fa-lock"></i> Connexion</a></li>
-            <li><a href="#dashboard" onclick="navigate && if(typeof _realNavigate==='function')_realNavigate('dashboard');else if(typeof navigate==='function')navigate('dashboard')"><i class="fa-solid fa-chart-bar"></i> Mon espace</a></li>
+            <li><a href="#dashboard" onclick="if(typeof _realNavigate==='function')_realNavigate('dashboard');else if(typeof navigate==='function')navigate('dashboard')"><i class="fa-solid fa-chart-bar"></i> Mon espace</a></li>
             <li><span onclick="ouvrirInscription()">🚀 Devenir artisan</span></li>
           </ul>
         </div>
@@ -5632,11 +5735,33 @@ function copierCode() {
 }
 
 // ── TOAST ──
-function showToast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type === 'error' ? ' error' : '');
-  setTimeout(() => t.classList.remove('show'), 3000);
+function showToast(msg, type = 'info') {
+  // Normaliser le type
+  const validTypes = { error:'error', success:'success', warning:'warning', info:'info', ''  :'info' };
+  const t = validTypes[type] || 'info';
+
+  // Créer le conteneur une seule fois
+  let container = document.getElementById('yj-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'yj-toast-container';
+    document.body.appendChild(container);
+  }
+
+  // Créer le toast
+  const icons = { success:'<i class="fa-solid fa-circle-check"></i>', error:'<i class="fa-solid fa-circle-xmark"></i>', warning:'<i class="fa-solid fa-triangle-exclamation"></i>', info:'<i class="fa-solid fa-circle-info"></i>' };
+  const toast = document.createElement('div');
+  toast.className = `yj-toast ${t}`;
+  toast.innerHTML = `${icons[t]||''} <span>${msg}</span>`;
+  container.appendChild(toast);
+
+  // Auto-remove après 3.5s
+  const remove = () => {
+    toast.classList.add('removing');
+    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 260);
+  };
+  toast.addEventListener('click', remove);
+  setTimeout(remove, 3500);
 }
 
 // ── AUTO-LOGIN si session admin ──
@@ -5668,9 +5793,14 @@ async function deconnexion() {
   navigate('home');
 }
 async function getProviders({ categorie='', recherche='', limite=20, offset=0 }={}) {
+  // Colonnes de base garanties dans le schéma providers
+  const COLS_BASE = 'id,nom,prenom,metier,categorie,ville,commune,quartier,photo_url,note_moyenne,nb_vues,telephone,skills,description,statut,disponibilite,doc_cni_statut,doc_diplome_statut,created_at';
+  // Colonnes optionnelles (peuvent manquer selon version du schéma) — tentée séparément
+  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,latitude,longitude,tarif,experience,type_compte,nom_entreprise';
+
   try {
     let query = sb.from('providers')
-      .select('id,nom,prenom,metier,categorie,ville,commune,quartier,photo_url,note_moyenne,nb_vues,nb_favoris,nb_avis,nb_appels,nb_whatsapp,telephone,skills,description,latitude,longitude,tarif,experience,type_compte,nom_entreprise')
+      .select(COLS_BASE + ',' + COLS_OPT)
       .eq('statut', 'valide')
       .order('created_at', { ascending: false })
       .limit(limite);
@@ -5679,10 +5809,24 @@ async function getProviders({ categorie='', recherche='', limite=20, offset=0 }=
     if (categorie) query = query.eq('categorie', categorie);
     if (recherche) query = query.or(`nom.ilike.%${recherche}%,prenom.ilike.%${recherche}%,metier.ilike.%${recherche}%`);
 
-    const result = await query;
+    let result = await query;
 
-    if (result.error) { console.warn('getProviders:', result.error?.message||''); }
-    if (!result.data?.length && result.status === 0) return []; // connexion bloquée
+    // Si erreur de colonne manquante → retenter avec colonnes de base uniquement
+    if (result.error) {
+      console.warn('getProviders (full select):', result.error?.message||'');
+      let qBase = sb.from('providers')
+        .select(COLS_BASE)
+        .eq('statut', 'valide')
+        .order('created_at', { ascending: false })
+        .limit(limite);
+      if (offset > 0) qBase = qBase.range(offset, offset + limite - 1);
+      if (categorie) qBase = qBase.eq('categorie', categorie);
+      if (recherche) qBase = qBase.or(`nom.ilike.%${recherche}%,prenom.ilike.%${recherche}%,metier.ilike.%${recherche}%`);
+      result = await qBase;
+      if (result.error) { console.warn('getProviders (base select):', result.error?.message||''); }
+    }
+
+    if (!result.data?.length && result.status === 0) return [];
     return result.data || [];
   } catch(e) {
     console.warn('getProviders exception:', String(e?.message||e));
@@ -5691,12 +5835,18 @@ async function getProviders({ categorie='', recherche='', limite=20, offset=0 }=
 }
 
 async function getDashboardData(providerId) {
+  const COLS_BASE = 'id,prenom,nom,metier,categorie,ville,commune,quartier,telephone,photo_url,description,skills,statut,note_moyenne,nb_vues,essai_actif,essai_fin,abonnement_actif,abonnement_fin,created_at';
+  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise';
   try {
-    // Colonnes de base toujours présentes
-    const { data, error } = await sb.from('providers')
-      .select('id,prenom,nom,metier,categorie,ville,commune,quartier,telephone,photo_url,description,skills,statut,note_moyenne,nb_vues,nb_favoris,nb_avis,nb_appels,nb_whatsapp,latitude,longitude,essai_actif,essai_fin,abonnement_actif,abonnement_fin,tarif,experience,created_at,type_compte,nom_entreprise,role_entreprise')
-      .eq('id', providerId)
-      .single();
+    let res = await sb.from('providers')
+      .select(COLS_BASE + ',' + COLS_OPT)
+      .eq('id', providerId).single();
+    // Fallback colonnes de base si colonne manquante
+    if (res.error) {
+      console.warn('getDashboardData (full):', res.error.message);
+      res = await sb.from('providers').select(COLS_BASE).eq('id', providerId).single();
+    }
+    const { data, error } = res;
     if (error) console.warn('getDashboardData:', error.message);
     if (!data) return null;
     // Ajouter colonnes optionnelles sans bloquer
