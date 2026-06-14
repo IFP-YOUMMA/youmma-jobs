@@ -2543,7 +2543,20 @@ if (typeof connexionPrestataire === 'undefined') {
       </div>
       <div style="text-align:center;font-size:11px;color:#9CA3AF;margin-top:6px;">Ce code vous servira à vous connecter</div>
     </div>
-    <button id="i-btn1" onclick="(function(){var p=(document.getElementById('i-prenom')||{}).value||'';var n=(document.getElementById('i-nom')||{}).value||'';var t=(document.getElementById('i-tel')||{}).value||'';var pin=((document.getElementById('i-pin1')||{}).value||'')+((document.getElementById('i-pin2')||{}).value||'')+((document.getElementById('i-pin3')||{}).value||'')+((document.getElementById('i-pin4')||{}).value||'');var e=document.getElementById('i-err');if(!p.trim()||!n.trim()||!t.trim()){if(e){e.textContent='Remplissez tous les champs';e.style.display='block';}return;}if(pin.length<4){if(e){e.textContent='Entrez votre PIN 4 chiffres';e.style.display='block';}return;}if(e)e.style.display='none';document.getElementById('i-step1').style.display='none';document.getElementById('i-step2').style.display='block';})()" style="width:100%;padding:14px;background:#E85D04;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Suivant →</button>
+
+    <!-- Case à cocher CGU -->
+    <label id="i-cgu-label" style="display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;cursor:pointer;padding:12px 14px;border:1.5px solid #E5E7EB;border-radius:10px;background:#FAFBFF;transition:border-color .2s;">
+      <input type="checkbox" id="i-cgu" style="width:18px;height:18px;flex-shrink:0;margin-top:1px;accent-color:#E85D04;cursor:pointer;" onchange="document.getElementById('i-cgu-label').style.borderColor=this.checked?'#E85D04':'#E5E7EB';document.getElementById('i-cgu-label').style.background=this.checked?'#FFF7F0':'#FAFBFF';"/>
+      <span style="font-size:12.5px;color:#374151;line-height:1.6;">
+        J'accepte la
+        <a onclick="event.preventDefault();event.stopPropagation();navigate('confidentialite')" href="#" style="color:#E85D04;font-weight:700;text-decoration:underline;">Politique de confidentialité</a>
+        et les
+        <a onclick="event.preventDefault();event.stopPropagation();navigate('cgu')" href="#" style="color:#E85D04;font-weight:700;text-decoration:underline;">Conditions d'utilisation</a>
+        de YOUMMA JOBS *
+      </span>
+    </label>
+
+    <button id="i-btn1" onclick="(function(){var p=(document.getElementById('i-prenom')||{}).value||'';var n=(document.getElementById('i-nom')||{}).value||'';var t=(document.getElementById('i-tel')||{}).value||'';var pin=((document.getElementById('i-pin1')||{}).value||'')+((document.getElementById('i-pin2')||{}).value||'')+((document.getElementById('i-pin3')||{}).value||'')+((document.getElementById('i-pin4')||{}).value||'');var e=document.getElementById('i-err');if(!p.trim()||!n.trim()||!t.trim()){if(e){e.textContent='Remplissez tous les champs';e.style.display='block';}return;}if(pin.length<4){if(e){e.textContent='Entrez votre PIN 4 chiffres';e.style.display='block';}return;}if(!document.getElementById('i-cgu').checked){if(e){e.textContent='Veuillez accepter nos conditions d\'utilisation pour continuer';e.style.display='block';}return;}if(e)e.style.display='none';document.getElementById('i-step1').style.display='none';document.getElementById('i-step2').style.display='block';})()" style="width:100%;padding:14px;background:#E85D04;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Suivant →</button>
   </div>
   <div id="i-step-sms" style="display:none;">
     <div style="text-align:center;margin-bottom:20px;">
@@ -2692,6 +2705,7 @@ if (typeof connexionPrestataire === 'undefined') {
                 + ((document.getElementById('i-pin4')||{}).value||'');
       if (!prenom.trim() || !nom.trim() || !tel.trim()) { showErr('Remplissez tous les champs'); return; }
       if (pin.length < 4) { showErr('Entrez votre code PIN 4 chiffres'); return; }
+      if (!document.getElementById('i-cgu').checked) { showErr("Veuillez accepter nos conditions d'utilisation pour continuer"); return; }
       b1.disabled=true; b1.textContent='Envoi du SMS...'; hideErr();
       var smsRes=await window._smsSend(tel);
       if(!smsRes.success){showErr(smsRes.message||'Erreur SMS');b1.disabled=false;b1.textContent='Suivant →';return;}
