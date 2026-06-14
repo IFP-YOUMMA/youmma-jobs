@@ -4797,22 +4797,41 @@ function updateAbonnementUI(p) {
 // ── MISSIONS ──
 async function declarerMission() {
   const pid = providerId || _dashProviderId;
-  if (!pid) { showToast('Session expirée','error'); return; }
+  if (!pid) { showToast('Session expirée', 'error'); return; }
   const desc = document.getElementById('missionDesc')?.value.trim();
-  if (!desc) { showToast('Décrivez la mission','error'); return; }
-  const client = document.getElementById('missionClient')?.value.trim()||null;
-  const montant = document.getElementById('missionMontant')?.value.trim()||null;
-  const date = document.getElementById('missionDate')?.value||new Date().toISOString().split('T')[0];
+  if (!desc) { showToast('Décrivez la mission', 'error'); return; }
+  const client  = document.getElementById('missionClient')?.value.trim() || null;
+  const montant = document.getElementById('missionMontant')?.value.trim() || null;
+  const date    = document.getElementById('missionDate')?.value || new Date().toISOString().split('T')[0];
 
-  const { error } = await sb.from('missions').insert({
-    provider_id: pid, description: desc, client_nom: client,
-    montant, date_mission: date, statut: 'en_attente'
+  const btn = document.querySelector('[onclick="declarerMission()"]');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Envoi...'; }
+
+  // Tentative avec toutes les colonnes
+  let { error } = await sb.from('missions').insert({
+    provider_id: pid, description: desc, statut: 'en_attente',
+    client_nom: client, montant, date_mission: date
   });
-  if (error) { showToast('❌ Erreur : '+error.message,'error'); return; }
-  showToast('✅ Mission déclarée ! En attente de validation YOUMMA JOBS.','success');
-  document.getElementById('missionDesc').value='';
-  document.getElementById('missionClient').value='';
-  document.getElementById('missionMontant').value='';
+
+  // Fallback si colonnes manquantes (erreur 42703 = column does not exist)
+  if (error && (error.code === '42703' || (error.message||'').includes('column'))) {
+    const res2 = await sb.from('missions').insert({
+      provider_id: pid, description: desc, statut: 'en_attente'
+    });
+    error = res2.error;
+  }
+
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Envoyer la déclaration'; }
+
+  if (error) {
+    showToast('Erreur : ' + (error.message || 'impossible de déclarer la mission'), 'error');
+    return;
+  }
+
+  showToast('Mission déclarée ! En attente de validation YOUMMA JOBS.', 'success');
+  ['missionDesc','missionClient','missionMontant'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
   chargerMissions(pid);
 }
 
