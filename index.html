@@ -2629,11 +2629,8 @@ if (typeof connexionPrestataire === 'undefined') {
       if (!prenom.trim() || !nom.trim() || !tel.trim()) { showErr('Remplissez tous les champs'); return; }
       if (pin.length < 4) { showErr('Entrez votre code PIN 4 chiffres'); return; }
       if (!document.getElementById('i-cgu').checked) { showErr("Veuillez accepter nos conditions d'utilisation pour continuer"); return; }
-      b1.disabled=true; b1.textContent='Envoi du SMS...'; hideErr();
-      var smsRes=await window._smsSend(tel);
-      if(!smsRes.success){showErr(smsRes.message||'Erreur SMS');b1.disabled=false;b1.textContent='Suivant →';return;}
-      b1.disabled=false; b1.textContent='Suivant →';
-      window._smsShowStep(tel);
+      // TODO: Réactiver SMS Orange quand bundle acheté
+      goTo(2);
     };
 
     // Bouton suivant étape 2
@@ -2801,11 +2798,8 @@ if (typeof inscrirePrestataire === 'undefined') {
       var pin=(document.getElementById('i-pin1')||{}).value+(document.getElementById('i-pin2')||{}).value+(document.getElementById('i-pin3')||{}).value+(document.getElementById('i-pin4')||{}).value;
       if(!p.trim()||!n.trim()||!t.trim()){showErr('Remplissez tous les champs');return;}
       if(pin.length<4){showErr('Entrez votre code PIN 4 chiffres');return;}
-      b1.disabled=true;b1.textContent='Envoi du SMS...';hideErr();
-      var smsRes=await window._smsSend(t);
-      if(!smsRes.success){showErr(smsRes.message||'Erreur SMS');b1.disabled=false;b1.textContent='Suivant →';return;}
-      b1.disabled=false;b1.textContent='Suivant →';
-      window._smsShowStep(t);
+      // TODO: Réactiver SMS Orange quand bundle acheté
+      goTo(2);
     };
     if(b2)b2.onclick=function(){
       var cat=(document.getElementById('i-cat')||{}).value||'',met=((document.getElementById('i-metier')||{}).value||'').trim(),desc=((document.getElementById('i-desc')||{}).value||'').trim();
