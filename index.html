@@ -8341,57 +8341,116 @@ function _notifSetFilter(type, btn) {
 }
 
 // ── MARQUER TOUT LU ──
+const _UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 async function _notifMarkAll() {
-  const ids = _notifItems.filter(n => !n.lu).map(n => n.id);
-  if (!ids.length) return;
-  try {
-    await sb.from('notifications').update({ lu: true }).in('id', ids);
-    _notifItems.forEach(n => n.lu = true);
-    _notifRenderList();
-    _notifUpdateBadges(0);
-    showToast('✅ Toutes les notifications marquées comme lues');
-  } catch(e) { console.warn('markAll:', e); }
+  const unread = _notifItems.filter(n => !n.lu);
+  if (!unread.length) { showToast('Toutes les notifications sont déjà lues', 'info'); return; }
+
+  // Mettre à jour en mémoire immédiatement
+  _notifItems.forEach(n => { n.lu = true; });
+  _notifRenderList();
+  _notifUpdateBadges(0);
+
+  // Persister uniquement les vrais UUIDs Supabase
+  const realIds = unread.map(n => n.id).filter(id => _UUID_RE.test(String(id)));
+  if (realIds.length) {
+    try {
+      await sb.from('notifications').update({ lu: true }).in('id', realIds);
+    } catch(e) { console.warn('markAll Supabase:', e); }
+  }
+
+  showToast('Toutes les notifications marquées comme lues', 'success');
 }
 
 // ── CHARGER NOTIFICATIONS ──
 async function _notifLoadPanel() {
   const list = document.getElementById('notifList');
   if (list) list.innerHTML = '<div style="text-align:center;padding:30px;color:#9CA3AF;"><i class="fa-solid fa-spinner fa-spin"></i></div>';
-  
+
+  // Essayer la table notifications d'abord
+  const fromTable = await _notifFetchFromTable();
+
+  if (fromTable !== null) {
+    // Table existe et requête réussie
+    _notifItems = fromTable;
+  } else {
+    // Table absente ou erreur → fallback dynamique
+    _notifItems = await _notifGenerateDynamic();
+  }
+
+  const unread = _notifItems.filter(n => !n.lu).length;
+  const countEl = document.getElementById('notifCount');
+  if (countEl) countEl.textContent = _notifItems.length;
+  _notifUpdateBadges(unread);
+  _notifRenderList();
+}
+
+// Requête directe sur la table notifications — retourne null si table absente
+async function _notifFetchFromTable() {
   try {
     let query = sb.from('notifications')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(50);
-    
-    // Filtrer selon le mode
-    if (_notifMode === 'provider' && (providerId || _dashProviderId)) {
-      const pid = providerId || _dashProviderId;
-      query = query.eq('destinataire_id', pid).eq('destinataire_type', 'provider');
+
+    if (_notifMode === 'provider') {
+      const pid = (typeof providerId !== 'undefined' && providerId) || (typeof _dashProviderId !== 'undefined' && _dashProviderId);
+      if (pid) query = query.eq('destinataire_id', pid).eq('destinataire_type', 'provider');
+      else return null;
     } else if (_notifMode === 'admin') {
       query = query.eq('destinataire_type', 'admin');
     }
 
     const { data, error } = await query;
-    if (error) throw error;
-    
-    _notifItems = data || [];
-    const unread = _notifItems.filter(n => !n.lu).length;
-    
-    // Mettre à jour le count dans le header
-    const countEl = document.getElementById('notifCount');
-    if (countEl) countEl.textContent = _notifItems.length;
-    
-    _notifUpdateBadges(unread);
-    _notifRenderList();
-    
+
+    if (error) {
+      // Table manquante → afficher SQL de création
+      if (error.code === '42P01' || (error.message||'').includes('does not exist')) {
+        _notifShowCreateTableSQL();
+        return null;
+      }
+      // Autre erreur (RLS, etc.) → fallback dynamique silencieux
+      console.warn('notifications table:', error.message);
+      return null;
+    }
+    return data || [];
   } catch(e) {
-    // Si la table n'existe pas encore, afficher les notifs générées dynamiquement
-    _notifItems = await _notifGenerateDynamic();
-    const unread = _notifItems.filter(n => !n.lu).length;
-    _notifUpdateBadges(unread);
-    _notifRenderList();
+    return null;
   }
+}
+
+// Affiche le SQL de création dans le panel si table absente
+function _notifShowCreateTableSQL() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  list.innerHTML = `
+    <div style="padding:16px;">
+      <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:12px;padding:16px;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:#B45309;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+          <i class="fa-solid fa-triangle-exclamation"></i> Table notifications à créer dans Supabase
+        </div>
+        <div style="font-size:12px;color:#78350F;line-height:1.6;margin-bottom:10px;">Exécutez ce SQL dans Supabase → SQL Editor :</div>
+        <pre style="background:#1A1A4E;color:#F5C842;border-radius:8px;padding:12px;font-size:11px;overflow-x:auto;white-space:pre-wrap;line-height:1.7;">CREATE TABLE IF NOT EXISTS notifications (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  destinataire_id   TEXT,
+  destinataire_type TEXT DEFAULT 'admin',
+  type          TEXT DEFAULT 'system',
+  titre         TEXT NOT NULL,
+  message       TEXT,
+  lu            BOOLEAN DEFAULT false,
+  data          JSONB DEFAULT '{}',
+  created_at    TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "admin_all" ON notifications FOR ALL USING (true);
+CREATE INDEX ON notifications (destinataire_id, lu, created_at DESC);</pre>
+        <button onclick="navigator.clipboard?.writeText(document.querySelector('#notifList pre')?.textContent||'').then(()=>showToast('SQL copié !','success'))" style="margin-top:8px;padding:6px 14px;background:#E85D04;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">
+          <i class="fa-solid fa-copy"></i> Copier le SQL
+        </button>
+      </div>
+      <div style="text-align:center;color:#9CA3AF;font-size:12px;">En attendant, les notifications sont générées depuis vos données existantes.</div>
+    </div>`;
 }
 
 // ── GÉNÉRER NOTIFS DYNAMIQUEMENT (depuis les données existantes) ──
@@ -8598,16 +8657,19 @@ function _notifRenderList() {
 
 // ── CLICK NOTIFICATION ──
 async function _notifClick(id) {
-  const n = _notifItems.find(x => x.id == id);
+  const n = _notifItems.find(x => String(x.id) === String(id));
   if (!n) return;
-  
-  // Marquer comme lue
+
+  // Marquer comme lue en mémoire immédiatement
   if (!n.lu) {
     n.lu = true;
-    try { await sb.from('notifications').update({ lu: true }).eq('id', id); } catch(e) {}
     const unread = _notifItems.filter(x => !x.lu).length;
     _notifUpdateBadges(unread);
     _notifRenderList();
+    // Persister en Supabase uniquement si vrai UUID
+    if (_UUID_RE.test(String(id))) {
+      try { await sb.from('notifications').update({ lu: true }).eq('id', id); } catch(e) {}
+    }
   }
   
   // Action selon le type
@@ -8677,21 +8739,27 @@ function _notifToastHide() {
 
 // ── POLLING — Vérifier les nouvelles notifs toutes les 30s ──
 function _notifStartPolling(mode) {
+  if (mode) _notifMode = mode; // Propager le mode dès le départ
   if (_notifPollTimer) clearInterval(_notifPollTimer);
   _notifPollTimer = setInterval(() => _notifPoll(mode), 30000);
-  // Premier check
+  // Premier check immédiat
   _notifPoll(mode);
 }
 
 async function _notifPoll(mode) {
   try {
-    const notifs = await _notifGenerateDynamic();
-    if (!notifs.length) return;
-    
+    // Propager le mode
+    if (mode) _notifMode = mode;
+
+    // Essayer la table d'abord, sinon fallback dynamique
+    let notifs = await _notifFetchFromTable();
+    if (notifs === null) notifs = await _notifGenerateDynamic();
+    if (!notifs || !notifs.length) return;
+
     const unread = notifs.filter(n => !n.lu).length;
     _notifUpdateBadges(unread);
-    
-    // Si nouvelles notifs non lues depuis le dernier check
+
+    // Toast si nouvelles notifs non lues depuis le dernier check
     if (_notifLastCheck) {
       const newOnes = notifs.filter(n =>
         !n.lu && new Date(n.created_at) > _notifLastCheck
@@ -8700,14 +8768,17 @@ async function _notifPoll(mode) {
         _notifToastShow(n.titre, n.message, n.type);
       });
     }
-    
+
     _notifLastCheck = new Date();
-    // Si panel ouvert, rafraîchir
+
+    // Si panel ouvert → rafraîchir le contenu
     if (document.getElementById('notifPanel')?.classList.contains('open')) {
       _notifItems = notifs;
+      const countEl = document.getElementById('notifCount');
+      if (countEl) countEl.textContent = notifs.length;
       _notifRenderList();
     }
-  } catch(e) {}
+  } catch(e) { console.warn('_notifPoll:', e); }
 }
 
 // ── SECTION NOTIFICATIONS DANS L'ADMIN ──
