@@ -2380,6 +2380,29 @@ if (typeof connexionPrestataire === 'undefined') {
     </div>
     <button id="i-btn1" onclick="(function(){var p=(document.getElementById('i-prenom')||{}).value||'';var n=(document.getElementById('i-nom')||{}).value||'';var t=(document.getElementById('i-tel')||{}).value||'';var pin=((document.getElementById('i-pin1')||{}).value||'')+((document.getElementById('i-pin2')||{}).value||'')+((document.getElementById('i-pin3')||{}).value||'')+((document.getElementById('i-pin4')||{}).value||'');var e=document.getElementById('i-err');if(!p.trim()||!n.trim()||!t.trim()){if(e){e.textContent='Remplissez tous les champs';e.style.display='block';}return;}if(pin.length<4){if(e){e.textContent='Entrez votre PIN 4 chiffres';e.style.display='block';}return;}if(e)e.style.display='none';document.getElementById('i-step1').style.display='none';document.getElementById('i-step2').style.display='block';})()" style="width:100%;padding:14px;background:#E85D04;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Suivant →</button>
   </div>
+  <div id="i-step-sms" style="display:none;">
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="width:52px;height:52px;border-radius:14px;background:#FDE8D8;display:inline-flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:10px;">📱</div>
+      <h3 style="font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:#1A1A4E;margin:0 0 6px;">Vérification SMS</h3>
+      <p style="font-size:12.5px;color:#6B7280;margin:0 0 3px;">Un code a été envoyé au</p>
+      <p id="i-sms-phone-display" style="font-size:14px;font-weight:700;color:#E85D04;margin:0;"></p>
+    </div>
+    <div id="i-sms-err" style="display:none;background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:10px;padding:10px 14px;font-size:13px;color:#DC2626;margin-bottom:14px;text-align:center;"></div>
+    <div style="display:flex;gap:7px;justify-content:center;margin-bottom:14px;">
+      <input id="i-sms-c1" type="text" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:11px;font-size:22px;font-weight:700;color:#1A1A4E;outline:none;box-sizing:border-box;"/>
+      <input id="i-sms-c2" type="text" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:11px;font-size:22px;font-weight:700;color:#1A1A4E;outline:none;box-sizing:border-box;"/>
+      <input id="i-sms-c3" type="text" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:11px;font-size:22px;font-weight:700;color:#1A1A4E;outline:none;box-sizing:border-box;"/>
+      <input id="i-sms-c4" type="text" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:11px;font-size:22px;font-weight:700;color:#1A1A4E;outline:none;box-sizing:border-box;"/>
+      <input id="i-sms-c5" type="text" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:11px;font-size:22px;font-weight:700;color:#1A1A4E;outline:none;box-sizing:border-box;"/>
+      <input id="i-sms-c6" type="text" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:11px;font-size:22px;font-weight:700;color:#1A1A4E;outline:none;box-sizing:border-box;"/>
+    </div>
+    <div style="text-align:center;margin-bottom:14px;font-size:12px;color:#9CA3AF;">Code valable <strong id="i-sms-countdown" style="color:#E85D04;">10:00</strong></div>
+    <button id="i-sms-verify" onclick="verifySmsCode()" style="width:100%;padding:14px;background:#E85D04;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">Vérifier le code</button>
+    <div style="display:flex;gap:10px;">
+      <button onclick="showStep1FromSms()" style="flex:1;padding:12px;background:#F4F6FB;border:none;border-radius:12px;color:#1A1A4E;font-size:13px;font-weight:700;cursor:pointer;">← Modifier</button>
+      <button id="i-sms-resend" onclick="resendSmsCode()" style="flex:1;padding:12px;background:#fff;border:1.5px solid #E85D04;border-radius:12px;color:#E85D04;font-size:13px;font-weight:700;cursor:pointer;">Renvoyer</button>
+    </div>
+  </div>
   <div id="i-step2" style="display:none;">
     <div id="i-err2" style="display:none;background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:10px;padding:10px 14px;font-size:13px;color:#DC2626;margin-bottom:14px;"></div>
     <div style="font-family:'Libre Baskerville',serif;font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E5E7EB;">Profil professionnel</div>
@@ -2471,7 +2494,7 @@ if (typeof connexionPrestataire === 'undefined') {
   function init() {
     // Bouton suivant étape 1
     var b1 = document.getElementById('i-btn1');
-    if (b1) b1.onclick = function() {
+    if (b1) b1.onclick = async function() {
       var prenom = (document.getElementById('i-prenom') || {}).value || '';
       var nom    = (document.getElementById('i-nom')    || {}).value || '';
       var tel    = (document.getElementById('i-tel')    || {}).value || '';
@@ -2481,7 +2504,11 @@ if (typeof connexionPrestataire === 'undefined') {
                 + ((document.getElementById('i-pin4')||{}).value||'');
       if (!prenom.trim() || !nom.trim() || !tel.trim()) { showErr('Remplissez tous les champs'); return; }
       if (pin.length < 4) { showErr('Entrez votre code PIN 4 chiffres'); return; }
-      goTo(2);
+      b1.disabled=true; b1.textContent='Envoi du SMS...'; hideErr();
+      var smsRes=await window._smsSend(tel);
+      if(!smsRes.success){showErr(smsRes.message||'Erreur SMS');b1.disabled=false;b1.textContent='Suivant →';return;}
+      b1.disabled=false; b1.textContent='Suivant →';
+      window._smsShowStep(tel);
     };
 
     // Bouton suivant étape 2
@@ -2603,12 +2630,16 @@ if (typeof inscrirePrestataire === 'undefined') {
   }
   function init(){
     var b1=document.getElementById('i-btn1'),b2=document.getElementById('i-btn2'),ba2=document.getElementById('i-back2'),b3=document.getElementById('i-submit'),ba3=document.getElementById('i-back3');
-    if(b1)b1.onclick=function(){
+    if(b1)b1.onclick=async function(){
       var p=(document.getElementById('i-prenom')||{}).value||'',n=(document.getElementById('i-nom')||{}).value||'',t=(document.getElementById('i-tel')||{}).value||'';
       var pin=(document.getElementById('i-pin1')||{}).value+(document.getElementById('i-pin2')||{}).value+(document.getElementById('i-pin3')||{}).value+(document.getElementById('i-pin4')||{}).value;
       if(!p.trim()||!n.trim()||!t.trim()){showErr('Remplissez tous les champs');return;}
       if(pin.length<4){showErr('Entrez votre code PIN 4 chiffres');return;}
-      goTo(2);
+      b1.disabled=true;b1.textContent='Envoi du SMS...';hideErr();
+      var smsRes=await window._smsSend(t);
+      if(!smsRes.success){showErr(smsRes.message||'Erreur SMS');b1.disabled=false;b1.textContent='Suivant →';return;}
+      b1.disabled=false;b1.textContent='Suivant →';
+      window._smsShowStep(t);
     };
     if(b2)b2.onclick=function(){
       var cat=(document.getElementById('i-cat')||{}).value||'',met=((document.getElementById('i-metier')||{}).value||'').trim(),desc=((document.getElementById('i-desc')||{}).value||'').trim();
@@ -2676,8 +2707,133 @@ if (typeof inscrirePrestataire === 'undefined') {
       }
     };
   }
+  window._insc_goTo=goTo;
   init();window.addEventListener('load',init);
   var _on=window.navigate;window.navigate=(function(_p){return function(p){if(typeof _realNavigate==='function')_realNavigate(p);else if(_p)_p(p);if(p==='inscription')setTimeout(init,100);};})(window.navigate);
+})();
+</script>
+
+<script>
+// === Vérification SMS Orange Guinea ===
+(function(){
+  var _smsCode='',_smsTimer=null;
+
+  function _norm(phone){
+    var p=phone.replace(/[\s\-\.]/g,'');
+    if(p.startsWith('00224'))p='+'+p.slice(2);
+    if(!p.startsWith('+')){
+      if(p.startsWith('224'))p='+'+p;
+      else p='+224'+p.replace(/^0/,'');
+    }
+    return p;
+  }
+
+  window._smsSend=async function(rawPhone){
+    var e164=_norm(rawPhone);
+    _smsCode=Math.floor(100000+Math.random()*900000).toString();
+    var exp=new Date(Date.now()+10*60*1000).toISOString();
+    var dbRes=await sb.from('verification_codes').insert([{phone:e164,code:_smsCode,expires_at:exp,used:false}]);
+    if(dbRes.error)return {success:false,message:'Erreur base de données: '+dbRes.error.message};
+    try{
+      var r=await fetch('/api/send-sms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:e164,code:_smsCode})});
+      var d=await r.json();
+      return r.ok?{success:true}:{success:false,message:d.error||'Erreur envoi SMS'};
+    }catch(err){return {success:false,message:'Erreur réseau: '+err.message};}
+  };
+
+  function _startTimer(){
+    var secs=600;clearInterval(_smsTimer);
+    _smsTimer=setInterval(function(){
+      secs--;
+      var cd=document.getElementById('i-sms-countdown');
+      if(cd)cd.textContent=Math.floor(secs/60)+':'+(secs%60<10?'0':'')+(secs%60);
+      if(secs<=0){
+        clearInterval(_smsTimer);
+        var e=document.getElementById('i-sms-err');
+        if(e){e.textContent='Code expiré. Cliquez sur Renvoyer.';e.style.display='block';}
+        var vb=document.getElementById('i-sms-verify');if(vb)vb.disabled=true;
+      }
+    },1000);
+  }
+
+  window._smsShowStep=function(rawPhone){
+    var e164=_norm(rawPhone);
+    [1,2,3].forEach(function(s){var el=document.getElementById('i-step'+s);if(el)el.style.display='none';});
+    var ss=document.getElementById('i-step-sms');if(ss)ss.style.display='block';
+    var pd=document.getElementById('i-sms-phone-display');if(pd)pd.textContent=e164;
+    var err=document.getElementById('i-sms-err');if(err)err.style.display='none';
+    var vb=document.getElementById('i-sms-verify');if(vb){vb.disabled=false;vb.textContent='Vérifier le code';}
+    var ids=['i-sms-c1','i-sms-c2','i-sms-c3','i-sms-c4','i-sms-c5','i-sms-c6'];
+    ids.forEach(function(id,i){
+      var el=document.getElementById(id);if(!el)return;
+      el.value='';
+      el.oninput=function(){this.value=this.value.replace(/[^0-9]/g,'').slice(0,1);if(this.value&&i<ids.length-1)document.getElementById(ids[i+1]).focus();};
+      el.onkeydown=function(e){if(e.key==='Backspace'&&!this.value&&i>0)document.getElementById(ids[i-1]).focus();};
+    });
+    _startTimer();
+    setTimeout(function(){var c=document.getElementById('i-sms-c1');if(c)c.focus();},100);
+  };
+
+  window.verifySmsCode=async function(){
+    var ids=['i-sms-c1','i-sms-c2','i-sms-c3','i-sms-c4','i-sms-c5','i-sms-c6'];
+    var entered=ids.map(function(id){return(document.getElementById(id)||{}).value||'';}).join('');
+    var err=document.getElementById('i-sms-err');
+    if(entered.length<6){if(err){err.textContent='Entrez le code complet à 6 chiffres';err.style.display='block';}return;}
+    var vb=document.getElementById('i-sms-verify');if(vb){vb.disabled=true;vb.textContent='Vérification...';}
+    var phone=((document.getElementById('i-sms-phone-display')||{}).textContent||'').trim();
+    var now=new Date().toISOString();
+    var chk=await sb.from('verification_codes').select('id').eq('phone',phone).eq('code',entered).eq('used',false).gte('expires_at',now).order('created_at',{ascending:false}).limit(1);
+    if(chk.error||!chk.data||!chk.data.length){
+      if(err){err.textContent='Code incorrect ou expiré. Réessayez.';err.style.display='block';}
+      if(vb){vb.disabled=false;vb.textContent='Vérifier le code';}
+      return;
+    }
+    await sb.from('verification_codes').update({used:true}).eq('id',chk.data[0].id);
+    clearInterval(_smsTimer);
+    var ss=document.getElementById('i-step-sms');if(ss)ss.style.display='none';
+    if(typeof window._insc_goTo==='function'){window._insc_goTo(2);}
+    else{
+      [1,2,3].forEach(function(s){var el=document.getElementById('i-step'+s);if(el)el.style.display=s===2?'block':'none';});
+      var base='width:30px;height:30px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;';
+      var d1=document.getElementById('i-dot-1');if(d1){d1.style.cssText='background:#16A34A;border-color:#16A34A;color:#fff;'+base;d1.innerHTML='<i class="fa-solid fa-check"></i>';}
+      var d2=document.getElementById('i-dot-2');if(d2){d2.style.cssText='background:#E85D04;border-color:#E85D04;color:#fff;'+base;d2.textContent='2';}
+      var d3=document.getElementById('i-dot-3');if(d3){d3.style.cssText='background:#fff;border-color:#E5E7EB;color:#6B7280;'+base;d3.textContent='3';}
+      var l1=document.getElementById('i-line-1');if(l1)l1.style.background='#16A34A';
+      var l2=document.getElementById('i-line-2');if(l2)l2.style.background='#E5E7EB';
+    }
+  };
+
+  window.resendSmsCode=async function(){
+    var rb=document.getElementById('i-sms-resend');if(rb){rb.disabled=true;rb.textContent='Envoi...';}
+    var err=document.getElementById('i-sms-err');if(err)err.style.display='none';
+    var phone=((document.getElementById('i-sms-phone-display')||{}).textContent||'').trim();
+    if(!phone){if(rb){rb.disabled=false;rb.textContent='Renvoyer';}return;}
+    _smsCode=Math.floor(100000+Math.random()*900000).toString();
+    var exp=new Date(Date.now()+10*60*1000).toISOString();
+    await sb.from('verification_codes').insert([{phone:phone,code:_smsCode,expires_at:exp,used:false}]);
+    try{
+      var r=await fetch('/api/send-sms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:phone,code:_smsCode})});
+      var d=await r.json();
+      if(r.ok){
+        _startTimer();
+        var vb=document.getElementById('i-sms-verify');if(vb)vb.disabled=false;
+        ['i-sms-c1','i-sms-c2','i-sms-c3','i-sms-c4','i-sms-c5','i-sms-c6'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+        if(err){
+          err.textContent='Nouveau code envoyé !';
+          err.style.cssText='display:block;background:rgba(22,163,74,.08);border:1.5px solid rgba(22,163,74,.2);border-radius:10px;padding:10px 14px;font-size:13px;color:#16A34A;margin-bottom:14px;text-align:center;';
+          setTimeout(function(){err.style.display='none';},3000);
+        }
+      }else{if(err){err.textContent=d.error||'Erreur envoi SMS';err.style.display='block';}}
+    }catch(ex){if(err){err.textContent='Erreur réseau';err.style.display='block';}}
+    if(rb){rb.disabled=false;rb.textContent='Renvoyer';}
+  };
+
+  window.showStep1FromSms=function(){
+    clearInterval(_smsTimer);
+    var ss=document.getElementById('i-step-sms');if(ss)ss.style.display='none';
+    if(typeof window._insc_goTo==='function'){window._insc_goTo(1);}
+    else{[1,2,3].forEach(function(s){var el=document.getElementById('i-step'+s);if(el)el.style.display=s===1?'block':'none';});}
+  };
 })();
 </script>
 </div>
@@ -9381,3 +9537,4 @@ window.loginSubmitHandler=loginSubmitHandler;
 </script>
 </body>
 </html>
+
