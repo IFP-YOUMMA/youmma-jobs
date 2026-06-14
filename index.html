@@ -1665,6 +1665,29 @@ async function verifierSession() {
   </div>
 </section>
 
+<section id="images-une" style="background:#0D0D2E;padding:48px 0;overflow:hidden;">
+  <div style="max-width:1320px;margin:0 auto;padding:0 5%;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#E85D04;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Actualités</div>
+        <h2 style="font-family:'Libre Baskerville',serif;font-size:clamp(20px,3vw,30px);font-weight:700;color:#fff;margin:0;">Images à la une</h2>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="realPrev()" id="realBtnPrev" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:16px;transition:.2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='rgba(232,93,4,.6)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">‹</button>
+        <button onclick="realNext()" id="realBtnNext" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:16px;transition:.2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='rgba(232,93,4,.6)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">›</button>
+      </div>
+    </div>
+    <div style="position:relative;overflow:hidden;">
+      <div id="realTrack" style="display:flex;gap:16px;transition:transform .5s cubic-bezier(.25,.46,.45,.94);will-change:transform;"></div>
+    </div>
+    <div id="realDots" style="display:flex;gap:6px;justify-content:center;margin-top:20px;"></div>
+    <div id="realEmpty" style="display:none;text-align:center;padding:40px 20px;">
+      <i class="fa-solid fa-photo-film" style="font-size:36px;color:rgba(255,255,255,.2);display:block;margin-bottom:10px;"></i>
+      <p style="color:rgba(255,255,255,.4);font-size:13px;">Aucune image à la une pour le moment</p>
+    </div>
+  </div>
+</section>
+
 <div class="search-section">
   <div class="search-container">
     <div class="search-box">
@@ -1892,40 +1915,6 @@ async function verifierSession() {
     </div>
   </div>
 </section>
-
-<section id="realisations" style="background:#0D0D2E;padding:60px 0;overflow:hidden;">
-  <div style="max-width:1320px;margin:0 auto;padding:0 5%;">
-    <!-- En-tête -->
-    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:16px;">
-      <div>
-        <div style="font-size:11px;font-weight:700;color:#E85D04;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Portfolio</div>
-        <h2 style="font-family:'Libre Baskerville',serif;font-size:clamp(22px,3.5vw,34px);font-weight:700;color:#fff;margin-bottom:8px;">Nos réalisations</h2>
-        <p style="font-size:14px;color:rgba(255,255,255,.55);max-width:380px;">Les travaux réalisés par nos artisans qualifiés à Conakry et en Guinée.</p>
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="realPrev()" id="realBtnPrev" style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:16px;transition:.2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='rgba(232,93,4,.6)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">‹</button>
-        <button onclick="realNext()" id="realBtnNext" style="width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:16px;transition:.2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='rgba(232,93,4,.6)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">›</button>
-      </div>
-    </div>
-
-    <!-- Carousel track -->
-    <div style="position:relative;overflow:hidden;">
-      <div id="realTrack" style="display:flex;gap:16px;transition:transform .5s cubic-bezier(.25,.46,.45,.94);will-change:transform;">
-        <!-- Cartes injectées par JS -->
-      </div>
-    </div>
-
-    <!-- Dots -->
-    <div id="realDots" style="display:flex;gap:6px;justify-content:center;margin-top:24px;"></div>
-
-    <!-- État vide -->
-    <div id="realEmpty" style="display:none;text-align:center;padding:60px 20px;">
-      <i class="fa-solid fa-images" style="font-size:40px;color:rgba(255,255,255,.2);display:block;margin-bottom:12px;"></i>
-      <p style="color:rgba(255,255,255,.4);font-size:14px;">Les réalisations seront bientôt disponibles</p>
-    </div>
-  </div>
-</section>
-
 
 <section class="temo-bg" id="temoignages">
   <div class="temo-inner">
