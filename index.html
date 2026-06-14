@@ -7281,7 +7281,7 @@ function showAdmin(name) {
   });
   if (name==='codes') { if(typeof loadCodes==='function') loadCodes(); }
   else if (name==='realisations') { if(typeof renderAdminRealisations==='function') renderAdminRealisations(); }
-  else if (name==='missions') { chargerMissionsAdmin(); }
+  else if (name==='missions') { renderAdminMissions(); }
   else if (name!=='dashboard') { if(typeof _adminLoadAll==='function') _adminLoadAll(); }
 }
 
@@ -9332,19 +9332,37 @@ async function renderAdminMissions() {
 
   try {
     const filtreStatut = document.getElementById('missFilterStatut')?.value || '';
-    
-    let query = sb.from('missions')
-      .select('id,titre,description,statut,montant,created_at,updated_at,client_nom,client_tel,provider_id,categorie,ville,note,avis')
-      .order('created_at', { ascending: false })
-      .limit(100);
-    
-    if (filtreStatut) query = query.eq('statut', filtreStatut);
-    
-    const { data, error } = await query;
-    
+    const COLS = 'id,titre,description,statut,montant,created_at,updated_at,client_nom,client_tel,provider_id,categorie,ville,note,avis';
+
+    const buildQuery = (cols) => {
+      let q = sb.from('missions').select(cols).order('created_at', { ascending: false }).limit(100);
+      if (filtreStatut) q = q.eq('statut', filtreStatut);
+      return q;
+    };
+
+    // 1ère tentative : colonnes complètes
+    let { data, error } = await buildQuery(COLS);
+
+    // Fallback : certaines colonnes absentes → select *
+    if (error && (error.code === '42703' || (error.message||'').includes('column'))) {
+      console.warn('renderAdminMissions colonnes:', error.message, '→ fallback select *');
+      ({ data, error } = await buildQuery('*'));
+    }
+
     if (error || !data) {
-      // Table missions peut ne pas exister encore
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;"><div style="background:#FFFBEB;border-radius:12px;padding:20px;display:inline-block;"><div style="font-size:20px;margin-bottom:8px;">📋</div><div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">Système de missions</div><div style="font-size:13px;color:#6B7280;margin-bottom:16px;">La table missions doit etre creee dans Supabase.</div><div style="font-size:11px;background:#F4F6FB;border-radius:8px;padding:10px;color:#374151;text-align:left;font-family:monospace;">CREATE TABLE missions (<br>&nbsp;&nbsp;id uuid DEFAULT gen_random_uuid() PRIMARY KEY,<br>&nbsp;&nbsp;titre TEXT,<br>&nbsp;&nbsp;description TEXT,<br>&nbsp;&nbsp;statut TEXT DEFAULT &#39;en_attente&#39;,<br>&nbsp;&nbsp;montant NUMERIC,<br>&nbsp;&nbsp;client_nom TEXT,<br>&nbsp;&nbsp;client_tel TEXT,<br>&nbsp;&nbsp;provider_id uuid REFERENCES providers(id),<br>&nbsp;&nbsp;categorie TEXT,<br>&nbsp;&nbsp;ville TEXT,<br>&nbsp;&nbsp;note INT,<br>&nbsp;&nbsp;avis TEXT,<br>&nbsp;&nbsp;created_at TIMESTAMPTZ DEFAULT now(),<br>&nbsp;&nbsp;updated_at TIMESTAMPTZ DEFAULT now()<br>);</div></div></td></tr>';
+      console.error('renderAdminMissions error:', error);
+      // Distinguer table manquante (42P01) vs RLS (42501/PGRST) vs autre
+      const isTableMissing = error?.code === '42P01' || (error?.message||'').toLowerCase().includes('does not exist');
+      const isRLS = error?.code === '42501' || (error?.message||'').toLowerCase().includes('permission') || (error?.message||'').toLowerCase().includes('policy');
+
+      if (isTableMissing) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;"><div style="background:#FFFBEB;border-radius:12px;padding:20px;display:inline-block;"><div style="font-size:20px;margin-bottom:8px;">📋</div><div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">Table missions manquante</div><div style="font-size:13px;color:#6B7280;margin-bottom:16px;">Créez la table dans Supabase SQL Editor :</div><div style="font-size:11px;background:#F4F6FB;border-radius:8px;padding:10px;color:#374151;text-align:left;font-family:monospace;">CREATE TABLE missions (<br>&nbsp;&nbsp;id uuid DEFAULT gen_random_uuid() PRIMARY KEY,<br>&nbsp;&nbsp;titre TEXT,<br>&nbsp;&nbsp;description TEXT,<br>&nbsp;&nbsp;statut TEXT DEFAULT 'en_attente',<br>&nbsp;&nbsp;montant NUMERIC,<br>&nbsp;&nbsp;client_nom TEXT,<br>&nbsp;&nbsp;client_tel TEXT,<br>&nbsp;&nbsp;provider_id uuid REFERENCES providers(id),<br>&nbsp;&nbsp;categorie TEXT,<br>&nbsp;&nbsp;ville TEXT,<br>&nbsp;&nbsp;note INT,<br>&nbsp;&nbsp;avis TEXT,<br>&nbsp;&nbsp;created_at TIMESTAMPTZ DEFAULT now(),<br>&nbsp;&nbsp;updated_at TIMESTAMPTZ DEFAULT now()<br>);<br>ALTER TABLE missions DISABLE ROW LEVEL SECURITY;</div></div></td></tr>`;
+      } else if (isRLS) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;"><div style="background:#FEF2F2;border-radius:12px;padding:24px;display:inline-block;max-width:520px;"><div style="font-size:20px;margin-bottom:8px;">🔒</div><div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:8px;">RLS bloque l'accès aux missions</div><div style="font-size:13px;color:#6B7280;margin-bottom:14px;">Row Level Security empêche la lecture. Exécutez dans Supabase SQL Editor :</div><div style="font-size:12px;background:#F4F6FB;border-radius:8px;padding:12px;color:#374151;text-align:left;font-family:monospace;font-weight:700;">ALTER TABLE missions DISABLE ROW LEVEL SECURITY;</div></div></td></tr>`;
+      } else {
+        const errMsg = error?.message || 'Erreur inconnue';
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;"><div style="background:#FEF2F2;border-radius:12px;padding:20px;display:inline-block;max-width:500px;"><div style="font-size:20px;margin-bottom:8px;">⚠️</div><div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:8px;">Erreur lors du chargement</div><div style="font-size:12px;color:#DC2626;font-family:monospace;background:#fff;padding:10px;border-radius:8px;border:1px solid #FECACA;">${errMsg}</div><div style="font-size:12px;color:#9CA3AF;margin-top:10px;">Code: ${error?.code||'—'}</div></div></td></tr>`;
+      }
       return;
     }
     
