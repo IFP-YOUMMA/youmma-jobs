@@ -7375,6 +7375,7 @@ function navigate(page) {
     if (mc) mc.style.cssText = 'display:block!important;';
     if (mn) mn.style.cssText = '';
     window.scrollTo(0,0);
+    if (typeof _expInit === 'function') setTimeout(_expInit, 50);
   } else if (page === 'admin') {
     document.body.classList.add('on-admin','admin-mode');
     if (mc) mc.style.cssText = 'display:none!important';
@@ -10199,7 +10200,12 @@ async function _expInit() {
   }
 }
 
-window.addEventListener('load', _expInit);
+// load déjà déclenché quand ce script s'exécute → appel direct
+if (document.readyState === 'complete') {
+  _expInit();
+} else {
+  window.addEventListener('load', _expInit);
+}
 
 // ══════════════════════════════════════════════════════════════════
 // CAROUSEL IMAGES À LA UNE — Admin (table carousel_images)
