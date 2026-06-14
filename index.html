@@ -981,7 +981,9 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
 /* ══ DASHBOARD LAYOUT PAR CLASSE JS — PRIORITÉ ABSOLUE ══ */
 
 /* Desktop : sidebar visible à gauche */
-/* ══ DASHBOARD LAYOUT FLEXBOX — OVERRIDE DÉFINITIF ══ */
+/* ══ DASHBOARD LAYOUT — FLEXBOX DESKTOP + DRAWER MOBILE ══ */
+
+/* Desktop ≥ 769px : côte à côte */
 #page-dashboard .dash-layout{
   display:flex!important;
   flex-direction:row!important;
@@ -989,7 +991,6 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
   min-height:100vh!important;
   position:relative!important;
   width:100%!important;
-  overflow:hidden!important;
 }
 #page-dashboard .sidebar{
   position:relative!important;
@@ -999,9 +1000,11 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
   height:auto!important;
   min-height:100vh!important;
   transform:none!important;
+  transition:none!important;
   z-index:10!important;
   display:flex!important;
   flex-direction:column!important;
+  overflow-y:auto!important;
 }
 #page-dashboard .main{
   flex:1!important;
@@ -1015,20 +1018,36 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
   display:block!important;
 }
 #page-dashboard .dash-hamburger{display:none!important;}
+
+/* Mobile ≤ 768px : drawer glissant */
 @media(max-width:768px){
   #page-dashboard .dash-layout{
-    flex-direction:column!important;
+    display:block!important;
+    position:relative!important;
   }
   #page-dashboard .sidebar{
-    width:100%!important;
+    position:fixed!important;
+    top:0!important;left:0!important;
+    width:min(280px,85vw)!important;
     min-width:0!important;
-    height:auto!important;
-    min-height:auto!important;
-    flex-shrink:1!important;
+    height:100vh!important;
+    min-height:100vh!important;
+    transform:translateX(-100%)!important;
+    transition:transform .3s ease!important;
+    z-index:9999!important;
+    overflow-y:auto!important;
+  }
+  #page-dashboard .sidebar.open{
+    transform:translateX(0)!important;
   }
   #page-dashboard .main{
+    margin-left:0!important;
     width:100%!important;
-    min-height:50vh!important;
+    min-width:0!important;
+    min-height:100vh!important;
+  }
+  #page-dashboard .dash-hamburger{
+    display:flex!important;
   }
 }
 </style>
@@ -6863,9 +6882,15 @@ window._realNavigate = navigate;
 
 /* ── DASHBOARD LAYOUT JS — surclasse tout le CSS ── */
 function applyDashboardLayout() {
-  // Le layout est géré par CSS flexbox — pas de classes JS nécessaires
-  const overlay = document.getElementById('dashSidebarOverlay');
-  if (overlay) overlay.remove();
+  const pg = document.getElementById('page-dashboard');
+  if (!pg) return;
+  // Sur desktop : fermer le drawer mobile s'il était ouvert
+  if (window.innerWidth > 768) {
+    const sidebar = pg.querySelector('.sidebar');
+    if (sidebar) { sidebar.classList.remove('open'); sidebar.style.transform = ''; }
+    const overlay = document.getElementById('dashSidebarOverlay');
+    if (overlay) overlay.remove();
+  }
 }
 
 // Appliquer au redimensionnement
