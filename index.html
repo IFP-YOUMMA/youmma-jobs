@@ -978,34 +978,53 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
   pointer-events:none!important;
 }
 
-/* ── DASHBOARD PRESTATAIRE — DRAWER DÉFINITIF (≤1024px) ── */
-@media(max-width:1024px){
-  /* Sidebar : TOUJOURS cachée hors écran sur mobile+tablette */
-  #page-dashboard .dash-layout{
-    display:block!important;
-  }
-  #page-dashboard .sidebar{
-    position:fixed!important;
-    top:0!important;
-    left:0!important;
-    width:min(280px,85vw)!important;
-    height:100vh!important;
-    transform:translateX(-100%)!important;
-    transition:transform .3s ease!important;
-    z-index:9999!important;
-    overflow-y:auto!important;
-  }
-  #page-dashboard .sidebar.open{
-    transform:translateX(0)!important;
-  }
-  #page-dashboard .main{
-    margin-left:0!important;
-    width:100%!important;
-    min-height:100vh!important;
-  }
-  .dash-hamburger{
-    display:flex!important;
-  }
+/* ══ DASHBOARD LAYOUT PAR CLASSE JS — PRIORITÉ ABSOLUE ══ */
+
+/* Desktop : sidebar visible à gauche */
+#page-dashboard.dash-desktop .sidebar{
+  transform:none!important;
+  position:fixed!important;
+  top:0!important;left:0!important;
+  width:220px!important;
+  height:100vh!important;
+  z-index:200!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+#page-dashboard.dash-desktop .main{
+  margin-left:220px!important;
+  width:calc(100vw - 220px)!important;
+  min-height:100vh!important;
+  display:block!important;
+}
+#page-dashboard.dash-desktop .dash-hamburger{
+  display:none!important;
+}
+
+/* Mobile/Tablette : drawer caché par défaut */
+#page-dashboard.dash-mobile .sidebar{
+  transform:translateX(-100%)!important;
+  position:fixed!important;
+  top:0!important;left:0!important;
+  width:min(280px,85vw)!important;
+  height:100vh!important;
+  z-index:9999!important;
+  transition:transform .3s ease!important;
+  overflow-y:auto!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+#page-dashboard.dash-mobile .sidebar.open{
+  transform:translateX(0)!important;
+}
+#page-dashboard.dash-mobile .main{
+  margin-left:0!important;
+  width:100%!important;
+  min-height:100vh!important;
+  display:block!important;
+}
+#page-dashboard.dash-mobile .dash-hamburger{
+  display:flex!important;
 }
 </style>
 </head>
@@ -6666,8 +6685,10 @@ function navigate(page) {
     }
     if (page === 'dashboard') {
       document.body.classList.add('on-dashboard');
-      // Reset sidebar état à chaque navigation vers dashboard
-      setTimeout(applyDashboardLayout, 0);
+      // Appliquer le layout immédiatement + après rendu
+      applyDashboardLayout();
+      setTimeout(applyDashboardLayout, 50);
+      setTimeout(applyDashboardLayout, 200);
     }
     window.scrollTo(0,0);
   }
@@ -6676,26 +6697,21 @@ window._realNavigate = navigate;
 
 /* ── DASHBOARD LAYOUT JS — surclasse tout le CSS ── */
 function applyDashboardLayout() {
-  const sidebar = document.querySelector('#page-dashboard .sidebar');
-  const main = document.querySelector('#page-dashboard .main');
-  const hamburger = document.querySelector('.dash-hamburger');
-  if (!sidebar || !main) return;
+  const pg = document.getElementById('page-dashboard');
+  if (!pg) return;
 
-  // Fermer le sidebar drawer s'il était ouvert
-  sidebar.classList.remove('open');
+  // Fermer le sidebar drawer si ouvert
+  const sidebar = pg.querySelector('.sidebar');
+  if (sidebar) sidebar.classList.remove('open');
   const overlay = document.getElementById('dashSidebarOverlay');
   if (overlay) overlay.remove();
 
+  // Appliquer la classe selon la largeur d'écran
+  pg.classList.remove('dash-desktop','dash-mobile');
   if (window.innerWidth > 1024) {
-    // DESKTOP : sidebar visible en permanence
-    sidebar.style.cssText = 'transform:none;position:fixed;top:0;left:0;width:220px;height:100vh;z-index:200;display:flex;flex-direction:column;';
-    main.style.cssText = 'margin-left:220px;width:calc(100vw - 220px);min-height:100vh;';
-    if (hamburger) hamburger.style.cssText = 'display:none;';
+    pg.classList.add('dash-desktop');
   } else {
-    // MOBILE/TABLETTE : drawer caché par défaut
-    sidebar.style.cssText = 'transform:translateX(-100%);position:fixed;top:0;left:0;width:min(280px,85vw);height:100vh;z-index:9999;transition:transform .3s ease;overflow-y:auto;';
-    main.style.cssText = 'margin-left:0;width:100%;min-height:100vh;';
-    if (hamburger) hamburger.style.cssText = 'display:flex;flex-shrink:0;';
+    pg.classList.add('dash-mobile');
   }
 }
 
