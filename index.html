@@ -1558,8 +1558,8 @@ async function verifierSession() {
       
       
       <div id="expWrap" style="position:relative;border-radius:16px;overflow:hidden;margin-bottom:28px;height:260px;">
-        <div id="expSlides" style="position:absolute;inset:0;display:flex;transition:transform .8s cubic-bezier(.4,0,.2,1);">
-          <div style="min-width:100%;height:100%;background:linear-gradient(135deg,#1A0A4E,#2D2D6B);flex-shrink:0;"></div>
+        <div id="expSlides" style="position:absolute;inset:0;">
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1A0A4E,#2D2D6B);opacity:1;"></div>
         </div>
         <div style="position:absolute;inset:0;background:rgba(5,5,20,.52);z-index:1;"></div>
         <div style="position:absolute;inset:0;z-index:2;pointer-events:none;">
@@ -10135,8 +10135,16 @@ var _expIdx = 0, _expTimer = null, _expCount = 1;
 function _expGo(n) {
   _expCount = Math.max(1, _expCount);
   _expIdx = ((n % _expCount) + _expCount) % _expCount;
-  var s = document.getElementById('expSlides');
-  if (s) s.style.transform = 'translateX(-' + (_expIdx * 100) + '%)';
+  // Fade: affiche le slide actif, cache les autres
+  var slideEls = document.querySelectorAll('#expSlides ._exp-slide');
+  slideEls.forEach(function(el, i) {
+    el.style.opacity = (i === _expIdx) ? '1' : '0';
+    // Lazy-load : ne set background-image que quand le slide devient visible
+    if (i === _expIdx && el.dataset.url && !el.style.backgroundImage) {
+      el.style.backgroundImage = "url('" + el.dataset.url + "')";
+    }
+  });
+  // Dots
   for (var i = 0; i < _expCount; i++) {
     var d = document.getElementById('exd' + i);
     if (d) {
@@ -10170,15 +10178,20 @@ var _expFallback = [
 function _expApply(images) {
   var slides = document.getElementById('expSlides');
   if (!slides) return;
+  var baseStyle = 'position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;transition:opacity 1s ease;';
   if (images && images.length) {
-    slides.innerHTML = images.map(function(img) {
+    slides.innerHTML = images.map(function(img, i) {
       var url = (img.url || img).replace(/'/g, '%27');
-      return '<div style="min-width:100%;height:100%;flex-shrink:0;background-image:url(\'' + url + '\');background-size:cover;background-position:center;background-repeat:no-repeat;"></div>';
+      // Première image chargée immédiatement ; les autres en lazy-load via data-url
+      if (i === 0) {
+        return '<div class="_exp-slide" style="' + baseStyle + 'background-image:url(\'' + url + '\');opacity:1;"></div>';
+      }
+      return '<div class="_exp-slide" data-url="' + url + '" style="' + baseStyle + 'opacity:0;"></div>';
     }).join('');
     _expCount = images.length;
   } else {
-    slides.innerHTML = _expFallback.map(function(g) {
-      return '<div style="min-width:100%;height:100%;background:' + g + ';flex-shrink:0;"></div>';
+    slides.innerHTML = _expFallback.map(function(g, i) {
+      return '<div class="_exp-slide" style="' + baseStyle + 'background:' + g + ';opacity:' + (i===0?'1':'0') + ';"></div>';
     }).join('');
     _expCount = _expFallback.length;
   }
@@ -10186,7 +10199,7 @@ function _expApply(images) {
   _expBuildDots(_expCount);
   _expGo(0);
   clearInterval(_expTimer);
-  _expTimer = setInterval(function() { _expGo(_expIdx + 1); }, 7000);
+  _expTimer = setInterval(function() { _expGo(_expIdx + 1); }, 5000);
 }
 
 async function _expInit() {
