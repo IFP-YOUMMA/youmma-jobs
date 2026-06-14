@@ -1228,7 +1228,7 @@ function filterProviders() {
       || dispoFilter === 'all';
 
     const mchip = activeFilter === 'all' ? true
-      : activeFilter === 'express' ? p.badge_express
+      : activeFilter === 'express' ? (p.dispo === 'express' || p.badge_express)
       : activeFilter === 'verifie' ? p.badge_verifie
       : activeFilter === 'top' ? p.badge_top
       : activeFilter === 'recommande' ? p.recommande
@@ -1557,10 +1557,30 @@ async function verifierSession() {
       <p class="hero-subtitle">Trouvez rapidement le bon artisan pour tous vos projets — électriciens, plombiers, maçons, soudeurs, menuisiers, mécaniciens et bien plus.</p>
       
       
+      <!-- Services Express rapides -->
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;">
+          <span style="font-size:13px;font-weight:800;color:#FF8A50;letter-spacing:.03em;">⚡ Services Express</span>
+          <span style="font-size:10px;color:rgba(255,255,255,.4);font-style:italic;">Disponibles maintenant</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;">
+          <button onclick="filterByExpressService('électricien')" style="background:rgba(232,93,4,.18);border:1.5px solid rgba(232,93,4,.45);color:#FF8A50;font-size:11px;font-weight:700;padding:5px 11px;border-radius:50px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(232,93,4,.32)'" onmouseout="this.style.background='rgba(232,93,4,.18)'">⚡ Électricien</button>
+          <button onclick="filterByExpressService('plombier')" style="background:rgba(232,93,4,.18);border:1.5px solid rgba(232,93,4,.45);color:#FF8A50;font-size:11px;font-weight:700;padding:5px 11px;border-radius:50px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(232,93,4,.32)'" onmouseout="this.style.background='rgba(232,93,4,.18)'">🚰 Plombier</button>
+          <button onclick="filterByExpressService('serrurier')" style="background:rgba(232,93,4,.18);border:1.5px solid rgba(232,93,4,.45);color:#FF8A50;font-size:11px;font-weight:700;padding:5px 11px;border-radius:50px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(232,93,4,.32)'" onmouseout="this.style.background='rgba(232,93,4,.18)'">🔑 Serrurier</button>
+          <button onclick="filterByExpressService('mécanicien')" style="background:rgba(232,93,4,.18);border:1.5px solid rgba(232,93,4,.45);color:#FF8A50;font-size:11px;font-weight:700;padding:5px 11px;border-radius:50px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(232,93,4,.32)'" onmouseout="this.style.background='rgba(232,93,4,.18)'">🚗 Mécanicien</button>
+          <button onclick="filterByExpressService('livraison')" style="background:rgba(232,93,4,.18);border:1.5px solid rgba(232,93,4,.45);color:#FF8A50;font-size:11px;font-weight:700;padding:5px 11px;border-radius:50px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(232,93,4,.32)'" onmouseout="this.style.background='rgba(232,93,4,.18)'">🚚 Livraison</button>
+          <button onclick="filterByExpressService('cuisinier')" style="background:rgba(232,93,4,.18);border:1.5px solid rgba(232,93,4,.45);color:#FF8A50;font-size:11px;font-weight:700;padding:5px 11px;border-radius:50px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(232,93,4,.32)'" onmouseout="this.style.background='rgba(232,93,4,.18)'">🍽️ Cuisinier</button>
+          <button onclick="filterByExpressService('ménage')" style="background:rgba(232,93,4,.18);border:1.5px solid rgba(232,93,4,.45);color:#FF8A50;font-size:11px;font-weight:700;padding:5px 11px;border-radius:50px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(232,93,4,.32)'" onmouseout="this.style.background='rgba(232,93,4,.18)'">🏠 Femme de ménage</button>
+          <button onclick="filterByExpressService('climatiseur')" style="background:rgba(232,93,4,.18);border:1.5px solid rgba(232,93,4,.45);color:#FF8A50;font-size:11px;font-weight:700;padding:5px 11px;border-radius:50px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(232,93,4,.32)'" onmouseout="this.style.background='rgba(232,93,4,.18)'">❄️ Clim</button>
+          <button onclick="filterByExpressService('réfrigérateur')" style="background:rgba(232,93,4,.18);border:1.5px solid rgba(232,93,4,.45);color:#FF8A50;font-size:11px;font-weight:700;padding:5px 11px;border-radius:50px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(232,93,4,.32)'" onmouseout="this.style.background='rgba(232,93,4,.18)'">🧊 Frigo</button>
+          <button onclick="filterByExpressService('informatique')" style="background:rgba(232,93,4,.18);border:1.5px solid rgba(232,93,4,.45);color:#FF8A50;font-size:11px;font-weight:700;padding:5px 11px;border-radius:50px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(232,93,4,.32)'" onmouseout="this.style.background='rgba(232,93,4,.18)'">💻 Informatique</button>
+        </div>
+      </div>
+
       <!-- Section titre À la Une -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <div style="font-family:'Libre Baskerville',serif;font-size:17px;font-weight:700;color:#fff;">🌟 À la Une</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.45);font-style:italic;">Espaces publicitaires gérés par YOUMMA JOBS</div>
+        <div style="font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:#fff;">🌟 À la Une</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);font-style:italic;">Espaces publicitaires</div>
       </div>
 
       <div id="expWrap" style="position:relative;border-radius:20px;overflow:hidden;margin-bottom:28px;height:280px;box-shadow:0 8px 32px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.3);">
@@ -1589,6 +1609,12 @@ async function verifierSession() {
         </button>
         <!-- Dots navigation -->
         <div id="expDots" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:4;display:flex;gap:6px;align-items:center;"></div>
+        <!-- Ticker artisans express -->
+        <div id="expTicker" onclick="filterByExpress();document.getElementById('prestataires').scrollIntoView({behavior:'smooth'});" style="position:absolute;bottom:55px;left:16px;z-index:3;max-width:calc(100% - 130px);cursor:pointer;pointer-events:auto;">
+          <div id="expTickerText" style="display:inline-flex;align-items:center;gap:6px;background:rgba(10,10,30,.72);backdrop-filter:blur(6px);border:1px solid rgba(232,93,4,.35);border-radius:20px;padding:5px 12px;transition:opacity .5s ease;">
+            <span style="color:#E85D04;font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;">⚡ Artisans disponibles pour intervention rapide</span>
+          </div>
+        </div>
       </div>
       <div class="hero-actions">
         <button class="btn-hero-main" onclick="document.getElementById('artisans').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-magnifying-glass"></i> Trouver un artisan</button>
@@ -1727,7 +1753,7 @@ async function verifierSession() {
     <div class="search-filters-row">
       <div class="search-filters">
         <button class="filter-chip active" id="chip-all" onclick="setActiveFilter('all')">Tous</button>
-        <button class="filter-chip express-chip" id="chip-express" onclick="setActiveFilter('express')"> Express</button>
+        <button class="filter-chip express-chip" id="chip-express" onclick="setActiveFilter('express')">⚡ Intervention rapide</button>
         <button class="filter-chip" id="chip-verifie" onclick="setActiveFilter('verifie')"><i class="fa-solid fa-check"></i> Vérifiés</button>
         <button class="filter-chip top-chip" id="chip-top" onclick="setActiveFilter('top')"><i class="fa-solid fa-trophy" style="color:#F5C842;"></i> Top Artisans</button>
         <button class="filter-chip" id="chip-recommande" onclick="setActiveFilter('recommande')">👍 Recommandés</button>
@@ -1757,14 +1783,6 @@ async function verifierSession() {
       
       <select id="filterCat" onchange="filterProviders()" style="padding:10px 16px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;color:#1A1A4E;background:#fff;cursor:pointer;outline:none;">
         <option value="">Toutes les catégories</option>
-        <option>Artisans</option>
-        <option>Santé &amp; Beauté</option>
-        <option>Construction &amp; BTP</option>
-        <option>IT &amp; Digital</option>
-        <option>Éducation</option>
-        <option>Transport</option>
-        <option>Services Express</option>
-        <option>Aide à domicile</option>
       </select>
     </div>
 
@@ -2532,14 +2550,16 @@ if (typeof connexionPrestataire === 'undefined') {
     <div id="i-err2" style="display:none;background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.2);border-radius:10px;padding:10px 14px;font-size:13px;color:#DC2626;margin-bottom:14px;"></div>
     <div style="font-family:'Libre Baskerville',serif;font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;padding-bottom:8px;border-bottom:1.5px solid #E5E7EB;">Profil professionnel</div>
     <div style="margin-bottom:12px;"><label style="display:block;font-size:11.5px;font-weight:700;color:#0F1020;margin-bottom:5px;">Catégorie *</label>
-      <select id="i-cat" style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;background:#fff;">
+      <select id="i-cat" style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;background:#fff;" onchange="_inscrUpdateSousCat(this.value)">
         <option value="">Choisir votre catégorie</option>
-        <option>Artisans</option><option>Santé &amp; Beauté</option><option>Construction &amp; BTP</option>
-        <option>IT &amp; Digital</option><option>Éducation</option><option>Transport</option>
-        <option>Juridique</option><option>Services Express</option><option>Aide à domicile</option><option>Autre</option>
       </select>
     </div>
-    <div style="margin-bottom:12px;"><label style="display:block;font-size:11.5px;font-weight:700;color:#0F1020;margin-bottom:5px;">Métier *</label><input id="i-metier" type="text" placeholder="Ex: Électricien certifié..." style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;box-sizing:border-box;"/></div>
+    <div id="i-sous-cat-wrap" style="margin-bottom:12px;display:none;"><label style="display:block;font-size:11.5px;font-weight:700;color:#0F1020;margin-bottom:5px;">Spécialité</label>
+      <select id="i-sous-cat" style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;background:#fff;" onchange="if(this.value){var m=document.getElementById('i-metier');if(m&&!m.value)m.value=this.value;}">
+        <option value="">Choisir une spécialité</option>
+      </select>
+    </div>
+    <div style="margin-bottom:12px;"><label style="display:block;font-size:11.5px;font-weight:700;color:#0F1020;margin-bottom:5px;">Métier / Titre professionnel *</label><input id="i-metier" type="text" placeholder="Ex: Électricien certifié..." style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;box-sizing:border-box;"/></div>
     <div style="margin-bottom:20px;"><label style="display:block;font-size:11.5px;font-weight:700;color:#0F1020;margin-bottom:5px;">Description *</label><textarea id="i-desc" placeholder="Décrivez vos services..." style="width:100%;padding:11px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;min-height:80px;resize:vertical;box-sizing:border-box;"></textarea></div>
     <div style="display:flex;gap:10px;">
       <button id="i-back2" onclick="document.getElementById('i-step2').style.display='none';document.getElementById('i-step1').style.display='block';" style="flex:1;padding:13px;background:#F4F6FB;border:none;border-radius:12px;color:#1A1A4E;font-size:13.5px;font-weight:700;cursor:pointer;">← Retour</button>
@@ -3482,7 +3502,8 @@ function renderArtisans() {
       p.badge_verifie ? `<span class="badge-verifie"><i class="fa-solid fa-check"></i> Vérifié</span>` : '',
       p.recommande    ? `<span class="badge-recommande">👍 Recommandé</span>` : '',
     ].filter(Boolean).join('');
-    const isOccupe = p.dispo === 'Occupé';
+    const isOccupe  = p.dispo === 'Occupé';
+    const isExpress = p.dispo === 'express';
     const dispoClass = isOccupe ? 'led-red' : 'led-green';
     const missionsBadge = p.missions ? `<span class="badge-missions"><i class="fa-solid fa-bullseye"></i> ${p.missions} missions</span>` : '';
 
@@ -3511,7 +3532,10 @@ function renderArtisans() {
           ${p.experience ? `<span class="ac2-exp">${p.experience} ans</span>` : ''}
           ${missionsBadge}
         </div>
-        ${p.dispo ? `<div class="ac2-dispo"><span class="dispo-led ${dispoClass}"></span><span style="font-size:12px;">${isOccupe ? 'Je suis Occupé(e)' : 'Je suis Disponible'}</span></div>` : ''}
+        ${p.dispo ? (isExpress
+          ? `<div class="ac2-dispo"><span style="font-size:11px;font-weight:800;color:#E85D04;background:rgba(232,93,4,.12);padding:2px 8px;border-radius:20px;border:1px solid rgba(232,93,4,.3);">⚡ Prêt à intervenir</span></div>`
+          : `<div class="ac2-dispo"><span class="dispo-led ${dispoClass}"></span><span style="font-size:12px;">${isOccupe ? 'Je suis Occupé(e)' : 'Je suis Disponible'}</span></div>`
+        ) : ''}
         <div class="ac2-skills">${(p.skills||[]).slice(0,3).map(s=>`<span class="ac2-skill">${s}</span>`).join('')}</div>
         ${p.tarif ? `<div class="ac2-tarif">💰 ${p.tarif}</div>` : ''}
         <div class="ac2-portfolio-preview">${portIcons}</div>
@@ -3552,7 +3576,8 @@ function renderProviders() {
     const typeCompteBadge = isEntreprise
       ? `<span style="font-size:9px;font-weight:700;color:#fff;background:#E85D04;padding:2px 6px;border-radius:10px;white-space:nowrap;">🏢 Entreprise</span>`
       : `<span style="font-size:9px;font-weight:700;color:#6B7280;background:#F3F4F6;padding:2px 6px;border-radius:10px;white-space:nowrap;">👤 Particulier</span>`;
-    const isOccupe = p.dispo === 'Occupé';
+    const isOccupe  = p.dispo === 'Occupé';
+    const isExpress = p.dispo === 'express';
     const dispoClass = isOccupe ? 'led-red' : 'led-green';
 
     return `
@@ -3600,13 +3625,18 @@ function renderProviders() {
             </div>
           </div>
           
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding:5px 8px;background:var(--fond2);border-radius:8px;">
-            <span style="font-size:11px;color:var(--gris);">Disponibilité</span>
-            <span style="display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:${dispoClass==='led-green'?'#16A34A':'#DC2626'};">
-              <span style="width:8px;height:8px;border-radius:50%;background:${dispoClass==='led-green'?'#22C55E':'#EF4444'};display:inline-block;animation:${dispoClass==='led-green'?'pulse-green':'pulse-red'} 1.5s infinite;flex-shrink:0;"></span>
-              ${isOccupe ? 'Je suis Occupé(e)' : 'Je suis Disponible'}
-            </span>
-          </div>
+          ${isExpress
+            ? `<div style="display:flex;align-items:center;justify-content:center;margin-top:6px;padding:6px 8px;background:rgba(232,93,4,.08);border-radius:8px;border:1.5px solid rgba(232,93,4,.25);">
+                <span style="font-size:11.5px;font-weight:800;color:#E85D04;">⚡ Prêt à intervenir</span>
+               </div>`
+            : `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding:5px 8px;background:var(--fond2);border-radius:8px;">
+                <span style="font-size:11px;color:var(--gris);">Disponibilité</span>
+                <span style="display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:${dispoClass==='led-green'?'#16A34A':'#DC2626'};">
+                  <span style="width:8px;height:8px;border-radius:50%;background:${dispoClass==='led-green'?'#22C55E':'#EF4444'};display:inline-block;animation:${dispoClass==='led-green'?'pulse-green':'pulse-red'} 1.5s infinite;flex-shrink:0;"></span>
+                  ${isOccupe ? 'Je suis Occupé(e)' : 'Je suis Disponible'}
+                </span>
+               </div>`
+          }
           
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px;padding:5px 8px;background:${p.badge_verifie?'#F0FDF4':'#F9FAFB'};border-radius:8px;border:1px solid ${p.badge_verifie?'#86EFAC':'#E5E7EB'};">
             <span style="font-size:11px;color:var(--gris);display:flex;align-items:center;gap:4px;"><i class="fa-solid fa-id-card"></i> Pièce d'identité</span>
@@ -3718,7 +3748,9 @@ function openModal(id) {
     </div>
   `).join('');
 
-  const dispoClass = p.dispo && (p.dispo.includes('maintenant')||p.dispo.includes("aujourd'hui")) ? 'led-green' : 'led-yellow';
+  const isExpressModal = p.dispo === 'express';
+  const isOccupeModal  = p.dispo === 'Occupé';
+  const dispoClass = isOccupeModal ? 'led-red' : 'led-green';
 
   document.getElementById('modalContent').innerHTML = `
     
@@ -3757,7 +3789,7 @@ function openModal(id) {
 
     
     <div class="mp-info-grid">
-      ${p.dispo ? `<div class="mp-info-item"><div class="mp-info-label">Disponibilité</div><div class="mp-info-val" style="display:flex;align-items:center;gap:6px;"><span class="dispo-led ${dispoClass}"></span>${p.dispo}</div></div>` : ''}
+      ${p.dispo ? `<div class="mp-info-item"><div class="mp-info-label">Disponibilité</div><div class="mp-info-val" style="display:flex;align-items:center;gap:6px;">${isExpressModal ? '<span style="font-size:12px;font-weight:800;color:#E85D04;background:rgba(232,93,4,.1);padding:2px 8px;border-radius:20px;border:1px solid rgba(232,93,4,.3);">⚡ Prêt à intervenir</span>' : `<span class="dispo-led ${dispoClass}"></span>${isOccupeModal ? 'Je suis Occupé(e)' : 'Je suis Disponible'}`}</div></div>` : ''}
       ${p.tarif ? `<div class="mp-info-item"><div class="mp-info-label">Tarifs indicatifs</div><div class="mp-info-val">💰 ${p.tarif}</div></div>` : ''}
       ${p.experience ? `<div class="mp-info-item"><div class="mp-info-label">Expérience</div><div class="mp-info-val">${p.experience} ans d'expérience</div></div>` : ''}
       <div class="mp-info-item"><div class="mp-info-label">Localisation</div><div class="mp-info-val"><i class="fa-solid fa-location-dot"></i> ${p.ville}, Conakry</div></div>
@@ -4219,10 +4251,27 @@ document.addEventListener('keydown', e => {
     </div>
     <div class="topbar-right">
 
-      <button id="dashDispoBtn" onclick="_dashToggleDispo()" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:50px;border:1.5px solid #86EFAC;background:#F0FDF4;color:#16A34A;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;margin-right:8px;">
-        <span id="dashDispoDot" style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block;flex-shrink:0;"></span>
-        <span id="dashDispoLabel">Je suis Disponible</span>
-      </button>
+      <div id="dashDispoWrap" style="position:relative;margin-right:8px;">
+        <button id="dashDispoBtn" onclick="_dashShowDispoMenu()" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:50px;border:1.5px solid #86EFAC;background:#F0FDF4;color:#16A34A;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;">
+          <span id="dashDispoDot" style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block;flex-shrink:0;"></span>
+          <span id="dashDispoLabel">Je suis Disponible</span>
+          <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:1px;"></i>
+        </button>
+        <div id="dashDispoMenu" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#fff;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.14);border:1.5px solid #E5E7EB;z-index:500;min-width:190px;overflow:hidden;">
+          <div onclick="_dashSetDispo('Disponible')" style="padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:background .15s;" onmouseover="this.style.background='#F0FDF4'" onmouseout="this.style.background=''">
+            <span style="width:9px;height:9px;border-radius:50%;background:#22C55E;display:inline-block;flex-shrink:0;"></span>
+            <span style="font-size:13px;font-weight:600;color:#16A34A;">Je suis Disponible</span>
+          </div>
+          <div onclick="_dashSetDispo('express')" style="padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:background .15s;border-top:1px solid #F3F4F6;" onmouseover="this.style.background='#FFF7F0'" onmouseout="this.style.background=''">
+            <span style="font-size:13px;line-height:1;">⚡</span>
+            <span style="font-size:13px;font-weight:600;color:#E85D04;">Je suis prêt à intervenir</span>
+          </div>
+          <div onclick="_dashSetDispo('Occupé')" style="padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:background .15s;border-top:1px solid #F3F4F6;" onmouseover="this.style.background='#FFF5F5'" onmouseout="this.style.background=''">
+            <span style="width:9px;height:9px;border-radius:50%;background:#EF4444;display:inline-block;flex-shrink:0;"></span>
+            <span style="font-size:13px;font-weight:600;color:#DC2626;">Je suis Occupé(e)</span>
+          </div>
+        </div>
+      </div>
       <button class="notif-bell-btn" id="dashNotifBell" onclick="_notifOpen('provider')" title="Notifications" style="margin-right:8px;">
         <i class="fa-solid fa-bell"></i>
         <span class="notif-badge hidden" id="dashNotifBadge">0</span>
@@ -4245,15 +4294,23 @@ document.addEventListener('keydown', e => {
       <div class="alert alert-info" id="alertStatut" style="display:none;"></div>
 
       <!-- Widget disponibilité mobile (visible sur mobile, caché desktop via CSS) -->
-      <div id="dashDispoBtnIn" onclick="_dashToggleDispo()" style="align-items:center;justify-content:space-between;margin-bottom:14px;padding:12px 16px;background:#F0FDF4;border-radius:14px;border:1.5px solid #86EFAC;cursor:pointer;transition:all .2s;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span id="dashDotIn" style="width:10px;height:10px;border-radius:50%;background:#22C55E;display:inline-block;flex-shrink:0;animation:pulse-green 1.5s infinite;"></span>
-          <div>
-            <div style="font-size:10px;color:#16A34A;font-weight:600;">Disponibilité</div>
-            <div style="font-size:13px;font-weight:700;color:#1A1A4E;" id="dashLabelIn">Je suis Disponible</div>
-          </div>
+      <div id="dashDispoBtnIn" style="margin-bottom:14px;padding:12px 14px;background:#F0FDF4;border-radius:14px;border:1.5px solid #86EFAC;transition:all .2s;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;">
+          <span id="dashDotIn" style="width:9px;height:9px;border-radius:50%;background:#22C55E;display:inline-block;flex-shrink:0;animation:pulse-green 1.5s infinite;"></span>
+          <span style="font-size:10px;color:#16A34A;font-weight:600;">Disponibilité actuelle :</span>
+          <span style="font-size:12px;font-weight:700;color:#1A1A4E;" id="dashLabelIn">Je suis Disponible</span>
         </div>
-        <span style="font-size:11px;color:#16A34A;font-weight:700;">Changer →</span>
+        <div style="display:flex;gap:7px;">
+          <button onclick="_dashSetDispo('Disponible')" style="flex:1;padding:8px 4px;border-radius:10px;border:1.5px solid #86EFAC;background:#fff;cursor:pointer;font-size:11px;font-weight:700;color:#16A34A;display:flex;align-items:center;justify-content:center;gap:4px;font-family:'DM Sans',sans-serif;">
+            <span style="width:7px;height:7px;border-radius:50%;background:#22C55E;display:inline-block;flex-shrink:0;"></span>Disponible
+          </button>
+          <button onclick="_dashSetDispo('express')" style="flex:1;padding:8px 4px;border-radius:10px;border:1.5px solid rgba(232,93,4,.4);background:#fff;cursor:pointer;font-size:11px;font-weight:700;color:#E85D04;display:flex;align-items:center;justify-content:center;gap:4px;font-family:'DM Sans',sans-serif;">
+            ⚡ Prêt
+          </button>
+          <button onclick="_dashSetDispo('Occupé')" style="flex:1;padding:8px 4px;border-radius:10px;border:1.5px solid #FECACA;background:#fff;cursor:pointer;font-size:11px;font-weight:700;color:#DC2626;display:flex;align-items:center;justify-content:center;gap:4px;font-family:'DM Sans',sans-serif;">
+            <span style="width:7px;height:7px;border-radius:50%;background:#EF4444;display:inline-block;flex-shrink:0;"></span>Occupé
+          </button>
+        </div>
       </div>
 
 
@@ -6172,7 +6229,7 @@ async function getProviders({ categorie='', recherche='', limite=20, offset=0 }=
 }
 
 async function getDashboardData(providerId) {
-  const COLS_BASE = 'id,prenom,nom,metier,categorie,ville,commune,quartier,telephone,photo_url,description,skills,statut,note_moyenne,nb_vues,essai_actif,essai_fin,abonnement_actif,abonnement_fin,created_at';
+  const COLS_BASE = 'id,prenom,nom,metier,categorie,ville,commune,quartier,telephone,photo_url,description,skills,statut,note_moyenne,nb_vues,essai_actif,essai_fin,abonnement_actif,abonnement_fin,created_at,disponibilite';
   const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise';
   try {
     let res = await sb.from('providers')
@@ -6370,115 +6427,169 @@ async function geocoderAdresse(commune,quartier) {
 
 var CATEGORIES = [
   {
-    id: 'sante-beaute',
-    nom: 'Santé & Beauté',
-    emoji: '🏥',
-    couleur: '#1B5E20',
-    bg: '#E0F8E9',
-    badgeClass: 'pb-sante',
-    count: '12+',
-    desc: 'Médecins, infirmiers, coiffeurs',
-    sous: ['Médecin','Infirmier / Infirmière','Pharmacien','Coiffeur / Coiffeuse','Esthéticienne','Makeup artist','Dentiste','Sage-femme']
-  },
-  {
-    id: 'artisans',
-    nom: 'Artisans',
-    emoji: '',
-    couleur: '#8B4513',
-    bg: '#FFF3E8',
-    badgeClass: 'pb-artisan',
-    count: '15+',
-    desc: 'Électriciens, plombiers, menuisiers',
-    sous: ['Électricien','Plombier','Menuisier','Soudeur','Peintre en bâtiment','Carreleur','Vitrier','Serrurier']
-  },
-  {
     id: 'construction-btp',
     nom: 'Construction & BTP',
-    emoji: '',
+    emoji: '🏗️',
     couleur: '#B45309',
     bg: '#FEF3C7',
     badgeClass: 'pb-artisan',
-    count: '8+',
-    desc: 'Maçons, architectes, ingénieurs',
-    sous: ['Maçon','Architecte','Ingénieur BTP','Géomètre','Topographe']
+    count: '15+',
+    desc: 'Maçons, carreleurs, peintres, ferraillers',
+    sous: ['Maçon','Carreleur','Peintre en bâtiment','Coffreur','Ferrailleur','Étancheur','Charpentier','Plâtrier']
   },
   {
-    id: 'it',
-    nom: 'IT',
-    emoji: '',
-    couleur: '#2D2D6B',
-    bg: '#E0E0F8',
-    badgeClass: 'pb-it',
+    id: 'electricite-energie',
+    nom: 'Électricité & Énergie',
+    emoji: '⚡',
+    couleur: '#D97706',
+    bg: '#FEF3C7',
+    badgeClass: 'pb-artisan',
+    count: '12+',
+    desc: 'Électriciens, solaire, groupe électrogène',
+    sous: ['Électricien','Installateur solaire','Technicien groupe électrogène','Installateur caméra','Technicien réseau','Électricien industriel']
+  },
+  {
+    id: 'plomberie-assainissement',
+    nom: 'Plomberie & Assainissement',
+    emoji: '🚰',
+    couleur: '#0369A1',
+    bg: '#E0F2FE',
+    badgeClass: 'pb-artisan',
     count: '10+',
-    desc: 'Développeurs, graphistes, CM',
-    sous: ['Développeur web','Développeur mobile','Graphiste / Designer','Community Manager','Technicien informatique','Photographe / Vidéaste']
+    desc: 'Plombiers, débouchage, pompe à eau',
+    sous: ['Plombier','Déboucheur de canalisation','Technicien pompe à eau','Fontainier','Installateur sanitaire']
   },
   {
-    id: 'education',
-    nom: 'Éducation',
-    emoji: '📚',
-    couleur: '#1A73E8',
-    bg: '#E8F0FE',
-    badgeClass: 'pb-education',
+    id: 'menuiserie-metallerie',
+    nom: 'Menuiserie & Métallerie',
+    emoji: '🪚',
+    couleur: '#92400E',
+    bg: '#FEF3C7',
+    badgeClass: 'pb-artisan',
     count: '10+',
-    desc: 'Professeurs, formateurs, traducteurs',
-    sous: ['Professeur de maths','Professeur de français',"Professeur d'anglais",'Formateur professionnel','Traducteur','Tuteur scolaire']
+    desc: 'Menuisiers, soudeurs, serruriers',
+    sous: ['Menuisier bois','Menuisier aluminium','Soudeur','Serrurier','Forgeron','Vitrier','Chaudronnier']
   },
   {
-    id: 'aide-domicile',
-    nom: 'Aide à domicile',
-    emoji: '<i class="fa-solid fa-house"></i>',
-    couleur: '#2E7D32',
-    bg: '#E8F5E9',
-    badgeClass: 'pb-immobilier',
+    id: 'climatisation-electromenager',
+    nom: 'Climatisation & Électroménager',
+    emoji: '❄️',
+    couleur: '#0891B2',
+    bg: '#ECFEFF',
+    badgeClass: 'pb-artisan',
     count: '8+',
-    desc: "Ménage, garde d'enfants, cuisiniers",
-    sous: ['Femme de ménage',"Garde d'enfants",'Cuisinier / Cuisinière','Baby-sitter','Aide aux personnes âgées']
+    desc: 'Clim, réfrigérateur, électroménager',
+    sous: ['Technicien climatiseur','Réparateur réfrigérateur','Réparateur électroménager','Technicien froid','Installateur pompe à chaleur']
   },
   {
-    id: 'transport',
-    nom: 'Transport',
-    emoji: '',
+    id: 'automobile-moto',
+    nom: 'Automobile & Moto',
+    emoji: '🚗',
+    couleur: '#B45309',
+    bg: '#FEF3C7',
+    badgeClass: 'pb-transport',
+    count: '10+',
+    desc: 'Mécaniciens, électriciens auto, vulcanisateurs',
+    sous: ['Mécanicien auto','Électricien auto','Vulcanisateur','Laveur automobile','Carrossier','Mécanicien moto','Diagnosticien auto']
+  },
+  {
+    id: 'transport-livraison',
+    nom: 'Transport & Livraison',
+    emoji: '🚚',
     couleur: '#B45309',
     bg: '#FEF3C7',
     badgeClass: 'pb-transport',
     count: '8+',
-    desc: 'Chauffeurs, déménageurs, livreurs',
-    sous: ['Chauffeur VTC','Déménageur','Livreur','Transport scolaire','Moto-taxi']
+    desc: 'Chauffeurs, livreurs, déménageurs',
+    sous: ['Chauffeur VTC','Livreur','Déménageur','Transporteur','Moto-taxi','Transport scolaire','Coursier']
   },
   {
-    id: 'recrutement-rh',
-    nom: 'Recrutement & RH',
-    emoji: '👥',
-    couleur: '#4F46E5',
-    bg: '#E0E7FF',
-    badgeClass: 'pb-it',
-    count: '5+',
-    desc: 'Consultants RH, recruteurs',
-    sous: ['Consultant RH','Recruteur','DRH freelance','Coach professionnel']
+    id: 'services-domicile',
+    nom: 'Services à Domicile',
+    emoji: '🏠',
+    couleur: '#2E7D32',
+    bg: '#E8F5E9',
+    badgeClass: 'pb-immobilier',
+    count: '12+',
+    desc: 'Ménage, jardiniers, gardiens, nounous',
+    sous: ['Femme de ménage','Jardinier','Gardien','Nounou / Baby-sitter','Aide aux personnes âgées','Agent de nettoyage','Cuisinier à domicile']
   },
   {
-    id: 'juridique',
-    nom: 'Juridique',
-    emoji: '⚖️',
+    id: 'cuisine-traiteur',
+    nom: 'Cuisine & Traiteur',
+    emoji: '🍽️',
     couleur: '#B45309',
-    bg: '#FEF3C7',
-    badgeClass: 'pb-juridique',
-    count: '6+',
-    desc: 'Avocats, comptables, fiscalistes',
-    sous: ['Avocat','Notaire','Comptable','Fiscaliste','Huissier','Conseiller juridique']
+    bg: '#FFF7ED',
+    badgeClass: 'pb-artisan',
+    count: '8+',
+    desc: 'Cuisiniers, traiteurs, pâtissiers',
+    sous: ['Cuisinier / Cuisinière','Traiteur','Pâtissier','Boulanger','Chef à domicile','Pizzaïolo']
   },
   {
-    id: 'services-express',
-    nom: 'Services Express',
-    emoji: '',
+    id: 'beaute-mode',
+    nom: 'Beauté & Mode',
+    emoji: '💄',
+    couleur: '#9D174D',
+    bg: '#FCE4EC',
+    badgeClass: 'pb-sante',
+    count: '10+',
+    desc: 'Coiffeurs, barbiers, maquilleuses, couturiers',
+    sous: ['Coiffeur / Coiffeuse','Barbier','Maquilleuse','Couturier(e)','Esthéticienne','Manucure / Pédicure','Tresseur / Tresseuse']
+  },
+  {
+    id: 'evenementiel',
+    nom: 'Événementiel',
+    emoji: '🎉',
     couleur: '#7C3AED',
     bg: '#EDE9FE',
     badgeClass: 'pb-express',
-    count: '10+',
-    desc: 'Livraison, dépannage, réparations rapides',
-    badge_urgent: true,
-    sous: ['Livraison express','Coursier','Dépannage rapide','Assistance informatique rapide','Réparation téléphone','Réparation électroménager','Installation TV','Installation internet','Serrurerie',"Service d'urgence"]
+    count: '8+',
+    desc: 'Photographes, DJ, décorateurs',
+    sous: ['Photographe','Vidéaste','DJ','Décorateur événementiel','Animateur','Sonoriste','MC / Présentateur']
+  },
+  {
+    id: 'informatique-digital',
+    nom: 'Informatique & Digital',
+    emoji: '💻',
+    couleur: '#2D2D6B',
+    bg: '#E0E0F8',
+    badgeClass: 'pb-it',
+    count: '12+',
+    desc: 'Développeurs, graphistes, réparateurs',
+    sous: ['Développeur web','Développeur mobile','Graphiste / Designer','Community Manager','Réparateur informatique','Technicien réseau','Data analyste']
+  },
+  {
+    id: 'formation-coaching',
+    nom: 'Formation & Coaching',
+    emoji: '📚',
+    couleur: '#1A73E8',
+    bg: '#E8F0FE',
+    badgeClass: 'pb-education',
+    count: '8+',
+    desc: 'Formateurs, profs particuliers, coachs',
+    sous: ['Formateur informatique','Professeur particulier','Coach professionnel','Tuteur scolaire','Formateur en langues','Consultant en orientation']
+  },
+  {
+    id: 'securite-surveillance',
+    nom: 'Sécurité & Surveillance',
+    emoji: '🛡️',
+    couleur: '#1E40AF',
+    bg: '#DBEAFE',
+    badgeClass: 'pb-it',
+    count: '6+',
+    desc: 'Gardiens, agents, installateurs caméra',
+    sous: ['Gardien','Agent de sécurité','Installateur caméra','Vigile','Rondier','Technicien alarme']
+  },
+  {
+    id: 'sante-bien-etre',
+    nom: 'Santé & Bien-être',
+    emoji: '🏥',
+    couleur: '#1B5E20',
+    bg: '#E0F8E9',
+    badgeClass: 'pb-sante',
+    count: '8+',
+    desc: 'Infirmiers, aides-soignants, kiné',
+    sous: ['Infirmier(e) à domicile','Aide-soignant(e)','Kinésithérapeute','Sage-femme','Médecin généraliste','Psychologue','Nutritionniste']
   }
 ];
 
@@ -6561,6 +6672,37 @@ window.renderCategoriesSelect = renderCategoriesSelect;
 // Appliquer les selects en attente
 if(window._pendingCatSelect) { renderCategoriesSelect(window._pendingCatSelect); window._pendingCatSelect=null; }
 window.renderSousCatsSelect = renderSousCatsSelect;
+
+// ── Peupler le select inscription i-cat ──
+(function() {
+  const sel = document.getElementById('i-cat');
+  if (!sel) return;
+  CATEGORIES.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat.nom;
+    opt.textContent = cat.emoji + ' ' + cat.nom;
+    sel.appendChild(opt);
+  });
+})();
+
+function _inscrUpdateSousCat(catNom) {
+  const cat = (window.CATEGORIES||[]).find(c => c.nom === catNom);
+  const wrap = document.getElementById('i-sous-cat-wrap');
+  const sel  = document.getElementById('i-sous-cat');
+  if (!wrap || !sel) return;
+  if (!cat || !cat.sous || cat.sous.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+  sel.innerHTML = '<option value="">Choisir une spécialité</option>';
+  cat.sous.forEach(sc => {
+    const opt = document.createElement('option');
+    opt.value = sc; opt.textContent = sc;
+    sel.appendChild(opt);
+  });
+  wrap.style.display = 'block';
+}
+window._inscrUpdateSousCat = _inscrUpdateSousCat;
 
 // ── ROUTEUR ──
 
@@ -6648,10 +6790,25 @@ async function loadProvidersFromSupabase() {
       return;
     }
     const catColors = {
+      'Construction & BTP':{bg:'#FEF3C7',color:'#B45309'},
+      'Électricité & Énergie':{bg:'#FEF3C7',color:'#D97706'},
+      'Plomberie & Assainissement':{bg:'#E0F2FE',color:'#0369A1'},
+      'Menuiserie & Métallerie':{bg:'#FEF3C7',color:'#92400E'},
+      'Climatisation & Électroménager':{bg:'#ECFEFF',color:'#0891B2'},
+      'Automobile & Moto':{bg:'#FEF3C7',color:'#B45309'},
+      'Transport & Livraison':{bg:'#FEF3C7',color:'#B45309'},
+      'Services à Domicile':{bg:'#E8F5E9',color:'#2E7D32'},
+      'Cuisine & Traiteur':{bg:'#FFF7ED',color:'#B45309'},
+      'Beauté & Mode':{bg:'#FCE4EC',color:'#9D174D'},
+      'Événementiel':{bg:'#EDE9FE',color:'#7C3AED'},
+      'Informatique & Digital':{bg:'#E0E0F8',color:'#2D2D6B'},
+      'Formation & Coaching':{bg:'#E8F0FE',color:'#1A73E8'},
+      'Sécurité & Surveillance':{bg:'#DBEAFE',color:'#1E40AF'},
+      'Santé & Bien-être':{bg:'#E0F8E9',color:'#1B5E20'},
+      // legacy
       'Artisans':{bg:'#FDE8D8',color:'#C74B00'},'Santé':{bg:'#E0F8E9',color:'#1B5E20'},
       'Juridique':{bg:'#FEF3C7',color:'#B45309'},'IT':{bg:'#E0E0F8',color:'#2D2D6B'},
-      'Éducation':{bg:'#E8F0FE',color:'#1A73E8'},'Beauté':{bg:'#FCE4EC',color:'#880E4F'},
-      'Transport':{bg:'#FEF3C7',color:'#B45309'},'Immobilier':{bg:'#E8F5E9',color:'#2E7D32'},
+      'Éducation':{bg:'#E8F0FE',color:'#1A73E8'},'Transport':{bg:'#FEF3C7',color:'#B45309'},
       'Services Express':{bg:'#EDE9FE',color:'#7C3AED'}
     };
     const catClass = {
@@ -6684,9 +6841,9 @@ async function loadProvidersFromSupabase() {
       // Champs requis par openModal
       badge_verifie: p.statut === 'valide' || p.doc_cni_statut === 'valide',
       badge_top: p.doc_diplome_statut === 'valide' || (p.note_moyenne||0) >= 4.8,
-      badge_express: p.categorie === 'Services Express',
+      badge_express: p.disponibilite === 'express',
       recommande: (p.nb_avis||0) >= 3,
-      dispo: p.disponibilite || 'Disponible maintenant',
+      dispo: p.disponibilite || 'Disponible',
       tarif: p.tarif || null,
       experience: p.experience || null,
       portfolio: (p.portfolio||[]),
@@ -6705,18 +6862,27 @@ async function loadProvidersFromSupabase() {
 }
 
 function updateCatSelect() {
-  const sel = document.getElementById('catFilter');
-  if (!sel) return;
-  const val = sel.value;
-  sel.innerHTML = '<option value="">Toutes catégories</option>';
-  (window.CATEGORIES||[]).forEach(cat => {
-    const opt = document.createElement('option');
-    opt.value = cat.nom;
-    opt.textContent = cat.emoji + ' ' + cat.nom;
-    sel.appendChild(opt);
+  ['catFilter','filterCat'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const val = sel.value;
+    const placeholder = id === 'filterCat' ? 'Toutes les catégories' : 'Toutes catégories';
+    sel.innerHTML = `<option value="">${placeholder}</option>`;
+    (window.CATEGORIES||[]).forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat.nom;
+      opt.textContent = cat.emoji + ' ' + cat.nom;
+      sel.appendChild(opt);
+    });
+    sel.value = val;
   });
-  sel.value = val;
 }
+// Peupler filterCat au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof updateCatSelect === 'function') updateCatSelect();
+}, {once:true});
+// Déclencher immédiatement si DOM déjà prêt
+if (document.readyState !== 'loading') { setTimeout(updateCatSelect, 50); }
 
 // Patch openWA avec tracking
 const _origOpenWA = window.openWA;
@@ -6837,48 +7003,65 @@ async function chargerDashboard(pid) {
 }
 
 function _dashUpdateDispoBtn(state) {
-  const isDisponible = !state || state !== 'Occupé';
-  const gc = isDisponible ? '#F0FDF4' : '#FFF5F5';
-  const bc = isDisponible ? '#86EFAC' : '#FECACA';
-  const tc = isDisponible ? '#16A34A' : '#DC2626';
-  const dc = isDisponible ? '#22C55E' : '#EF4444';
-  const tx = isDisponible ? 'Je suis Disponible' : 'Je suis Occupé(e)';
+  const isExpress    = state === 'express';
+  const isOccupe     = state === 'Occupé';
+  const isDisponible = !isExpress && !isOccupe;
+  const gc = isExpress ? '#FFF7F0' : isDisponible ? '#F0FDF4' : '#FFF5F5';
+  const bc = isExpress ? 'rgba(232,93,4,.4)' : isDisponible ? '#86EFAC' : '#FECACA';
+  const tc = isExpress ? '#E85D04' : isDisponible ? '#16A34A' : '#DC2626';
+  const dc = isExpress ? '#E85D04' : isDisponible ? '#22C55E' : '#EF4444';
+  const tx = isExpress ? '⚡ Je suis prêt à intervenir' : isDisponible ? 'Je suis Disponible' : 'Je suis Occupé(e)';
   const btn   = document.getElementById('dashDispoBtn');
   const dot   = document.getElementById('dashDispoDot');
   const label = document.getElementById('dashDispoLabel');
   if (btn)   { btn.style.background = gc; btn.style.borderColor = bc; btn.style.color = tc; }
-  if (dot)   dot.style.background   = dc;
-  if (label) label.textContent      = tx;
+  if (dot)   { dot.style.background = dc; dot.style.animationName = isOccupe ? 'pulse-red' : 'pulse-green'; }
+  if (label) label.textContent = tx;
   // Widget interne (mobile)
   const btnIn   = document.getElementById('dashDispoBtnIn');
   const dotIn   = document.getElementById('dashDotIn');
   const labelIn = document.getElementById('dashLabelIn');
   if (btnIn)   { btnIn.style.background = gc; btnIn.style.borderColor = bc; }
-  if (dotIn)   { dotIn.style.background = dc; dotIn.style.animationName = isDisponible ? 'pulse-green' : 'pulse-red'; }
-  if (labelIn) labelIn.textContent      = tx;
+  if (dotIn)   { dotIn.style.background = dc; dotIn.style.animationName = isOccupe ? 'pulse-red' : 'pulse-green'; }
+  if (labelIn) labelIn.textContent = tx;
 }
 
-async function _dashToggleDispo() {
+function _dashShowDispoMenu() {
+  const menu = document.getElementById('dashDispoMenu');
+  if (!menu) return;
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+// Fermer le menu si clic extérieur
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#dashDispoWrap')) {
+    const m = document.getElementById('dashDispoMenu');
+    if (m) m.style.display = 'none';
+  }
+});
+
+async function _dashSetDispo(state) {
+  const menu = document.getElementById('dashDispoMenu');
+  if (menu) menu.style.display = 'none';
   const pid = _dashProviderId || providerId;
   if (!pid) return;
-  const current  = (_dashData || {}).disponibilite;
-  const newState = (current === 'Occupé') ? 'Disponible' : 'Occupé';
-  [document.getElementById('dashDispoBtn'), document.getElementById('dashDispoBtnIn')].forEach(b => {
-    if (b) { b.style.opacity = '0.6'; b.style.pointerEvents = 'none'; }
-  });
-  const { error } = await sb.from('providers').update({ disponibilite: newState }).eq('id', pid);
+  const btn = document.getElementById('dashDispoBtn');
+  if (btn) { btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none'; }
+  const { error } = await sb.from('providers').update({ disponibilite: state }).eq('id', pid);
   if (!error) {
-    if (_dashData)    _dashData.disponibilite    = newState;
-    if (providerData) providerData.disponibilite = newState;
-    _dashUpdateDispoBtn(newState);
-    showToast(newState === 'Disponible' ? '🟢 Je suis Disponible' : '🔴 Je suis Occupé(e)', 'success');
+    if (_dashData)    _dashData.disponibilite    = state;
+    if (providerData) providerData.disponibilite = state;
+    _dashUpdateDispoBtn(state);
+    const msgs = { 'Disponible':'🟢 Je suis Disponible', 'Occupé':'🔴 Je suis Occupé(e)', 'express':'⚡ Je suis prêt à intervenir' };
+    showToast(msgs[state] || '✅ Disponibilité mise à jour', 'success');
   } else {
     showToast('Erreur: ' + error.message, 'error');
   }
-  [document.getElementById('dashDispoBtn'), document.getElementById('dashDispoBtnIn')].forEach(b => {
-    if (b) { b.style.opacity = '1'; b.style.pointerEvents = 'auto'; }
-  });
+  if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
 }
+
+// Alias pour compatibilité
+function _dashToggleDispo() { _dashShowDispoMenu(); }
 
 function _dashUpdateUI() {
   const p = _dashData;
@@ -7328,10 +7511,34 @@ function filterByCat(cat) {
 }
 
 function filterByExpress() {
-  // Toggle chip express active
-  filteredData = PRESTATAIRES.filter(p => p.badge_express);
-  displayedCount = 6;
+  filteredData = PRESTATAIRES.filter(p => p.dispo === 'express' || p.badge_express);
+  displayedCount = 9;
   renderProviders();
+  const c = document.getElementById('resultsCount');
+  if (c) c.textContent = filteredData.length + ' artisan' + (filteredData.length > 1 ? 's' : '');
+  document.getElementById('prestataires').scrollIntoView({behavior:'smooth'});
+}
+
+function filterByExpressService(keyword) {
+  const kw = keyword.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  filteredData = PRESTATAIRES.filter(p => {
+    const m = ((p.metier||'') + ' ' + (p.nom||'') + ' ' + (p.cat||'') + ' ' + (p.desc||'')).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    return m.includes(kw);
+  });
+  // Trier : express en premier, puis disponible, puis occupé
+  filteredData.sort((a, b) => {
+    const score = s => s.dispo === 'express' ? 0 : s.dispo === 'Occupé' ? 2 : 1;
+    return score(a) - score(b);
+  });
+  if (filteredData.length === 0) {
+    filteredData = [...PRESTATAIRES];
+  }
+  displayedCount = 9;
+  renderProviders();
+  const c = document.getElementById('resultsCount');
+  if (c) c.textContent = filteredData.length + ' artisan' + (filteredData.length > 1 ? 's' : '');
+  const rb = document.getElementById('resetBtn');
+  if (rb) rb.style.display = 'block';
   document.getElementById('prestataires').scrollIntoView({behavior:'smooth'});
 }
 
@@ -10249,8 +10456,38 @@ async function _expInit() {
 // load déjà déclenché quand ce script s'exécute → appel direct
 if (document.readyState === 'complete') {
   _expInit();
+  _expTickerInit();
 } else {
-  window.addEventListener('load', _expInit);
+  window.addEventListener('load', function() { _expInit(); _expTickerInit(); });
+}
+
+// ── Ticker artisans express ──
+var _expTickerTimer = null;
+async function _expTickerInit() {
+  var el = document.getElementById('expTickerText');
+  if (!el) return;
+  var items = [];
+  try {
+    var res = await sb.from('providers').select('prenom,nom,metier,ville,commune').eq('disponibilite','express').eq('statut','valide').limit(10);
+    if (res.data && res.data.length) {
+      items = res.data.map(function(p) {
+        var lieu = p.commune || p.ville || '';
+        return '⚡ ' + ((p.prenom||'') + ' ' + (p.nom||'')).trim() + (p.metier ? ' — ' + p.metier : '') + (lieu ? ' — ' + lieu : '');
+      });
+    }
+  } catch(e) {}
+  if (!items.length) return; // garde le fallback déjà affiché
+  var idx = 0;
+  function _tick() {
+    el.style.opacity = '0';
+    setTimeout(function() {
+      el.querySelector('span').textContent = items[idx % items.length];
+      el.style.opacity = '1';
+      idx++;
+    }, 500);
+  }
+  _tick();
+  _expTickerTimer = setInterval(_tick, 5000);
 }
 
 // ══════════════════════════════════════════════════════════════════
