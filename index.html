@@ -1557,20 +1557,38 @@ async function verifierSession() {
       <p class="hero-subtitle">Trouvez rapidement le bon artisan pour tous vos projets — électriciens, plombiers, maçons, soudeurs, menuisiers, mécaniciens et bien plus.</p>
       
       
-      <div id="expWrap" style="position:relative;border-radius:16px;overflow:hidden;margin-bottom:28px;height:260px;">
+      <!-- Section titre À la Une -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="font-family:'Libre Baskerville',serif;font-size:17px;font-weight:700;color:#fff;">🌟 À la Une</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.45);font-style:italic;">Espaces publicitaires gérés par YOUMMA JOBS</div>
+      </div>
+
+      <div id="expWrap" style="position:relative;border-radius:20px;overflow:hidden;margin-bottom:28px;height:280px;box-shadow:0 8px 32px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.3);">
+        <!-- Slides -->
         <div id="expSlides" style="position:absolute;inset:0;">
           <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1A0A4E,#2D2D6B);opacity:1;"></div>
         </div>
-        <div style="position:absolute;inset:0;background:rgba(5,5,20,.52);z-index:1;"></div>
-        <div style="position:absolute;inset:0;z-index:2;pointer-events:none;">
-          <div style="position:absolute;top:16px;left:24px;pointer-events:auto;">
-            <div style="font-size:10px;font-weight:700;color:#E85D04;letter-spacing:.12em;text-transform:uppercase;">À la une</div>
-          </div>
-          <button onclick="(function(){filterByExpress();document.getElementById('artisans').scrollIntoView({behavior:'smooth'});})()" style="position:absolute;bottom:18px;right:20px;pointer-events:auto;padding:10px 20px;background:#E85D04;border:none;border-radius:50px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s;box-shadow:0 4px 16px rgba(232,93,4,.5);" onmouseover="this.style.background='#C74B00'" onmouseout="this.style.background='#E85D04'">
-            <i class="fa-solid fa-bolt"></i> Intervention Rapide
-          </button>
+        <!-- Overlay global léger -->
+        <div style="position:absolute;inset:0;background:rgba(5,5,20,.28);z-index:1;pointer-events:none;"></div>
+        <!-- Overlay bas : gradient + titre image -->
+        <div style="position:absolute;bottom:0;left:0;right:0;z-index:2;background:linear-gradient(transparent,rgba(5,5,20,.82));padding:36px 16px 38px;pointer-events:none;">
+          <div id="expTitreOverlay" style="color:#fff;font-size:13px;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.7);max-width:65%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
         </div>
-        <div id="expDots" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:3;display:flex;gap:5px;"></div>
+        <!-- Badges haut gauche -->
+        <div style="position:absolute;top:14px;left:16px;z-index:4;display:flex;align-items:center;gap:7px;pointer-events:none;">
+          <span style="background:#E85D04;color:#fff;font-size:10px;font-weight:800;padding:4px 11px;border-radius:20px;letter-spacing:.07em;text-transform:uppercase;box-shadow:0 2px 10px rgba(232,93,4,.55);">⭐ À LA UNE</span>
+          <span style="background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:rgba(255,255,255,.88);font-size:9px;font-weight:700;padding:4px 9px;border-radius:20px;border:1px solid rgba(255,255,255,.18);letter-spacing:.06em;text-transform:uppercase;">Sponsorisé</span>
+        </div>
+        <!-- Flèche gauche -->
+        <button onclick="_expPrev()" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:4;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseover="this.style.background='rgba(232,93,4,.8)'" onmouseout="this.style.background='rgba(0,0,0,.45)'">&#8249;</button>
+        <!-- Flèche droite -->
+        <button onclick="_expNext()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:4;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseover="this.style.background='rgba(232,93,4,.8)'" onmouseout="this.style.background='rgba(0,0,0,.45)'">&#8250;</button>
+        <!-- Bouton Intervention Rapide -->
+        <button onclick="(function(){filterByExpress();document.getElementById('artisans').scrollIntoView({behavior:'smooth'});})()" style="position:absolute;bottom:10px;right:16px;z-index:4;pointer-events:auto;padding:9px 18px;background:#E85D04;border:none;border-radius:50px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s;box-shadow:0 4px 16px rgba(232,93,4,.5);" onmouseover="this.style.background='#C74B00'" onmouseout="this.style.background='#E85D04'">
+          <i class="fa-solid fa-bolt"></i> Intervention Rapide
+        </button>
+        <!-- Dots navigation -->
+        <div id="expDots" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:4;display:flex;gap:6px;align-items:center;"></div>
       </div>
       <div class="hero-actions">
         <button class="btn-hero-main" onclick="document.getElementById('artisans').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-magnifying-glass"></i> Trouver un artisan</button>
@@ -10135,21 +10153,25 @@ var _expIdx = 0, _expTimer = null, _expCount = 1;
 function _expGo(n) {
   _expCount = Math.max(1, _expCount);
   _expIdx = ((n % _expCount) + _expCount) % _expCount;
-  // Fade: affiche le slide actif, cache les autres
   var slideEls = document.querySelectorAll('#expSlides ._exp-slide');
   slideEls.forEach(function(el, i) {
     el.style.opacity = (i === _expIdx) ? '1' : '0';
-    // Lazy-load : ne set background-image que quand le slide devient visible
+    // Lazy-load : charge background-image au moment où la slide devient visible
     if (i === _expIdx && el.dataset.url && !el.style.backgroundImage) {
       el.style.backgroundImage = "url('" + el.dataset.url + "')";
+    }
+    // Titre overlay bas
+    if (i === _expIdx) {
+      var ov = document.getElementById('expTitreOverlay');
+      if (ov) ov.textContent = el.dataset.titre || '';
     }
   });
   // Dots
   for (var i = 0; i < _expCount; i++) {
     var d = document.getElementById('exd' + i);
     if (d) {
-      d.style.width = i === _expIdx ? '22px' : '7px';
-      d.style.background = i === _expIdx ? '#fff' : 'rgba(255,255,255,.35)';
+      d.style.width  = i === _expIdx ? '26px' : '9px';
+      d.style.background = i === _expIdx ? '#fff' : 'rgba(255,255,255,.38)';
     }
   }
 }
@@ -10161,10 +10183,21 @@ function _expBuildDots(count) {
   for (var i = 0; i < count; i++) {
     var d = document.createElement('div');
     d.id = 'exd' + i;
-    d.style.cssText = 'width:' + (i===0?'22px':'7px') + ';height:7px;border-radius:4px;background:' + (i===0?'#fff':'rgba(255,255,255,.35)') + ';cursor:pointer;transition:all .3s;';
-    (function(idx){ d.onclick = function() { _expGo(idx); clearInterval(_expTimer); _expTimer = setInterval(function(){ _expGo(_expIdx+1); }, 7000); }; })(i);
+    d.style.cssText = 'width:' + (i===0?'26px':'9px') + ';height:9px;border-radius:5px;background:' + (i===0?'#fff':'rgba(255,255,255,.38)') + ';cursor:pointer;transition:all .35s;box-shadow:0 1px 4px rgba(0,0,0,.4);';
+    (function(idx){ d.onclick = function() { _expGo(idx); clearInterval(_expTimer); _expTimer = setInterval(function(){ _expGo(_expIdx+1); }, 5000); }; })(i);
     dots.appendChild(d);
   }
+}
+
+function _expPrev() {
+  clearInterval(_expTimer);
+  _expGo(_expIdx - 1);
+  _expTimer = setInterval(function(){ _expGo(_expIdx+1); }, 5000);
+}
+function _expNext() {
+  clearInterval(_expTimer);
+  _expGo(_expIdx + 1);
+  _expTimer = setInterval(function(){ _expGo(_expIdx+1); }, 5000);
 }
 
 var _expFallback = [
@@ -10181,12 +10214,12 @@ function _expApply(images) {
   var baseStyle = 'position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;transition:opacity 1s ease;';
   if (images && images.length) {
     slides.innerHTML = images.map(function(img, i) {
-      var url = (img.url || img).replace(/'/g, '%27');
-      // Première image chargée immédiatement ; les autres en lazy-load via data-url
+      var url   = (img.url   || img).replace(/'/g, '%27');
+      var titre = (img.titre || '').replace(/"/g, '&quot;');
       if (i === 0) {
-        return '<div class="_exp-slide" style="' + baseStyle + 'background-image:url(\'' + url + '\');opacity:1;"></div>';
+        return '<div class="_exp-slide" data-titre="' + titre + '" style="' + baseStyle + 'background-image:url(\'' + url + '\');opacity:1;"></div>';
       }
-      return '<div class="_exp-slide" data-url="' + url + '" style="' + baseStyle + 'opacity:0;"></div>';
+      return '<div class="_exp-slide" data-url="' + url + '" data-titre="' + titre + '" style="' + baseStyle + 'opacity:0;"></div>';
     }).join('');
     _expCount = images.length;
   } else {
