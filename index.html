@@ -2734,10 +2734,15 @@ if (typeof inscrirePrestataire === 'undefined') {
     var exp=new Date(Date.now()+10*60*1000).toISOString();
     var dbRes=await sb.from('verification_codes').insert([{phone:e164,code:_smsCode,expires_at:exp,used:false}]);
     if(dbRes.error)return {success:false,message:'Erreur base de données: '+dbRes.error.message};
+    // Détection local (Live Server) — l'API SMS n'existe qu'en production
+    if(location.hostname==='localhost'||location.hostname==='127.0.0.1'){
+      return {success:false,message:'API SMS non disponible en local. Ouvrez www.yoummajobs.com pour tester. (code enregistré dans Supabase → verification_codes)'};
+    }
     try{
       var r=await fetch('/api/send-sms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:e164,code:_smsCode})});
-      var d=await r.json();
-      return r.ok?{success:true}:{success:false,message:d.error||'Erreur envoi SMS'};
+      var d={};
+      try{d=await r.json();}catch(je){return{success:false,message:'Réponse API vide ('+r.status+'). Vérifiez les logs Vercel → Functions.';};}
+      return r.ok?{success:true}:{success:false,message:d.error||'Erreur SMS ('+r.status+')'};
     }catch(err){return {success:false,message:'Erreur réseau: '+err.message};}
   };
 
