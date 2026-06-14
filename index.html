@@ -5235,6 +5235,7 @@ async function chargerAvis() {
     <div onclick="showAdmin('suspendu')" id="amenu-suspendu" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-ban" style="width:16px;"></i> Suspendus</div>
     <div onclick="showAdmin('codes')" id="amenu-codes" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-key" style="width:16px;"></i> Codes d'activation</div>
     <div onclick="showAdmin('realisations')" id="amenu-realisations" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-images" style="width:16px;"></i> Réalisations</div>
+    <div onclick="showAdmin('carousel')" id="amenu-carousel" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-photo-film" style="width:16px;"></i> Images à la une</div>
     <div onclick="showAdmin('missions')" id="amenu-missions" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullseye" style="width:16px;"></i> Missions</div>
     <div onclick="showAdmin('rapports')" id="amenu-rapports" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-chart-line" style="width:16px;"></i> Rapports</div>
     <div onclick="showAdmin('notifications')" id="amenu-notifications" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:9px;">
@@ -5647,6 +5648,45 @@ async function chargerAvis() {
       </div>
 
   </div>
+
+    <div class="admin-section" id="admin-carousel">
+      <div class="admin-section-inner">
+
+        <div class="adm-section-header" style="margin-bottom:20px;">
+          <div class="adm-section-title">
+            <i class="fa-solid fa-photo-film" style="color:#E85D04;"></i> Images à la une
+            <span id="carouselCountBadge" style="font-size:11px;font-weight:500;background:#FFF7F0;color:#E85D04;padding:3px 10px;border-radius:20px;margin-left:8px;">0/10 images</span>
+          </div>
+        </div>
+
+        <div style="background:#EFF6FF;border-radius:12px;padding:14px 18px;margin-bottom:24px;display:flex;gap:12px;align-items:flex-start;">
+          <i class="fa-solid fa-circle-info" style="color:#2563EB;font-size:16px;flex-shrink:0;margin-top:1px;"></i>
+          <div style="font-size:13px;color:#1E40AF;line-height:1.6;">
+            Ces images s'affichent dans le <strong>carrousel de la page d'accueil</strong>. Maximum <strong>10 images</strong>. Formats acceptés : JPG, PNG, WebP. Stockées dans Supabase Storage bucket <strong>photos</strong>.
+          </div>
+        </div>
+
+        <div style="background:#F9FAFB;border:1.5px dashed #D1D5DB;border-radius:14px;padding:20px;margin-bottom:24px;">
+          <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:12px;"><i class="fa-solid fa-plus-circle" style="color:#E85D04;"></i> Ajouter une image</div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:flex-end;">
+            <input id="carouselNewTitre" type="text" placeholder="Titre de l'image (optionnel)" maxlength="80"
+              style="padding:10px 14px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;color:#374151;outline:none;width:100%;box-sizing:border-box;"/>
+            <button id="carouselUploadBtn" onclick="_carouselUpload()"
+              style="padding:10px 18px;background:#E85D04;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:7px;">
+              <i class="fa-solid fa-plus"></i> Ajouter une image
+            </button>
+          </div>
+          <input type="file" id="carouselFileInput" accept="image/*" style="display:none;"/>
+        </div>
+
+        <div id="carouselAdminList">
+          <div style="text-align:center;padding:30px;color:#9CA3AF;font-size:13px;">
+            <i class="fa-solid fa-spinner fa-spin"></i> Chargement...
+          </div>
+        </div>
+
+      </div>
+    </div>
 
 </div>
 
@@ -7460,18 +7500,20 @@ function showAdmin(name) {
     suspendu: '<i class="fa-solid fa-ban" style="color:#7C3AED;margin-right:6px;"></i>Suspendus',
     codes: '<i class="fa-solid fa-key" style="color:#E85D04;margin-right:6px;"></i>Codes d\'activation',
     realisations: '<i class="fa-solid fa-images" style="color:#E85D04;margin-right:6px;"></i>Réalisations',
+    carousel: '<i class="fa-solid fa-photo-film" style="color:#E85D04;margin-right:6px;"></i>Images à la une',
     missions: '<i class="fa-solid fa-bullseye" style="color:#E85D04;margin-right:6px;"></i>Missions'
   };
   const tt = document.getElementById('adminTopbarTitle');
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','codes','realisations','missions'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','codes','realisations','carousel','missions'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (el) el.style.cssText = s===name ? ACTIVE : NORMAL;
   });
   if (name==='codes') { if(typeof loadCodes==='function') loadCodes(); }
   else if (name==='realisations') { if(typeof renderAdminRealisations==='function') renderAdminRealisations(); }
+  else if (name==='carousel') { if(typeof _carouselLoadAdmin==='function') _carouselLoadAdmin(); }
   else if (name==='missions') { renderAdminMissions(); }
   else if (name!=='dashboard') { if(typeof _adminLoadAll==='function') _adminLoadAll(); }
 }
@@ -9792,14 +9834,30 @@ function _realGetCardsPerView() {
 
 async function loadPublicRealisations() {
   try {
+    // Try carousel_images table first (new system)
+    const { data: ciData, error: ciErr } = await sb.from('carousel_images')
+      .select('id,url,titre,ordre').eq('actif', true).order('ordre', {ascending: true});
+
+    if (!ciErr && ciData && ciData.length) {
+      _realPubData = ciData.map(row => ({
+        key: 'ci_' + row.id,
+        imageUrl: row.url,
+        titre: row.titre || '',
+        _carouselId: row.id
+      }));
+      _realBuildCarousel();
+      return;
+    }
+
+    // Fallback: site_config legacy system
     const { data } = await sb.from('site_config')
       .select('cle,valeur').like('cle', 'realisation_%').order('cle');
     if (!data || !data.length) { _realShowEmpty(); return; }
-    
+
     _realPubData = data
       .map(row => { try { return { key: row.cle, ...JSON.parse(row.valeur||'{}') }; } catch(e) { return null; } })
       .filter(r => r && (r.imageUrl || r.titre));
-    
+
     if (!_realPubData.length) { _realShowEmpty(); return; }
     _realBuildCarousel();
   } catch(e) { _realShowEmpty(); }
@@ -9928,6 +9986,200 @@ window.addEventListener('resize', function() {
 
 // Charger au démarrage
 document.addEventListener('DOMContentLoaded', loadPublicRealisations);
+
+
+// ══════════════════════════════════════════════════════════════════
+// CAROUSEL IMAGES À LA UNE — Admin (table carousel_images)
+// ══════════════════════════════════════════════════════════════════
+
+var _carouselItems = [];
+
+async function _carouselLoadAdmin() {
+  const list = document.getElementById('carouselAdminList');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:30px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>';
+
+  try {
+    const { data, error } = await sb.from('carousel_images')
+      .select('*').order('ordre', {ascending: true});
+
+    if (error) {
+      if (error.code === '42P01' || (error.message||'').includes('does not exist')) {
+        _carouselShowSQL(list);
+        return;
+      }
+      list.innerHTML = `<div style="color:#DC2626;padding:20px;font-size:13px;">Erreur: ${error.message}</div>`;
+      return;
+    }
+
+    _carouselItems = data || [];
+    _carouselRenderAdmin(list);
+
+  } catch(e) {
+    list.innerHTML = `<div style="color:#DC2626;padding:20px;font-size:13px;">Erreur: ${e.message}</div>`;
+  }
+}
+
+function _carouselRenderAdmin(list) {
+  if (!list) list = document.getElementById('carouselAdminList');
+  if (!list) return;
+
+  const badge = document.getElementById('carouselCountBadge');
+  if (badge) badge.textContent = _carouselItems.length + '/10 images';
+
+  if (!_carouselItems.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-photo-film" style="font-size:32px;display:block;margin-bottom:12px;opacity:.4;"></i>Aucune image dans le carrousel.<br>Cliquez sur "Ajouter une image" pour commencer.</div>';
+    return;
+  }
+
+  list.innerHTML = _carouselItems.map((img, i) => `
+    <div id="carousel-item-${img.id}" style="display:flex;align-items:center;gap:14px;background:#fff;border:1.5px solid #E5E7EB;border-radius:14px;padding:12px 16px;margin-bottom:10px;">
+      <div style="width:80px;height:56px;border-radius:8px;overflow:hidden;background:#F1F5F9;flex-shrink:0;">
+        <img src="${img.url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:#CBD5E1;\\'><i class=\\'fa-solid fa-image\\'></i></div>'"/>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13.5px;font-weight:700;color:#1A1A4E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${img.titre || '(sans titre)'}</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Ordre: ${img.ordre} · ${img.actif ? '<span style="color:#059669;">✓ Actif</span>' : '<span style="color:#9CA3AF;">Inactif</span>'}</div>
+      </div>
+      <div style="display:flex;gap:5px;flex-shrink:0;">
+        ${i > 0 ? `<button onclick="_carouselMove('${img.id}','up')" title="Monter" style="width:30px;height:30px;border-radius:7px;border:1px solid #E5E7EB;background:#F9FAFB;color:#6B7280;cursor:pointer;font-size:12px;"><i class="fa-solid fa-chevron-up"></i></button>` : '<div style="width:30px;"></div>'}
+        ${i < _carouselItems.length - 1 ? `<button onclick="_carouselMove('${img.id}','down')" title="Descendre" style="width:30px;height:30px;border-radius:7px;border:1px solid #E5E7EB;background:#F9FAFB;color:#6B7280;cursor:pointer;font-size:12px;"><i class="fa-solid fa-chevron-down"></i></button>` : '<div style="width:30px;"></div>'}
+        <button onclick="_carouselToggleActif('${img.id}',${img.actif})" title="${img.actif ? 'Désactiver' : 'Activer'}" style="width:30px;height:30px;border-radius:7px;border:1px solid ${img.actif ? '#DCFCE7' : '#F3F4F6'};background:${img.actif ? '#F0FDF4' : '#F9FAFB'};color:${img.actif ? '#16A34A' : '#9CA3AF'};cursor:pointer;font-size:12px;"><i class="fa-solid fa-eye${img.actif ? '' : '-slash'}"></i></button>
+        <button onclick="_carouselDelete('${img.id}')" title="Supprimer" style="width:30px;height:30px;border-radius:7px;border:1px solid #FEE2E2;background:#FFF5F5;color:#DC2626;cursor:pointer;font-size:12px;"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+async function _carouselMove(id, direction) {
+  const idx = _carouselItems.findIndex(c => c.id === id);
+  if (idx < 0) return;
+  const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= _carouselItems.length) return;
+
+  const a = _carouselItems[idx];
+  const b = _carouselItems[swapIdx];
+  const tmpOrdre = a.ordre;
+
+  await Promise.all([
+    sb.from('carousel_images').update({ordre: b.ordre}).eq('id', a.id),
+    sb.from('carousel_images').update({ordre: tmpOrdre}).eq('id', b.id)
+  ]);
+
+  _carouselLoadAdmin();
+  loadPublicRealisations();
+}
+
+async function _carouselToggleActif(id, currentActif) {
+  await sb.from('carousel_images').update({actif: !currentActif}).eq('id', id);
+  showToast(currentActif ? 'Image désactivée' : '✅ Image activée', 'info');
+  _carouselLoadAdmin();
+  loadPublicRealisations();
+}
+
+async function _carouselDelete(id) {
+  if (!confirm('Supprimer cette image du carrousel ?')) return;
+  const { error } = await sb.from('carousel_images').delete().eq('id', id);
+  if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
+  showToast('Image supprimée', 'success');
+  _carouselLoadAdmin();
+  loadPublicRealisations();
+}
+
+async function _carouselUpload() {
+  if (_carouselItems.length >= 10) {
+    showToast('Maximum 10 images dans le carrousel', 'warning');
+    return;
+  }
+  const input = document.getElementById('carouselFileInput');
+  const titreEl = document.getElementById('carouselNewTitre');
+  if (!input) return;
+
+  input.onchange = async function() {
+    const file = input.files[0];
+    if (!file) return;
+    const titre = titreEl ? titreEl.value.trim() : '';
+
+    const btn = document.getElementById('carouselUploadBtn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Upload...'; }
+
+    try {
+      const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+      const fileName = 'carousel_' + Date.now() + '.' + ext;
+
+      const { error: upErr } = await sb.storage.from('photos').upload(fileName, file, {
+        cacheControl: '3600', upsert: false, contentType: file.type
+      });
+      if (upErr) throw new Error(upErr.message);
+
+      const { data: urlData } = sb.storage.from('photos').getPublicUrl(fileName);
+      const publicUrl = urlData.publicUrl;
+
+      const maxOrdre = _carouselItems.length ? Math.max(..._carouselItems.map(c => c.ordre || 0)) : 0;
+      const { error: insertErr } = await sb.from('carousel_images').insert({
+        url: publicUrl,
+        titre: titre || null,
+        ordre: maxOrdre + 1,
+        actif: true
+      });
+      if (insertErr) throw new Error(insertErr.message);
+
+      showToast('✅ Image ajoutée au carrousel !', 'success');
+      if (titreEl) titreEl.value = '';
+      input.value = '';
+      _carouselLoadAdmin();
+      loadPublicRealisations();
+
+    } catch(e) {
+      showToast('Erreur upload: ' + e.message, 'error');
+    }
+
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-plus"></i> Ajouter une image'; }
+  };
+
+  input.click();
+}
+
+function _carouselShowSQL(container) {
+  const sql = `-- Créer la table carousel_images dans Supabase SQL Editor
+CREATE TABLE carousel_images (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  url TEXT NOT NULL,
+  titre TEXT,
+  ordre INTEGER DEFAULT 0,
+  actif BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE carousel_images ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read carousel" ON carousel_images
+  FOR SELECT USING (true);
+
+CREATE POLICY "Admin write carousel" ON carousel_images
+  FOR ALL USING (true) WITH CHECK (true);`;
+
+  container.innerHTML = `
+    <div style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:12px;padding:20px;">
+      <div style="font-size:14px;font-weight:700;color:#C74B00;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        <i class="fa-solid fa-triangle-exclamation"></i> Table carousel_images introuvable
+      </div>
+      <div style="font-size:13px;color:#92400E;margin-bottom:14px;">Créez cette table dans le <strong>Supabase SQL Editor</strong>, puis revenez ici :</div>
+      <pre id="carouselSqlBlock" style="background:#1A1A4E;color:#E2E8F0;padding:16px;border-radius:10px;font-size:11.5px;line-height:1.7;overflow-x:auto;white-space:pre-wrap;">${sql}</pre>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button onclick="_carouselCopySQL()" style="padding:8px 18px;background:#E85D04;color:#fff;border:none;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-copy"></i> Copier le SQL</button>
+        <button onclick="_carouselLoadAdmin()" style="padding:8px 18px;background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-rotate"></i> Réessayer</button>
+      </div>
+    </div>`;
+}
+
+function _carouselCopySQL() {
+  const el = document.getElementById('carouselSqlBlock');
+  if (el) {
+    navigator.clipboard.writeText(el.textContent)
+      .then(() => showToast('SQL copié !', 'success'))
+      .catch(() => showToast('Copie manuelle nécessaire', 'warning'));
+  }
+}
 
 
 function loginSubmitHandler(){var tel=document.getElementById("telephone")?.value;var pin=["lpin1","lpin2","lpin3","lpin4"].map(function(id){return document.getElementById(id)?.value||"";}).join("");var errBox=document.getElementById("errorBox");var btn=document.getElementById("loginSubmitBtn");if(errBox)errBox.style.display="none";if(!tel||tel.trim().length<8){if(errBox){errBox.textContent="Entrez un numero valide";errBox.style.display="block";}return;}if(pin.length<4){if(errBox){errBox.textContent="Entrez votre code PIN 4 chiffres";errBox.style.display="block";}return;}if(btn)btn.disabled=true;(async function(){try{var res=await connexionPrestataire(tel.trim(),pin);if(res.success){var pid=res.provider&&res.provider.id;if(pid){document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");p.style.display="";});document.getElementById("page-login").style.cssText="display:none!important";document.body.classList.add("on-dashboard");document.body.classList.remove("on-home","on-admin");var pd=document.getElementById("page-dashboard");if(pd){pd.classList.add("active");pd.style.cssText="display:block!important";window.scrollTo(0,0);}if(typeof chargerDashboard==="function")await chargerDashboard(pid);}}else{if(errBox){errBox.textContent=res.message||"Telephone ou PIN incorrect";errBox.style.display="block";}}}catch(e){if(errBox){errBox.textContent="Erreur: "+e.message;errBox.style.display="block";}}if(btn)btn.disabled=false;})();}
