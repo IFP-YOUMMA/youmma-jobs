@@ -3525,12 +3525,9 @@ function renderProviders() {
     const isFav = favorites.includes(p.id);
     const stars5 = Array.from({length:5},(_,j)=>`<span style="color:${j<Math.floor(p.note)?'#D4A017':'#D1D5DB'};font-size:11px;">★</span>`).join('');
     const isEntreprise = p.type_compte === 'entreprise';
-    const badgesInline = [
-      isEntreprise ? `<span style="font-size:9.5px;padding:2px 7px;background:#F5F3FF;color:#7C3AED;border-radius:20px;font-weight:700;"><i class="fa-solid fa-building" style="font-size:8px;"></i> Entreprise</span>` : '',
-      p.badge_express ? `<span class="badge-express" style="font-size:9.5px;padding:2px 7px;"> Express</span>` : '',
-      p.badge_top ? `<span class="badge-top" style="font-size:9.5px;padding:2px 7px;"><i class="fa-solid fa-trophy" style="color:#F5C842;"></i> Top</span>` : '',
-      p.badge_verifie ? `<span class="badge-verifie" style="font-size:9.5px;padding:2px 7px;"><i class="fa-solid fa-check"></i> Vérifié</span>` : '',
-    ].filter(Boolean).join('');
+    const typeCompteBadge = isEntreprise
+      ? `<span style="font-size:9px;font-weight:700;color:#fff;background:#E85D04;padding:2px 6px;border-radius:10px;white-space:nowrap;">🏢 Entreprise</span>`
+      : `<span style="font-size:9px;font-weight:700;color:#6B7280;background:#F3F4F6;padding:2px 6px;border-radius:10px;white-space:nowrap;">👤 Particulier</span>`;
     const isOccupe = p.dispo === 'Occupé';
     const dispoClass = isOccupe ? 'led-red' : 'led-green';
 
@@ -3552,9 +3549,11 @@ function renderProviders() {
           <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px;">
             <div class="pc2-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
               ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom_entreprise : p.nom}
-              ${p.type_compte==='entreprise' ? '<span style="font-size:9px;font-weight:700;color:#7C3AED;background:#F5F3FF;padding:1px 6px;border-radius:10px;margin-left:4px;vertical-align:middle;white-space:nowrap;">🏢</span>' : ''}
             </div>
-            <button class="btn-pfav" onclick="event.stopPropagation();toggleFav('${p.id}')" style="flex-shrink:0;background:none;border:none;cursor:pointer;font-size:17px;padding:2px 4px;line-height:1;">${isFav?'<i class="fa-solid fa-heart" style="color:#E85D04;"></i>':'<i class="fa-regular fa-heart" style="color:#bbb;"></i>'}</button>
+            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+              ${typeCompteBadge}
+              <button class="btn-pfav" onclick="event.stopPropagation();toggleFav('${p.id}')" style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px 4px;line-height:1;">${isFav?'<i class="fa-solid fa-heart" style="color:#E85D04;"></i>':'<i class="fa-regular fa-heart" style="color:#bbb;"></i>'}</button>
+            </div>
           </div>
           
           <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">
@@ -4670,6 +4669,8 @@ function updateUI() {
   if (p.statut === 'en_attente') badges.push('<span class="pb-badge pending">⏳ En attente</span>');
   if (p.essai_actif && new Date(p.essai_fin) > new Date()) badges.push('<span class="pb-badge trial">Essai gratuit</span>');
   if (p.abonnement_actif && new Date(p.abonnement_fin) > new Date()) badges.push('<span class="pb-badge active">Abonné</span>');
+  if (p.type_compte === 'entreprise') badges.push('<span style="font-size:10px;font-weight:700;color:#fff;background:#E85D04;padding:3px 9px;border-radius:20px;white-space:nowrap;">🏢 Entreprise</span>');
+  else badges.push('<span style="font-size:10px;font-weight:700;color:#6B7280;background:#F3F4F6;padding:3px 9px;border-radius:20px;white-space:nowrap;">👤 Particulier</span>');
   document.getElementById('pbBadges').innerHTML = badges.join('');
 
   // Stats
@@ -6737,6 +6738,8 @@ function _dashUpdateUI() {
   if (p.statut==='en_attente') badges.push('<span class="pb-badge pending">⏳ En attente</span>');
   if (p.essai_actif && new Date(p.essai_fin)>new Date()) badges.push('<span class="pb-badge trial">Essai gratuit</span>');
   if (p.abonnement_actif && p.abonnement_fin && new Date(p.abonnement_fin)>new Date()) badges.push('<span class="pb-badge active">Abonné</span>');
+  if (p.type_compte === 'entreprise') badges.push('<span style="font-size:10px;font-weight:700;color:#fff;background:#E85D04;padding:3px 9px;border-radius:20px;white-space:nowrap;">🏢 Entreprise</span>');
+  else badges.push('<span style="font-size:10px;font-weight:700;color:#6B7280;background:#F3F4F6;padding:3px 9px;border-radius:20px;white-space:nowrap;">👤 Particulier</span>');
   const pbBadges = document.getElementById('pbBadges');
   if (pbBadges) pbBadges.innerHTML = badges.join('');
 
