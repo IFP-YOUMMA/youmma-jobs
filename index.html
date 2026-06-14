@@ -1551,23 +1551,14 @@ async function verifierSession() {
       <p class="hero-subtitle">Trouvez rapidement le bon artisan pour tous vos projets — électriciens, plombiers, maçons, soudeurs, menuisiers, mécaniciens et bien plus.</p>
       
       
-      <div style="position:relative;border-radius:16px;overflow:hidden;margin-bottom:28px;height:200px;">
-
-        
+      <div id="expWrap" style="position:relative;border-radius:16px;overflow:hidden;margin-bottom:28px;height:260px;">
         <div id="expSlides" style="position:absolute;inset:0;display:flex;transition:transform .8s cubic-bezier(.4,0,.2,1);">
-          <div style="min-width:100%;height:100%;background:linear-gradient(135deg,#1A0A4E,#7C3AED);flex-shrink:0;"></div>
-          <div style="min-width:100%;height:100%;background:linear-gradient(135deg,#1A2E0A,#16A34A);flex-shrink:0;"></div>
-          <div style="min-width:100%;height:100%;background:linear-gradient(135deg,#2E1A0A,#E85D04);flex-shrink:0;"></div>
-          <div style="min-width:100%;height:100%;background:linear-gradient(135deg,#0A1A2E,#0F6E56);flex-shrink:0;"></div>
-          <div style="min-width:100%;height:100%;background:linear-gradient(135deg,#2E0A0A,#DC2626);flex-shrink:0;"></div>
+          <div style="min-width:100%;height:100%;background:linear-gradient(135deg,#1A0A4E,#2D2D6B);flex-shrink:0;"></div>
         </div>
-
-        
-        <div style="position:absolute;inset:0;background:rgba(5,5,20,.55);z-index:1;"></div>
-
-        
-        <div style="position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:0 28px;gap:20px;">
+        <div style="position:absolute;inset:0;background:rgba(5,5,20,.52);z-index:1;"></div>
+        <div style="position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:0 32px;gap:20px;">
           <div>
+            <div style="font-size:10px;font-weight:700;color:#E85D04;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;">À la une</div>
             <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;">Une urgence ?</div>
             <div style="font-size:14px;color:rgba(255,255,255,.75);">Trouvez rapidement un artisan qualifié près de chez vous.</div>
           </div>
@@ -1575,40 +1566,8 @@ async function verifierSession() {
             Voir les artisans Express →
           </button>
         </div>
-
-        
-        <div id="expDots" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);z-index:3;display:flex;gap:5px;"></div>
+        <div id="expDots" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:3;display:flex;gap:5px;"></div>
       </div>
-
-      <script>
-      (function() {
-        var _ei = 0, _et = null, _en = 5;
-        function expGo(n) {
-          _ei = ((n % _en) + _en) % _en;
-          var s = document.getElementById('expSlides');
-          if (s) s.style.transform = 'translateX(-' + (_ei * 100) + '%)';
-          for (var i = 0; i < _en; i++) {
-            var d = document.getElementById('exd' + i);
-            if (d) { d.style.width = i === _ei ? '18px' : '7px'; d.style.background = i === _ei ? '#fff' : 'rgba(255,255,255,.35)'; }
-          }
-        }
-        function expInit() {
-          var dots = document.getElementById('expDots');
-          if (!dots || dots.children.length > 0) return;
-          for (var i = 0; i < _en; i++) {
-            var d = document.createElement('div');
-            d.id = 'exd' + i;
-            d.style.cssText = 'width:' + (i===0?'18px':'7px') + ';height:7px;border-radius:4px;background:' + (i===0?'#fff':'rgba(255,255,255,.35)') + ';cursor:pointer;transition:all .3s;';
-            (function(idx){d.onclick=function(){expGo(idx);clearInterval(_et);_et=setInterval(function(){expGo(_ei+1);},3500);};})(i);
-            dots.appendChild(d);
-          }
-          clearInterval(_et);
-          _et = setInterval(function() { expGo(_ei + 1); }, 3500);
-        }
-        window.addEventListener('load', expInit);
-        document.addEventListener('DOMContentLoaded', expInit);
-      })();
-      </script>
       <div class="hero-actions">
         <button class="btn-hero-main" onclick="document.getElementById('artisans').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-magnifying-glass"></i> Trouver un artisan</button>
         <button class="btn-hero-outline" onclick="ouvrirInscription()">🚀 Devenir artisan</button>
@@ -1661,29 +1620,6 @@ async function verifierSession() {
           <div><div class="fn-label">Note moyenne</div><div class="fn-val">4.8 / 5 ★</div></div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<section id="images-une" style="background:#0D0D2E;padding:48px 0;overflow:hidden;">
-  <div style="max-width:1320px;margin:0 auto;padding:0 5%;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
-      <div>
-        <div style="font-size:11px;font-weight:700;color:#E85D04;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Actualités</div>
-        <h2 style="font-family:'Libre Baskerville',serif;font-size:clamp(20px,3vw,30px);font-weight:700;color:#fff;margin:0;">Images à la une</h2>
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="realPrev()" id="realBtnPrev" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:16px;transition:.2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='rgba(232,93,4,.6)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">‹</button>
-        <button onclick="realNext()" id="realBtnNext" style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;cursor:pointer;font-size:16px;transition:.2s;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='rgba(232,93,4,.6)'" onmouseout="this.style.background='rgba(255,255,255,.08)'">›</button>
-      </div>
-    </div>
-    <div style="position:relative;overflow:hidden;">
-      <div id="realTrack" style="display:flex;gap:16px;transition:transform .5s cubic-bezier(.25,.46,.45,.94);will-change:transform;"></div>
-    </div>
-    <div id="realDots" style="display:flex;gap:6px;justify-content:center;margin-top:20px;"></div>
-    <div id="realEmpty" style="display:none;text-align:center;padding:40px 20px;">
-      <i class="fa-solid fa-photo-film" style="font-size:36px;color:rgba(255,255,255,.2);display:block;margin-bottom:10px;"></i>
-      <p style="color:rgba(255,255,255,.4);font-size:13px;">Aucune image à la une pour le moment</p>
     </div>
   </div>
 </section>
@@ -9978,6 +9914,83 @@ document.addEventListener('DOMContentLoaded', loadPublicRealisations);
 
 
 // ══════════════════════════════════════════════════════════════════
+// DIAPORAMA "À LA UNE" — expSlides dans le hero (carousel_images)
+// ══════════════════════════════════════════════════════════════════
+
+var _expIdx = 0, _expTimer = null, _expCount = 1;
+
+function _expGo(n) {
+  _expCount = Math.max(1, _expCount);
+  _expIdx = ((n % _expCount) + _expCount) % _expCount;
+  var s = document.getElementById('expSlides');
+  if (s) s.style.transform = 'translateX(-' + (_expIdx * 100) + '%)';
+  for (var i = 0; i < _expCount; i++) {
+    var d = document.getElementById('exd' + i);
+    if (d) {
+      d.style.width = i === _expIdx ? '22px' : '7px';
+      d.style.background = i === _expIdx ? '#fff' : 'rgba(255,255,255,.35)';
+    }
+  }
+}
+
+function _expBuildDots(count) {
+  var dots = document.getElementById('expDots');
+  if (!dots) return;
+  dots.innerHTML = '';
+  for (var i = 0; i < count; i++) {
+    var d = document.createElement('div');
+    d.id = 'exd' + i;
+    d.style.cssText = 'width:' + (i===0?'22px':'7px') + ';height:7px;border-radius:4px;background:' + (i===0?'#fff':'rgba(255,255,255,.35)') + ';cursor:pointer;transition:all .3s;';
+    (function(idx){ d.onclick = function() { _expGo(idx); clearInterval(_expTimer); _expTimer = setInterval(function(){ _expGo(_expIdx+1); }, 7000); }; })(i);
+    dots.appendChild(d);
+  }
+}
+
+async function _expInit() {
+  var slides = document.getElementById('expSlides');
+  if (!slides) return;
+
+  var _fallbackGradients = [
+    'linear-gradient(135deg,#1A0A4E,#7C3AED)',
+    'linear-gradient(135deg,#1A2E0A,#16A34A)',
+    'linear-gradient(135deg,#2E1A0A,#E85D04)',
+    'linear-gradient(135deg,#0A1A2E,#0F6E56)',
+    'linear-gradient(135deg,#2E0A0A,#DC2626)'
+  ];
+
+  try {
+    var result = await sb.from('carousel_images').select('id,url,titre').eq('actif', true).order('ordre', {ascending: true});
+    var data = result.data;
+    var err = result.error;
+
+    if (!err && data && data.length) {
+      slides.innerHTML = data.map(function(img) {
+        return '<div style="min-width:100%;height:100%;flex-shrink:0;background-image:url(\'' + img.url.replace(/'/g,"\\'") + '\');background-size:cover;background-position:center;"></div>';
+      }).join('');
+      _expCount = data.length;
+    } else {
+      slides.innerHTML = _fallbackGradients.map(function(g) {
+        return '<div style="min-width:100%;height:100%;background:' + g + ';flex-shrink:0;"></div>';
+      }).join('');
+      _expCount = _fallbackGradients.length;
+    }
+  } catch(e) {
+    slides.innerHTML = _fallbackGradients.map(function(g) {
+      return '<div style="min-width:100%;height:100%;background:' + g + ';flex-shrink:0;"></div>';
+    }).join('');
+    _expCount = _fallbackGradients.length;
+  }
+
+  _expIdx = 0;
+  _expBuildDots(_expCount);
+  _expGo(0);
+  clearInterval(_expTimer);
+  _expTimer = setInterval(function() { _expGo(_expIdx + 1); }, 7000);
+}
+
+document.addEventListener('DOMContentLoaded', _expInit);
+
+// ══════════════════════════════════════════════════════════════════
 // CAROUSEL IMAGES À LA UNE — Admin (table carousel_images)
 // ══════════════════════════════════════════════════════════════════
 
@@ -10055,14 +10068,14 @@ async function _carouselMove(id, direction) {
   ]);
 
   _carouselLoadAdmin();
-  loadPublicRealisations();
+  _expInit();
 }
 
 async function _carouselToggleActif(id, currentActif) {
   await sb.from('carousel_images').update({actif: !currentActif}).eq('id', id);
   showToast(currentActif ? 'Image désactivée' : '✅ Image activée', 'info');
   _carouselLoadAdmin();
-  loadPublicRealisations();
+  _expInit();
 }
 
 async function _carouselDelete(id) {
@@ -10071,7 +10084,7 @@ async function _carouselDelete(id) {
   if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
   showToast('Image supprimée', 'success');
   _carouselLoadAdmin();
-  loadPublicRealisations();
+  _expInit();
 }
 
 async function _carouselUpload() {
@@ -10116,7 +10129,7 @@ async function _carouselUpload() {
       if (titreEl) titreEl.value = '';
       input.value = '';
       _carouselLoadAdmin();
-      loadPublicRealisations();
+      _expInit();
 
     } catch(e) {
       showToast('Erreur upload: ' + e.message, 'error');
