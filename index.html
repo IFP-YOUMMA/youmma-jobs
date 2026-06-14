@@ -4203,7 +4203,7 @@ document.addEventListener('keydown', e => {
 
       <button id="dashDispoBtn" onclick="_dashToggleDispo()" style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:50px;border:1.5px solid #86EFAC;background:#F0FDF4;color:#16A34A;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;margin-right:8px;">
         <span id="dashDispoDot" style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block;flex-shrink:0;"></span>
-        <span id="dashDispoLabel">Disponible</span>
+        <span id="dashDispoLabel">Je suis Disponible</span>
       </button>
       <button class="notif-bell-btn" id="dashNotifBell" onclick="_notifOpen('provider')" title="Notifications" style="margin-right:8px;">
         <i class="fa-solid fa-bell"></i>
@@ -4232,7 +4232,7 @@ document.addEventListener('keydown', e => {
           <span id="dashDotIn" style="width:10px;height:10px;border-radius:50%;background:#22C55E;display:inline-block;flex-shrink:0;animation:pulse-green 1.5s infinite;"></span>
           <div>
             <div style="font-size:10px;color:#16A34A;font-weight:600;">Disponibilité</div>
-            <div style="font-size:13px;font-weight:700;color:#1A1A4E;" id="dashLabelIn">Disponible</div>
+            <div style="font-size:13px;font-weight:700;color:#1A1A4E;" id="dashLabelIn">Je suis Disponible</div>
           </div>
         </div>
         <span style="font-size:11px;color:#16A34A;font-weight:700;">Changer →</span>
@@ -6824,7 +6824,7 @@ function _dashUpdateDispoBtn(state) {
   const bc = isDisponible ? '#86EFAC' : '#FECACA';
   const tc = isDisponible ? '#16A34A' : '#DC2626';
   const dc = isDisponible ? '#22C55E' : '#EF4444';
-  const tx = isDisponible ? 'Disponible' : 'Occupé';
+  const tx = isDisponible ? 'Je suis Disponible' : 'Je suis Occupé(e)';
   const btn   = document.getElementById('dashDispoBtn');
   const dot   = document.getElementById('dashDispoDot');
   const label = document.getElementById('dashDispoLabel');
@@ -6853,7 +6853,7 @@ async function _dashToggleDispo() {
     if (_dashData)    _dashData.disponibilite    = newState;
     if (providerData) providerData.disponibilite = newState;
     _dashUpdateDispoBtn(newState);
-    showToast(newState === 'Disponible' ? '🟢 Vous êtes maintenant Disponible' : '🔴 Vous êtes marqué Occupé', 'success');
+    showToast(newState === 'Disponible' ? '🟢 Je suis Disponible' : '🔴 Je suis Occupé(e)', 'success');
   } else {
     showToast('Erreur: ' + error.message, 'error');
   }
