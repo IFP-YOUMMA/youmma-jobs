@@ -10453,17 +10453,54 @@ var _provMiniTimer = null;
 async function _provMiniInit() {
   var wrap = document.getElementById('provMiniWrap');
   var card = document.getElementById('provMiniCard');
-  if (!wrap || !card) return;
+  if (!wrap || !card) {
+    console.warn('[provMini] Éléments HTML introuvables (#provMiniWrap / #provMiniCard)');
+    return;
+  }
   var providers = [];
+  var isFallback = false;
   try {
-    var res = await sb.from('providers').select('id,prenom,nom,metier,photo_url,disponibilite').limit(20);
-    if (res.data && res.data.length) {
-      // Priorité aux disponibles, sinon tous
-      var dispo = res.data.filter(function(p){ return p.disponibilite !== 'Occupé'; });
-      providers = dispo.length ? dispo : res.data;
+    console.log('[provMini] Requête Supabase en cours...');
+    var res = await sb.from('providers')
+      .select('id,prenom,nom,metier,photo_url,disponibilite,localisation')
+      .limit(20);
+    if (res.error) {
+      console.error('[provMini] Erreur Supabase:', res.error.message);
+    } else {
+      console.log('[provMini] Données reçues:', res.data ? res.data.length : 0, 'ligne(s)');
+      if (res.data && res.data.length) {
+        console.log('[provMini] Valeurs disponibilite:', res.data.map(function(p){ return '"' + p.disponibilite + '"'; }).join(', '));
+        // Filtre : valeur lowercase 'disponible'
+        var dispo = res.data.filter(function(p){
+          return (p.disponibilite||'').toLowerCase().trim() === 'disponible';
+        });
+        console.log('[provMini] Prestataires "disponible":', dispo.length);
+        if (dispo.length) {
+          providers = dispo;
+        } else {
+          // Fallback 1 : tous sauf occupé
+          var nonOccupe = res.data.filter(function(p){
+            return (p.disponibilite||'').toLowerCase().trim() !== 'occupé';
+          });
+          providers = nonOccupe.length ? nonOccupe : res.data;
+          console.log('[provMini] Fallback (non-occupé):', providers.length);
+        }
+      }
     }
-  } catch(e) {}
-  if (!providers.length) return;
+  } catch(e) {
+    console.error('[provMini] Exception:', e.message || String(e));
+  }
+  // Fallback fictif si aucune donnée — pour tester le design
+  if (!providers.length) {
+    console.warn('[provMini] Aucune donnée → prestataires fictifs pour test design');
+    providers = [
+      { id: null, prenom: 'Mamadou', nom: 'Diallo', metier: 'Électricien certifié', photo_url: null },
+      { id: null, prenom: 'Fatoumata', nom: 'Bah', metier: 'Coiffeuse professionnelle', photo_url: null },
+      { id: null, prenom: 'Ibrahim', nom: 'Kouyaté', metier: 'Plombier', photo_url: null }
+    ];
+    isFallback = true;
+  }
+  console.log('[provMini] Affichage:', providers.length, 'profil(s)', isFallback ? '⚠️ FICTIFS' : '✅ réels');
   wrap.style.display = 'block';
   var idx = 0;
   function _showProvider(p) {
@@ -10483,7 +10520,7 @@ async function _provMiniInit() {
     }
     nameEl.textContent   = ((p.prenom||'') + ' ' + (p.nom||'')).trim();
     metierEl.textContent = p.metier || '';
-    card.onclick = function() { if (typeof openModal === 'function') openModal(p.id); };
+    card.onclick = p.id ? function() { if (typeof openModal === 'function') openModal(p.id); } : null;
   }
   function _tick() {
     card.style.opacity = '0';
