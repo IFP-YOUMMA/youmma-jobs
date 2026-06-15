@@ -17,7 +17,6 @@ module.exports = async function(req, res) {
     return res.status(400).json({ error: 'phone et code requis' });
   }
 
-  // Numéro au format international +224XXXXXXXXX
   const clean = phone.replace(/[\s\-]/g, '');
   const e164  = clean.startsWith('+')   ? clean
               : clean.startsWith('224') ? '+' + clean
@@ -27,12 +26,8 @@ module.exports = async function(req, res) {
     return res.status(400).json({ error: 'Numéro invalide', received: clean });
   }
 
-  const sid   = process.env.NIMBA_SID;
-  const token = process.env.NIMBA_TOKEN;
-
-  if (!sid || !token) {
-    return res.status(500).json({ error: 'NIMBA_SID / NIMBA_TOKEN manquants dans les variables Vercel' });
-  }
+  const sid   = process.env.NIMBA_SID   || '1a3b6b6f9e6e5648f9492b07a26dbdd6';
+  const token = process.env.NIMBA_TOKEN || 'iEIMmNfZQJGKdUWv6NU7CHNDSvLiVmGruwnMNLTU2-_8DLLpc1HGON6gsfictrB2dfkgv_QMXJWnFpt5jyatV_-V32V2It85RGIxjbEY7Mk';
 
   const message = 'Votre code de verification YOUMMA JOBS : ' + code + '. Valable 10 minutes.';
 
@@ -44,11 +39,9 @@ module.exports = async function(req, res) {
 
   const credentials = Buffer.from(sid + ':' + token).toString('base64');
 
-  console.log('[NimbaSMS] ── Nouvelle requête ──────────────────');
   console.log('[NimbaSMS] Numéro :', e164);
   console.log('[NimbaSMS] Code   :', code);
-  console.log('[NimbaSMS] Payload:', payload);
-  console.log('[NimbaSMS] SID    :', sid ? sid.slice(0, 6) + '...' : 'MANQUANT');
+  console.log('[NimbaSMS] SID via:', process.env.NIMBA_SID ? 'env' : 'fallback');
 
   return new Promise(function(resolve) {
     const options = {
