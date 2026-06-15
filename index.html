@@ -2948,15 +2948,14 @@ if (typeof inscrirePrestataire === 'undefined') {
     if(location.hostname==='localhost'||location.hostname==='127.0.0.1'){
       return {success:false,message:'API SMS non disponible en local. Ouvrez www.yoummajobs.com pour tester. (code enregistré dans Supabase → verification_codes)'};
     }
-    try{
-      var r=await fetch('/api/send-sms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:e164,code:_smsCode})});
-      var d={};
-      try{d=await r.json();}catch(je){return{success:false,message:'Réponse API vide ('+r.status+').';};}
-      console.log('[SMS] Statut:',r.status,'| Réponse:',d);
-      if(r.ok) return {success:true};
-      var detail = d.details ? (' | Nimba: '+d.details) : '';
-      return {success:false,message:(d.error||'Erreur SMS ('+r.status+')')+detail};
-    }catch(err){return {success:false,message:'Erreur réseau: '+err.message};}
+    var _r=null,_d={};
+    try{_r=await fetch('/api/send-sms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:e164,code:_smsCode})});}
+    catch(err){return {success:false,message:'Erreur réseau: '+err.message};}
+    try{_d=await _r.json();}catch(_j){_d={};}
+    console.log('[SMS] Statut:',_r.status,'| Réponse:',_d);
+    if(_r.ok)return {success:true};
+    var detail=_d.details?(' | Nimba: '+(typeof _d.details==='string'?_d.details:JSON.stringify(_d.details))):'';
+    return {success:false,message:(_d.error||'Erreur SMS '+_r.status)+detail};
   };
 
   function _startTimer(){
@@ -9820,6 +9819,11 @@ const SOON_MODULES = {
   },
 };
 
+function switchSuggTab(){}
+function setHubStar(){}
+function voterModule(){}
+function soumettreSuggestion(){}
+function soumettreCommentaire(){}
 window.openSoonHub = openSoonHub;
 window.switchSuggTab = switchSuggTab;
 window.setHubStar = setHubStar;
