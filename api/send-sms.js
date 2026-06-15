@@ -13,33 +13,42 @@ module.exports = async function(req, res) {
   const phone = body.phone;
   const code  = body.code;
 
-  if (!phone || !code) return res.status(400).json({ error: 'phone et code requis' });
+  if (!phone || !code) {
+    return res.status(400).json({ error: 'phone et code requis' });
+  }
 
-  // Numéro sans le + (format Nimba SMS : 224XXXXXXXXX)
-  const clean  = phone.replace(/[\s\-\+]/g, '');
-  const number = clean.startsWith('224') ? clean : '224' + clean.replace(/^0/, '');
+  // Numéro au format international +224XXXXXXXXX
+  const clean = phone.replace(/[\s\-]/g, '');
+  const e164  = clean.startsWith('+')   ? clean
+              : clean.startsWith('224') ? '+' + clean
+              : '+224' + clean.replace(/^0/, '');
 
-  if (!/^224[0-9]{9}$/.test(number)) {
-    return res.status(400).json({ error: 'Numéro guinéen invalide (224XXXXXXXXX)', received: number });
+  if (!/^\+224[0-9]{9}$/.test(e164)) {
+    return res.status(400).json({ error: 'Numéro invalide', received: clean });
   }
 
   const sid   = process.env.NIMBA_SID;
   const token = process.env.NIMBA_TOKEN;
 
   if (!sid || !token) {
-    return res.status(500).json({ error: 'NIMBA_SID / NIMBA_TOKEN non configurés sur Vercel' });
+    return res.status(500).json({ error: 'NIMBA_SID / NIMBA_TOKEN manquants dans les variables Vercel' });
   }
 
+  const message = 'Votre code de verification YOUMMA JOBS : ' + code + '. Valable 10 minutes.';
+
   const payload = JSON.stringify({
-    to: [number],
+    to: [e164],
     sender_name: 'YOUMMAJOBS',
-    message: 'Votre code de verification YOUMMA JOBS : ' + code + '. Valable 10 minutes.'
+    message: message
   });
 
   const credentials = Buffer.from(sid + ':' + token).toString('base64');
 
-  console.log('[NimbaSMS] Envoi vers:', number, '| Code:', code);
+  console.log('[NimbaSMS] ── Nouvelle requête ──────────────────');
+  console.log('[NimbaSMS] Numéro :', e164);
+  console.log('[NimbaSMS] Code   :', code);
   console.log('[NimbaSMS] Payload:', payload);
+  console.log('[NimbaSMS] SID    :', sid ? sid.slice(0, 6) + '...' : 'MANQUANT');
 
   return new Promise(function(resolve) {
     const options = {
@@ -55,32 +64,34 @@ module.exports = async function(req, res) {
       }
     };
 
-    const req2 = https.request(options, function(resp) {
+    const apiReq = https.request(options, function(apiRes) {
       let data = '';
-      resp.on('data', function(chunk) { data += chunk; });
-      resp.on('end', function() {
-        console.log('[NimbaSMS] Statut HTTP:', resp.statusCode);
-        console.log('[NimbaSMS] Réponse:', data);
+      apiRes.on('data', function(chunk) { data += chunk; });
+      apiRes.on('end', function() {
+        console.log('[NimbaSMS] Statut HTTP :', apiRes.statusCode);
+        console.log('[NimbaSMS] Réponse     :', data);
 
-        if (resp.statusCode >= 200 && resp.statusCode < 300) {
-          resolve(res.status(200).json({ success: true, nimba: data }));
+        let parsed = null;
+        try { parsed = JSON.parse(data); } catch(_) {}
+
+        if (apiRes.statusCode >= 200 && apiRes.statusCode < 300) {
+          resolve(res.status(200).json({ success: true, response: parsed || data }));
         } else {
-          // Retourne la réponse Nimba complète pour diagnostiquer
           resolve(res.status(502).json({
-            error: 'Nimba SMS erreur ' + resp.statusCode,
-            details: data,
-            number: number
+            error: 'Erreur Nimba SMS (HTTP ' + apiRes.statusCode + ')',
+            details: parsed || data,
+            numero: e164
           }));
         }
       });
     });
 
-    req2.on('error', function(e) {
-      console.error('[NimbaSMS] Erreur réseau:', e.message);
-      resolve(res.status(500).json({ error: 'Erreur réseau: ' + e.message }));
+    apiReq.on('error', function(e) {
+      console.error('[NimbaSMS] Erreur réseau :', e.message);
+      resolve(res.status(500).json({ error: 'Erreur réseau vers Nimba : ' + e.message }));
     });
 
-    req2.write(payload);
-    req2.end();
+    apiReq.write(payload);
+    apiReq.end();
   });
 };

@@ -2669,8 +2669,13 @@ if (typeof connexionPrestataire === 'undefined') {
       if (!prenom.trim() || !nom.trim() || !tel.trim()) { showErr('Remplissez tous les champs'); return; }
       if (pin.length < 4) { showErr('Entrez votre code PIN 4 chiffres'); return; }
       if (!document.getElementById('i-cgu').checked) { showErr("Veuillez accepter nos conditions d'utilisation pour continuer"); return; }
-      // TODO: Réactiver vérification SMS Nimba si désactivée
-      goTo(2);
+      // Envoi SMS Nimba
+      var origText = b1.textContent;
+      b1.disabled = true; b1.textContent = 'Envoi du code SMS…';
+      var smsRes = await window._smsSend(tel);
+      b1.disabled = false; b1.textContent = origText;
+      if (!smsRes.success) { showErr('SMS non envoyé : ' + smsRes.message); return; }
+      window._smsShowStep(tel);
     };
 
     // Bouton suivant étape 2
@@ -2838,8 +2843,13 @@ if (typeof inscrirePrestataire === 'undefined') {
       var pin=(document.getElementById('i-pin1')||{}).value+(document.getElementById('i-pin2')||{}).value+(document.getElementById('i-pin3')||{}).value+(document.getElementById('i-pin4')||{}).value;
       if(!p.trim()||!n.trim()||!t.trim()){showErr('Remplissez tous les champs');return;}
       if(pin.length<4){showErr('Entrez votre code PIN 4 chiffres');return;}
-      // TODO: Réactiver vérification SMS Nimba si désactivée
-      goTo(2);
+      // Envoi SMS Nimba
+      var origText=b1.textContent;
+      b1.disabled=true;b1.textContent='Envoi du code SMS…';
+      var smsRes=await window._smsSend(t);
+      b1.disabled=false;b1.textContent=origText;
+      if(!smsRes.success){showErr('SMS non envoyé : '+smsRes.message);return;}
+      window._smsShowStep(t);
     };
     if(b2)b2.onclick=function(){
       var cat=(document.getElementById('i-cat')||{}).value||'',met=((document.getElementById('i-metier')||{}).value||'').trim(),desc=((document.getElementById('i-desc')||{}).value||'').trim();
