@@ -2941,8 +2941,11 @@ if (typeof inscrirePrestataire === 'undefined') {
     try{
       var r=await fetch('/api/send-sms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:e164,code:_smsCode})});
       var d={};
-      try{d=await r.json();}catch(je){return{success:false,message:'Réponse API vide ('+r.status+'). Vérifiez les logs Vercel → Functions.';};}
-      return r.ok?{success:true}:{success:false,message:d.error||'Erreur SMS ('+r.status+')'};
+      try{d=await r.json();}catch(je){return{success:false,message:'Réponse API vide ('+r.status+').';};}
+      console.log('[SMS] Statut:',r.status,'| Réponse:',d);
+      if(r.ok) return {success:true};
+      var detail = d.details ? (' | Nimba: '+d.details) : '';
+      return {success:false,message:(d.error||'Erreur SMS ('+r.status+')')+detail};
     }catch(err){return {success:false,message:'Erreur réseau: '+err.message};}
   };
 
