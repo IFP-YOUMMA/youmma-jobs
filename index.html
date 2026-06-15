@@ -1594,10 +1594,9 @@ async function verifierSession() {
         <div style="position:absolute;bottom:0;left:0;right:0;z-index:2;background:linear-gradient(transparent,rgba(5,5,20,.82));padding:36px 16px 38px;pointer-events:none;">
           <div id="expTitreOverlay" style="color:#fff;font-size:13px;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.7);max-width:65%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
         </div>
-        <!-- Badges haut gauche -->
-        <div style="position:absolute;top:14px;left:16px;z-index:4;display:flex;align-items:center;gap:7px;pointer-events:none;">
+        <!-- Badge haut gauche -->
+        <div style="position:absolute;top:14px;left:16px;z-index:4;pointer-events:none;">
           <span style="background:#E85D04;color:#fff;font-size:10px;font-weight:800;padding:4px 11px;border-radius:20px;letter-spacing:.07em;text-transform:uppercase;box-shadow:0 2px 10px rgba(232,93,4,.55);">⭐ À LA UNE</span>
-          <span style="background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:rgba(255,255,255,.88);font-size:9px;font-weight:700;padding:4px 9px;border-radius:20px;border:1px solid rgba(255,255,255,.18);letter-spacing:.06em;text-transform:uppercase;">Sponsorisé</span>
         </div>
         <!-- Flèche gauche -->
         <button onclick="_expPrev()" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:4;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;" onmouseover="this.style.background='rgba(232,93,4,.8)'" onmouseout="this.style.background='rgba(0,0,0,.45)'">&#8249;</button>
@@ -1609,10 +1608,18 @@ async function verifierSession() {
         </button>
         <!-- Dots navigation -->
         <div id="expDots" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:4;display:flex;gap:6px;align-items:center;"></div>
-        <!-- Ticker artisans express -->
-        <div id="expTicker" onclick="filterByExpress();document.getElementById('prestataires').scrollIntoView({behavior:'smooth'});" style="position:absolute;bottom:55px;left:16px;z-index:3;max-width:calc(100% - 130px);cursor:pointer;pointer-events:auto;">
-          <div id="expTickerText" style="display:inline-flex;align-items:center;gap:6px;background:rgba(10,10,30,.72);backdrop-filter:blur(6px);border:1px solid rgba(232,93,4,.35);border-radius:20px;padding:5px 12px;transition:opacity .5s ease;">
-            <span style="color:#E85D04;font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;">⚡ Artisans disponibles pour intervention rapide</span>
+        <!-- Mini profil prestataires disponibles -->
+        <div id="provMiniWrap" style="position:absolute;bottom:55px;left:16px;z-index:3;pointer-events:auto;display:none;">
+          <div id="provMiniCard" style="display:inline-flex;align-items:center;gap:8px;background:rgba(10,10,30,.75);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.13);border-radius:26px;padding:6px 13px 6px 6px;transition:opacity .5s ease;cursor:pointer;max-width:210px;">
+            <div id="provMiniAvatarWrap" style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,.2);background:#2D2D6B;display:flex;align-items:center;justify-content:center;">
+              <img id="provMiniImg" style="width:100%;height:100%;object-fit:cover;display:none;" src="" alt="">
+              <span id="provMiniInitials" style="color:#fff;font-size:11px;font-weight:800;line-height:1;"></span>
+            </div>
+            <div style="min-width:0;flex:1;">
+              <div id="provMiniName" style="color:#fff;font-size:11.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;"></div>
+              <div id="provMiniMetier" style="color:rgba(255,255,255,.55);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;"></div>
+            </div>
+            <span style="width:7px;height:7px;border-radius:50%;background:#22C55E;flex-shrink:0;box-shadow:0 0 5px #22C55E;"></span>
           </div>
         </div>
       </div>
@@ -10391,7 +10398,7 @@ function _expBuildDots(count) {
     var d = document.createElement('div');
     d.id = 'exd' + i;
     d.style.cssText = 'width:' + (i===0?'26px':'9px') + ';height:9px;border-radius:5px;background:' + (i===0?'#fff':'rgba(255,255,255,.38)') + ';cursor:pointer;transition:all .35s;box-shadow:0 1px 4px rgba(0,0,0,.4);';
-    (function(idx){ d.onclick = function() { _expGo(idx); clearInterval(_expTimer); _expTimer = setInterval(function(){ _expGo(_expIdx+1); }, 5000); }; })(i);
+    (function(idx){ d.onclick = function() { _expGo(idx); clearInterval(_expTimer); _expTimer = setInterval(function(){ _expGo(_expIdx+1); }, 12000); }; })(i);
     dots.appendChild(d);
   }
 }
@@ -10399,12 +10406,12 @@ function _expBuildDots(count) {
 function _expPrev() {
   clearInterval(_expTimer);
   _expGo(_expIdx - 1);
-  _expTimer = setInterval(function(){ _expGo(_expIdx+1); }, 5000);
+  _expTimer = setInterval(function(){ _expGo(_expIdx+1); }, 12000);
 }
 function _expNext() {
   clearInterval(_expTimer);
   _expGo(_expIdx + 1);
-  _expTimer = setInterval(function(){ _expGo(_expIdx+1); }, 5000);
+  _expTimer = setInterval(function(){ _expGo(_expIdx+1); }, 12000);
 }
 
 var _expFallback = [
@@ -10439,7 +10446,7 @@ function _expApply(images) {
   _expBuildDots(_expCount);
   _expGo(0);
   clearInterval(_expTimer);
-  _expTimer = setInterval(function() { _expGo(_expIdx + 1); }, 5000);
+  _expTimer = setInterval(function() { _expGo(_expIdx + 1); }, 12000);
 }
 
 async function _expInit() {
@@ -10456,38 +10463,54 @@ async function _expInit() {
 // load déjà déclenché quand ce script s'exécute → appel direct
 if (document.readyState === 'complete') {
   _expInit();
-  _expTickerInit();
+  _provMiniInit();
 } else {
-  window.addEventListener('load', function() { _expInit(); _expTickerInit(); });
+  window.addEventListener('load', function() { _expInit(); _provMiniInit(); });
 }
 
-// ── Ticker artisans express ──
-var _expTickerTimer = null;
-async function _expTickerInit() {
-  var el = document.getElementById('expTickerText');
-  if (!el) return;
-  var items = [];
+// ── Mini profil prestataires disponibles ──
+var _provMiniTimer = null;
+async function _provMiniInit() {
+  var wrap = document.getElementById('provMiniWrap');
+  var card = document.getElementById('provMiniCard');
+  if (!wrap || !card) return;
+  var providers = [];
   try {
-    var res = await sb.from('providers').select('prenom,nom,metier,ville,commune').eq('disponibilite','express').eq('statut','valide').limit(10);
-    if (res.data && res.data.length) {
-      items = res.data.map(function(p) {
-        var lieu = p.commune || p.ville || '';
-        return '⚡ ' + ((p.prenom||'') + ' ' + (p.nom||'')).trim() + (p.metier ? ' — ' + p.metier : '') + (lieu ? ' — ' + lieu : '');
-      });
-    }
+    var res = await sb.from('providers').select('id,prenom,nom,metier,photo_url').eq('disponibilite','Disponible').eq('statut','valide').limit(15);
+    if (res.data && res.data.length) providers = res.data;
   } catch(e) {}
-  if (!items.length) return; // garde le fallback déjà affiché
+  if (!providers.length) return;
+  wrap.style.display = 'block';
   var idx = 0;
+  function _showProvider(p) {
+    var imgEl      = document.getElementById('provMiniImg');
+    var initialsEl = document.getElementById('provMiniInitials');
+    var nameEl     = document.getElementById('provMiniName');
+    var metierEl   = document.getElementById('provMiniMetier');
+    var initials   = ((p.prenom||'?').charAt(0) + (p.nom||'').charAt(0)).toUpperCase();
+    if (p.photo_url) {
+      imgEl.src = p.photo_url;
+      imgEl.style.display = 'block';
+      initialsEl.style.display = 'none';
+    } else {
+      imgEl.style.display = 'none';
+      initialsEl.style.display = 'block';
+      initialsEl.textContent = initials;
+    }
+    nameEl.textContent   = ((p.prenom||'') + ' ' + (p.nom||'')).trim();
+    metierEl.textContent = p.metier || '';
+    card.onclick = function() { if (typeof openModal === 'function') openModal(p.id); };
+  }
   function _tick() {
-    el.style.opacity = '0';
+    card.style.opacity = '0';
     setTimeout(function() {
-      el.querySelector('span').textContent = items[idx % items.length];
-      el.style.opacity = '1';
+      _showProvider(providers[idx % providers.length]);
+      card.style.opacity = '1';
       idx++;
     }, 500);
   }
   _tick();
-  _expTickerTimer = setInterval(_tick, 5000);
+  _provMiniTimer = setInterval(_tick, 5000);
 }
 
 // ══════════════════════════════════════════════════════════════════
