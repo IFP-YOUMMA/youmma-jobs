@@ -1,34 +1,5 @@
-// Vercel Serverless Function — Orange Guinea SMS (utilise https natif, compatible toutes versions Node.js)
+// Vercel Serverless Function — Nimba SMS
 const https = require('https');
-
-function httpsRequest(url, options, body) {
-  return new Promise(function(resolve, reject) {
-    var urlObj = new URL(url);
-    var reqOptions = {
-      hostname: urlObj.hostname,
-      port: urlObj.port || 443,
-      path: urlObj.pathname + urlObj.search,
-      method: options.method || 'GET',
-      headers: Object.assign({}, options.headers, {
-        'Content-Length': body ? Buffer.byteLength(body) : 0
-      })
-    };
-    var req = https.request(reqOptions, function(res) {
-      var data = '';
-      res.on('data', function(chunk) { data += chunk; });
-      res.on('end', function() {
-        resolve({
-          ok: res.statusCode >= 200 && res.statusCode < 300,
-          status: res.statusCode,
-          body: data
-        });
-      });
-    });
-    req.on('error', reject);
-    if (body) req.write(body);
-    req.end();
-  });
-}
 
 module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -38,93 +9,67 @@ module.exports = async function(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
 
-  var body = req.body || {};
-  var phone = body.phone;
-  var code = body.code;
+  const body = req.body || {};
+  const phone = body.phone;
+  const code  = body.code;
 
   if (!phone || !code) return res.status(400).json({ error: 'phone et code requis' });
 
-  var clean = phone.replace(/[\s\-]/g, '');
-  var e164 = clean.startsWith('+') ? clean
-           : clean.startsWith('224') ? '+' + clean
-           : '+224' + clean.replace(/^0/, '');
+  // Normaliser le numéro au format +224XXXXXXXXX
+  const clean = phone.replace(/[\s\-]/g, '');
+  const e164  = clean.startsWith('+')   ? clean
+              : clean.startsWith('224') ? '+' + clean
+              : '+224' + clean.replace(/^0/, '');
 
   if (!/^\+224[0-9]{9}$/.test(e164)) {
     return res.status(400).json({ error: 'Numéro guinéen invalide (+224XXXXXXXXX)' });
   }
 
-  var clientId = process.env.ORANGE_CLIENT_ID;
-  var clientSecret = process.env.ORANGE_CLIENT_SECRET;
+  const sid   = process.env.NIMBA_SID;
+  const token = process.env.NIMBA_TOKEN;
 
-  if (!clientId || !clientSecret) {
-    return res.status(500).json({ error: 'Clés Orange non configurées (ORANGE_CLIENT_ID / ORANGE_CLIENT_SECRET)' });
+  if (!sid || !token) {
+    return res.status(500).json({ error: 'Clés Nimba SMS non configurées (NIMBA_SID / NIMBA_TOKEN)' });
   }
 
-  try {
-    // Étape 1 : OAuth2 token
-    var creds = Buffer.from(clientId + ':' + clientSecret).toString('base64');
-    var tokenBody = 'grant_type=client_credentials';
+  const payload = JSON.stringify({
+    to: [e164],
+    sender_name: 'YOUMMAJOBS',
+    message: `Votre code de verification YOUMMA JOBS : ${code}. Valable 10 minutes.`
+  });
 
-    var tokenRes = await httpsRequest(
-      'https://api.orange.com/oauth/v3/token',
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Basic ' + creds,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
-        }
-      },
-      tokenBody
-    );
+  const credentials = Buffer.from(`${sid}:${token}`).toString('base64');
 
-    if (!tokenRes.ok) {
-      return res.status(502).json({ error: 'Erreur token Orange (' + tokenRes.status + '): ' + tokenRes.body });
-    }
-
-    var tokenData;
-    try { tokenData = JSON.parse(tokenRes.body); }
-    catch(e) { return res.status(502).json({ error: 'Réponse token Orange invalide: ' + tokenRes.body }); }
-
-    var accessToken = tokenData.access_token;
-    if (!accessToken) {
-      return res.status(502).json({ error: 'Token Orange manquant dans: ' + tokenRes.body });
-    }
-
-    // Étape 2 : Envoi SMS
-    var senderAddress = process.env.ORANGE_SENDER_ADDRESS || e164;
-    var encodedSender = encodeURIComponent(senderAddress);
-
-    var smsPayload = JSON.stringify({
-      outboundSMSMessageRequest: {
-        address: 'tel:' + e164,
-        senderAddress: senderAddress,
-        outboundSMSTextMessage: {
-          message: 'YOUMMA JOBS : Votre code de vérification est ' + code + '. Valable 10 minutes.'
-        }
+  return new Promise(function(resolve) {
+    const options = {
+      hostname: 'api.nimbasms.com',
+      port: 443,
+      path: '/v1/messages',
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + credentials,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
       }
+    };
+
+    const req2 = https.request(options, function(resp) {
+      let data = '';
+      resp.on('data', function(chunk) { data += chunk; });
+      resp.on('end', function() {
+        if (resp.statusCode >= 200 && resp.statusCode < 300) {
+          resolve(res.status(200).json({ success: true }));
+        } else {
+          resolve(res.status(502).json({ error: 'Erreur Nimba SMS (' + resp.statusCode + '): ' + data }));
+        }
+      });
     });
 
-    var smsRes = await httpsRequest(
-      'https://api.orange.com/smsmessaging/v1/outbound/' + encodedSender + '/requests',
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + accessToken,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      },
-      smsPayload
-    );
+    req2.on('error', function(e) {
+      resolve(res.status(500).json({ error: 'Erreur réseau: ' + e.message }));
+    });
 
-    if (!smsRes.ok) {
-      return res.status(502).json({ error: 'Erreur SMS Orange (' + smsRes.status + '): ' + smsRes.body });
-    }
-
-    return res.status(200).json({ success: true });
-
-  } catch (e) {
-    return res.status(500).json({ error: 'Erreur serveur: ' + e.message });
-  }
+    req2.write(payload);
+    req2.end();
+  });
 };
