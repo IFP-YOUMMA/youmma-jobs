@@ -33,6 +33,7 @@ module.exports = async function(req, res) {
 
   const payload = JSON.stringify({
     to: [e164],
+    sender_name: 'NimbaSMS',
     message: message
   });
 
