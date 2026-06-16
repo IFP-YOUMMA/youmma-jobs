@@ -10612,26 +10612,41 @@ async function _provMiniInit() {
   var wrap = document.getElementById('provMiniWrap');
   var card = document.getElementById('provMiniCard');
   if (!wrap || !card) return;
+
+  // Masquer par défaut jusqu'au chargement
+  wrap.style.display = 'none';
+  if (_provMiniTimer) { clearInterval(_provMiniTimer); _provMiniTimer = null; }
+
   var providers = [];
   try {
+    console.log('[provMini] Chargement depuis Supabase...');
     var res = await sb.from('providers')
       .select('id,prenom,nom,metier,photo_url,disponibilite,localisation')
-      .eq('disponibilite','disponible')
+      .eq('disponibilite', 'disponible')
       .limit(30);
-    if (!res.error && res.data && res.data.length) {
-      providers = res.data.filter(function(p){
-        return (p.disponibilite||'').toLowerCase().trim() === 'disponible';
+    if (res.error) {
+      console.error('[provMini] Erreur Supabase:', res.error.message);
+    } else {
+      console.log('[provMini] Données brutes reçues:', res.data ? res.data.length : 0, 'lignes');
+      console.log('[provMini] Détail:', res.data);
+      providers = (res.data || []).filter(function(p) {
+        return (p.disponibilite || '').toLowerCase().trim() === 'disponible';
       });
+      console.log('[provMini] Prestataires disponibles filtrés:', providers.length);
     }
-  } catch(e) { console.error('[provMini]', e); }
-  if (!providers.length) {
-    providers = [
-      { id:null, prenom:'Mamadou',   nom:'Diallo',  metier:'Électricien certifié', photo_url:null, localisation:'Ratoma, Conakry' },
-      { id:null, prenom:'Fatoumata', nom:'Bah',     metier:'Coiffeuse',             photo_url:null, localisation:'Kaloum, Conakry' },
-      { id:null, prenom:'Ibrahim',   nom:'Kouyaté', metier:'Plombier',              photo_url:null, localisation:'Matam, Conakry'  }
-    ];
+  } catch(e) {
+    console.error('[provMini] Exception:', e.message || e);
   }
+
+  // Aucun prestataire disponible → overlay caché
+  if (!providers.length) {
+    console.log('[provMini] Aucun prestataire disponible → overlay masqué');
+    wrap.style.display = 'none';
+    return;
+  }
+
   var idx = 0;
+
   function _fill(p) {
     var imgEl  = document.getElementById('provMiniImg');
     var iniEl  = document.getElementById('provMiniIni');
@@ -10639,16 +10654,24 @@ async function _provMiniInit() {
     var metEl  = document.getElementById('provMiniMetier');
     var locEl  = document.getElementById('provMiniLoc');
     if (!imgEl) return;
-    var ini = ((p.prenom||'?').charAt(0) + (p.nom||'').charAt(0)).toUpperCase();
-    if (p.photo_url) { imgEl.src = p.photo_url; imgEl.style.display = 'block'; iniEl.style.display = 'none'; }
-    else             { imgEl.style.display = 'none'; iniEl.style.display = 'block'; iniEl.textContent = ini; }
-    nameEl.textContent = ((p.prenom||'') + ' ' + (p.nom||'')).trim();
+    var ini = ((p.prenom || '?').charAt(0) + (p.nom || '').charAt(0)).toUpperCase();
+    if (p.photo_url) {
+      imgEl.src = p.photo_url;
+      imgEl.style.display = 'block';
+      iniEl.style.display = 'none';
+    } else {
+      imgEl.style.display = 'none';
+      iniEl.style.display = 'block';
+      iniEl.textContent = ini;
+    }
+    nameEl.textContent = ((p.prenom || '') + ' ' + (p.nom || '')).trim();
     metEl.textContent  = p.metier || '';
     locEl.textContent  = p.localisation ? '📍 ' + p.localisation : '';
     card.onclick = p.id
-      ? (function(id){ return function(e){ e.stopPropagation(); if(typeof openModal==='function') openModal(id); }; })(p.id)
+      ? (function(id) { return function(e) { e.stopPropagation(); if (typeof openModal === 'function') openModal(id); }; })(p.id)
       : null;
   }
+
   function _tick() {
     card.style.opacity = '0';
     setTimeout(function() {
@@ -10657,11 +10680,11 @@ async function _provMiniInit() {
       card.style.opacity = '1';
     }, 500);
   }
+
   wrap.style.display = 'block';
   _fill(providers[0]);
   idx = 1 % providers.length;
-  // Petit délai pour que la transition CSS soit prête
-  setTimeout(function(){ card.style.opacity = '1'; }, 50);
+  setTimeout(function() { card.style.opacity = '1'; }, 50);
   _provMiniTimer = setInterval(_tick, 5000);
 }
 
