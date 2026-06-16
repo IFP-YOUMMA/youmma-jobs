@@ -10619,20 +10619,26 @@ async function _provMiniInit() {
 
   var providers = [];
   try {
-    console.log('[provMini] Chargement depuis Supabase...');
+    console.log('[provMini] Chargement SANS filtre depuis Supabase...');
     var res = await sb.from('providers')
       .select('id,prenom,nom,metier,photo_url,disponibilite,localisation')
-      .eq('disponibilite', 'disponible')
-      .limit(30);
+      .limit(50);
     if (res.error) {
       console.error('[provMini] Erreur Supabase:', res.error.message);
     } else {
-      console.log('[provMini] Données brutes reçues:', res.data ? res.data.length : 0, 'lignes');
-      console.log('[provMini] Détail:', res.data);
+      console.log('[provMini] Total lignes reçues:', res.data ? res.data.length : 0);
+      // Afficher toutes les valeurs de disponibilite pour diagnostic
+      if (res.data && res.data.length) {
+        console.log('[provMini] Valeurs disponibilite:', res.data.map(function(p){ return JSON.stringify(p.disponibilite); }).join(', '));
+      }
       providers = (res.data || []).filter(function(p) {
         return (p.disponibilite || '').toLowerCase().trim() === 'disponible';
       });
-      console.log('[provMini] Prestataires disponibles filtrés:', providers.length);
+      console.log('[provMini] Filtrés disponible:', providers.length);
+      // Si aucun avec "disponible", prendre tous pour voir s'il y a des données
+      if (!providers.length && res.data && res.data.length) {
+        console.warn('[provMini] Aucun "disponible" — valeurs trouvées:', [...new Set(res.data.map(function(p){ return p.disponibilite; }))]);
+      }
     }
   } catch(e) {
     console.error('[provMini] Exception:', e.message || e);
