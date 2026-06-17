@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --orange: #f97316;
+  --orange-dark: #c74b00;
+  --bleu: #1a1a4e;
+  --bleu-mid: #2d2d6b;
+  --bleu-light: #e0e0f8;
+  --bleu-dark: #0a0f2e;
+  --blanc: #ffffff;
+  --fond: #f7f8fc;
+  --texte: #0f1020;
+  --gris: #6b7280;
+  --gris-light: #9ca3af;
+  --bordure: #e5e7eb;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.07);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,.1);
+  --radius-md: 14px;
+  --radius-lg: 20px;
+}
+
+@theme inline {
+  --color-background: #ffffff;
+  --color-foreground: #0f1020;
+  --font-sans: var(--font-dm-sans);
+  --font-serif: var(--font-libre-baskerville);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--blanc);
+  color: var(--texte);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-libre-baskerville), Georgia, serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: var(--font-dm-sans), sans-serif;
+  border: none;
+  cursor: pointer;
+}
+
