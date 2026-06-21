@@ -1249,11 +1249,15 @@ function filterProviders() {
     }) || activeFilter !== 'all' || _gpsPosition != null;
     rb.style.display = hasFilter ? 'block' : 'none';
   }
+  const wrap = document.getElementById('loadMoreWrap');
+  if (wrap) wrap.style.display = filteredData.length > 9 ? 'block' : 'none';
 }
 
 function loadMoreProviders() {
-  _provPage++;
-  renderProviderCards();
+  displayedCount = Math.min(displayedCount + 9, filteredData.length);
+  renderProviders();
+  const wrap = document.getElementById('loadMoreWrap');
+  if (wrap) wrap.style.display = displayedCount >= filteredData.length ? 'none' : 'block';
 }
 
 // Fonctions critiques
@@ -1858,7 +1862,7 @@ async function verifierSession() {
     </div>
 
     
-    <div style="text-align:center;margin-top:32px;" id="loadMoreWrap" style="display:none;">
+    <div id="loadMoreWrap" style="text-align:center;margin-top:32px;display:none;">
       <button onclick="loadMoreProviders()" style="padding:12px 28px;background:#fff;border:1.5px solid #E5E7EB;border-radius:50px;font-size:14px;font-weight:700;color:#1A1A4E;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='#E85D04';this.style.color='#E85D04'" onmouseout="this.style.borderColor='#E5E7EB';this.style.color='#1A1A4E'">
         Voir plus d'artisans
       </button>
@@ -7049,14 +7053,26 @@ async function loadProvidersFromSupabase() {
       type_compte: p.type_compte || 'particulier',
       nom_entreprise: p.nom_entreprise || null,
     }));
+    // Cacher le spinner dans tous les cas
+    const loader = document.getElementById('providersLoader');
+    if (loader) loader.style.display = 'none';
+
     if (mapped.length > 0) {
       PRESTATAIRES.splice(0, PRESTATAIRES.length, ...mapped);
       filteredData = [...PRESTATAIRES];
+      displayedCount = 9;
       renderArtisans();
       renderProviders();
+      // Afficher "Voir plus" seulement s'il y a plus de 9 artisans
+      const wrap = document.getElementById('loadMoreWrap');
+      if (wrap) wrap.style.display = filteredData.length > 9 ? 'block' : 'none';
     }
     _deepLinkCheck();
-  } catch(e) { console.warn('Supabase non configuré, données statiques utilisées'); }
+  } catch(e) {
+    console.warn('Supabase non configuré, données statiques utilisées');
+    const loader = document.getElementById('providersLoader');
+    if (loader) loader.style.display = 'none';
+  }
 }
 
 function updateCatSelect() {
