@@ -3552,6 +3552,21 @@ function initNavScroll() {
 }
 
 // ── RENDER ARTISANS SPOTLIGHT (top 6 artisans) ──
+function ouvrirProfil(id) {
+  const p = PRESTATAIRES.find(x => String(x.id) === String(id));
+  if (p) {
+    openModal(id);
+  } else {
+    // Supabase fallback: charger le profil directement
+    const sb = window._supabase || (window.supabase && window.supabase.createClient ? window.supabase.createClient(window._SB_URL, window._SB_KEY) : null);
+    if (!sb) { console.warn('ouvrirProfil: profil introuvable', id); return; }
+    sb.from('providers').select('*').eq('id', id).single().then(({data}) => {
+      if (data) { openModal(id); }
+      else { console.warn('ouvrirProfil: profil introuvable en base', id); }
+    });
+  }
+}
+
 function renderArtisans() {
   if (!document.getElementById('artisansGrid')) return; // section supprimée
   const artisans = PRESTATAIRES
@@ -3582,7 +3597,7 @@ function renderArtisans() {
     `).join('');
 
     return `
-    <div class="ac2-card fade-in" style="animation-delay:${i*0.09}s" onclick="openModal('${p.id}')">
+    <div class="ac2-card fade-in" style="animation-delay:${i*0.09}s;cursor:pointer;" onclick="ouvrirProfil('${p.id}')">
       <div class="ac2-header">
         <div class="ac2-badges-row">${badgeRow}</div>
         <div class="ac2-avatar-wrap">
@@ -3615,7 +3630,7 @@ function renderArtisans() {
         </div>
         <div class="ac2-actions">
           <button class="btn-ac-wa" onclick="event.stopPropagation();openWA('${p.wa}','${p.nom}')"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
-          <button class="btn-ac-profil" onclick="event.stopPropagation();openModal('${p.id}')">👤 Voir profil</button>
+          <button class="btn-ac-profil" onclick="event.stopPropagation();ouvrirProfil('${p.id}')">👤 Voir le profil complet</button>
         </div>
       </div>
     </div>`;
@@ -6978,6 +6993,12 @@ async function loadProvidersFromSupabase() {
     } else {
       try { data = await getProviders({ limite: 20 }); _providersCache = data; _providersCacheTs = Date.now(); }
       catch(_fe) { data = []; }
+    }
+
+    // Déduplication par id
+    if (data && data.length) {
+      const seen = new Set();
+      data = data.filter(p => { if (seen.has(p.id)) return false; seen.add(p.id); return true; });
     }
 
     if (!data || data.length === 0) {
