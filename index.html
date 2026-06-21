@@ -3711,6 +3711,7 @@ function renderProviders() {
             <span style="font-size:11px;color:var(--gris);display:flex;align-items:center;gap:4px;"><i class="fa-solid fa-id-card"></i> Pièce d'identité</span>
             <span style="font-size:10.5px;font-weight:700;color:${p.badge_verifie?'#16A34A':'#9CA3AF'};">${p.badge_verifie?'✅ Vérifiée':'⏳ En attente'}</span>
           </div>
+          ${(()=>{const fin=p.badge_ambassadeur_fin?new Date(p.badge_ambassadeur_fin):null;return(p.badge_ambassadeur&&fin&&fin>new Date())?`<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:5px;padding:6px 10px;background:linear-gradient(135deg,#FFF7E0,#FFF3D0);border-radius:8px;border:1.5px solid #F5C842;"><span style="font-size:11.5px;font-weight:800;background:linear-gradient(135deg,#F5C842,#E85D04);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">🏆 Artisan Ambassadeur</span></div>`:''})()}
         </div>
       </div>
 
