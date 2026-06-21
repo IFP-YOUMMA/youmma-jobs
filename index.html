@@ -3785,11 +3785,14 @@ function openModal(id) {
   if (!p) { console.warn('openModal: prestataire non trouvé', id); return; }
 
   const stars5Full = Array.from({length:5},(_,j)=>`<span style="color:${j<Math.floor(p.note)?'#D4A017':'#CBD5E1'};font-size:16px;">★</span>`).join('');
+  const badgeAmbFin = p.badge_ambassadeur_fin ? new Date(p.badge_ambassadeur_fin) : null;
+  const badgeAmbValide = p.badge_ambassadeur && badgeAmbFin && badgeAmbFin > new Date();
   const badgesHtml = [
-    p.badge_verifie ? '<span class="badge-verifie"><i class="fa-solid fa-check"></i> Vérifié YOUMMA</span>' : '',
-    p.badge_top     ? '<span class="badge-top"><i class="fa-solid fa-trophy" style="color:#F5C842;"></i> Top Artisan</span>' : '',
-    p.badge_express ? '<span class="badge-express"> Express</span>' : '',
-    p.recommande    ? '<span class="badge-recommande">👍 Recommandé</span>' : '',
+    p.badge_verifie   ? '<span class="badge-verifie"><i class="fa-solid fa-check"></i> Vérifié YOUMMA</span>' : '',
+    p.badge_top       ? '<span class="badge-top"><i class="fa-solid fa-trophy" style="color:#F5C842;"></i> Top Artisan</span>' : '',
+    p.badge_express   ? '<span class="badge-express"> Express</span>' : '',
+    p.recommande      ? '<span class="badge-recommande">👍 Recommandé</span>' : '',
+    badgeAmbValide    ? '<span style="background:linear-gradient(135deg,#F5C842,#E85D04);color:#fff;font-size:10.5px;font-weight:800;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;">🏆 Ambassadeur</span>' : '',
   ].filter(Boolean).join(' ');
 
   // Portfolio — galerie 5 réalisations (icônes représentatives)
@@ -7034,6 +7037,8 @@ async function loadProvidersFromSupabase() {
       badge_top: p.doc_diplome_statut === 'valide' || (p.note_moyenne||0) >= 4.8,
       badge_express: p.disponibilite === 'express',
       recommande: (p.nb_avis||0) >= 3,
+      badge_ambassadeur: p.badge_ambassadeur || false,
+      badge_ambassadeur_fin: p.badge_ambassadeur_fin || null,
       dispo: p.disponibilite || 'Disponible',
       tarif: p.tarif || null,
       experience: p.experience || null,
