@@ -3910,20 +3910,6 @@ function openModal(id) {
       <button class="btn-mp-call" onclick="callProvider('${p.tel}')"><i class="fa-solid fa-phone"></i> Appeler</button>
       <button class="btn-mp-maps" onclick="openMaps('${p.nom}','${p.ville}')"><i class="fa-solid fa-location-dot"></i> Localiser</button>
     </div>
-    <div style="display:flex;gap:8px;margin-top:12px;">
-      <button onclick="_partagerProfil('${p.id}','${(p.nom||'').replace(/'/g,"\\'")}','${(p.metier||'').replace(/'/g,"\\'")}','whatsapp')"
-        style="flex:1;padding:10px;background:#25D366;border:none;border-radius:10px;color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-        <i class="fa-brands fa-whatsapp"></i> Partager
-      </button>
-      <button onclick="_partagerProfil('${p.id}','${(p.nom||'').replace(/'/g,"\\'")}','${(p.metier||'').replace(/'/g,"\\'")}','copier')"
-        style="flex:1;padding:10px;background:var(--fond);border:1.5px solid var(--bordure);border-radius:10px;color:var(--texte);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-        <i class="fa-solid fa-link"></i> Copier lien
-      </button>
-      <button onclick="closeModal();navigate('home')"
-        style="flex:1;padding:10px;background:var(--bleu);border:none;border-radius:10px;color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-        <i class="fa-solid fa-globe"></i> Voir le site
-      </button>
-    </div>
     <div style="text-align:center;margin-top:10px;padding:10px;background:var(--fond2);border-radius:12px;">
       <div style="font-size:11.5px;color:var(--gris);">Vous êtes artisan ? <span onclick="closeModal();ouvrirInscription()" style="color:var(--orange);font-weight:700;cursor:pointer;">Créez votre profil gratuit →</span></div>
     </div>
