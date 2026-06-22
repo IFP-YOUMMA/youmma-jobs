@@ -9695,13 +9695,65 @@ async function verifierRetourPaiement() {
 }
 
 async function lancerPaiementAbonnement() {
-  const pid = (window.providerData && window.providerData.id) || window._dashProviderId;
-  const nom = ((window.providerData && window.providerData.prenom) || '') + ' ' +
-              ((window.providerData && window.providerData.nom) || '');
+  const pid = (window.providerData && window.providerData.id) || window._dashProviderId || localStorage.getItem('youmma_pid');
+  const prenom = (window.providerData && window.providerData.prenom) || '';
+  const nomFam = (window.providerData && window.providerData.nom) || '';
+  const nomComplet = (prenom + ' ' + nomFam).trim() || 'Artisan';
+
+  console.log('Provider ID:', pid);
+  console.log('Provider Data:', window.providerData);
+
   if (!pid) { showToast('❌ Session expirée, reconnectez-vous', 'error'); return; }
+
   const btn = document.querySelector('button[onclick="lancerPaiementAbonnement()"]');
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Création du paiement...'; }
-  await creerPaiementAbonnement(pid, nom.trim());
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Création du paiement...'; }
+
+  const statusEl = document.getElementById('paiementStatus');
+  if (statusEl) {
+    statusEl.style.display = 'block';
+    statusEl.style.background = '#FFF7F0';
+    statusEl.style.color = '#E85D04';
+    statusEl.textContent = '⏳ Connexion à Chap Chap Pay...';
+  }
+
+  try {
+    const body = JSON.stringify({ provider_id: pid, provider_nom: nomComplet });
+    console.log('Envoi vers Edge Function:', body);
+
+    const response = await fetch(SUPABASE_URL + '/functions/v1/chapchap-proxy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+      },
+      body: body
+    });
+
+    const data = await response.json();
+    console.log('Réponse Edge Function:', data);
+
+    if (data.payment_url) {
+      if (statusEl) {
+        statusEl.style.background = '#F0FFF4';
+        statusEl.style.color = '#16A34A';
+        statusEl.textContent = '✅ Redirection vers le paiement...';
+      }
+      showToast('✅ Ouverture de la page de paiement...', 'success');
+      setTimeout(() => { window.location.href = data.payment_url; }, 1000);
+    } else {
+      throw new Error(data.message || data.error || 'Erreur inconnue');
+    }
+
+  } catch(e) {
+    console.log('Erreur paiement:', e);
+    if (statusEl) {
+      statusEl.style.background = '#FEF2F2';
+      statusEl.style.color = '#DC2626';
+      statusEl.textContent = '❌ ' + e.message;
+    }
+    showToast('❌ ' + e.message, 'error');
+  }
+
   if (btn) { btn.disabled = false; btn.innerHTML = '💳 Payer maintenant — 50 000 GNF'; }
 }
 
