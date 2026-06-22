@@ -9564,39 +9564,67 @@ function _notifTimeAgo(dateStr) {
 async function creerPaiementAbonnement(providerId, providerNom) {
   try {
     const orderId = 'YOUMMA-' + providerId.slice(0,8).toUpperCase() + '-' + Date.now();
-    const body = {
+
+    const body = JSON.stringify({
       amount: 50000,
       description: 'Abonnement YOUMMA JOBS 30 jours - ' + providerNom,
       order_id: orderId,
       return_url: 'https://yoummajobs.com/?paiement=success&order=' + orderId,
       cancel_url: 'https://yoummajobs.com/?paiement=cancel',
-      fee_handling: 'add',
-      options: { 'auto-redirect': true }
-    };
-    const response = await fetch(CHAPCHAP_BASE_URL + '/ecommerce/create', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'CCP-Api-Key': CHAPCHAP_API_KEY },
-      body: JSON.stringify(body)
+      fee_handling: 'add'
     });
+
+    const response = await fetch('https://chapchappay.com/api/ecommerce/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'CCP-Api-Key': CHAPCHAP_API_KEY,
+        'Accept': 'application/json'
+      },
+      body: body
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.log('Erreur API:', response.status, errText);
+      throw new Error('Erreur API ' + response.status + ': ' + errText);
+    }
+
     const data = await response.json();
+    console.log('Reponse Chap Chap Pay:', data);
+
     if (data.payment_url) {
-      await sb.from('paiements_log').insert({
+      localStorage.setItem('youmma_order_' + orderId, JSON.stringify({
         provider_id: providerId,
         order_id: orderId,
         operation_id: data.operation_id,
         montant: 50000,
         statut: 'pending',
         created_at: new Date().toISOString()
-      });
-      window.open(data.payment_url, '_blank');
-      showToast('✅ Page de paiement ouverte !', 'success');
-      verifierPaiement(orderId, providerId);
+      }));
+
+      showToast('✅ Redirection vers le paiement...', 'success');
+
+      setTimeout(() => {
+        window.location.href = data.payment_url;
+      }, 1000);
+
     } else {
-      showToast('❌ Erreur : ' + (data.message || 'Paiement impossible'), 'error');
+      console.log('Pas de payment_url dans la reponse:', data);
+      showToast('❌ ' + (data.message || 'Erreur paiement'), 'error');
     }
+
   } catch(e) {
-    console.log('Erreur paiement:', e);
-    showToast('❌ Erreur de connexion', 'error');
+    console.log('Erreur complete:', e);
+
+    const statusEl = document.getElementById('paiementStatus');
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.background = '#FEF2F2';
+      statusEl.style.color = '#DC2626';
+      statusEl.textContent = 'Erreur: ' + e.message;
+    }
+    showToast('❌ ' + e.message, 'error');
   }
 }
 
