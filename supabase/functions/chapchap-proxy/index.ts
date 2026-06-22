@@ -45,7 +45,7 @@ serve(async (req: Request) => {
       order_id: orderId,
       return_url: 'https://yoummajobs.com/?paiement=success&order=' + orderId,
       cancel_url: 'https://yoummajobs.com/?paiement=cancel',
-      fee_handling: 'add'
+      fee_handling: 'deduct'
     };
 
     const ccpRes = await fetch('https://chapchappay.com/api/ecommerce/create', {
