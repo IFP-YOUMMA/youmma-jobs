@@ -3730,7 +3730,7 @@ function renderProviders() {
             <span style="font-size:11px;color:var(--gris);display:flex;align-items:center;gap:4px;"><i class="fa-solid fa-id-card"></i> Pièce d'identité</span>
             <span style="font-size:10.5px;font-weight:700;color:${p.badge_verifie?'#16A34A':'#9CA3AF'};">${p.badge_verifie?'✅ Vérifiée':'⏳ En attente'}</span>
           </div>
-          ${(()=>{const fin=p.badge_ambassadeur_fin?new Date(p.badge_ambassadeur_fin):null;return(p.badge_ambassadeur&&fin&&fin>new Date())?`<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:5px;padding:6px 10px;background:linear-gradient(135deg,#FFF7E0,#FFF3D0);border-radius:8px;border:1.5px solid #F5C842;"><span style="font-size:11.5px;font-weight:800;background:linear-gradient(135deg,#F5C842,#E85D04);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">🏆 Artisan Ambassadeur</span></div>`:''})()}
+          ${p.badge_ambassadeur && p.badge_ambassadeur_fin && new Date(p.badge_ambassadeur_fin) > new Date() ? `<div style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#F5C518,#E85D04);color:#fff;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:800;letter-spacing:.03em;box-shadow:0 2px 8px rgba(232,93,4,.35);margin-top:4px;">🏆 Ambassadeur YOUMMA</div>` : ''}
         </div>
       </div>
 
@@ -3859,6 +3859,11 @@ function openModal(id) {
           <div style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:3px;">${p.nom}</div>
           <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px;">${p.metier} · <i class="fa-solid fa-location-dot"></i> ${p.ville}</div>
           <div style="display:flex;gap:5px;flex-wrap:wrap;">${badgesHtml}</div>
+          ${badgeAmbValide ? `
+          <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#F5C518,#E85D04);color:#fff;border-radius:25px;padding:8px 18px;font-size:12px;font-weight:800;letter-spacing:.04em;box-shadow:0 4px 16px rgba(232,93,4,.4);margin:8px 0;width:fit-content;">
+            🏆 Artisan Ambassadeur YOUMMA JOBS
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,.55);margin-bottom:8px;">Certifié pour excellence et engagement communautaire</div>` : ''}
         </div>
       </div>
     </div>
@@ -4741,42 +4746,72 @@ document.addEventListener('keydown', e => {
           <i class="fa-solid fa-arrow-left" style="font-size:11px;"></i> Tableau de bord
         </button>
       </div>
-      <div style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:#1A1A4E;margin-bottom:6px;">
-        <i class="fa-solid fa-share-nodes" style="color:var(--orange);"></i> Partage & Badge Ambassadeur
-      </div>
-      <p style="font-size:13px;color:#6B7280;margin-bottom:20px;">Partagez YOUMMA JOBS autour de vous et gagnez le badge Ambassadeur 🏆 après 50 partages.</p>
+      <div class="edit-section" style="margin-bottom:16px;">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <div style="width:44px;height:44px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📤</div>
+          <div style="flex:1;">
+            <div style="font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:var(--bleu);">Programme Ambassadeur</div>
+            <div style="font-size:12px;color:var(--gris);margin-top:2px;">Partagez votre profil et devenez Ambassadeur YOUMMA</div>
+          </div>
+          <div id="badgeAmbassadeur" style="display:none;">
+            <div style="background:linear-gradient(135deg,#F5C518,#E85D04);color:#fff;border-radius:20px;padding:6px 14px;font-size:11px;font-weight:800;box-shadow:0 3px 10px rgba(232,93,4,.4);">🏆 Ambassadeur</div>
+          </div>
+        </div>
 
-      <!-- Statut badge -->
-      <div style="background:#fff;border-radius:16px;border:1.5px solid var(--bordure);padding:20px;margin-bottom:16px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div style="font-weight:700;color:#1A1A4E;font-size:15px;"><i class="fa-solid fa-trophy" style="color:#F5C842;"></i> Statut Ambassadeur</div>
-          <div id="badgeAmbassadeurSection" style="display:none;background:linear-gradient(135deg,#F5C842,#E85D04);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;">🏆 Ambassadeur Actif</div>
+        <!-- Progression -->
+        <div style="background:linear-gradient(135deg,#1A1A4E,#2D2D8E);border-radius:16px;padding:20px;margin-bottom:16px;color:#fff;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div>
+              <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Progression</div>
+              <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#F5C518;" id="nbPartagesDisplay">0 <span style="font-size:13px;color:rgba(255,255,255,.5);font-weight:400;">/ 50 partages</span></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;">Classement</div>
+              <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--orange);" id="rangAmbassadeurDisplay">#-</div>
+            </div>
+          </div>
+          <div style="height:10px;background:rgba(255,255,255,.1);border-radius:5px;overflow:hidden;margin-bottom:8px;">
+            <div id="progressBarFill" style="height:100%;background:linear-gradient(90deg,#F5C518,#E85D04);border-radius:5px;transition:width .8s ease;width:0%;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div id="statutAmbassadeurDisplay" style="font-size:11px;color:rgba(255,255,255,.5);">0 partages restants pour le badge</div>
+            <div id="expirationBadge" style="font-size:11px;color:#F5C518;display:none;"></div>
+          </div>
         </div>
-        <div id="statutAmbassadeurSection" style="font-size:13px;color:#6B7280;margin-bottom:14px;">Chargement...</div>
-        <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:12px;font-weight:700;color:var(--texte);">Progression</span>
-          <span id="progressLabelSection" style="font-size:12px;color:var(--orange);font-weight:700;">0/50</span>
-        </div>
-        <div style="height:10px;background:var(--fond);border-radius:5px;overflow:hidden;margin-bottom:8px;">
-          <div id="progressBarSection" style="height:100%;background:linear-gradient(90deg,var(--orange),#F5C842);border-radius:5px;transition:width .6s ease;width:0%;"></div>
-        </div>
-        <div style="font-size:11px;color:var(--gris);text-align:center;">50 partages = Badge 🏆 valable 30 jours</div>
-      </div>
 
-      <!-- Bouton partager -->
-      <div style="background:#fff;border-radius:16px;border:1.5px solid var(--bordure);padding:20px;margin-bottom:16px;">
-        <div style="font-weight:700;color:#1A1A4E;font-size:14px;margin-bottom:12px;"><i class="fa-solid fa-share" style="color:var(--orange);"></i> Partager YOUMMA JOBS</div>
-        <p style="font-size:13px;color:#6B7280;margin-bottom:14px;">Chaque partage compte ! Envoyez le lien de la plateforme à vos contacts.</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button onclick="incrementerPartage('whatsapp')" style="display:flex;align-items:center;gap:8px;padding:11px 18px;background:#25D366;border:none;border-radius:12px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">
-            <i class="fa-brands fa-whatsapp"></i> WhatsApp
-          </button>
-          <button onclick="incrementerPartage('facebook')" style="display:flex;align-items:center;gap:8px;padding:11px 18px;background:#1877F2;border:none;border-radius:12px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">
-            <i class="fa-brands fa-facebook"></i> Facebook
-          </button>
-          <button onclick="incrementerPartage('copier')" style="display:flex;align-items:center;gap:8px;padding:11px 18px;background:var(--fond);border:1.5px solid var(--bordure);border-radius:12px;color:var(--texte);font-weight:700;font-size:13px;cursor:pointer;">
-            <i class="fa-solid fa-link"></i> Copier le lien
-          </button>
+        <!-- Code promo + lien profil -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+          <div style="background:var(--fond);border-radius:12px;padding:14px;text-align:center;">
+            <div style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Votre code promo</div>
+            <div id="codePromoDisplay" style="font-family:'Libre Baskerville',serif;font-size:20px;font-weight:700;color:var(--orange);letter-spacing:.08em;">----</div>
+          </div>
+          <div style="background:var(--fond);border-radius:12px;padding:14px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;">
+            <div style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:.06em;">Lien profil</div>
+            <button onclick="copierLienProfil()" style="padding:8px 16px;background:var(--bleu);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;width:100%;">📋 Copier le lien</button>
+          </div>
+        </div>
+
+        <!-- Avantages -->
+        <div style="background:#FFFBF0;border:1.5px solid #F5C518;border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="font-size:12px;font-weight:700;color:#B45309;margin-bottom:10px;">✨ Avantages du badge Ambassadeur</div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;"><span>🏆</span> Badge doré visible sur votre profil public</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;"><span>📌</span> Profil mis en avant dans les résultats</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;"><span>🎯</span> Classement top ambassadeurs du mois</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;"><span>⏱</span> Badge valable 30 jours renouvelable</div>
+          </div>
+        </div>
+
+        <!-- Bouton WhatsApp -->
+        <button onclick="partagerProfilWhatsApp()" style="width:100%;padding:16px;background:linear-gradient(135deg,#25D366,#128C7E);border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;font-family:'DM Sans',sans-serif;box-shadow:0 4px 16px rgba(37,211,102,.35);transition:all .2s;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Partager sur WhatsApp
+        </button>
+
+        <div style="text-align:center;font-size:11px;color:var(--gris);margin-top:10px;line-height:1.6;">
+          50 partages en 30 jours = Badge 🏆 Ambassadeur<br>
+          visible sur votre profil public pendant 30 jours
         </div>
       </div>
     </div>
@@ -7091,6 +7126,7 @@ async function loadProvidersFromSupabase() {
       recommande: (p.nb_avis||0) >= 3,
       badge_ambassadeur: p.badge_ambassadeur || false,
       badge_ambassadeur_fin: p.badge_ambassadeur_fin || null,
+      nb_partages: p.nb_partages || 0,
       dispo: p.disponibilite || 'Disponible',
       tarif: p.tarif || null,
       experience: p.experience || null,
@@ -11367,51 +11403,90 @@ async function incrementerPartage(type) {
   } catch(e) { console.error('[Partage]', e); }
 }
 
-async function chargerInfosPartage(pid) {
-  if (!pid) pid = providerId || _dashProviderId;
+function genererCodePromo(prenom, pid) {
+  const initiales = (prenom || 'ART').slice(0, 3).toUpperCase();
+  const suffix = String(pid || '').slice(-4).toUpperCase();
+  return 'YJ-' + initiales + '-' + suffix;
+}
+
+function partagerProfilWhatsApp() {
+  const pid = window.providerData && window.providerData.id;
+  const nom = (window.providerData && window.providerData.prenom) || 'Artisan';
+  const metier = (window.providerData && window.providerData.metier) || '';
+  const lien = 'https://yoummajobs.com/?profil=' + pid;
+  const msg = encodeURIComponent('👋 Bonjour ! Je suis ' + nom + (metier ? ', ' + metier : '') + ' sur YOUMMA JOBS.\n\nVoici mon profil complet :\n' + lien + '\n\nContactez-moi directement depuis la plateforme 🙌');
+  window.open('https://wa.me/?text=' + msg, '_blank');
+  if (pid) incrementerPartage('whatsapp');
+}
+
+function copierLienProfil() {
+  const pid = window.providerData && window.providerData.id;
+  if (!pid) return;
+  const lien = 'https://yoummajobs.com/?profil=' + pid;
+  navigator.clipboard.writeText(lien).then(() => {
+    showToast('✅ Lien copié !', 'success');
+  }).catch(() => {
+    const inp = document.createElement('input');
+    inp.value = lien;
+    document.body.appendChild(inp);
+    inp.select();
+    document.execCommand('copy');
+    inp.remove();
+    showToast('✅ Lien copié !', 'success');
+  });
+}
+
+async function chargerClassementAmbassadeurs() {
+  const rangEl = document.getElementById('rangAmbassadeurDisplay');
+  if (!rangEl) return;
+  const pid = window.providerData && window.providerData.id;
   if (!pid) return;
   try {
     const { data } = await sb.from('providers')
-      .select('nb_partages,badge_ambassadeur,badge_ambassadeur_fin')
-      .eq('id', pid).single();
+      .select('id,nb_partages')
+      .order('nb_partages', { ascending: false })
+      .limit(100);
     if (!data) return;
-    const fin = data.badge_ambassadeur_fin ? new Date(data.badge_ambassadeur_fin) : null;
-    const estValide = fin && fin > new Date();
-    // Expirer automatiquement si délai dépassé
-    if (data.badge_ambassadeur && !estValide) {
-      await sb.from('providers').update({ badge_ambassadeur: false, badge_ambassadeur_fin: null }).eq('id', pid);
-      data.badge_ambassadeur = false;
-    }
-    // Mise à jour barre de progression (dashboard + section)
-    const nb = data.nb_partages || 0;
-    const pct = Math.min(100, Math.round((nb / 50) * 100));
-    ['progressBarFill','progressBarSection'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.style.width = pct + '%';
-    });
-    ['progressLabel','progressLabelSection'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.textContent = nb + '/50';
-    });
-    if (data.badge_ambassadeur && estValide) {
-      // Badge actif
-      ['badgeAmbassadeur','badgeAmbassadeurSection'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.style.display = 'flex';
-      });
-      const jours = Math.ceil((fin - new Date()) / (1000 * 60 * 60 * 24));
-      const msg = 'Ambassadeur ✅ (' + jours + 'j restants)';
-      ['statutAmbassadeurDisplay','statutAmbassadeurSection'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.textContent = msg;
-      });
-    } else {
-      ['badgeAmbassadeur','badgeAmbassadeurSection'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.style.display = 'none';
-      });
-      const restant = 50 - nb;
-      const msg = restant > 0 ? restant + ' partages restants pour le badge' : 'Renouvelez vos partages !';
-      ['statutAmbassadeurDisplay','statutAmbassadeurSection'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.textContent = msg;
-      });
-    }
-  } catch(e) { console.error('[InfosPartage]', e); }
+    const rang = data.findIndex(p => p.id === pid) + 1;
+    rangEl.textContent = rang > 0 ? '#' + rang : '#-';
+  } catch(e) {}
+}
+
+function chargerInfosPartage() {
+  if (!window.providerData) return;
+  const pid = window.providerData.id;
+  const prenom = window.providerData.prenom || '';
+  const code = genererCodePromo(prenom, pid);
+  const nb = window.providerData.nb_partages || 0;
+  const pct = Math.min(100, Math.round((nb / 50) * 100));
+
+  const codeEl = document.getElementById('codePromoDisplay');
+  if (codeEl) codeEl.textContent = code;
+
+  const nbEl = document.getElementById('nbPartagesDisplay');
+  if (nbEl) nbEl.innerHTML = nb + '<span style="font-size:13px;color:rgba(255,255,255,.5);font-weight:400;"> / 50 partages</span>';
+
+  const bar = document.getElementById('progressBarFill');
+  if (bar) bar.style.width = pct + '%';
+
+  const fin = window.providerData.badge_ambassadeur_fin ? new Date(window.providerData.badge_ambassadeur_fin) : null;
+  const estValide = fin && fin > new Date();
+
+  if (window.providerData.badge_ambassadeur && estValide) {
+    const badge = document.getElementById('badgeAmbassadeur');
+    if (badge) badge.style.display = 'block';
+    const jours = Math.ceil((fin - new Date()) / (1000 * 60 * 60 * 24));
+    const statut = document.getElementById('statutAmbassadeurDisplay');
+    if (statut) statut.textContent = '✅ Badge actif';
+    const expEl = document.getElementById('expirationBadge');
+    if (expEl) { expEl.style.display = 'block'; expEl.textContent = '⏱ ' + jours + ' jours restants'; }
+  } else {
+    const restant = Math.max(0, 50 - nb);
+    const statut = document.getElementById('statutAmbassadeurDisplay');
+    if (statut) statut.textContent = restant + ' partages restants pour le badge';
+  }
+
+  chargerClassementAmbassadeurs();
 }
 
 async function proposerPartageApresMission() {
