@@ -11545,7 +11545,7 @@ async function incrementerPartage(type) {
     if (e1) e1.innerHTML = total + '<span style="font-size:13px;color:rgba(255,255,255,.5);font-weight:400;"> / 50 partages</span>';
     if (e2) e2.style.width = pct + '%';
     if (e3) e3.textContent = total;
-    if (e4) e4.textContent = restant > 0 ? restant + ' partages restants pour le badge' : '🏆 Badge Ambassadeur obtenu !';
+    if (e4) e4.textContent = total >= 50 ? '🏆 Seuil atteint ! Badge en cours d\'activation...' : restant + ' partages restants pour le badge';
     if (e5) e5.textContent = total + '/50';
     showToast('✅ Partage enregistré ! ' + total + '/50', 'success');
   } catch(e) { console.error('[Partage]', e); }
@@ -11643,21 +11643,27 @@ function chargerInfosPartage() {
   const bar = document.getElementById('progressBarFill');
   if (bar) bar.style.width = pct + '%';
 
+  const restant = Math.max(0, 50 - nb);
   const fin = window.providerData.badge_ambassadeur_fin ? new Date(window.providerData.badge_ambassadeur_fin) : null;
-  const estValide = fin && fin > new Date();
+  const badgeValide = window.providerData.badge_ambassadeur && fin && fin > new Date();
 
-  if (window.providerData.badge_ambassadeur && estValide) {
-    const badge = document.getElementById('badgeAmbassadeur');
-    if (badge) badge.style.display = 'block';
+  const badgeEl = document.getElementById('badgeAmbassadeur');
+  const statutEl = document.getElementById('statutAmbassadeurDisplay');
+  const expEl = document.getElementById('expirationBadge');
+
+  if (badgeValide) {
+    if (badgeEl) badgeEl.style.display = 'block';
     const jours = Math.ceil((fin - new Date()) / (1000 * 60 * 60 * 24));
-    const statut = document.getElementById('statutAmbassadeurDisplay');
-    if (statut) statut.textContent = '✅ Badge actif';
-    const expEl = document.getElementById('expirationBadge');
+    if (statutEl) statutEl.textContent = '🏆 Badge actif — ' + jours + ' jours restants';
     if (expEl) { expEl.style.display = 'block'; expEl.textContent = '⏱ ' + jours + ' jours restants'; }
+  } else if (nb >= 50) {
+    if (badgeEl) badgeEl.style.display = 'none';
+    if (statutEl) statutEl.textContent = '🏆 Seuil atteint ! Badge en cours d\'activation...';
+    if (expEl) expEl.style.display = 'none';
   } else {
-    const restant = Math.max(0, 50 - nb);
-    const statut = document.getElementById('statutAmbassadeurDisplay');
-    if (statut) statut.textContent = restant + ' partages restants pour le badge';
+    if (badgeEl) badgeEl.style.display = 'none';
+    if (statutEl) statutEl.textContent = restant + ' partages restants pour le badge';
+    if (expEl) expEl.style.display = 'none';
   }
 
   chargerStatsPartage();
