@@ -11557,24 +11557,15 @@ async function partagerProfilWhatsApp() {
   const lien = 'https://yoummajobs.com/?profil=' + pid;
 
   const message =
-    '👋 *Bonjour !*\n\n' +
-    'C\'est *' + prenom + ' ' + nom.toUpperCase() + '*,\n' +
-    'Je suis *' + metier + '* professionnel basé à ' + ville + (commune ? ' · ' + commune : '') + '.\n\n' +
-    (verifie ? '✅ Mon profil est vérifié et certifié\n' : '') +
-    (missions > 0 ? '🏆 J\'ai déjà réalisé ' + missions + ' missions avec succès\n' : '') +
-    '\n' +
-    '━━━━━━━━━━━━━━━━━━\n' +
-    '💼 *Ce que je propose :*\n' +
-    '• Devis gratuit et rapide\n' +
-    '• Travail soigné et professionnel\n' +
-    '• Disponible à ' + ville + ' et environs\n' +
-    '━━━━━━━━━━━━━━━━━━\n\n' +
-    '👇 *Consultez mon profil complet ici :*\n' +
-    '🔗 ' + lien + '\n\n' +
-    '🎁 Mentionnez mon code *' + code + '*\n' +
-    'pour une réduction sur votre première mission !\n\n' +
-    '📲 Contactez-moi directement sur YOUMMA JOBS\n' +
-    'ou répondez à ce message 😊';
+    'Bonjour,\n\n' +
+    'Je vous invite à découvrir mon profil professionnel sur YOUMMAJOBS.\n\n' +
+    'Nom : ' + prenom + ' ' + nom.toUpperCase() + '\n' +
+    'Métier : ' + metier + '\n' +
+    'Ville : ' + ville + (commune ? ' · ' + commune : '') + '\n\n' +
+    'Besoin d\'un professionnel qualifié et disponible ?\n\n' +
+    'Consultez mon profil ici :\n' +
+    lien + '\n\n' +
+    'YOUMMAJOBS – Trouvez le bon professionnel pour vos besoins.';
 
   await incrementerPartage(pid);
   window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
