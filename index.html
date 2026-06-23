@@ -5650,7 +5650,6 @@ async function chargerAvis() {
     <div onclick="showAdmin('valide')" id="amenu-valide" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-circle-check" style="width:16px;"></i> Validés</div>
     <div onclick="showAdmin('rejete')" id="amenu-rejete" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-circle-xmark" style="width:16px;"></i> Rejetés</div>
     <div onclick="showAdmin('suspendu')" id="amenu-suspendu" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-ban" style="width:16px;"></i> Suspendus</div>
-    <div onclick="showAdmin('codes')" id="amenu-codes" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-key" style="width:16px;"></i> Codes d'activation</div>
     <div onclick="showAdmin('realisations')" id="amenu-realisations" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-images" style="width:16px;"></i> Réalisations</div>
     <div onclick="showAdmin('carousel')" id="amenu-carousel" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-photo-film" style="width:16px;"></i> Images à la une</div>
     <div onclick="showAdmin('missions')" id="amenu-missions" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullseye" style="width:16px;"></i> Missions</div>
@@ -5736,11 +5735,6 @@ async function chargerAvis() {
             <i class="fa-solid fa-user-clock" style="color:#E85D04;font-size:18px;display:block;margin-bottom:8px;"></i>
             <div style="font-size:13px;font-weight:700;color:#1A1A4E;">Valider les inscriptions</div>
             <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Gérer les nouveaux prestataires</div>
-          </button>
-          <button onclick="showAdmin('codes')" style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:12px;padding:14px;text-align:left;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='#BBF7D0'" onmouseout="this.style.background='#F0FDF4'">
-            <i class="fa-solid fa-key" style="color:#16A34A;font-size:18px;display:block;margin-bottom:8px;"></i>
-            <div style="font-size:13px;font-weight:700;color:#1A1A4E;">Générer un code</div>
-            <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Codes d'activation abonnement</div>
           </button>
           <button onclick="showAdmin('rapports')" style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:14px;text-align:left;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='#BFDBFE'" onmouseout="this.style.background='#EFF6FF'">
             <i class="fa-solid fa-chart-line" style="color:#2563EB;font-size:18px;display:block;margin-bottom:8px;"></i>
@@ -5856,37 +5850,6 @@ async function chargerAvis() {
       </div>
     </div>
 
-    
-    <div class="admin-section" id="admin-codes">
-      <div class="admin-section-inner">
-        <div class="adm-section-header" style="margin-bottom:20px;">
-          <div class="adm-section-title">
-            <i class="fa-solid fa-key" style="color:#E85D04;"></i> Codes d'activation
-          </div>
-        </div>
-        <div class="adm-codes-generator">
-          <div>
-            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px;">Durée de l'abonnement</div>
-            <select id="codeDuree">
-              <option value="30">30 jours — 50 000 GNF</option>
-              <option value="90">90 jours — 130 000 GNF</option>
-              <option value="365">365 jours — 450 000 GNF</option>
-            </select>
-          </div>
-          <button class="adm-btn-generate" onclick="genererCode()">
-            <i class="fa-solid fa-key"></i> Générer un code
-          </button>
-          <div style="flex:1;min-width:250px;">
-            <div class="adm-code-result" id="genCodeResult">
-              <div style="font-size:10.5px;color:rgba(255,255,255,.4);font-weight:600;">CODE GÉNÉRÉ</div>
-              <div class="adm-code-value" id="generatedCodeVal">—</div>
-              <button class="adm-btn-copy" onclick="copierCode()"><i class="fa-solid fa-copy"></i> Copier</button>
-            </div>
-          </div>
-        </div>
-        <div id="codesTable"></div>
-      </div>
-    </div>
 
     
     <div class="admin-section" id="admin-rapports">
@@ -6372,53 +6335,6 @@ function filterTable(statut, query) {
 async function action(type, id) {
   await _adminAction(type, id);
 }
-// ── CODES ──
-async function loadCodes() {
-  const codes = await getCodesActivation();
-  const formatDate = d => d ? new Date(d).toLocaleDateString('fr-FR') : '—';
-  document.getElementById('codesTable').innerHTML = `
-    <table class="admin-table code-table">
-      <thead>
-        <tr>
-          <th>Code</th>
-          <th>Durée</th>
-          <th>Prestataire</th>
-          <th>Utilisé</th>
-          <th>Expire le</th>
-          <th>Généré le</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${codes.map(c => `
-          <tr>
-            <td><span class="code-value">${c.code}</span></td>
-            <td style="color:#94A3B8;">${c.duree_jours}j</td>
-            <td style="font-size:12px;color:#94A3B8;">${c.providers ? `${c.providers.prenom} ${c.providers.nom}<br>${c.providers.telephone}` : '—'}</td>
-            <td>${c.utilise ? `<span class="badge valide">✅ ${formatDate(c.utilise_le)}</span>` : '<span class="badge en_attente">⏳ Non utilisé</span>'}</td>
-            <td style="font-size:12px;color:#94A3B8;">${formatDate(c.expire_le)}</td>
-            <td style="font-size:12px;color:#7A7F9A;">${formatDate(c.created_at)}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-}
-
-async function genererCode() {
-  const duree = parseInt(document.getElementById('codeDuree').value);
-  const montants = { 30: 50000, 90: 130000, 365: 450000 };
-  const code = await genererCodeActivation(montants[duree] || 50000, duree);
-  if (code) {
-    document.getElementById('generatedCodeVal').textContent = code.code;
-    document.getElementById('genCodeResult').classList.add('show');
-    showToast('✅ Code généré !');
-  }
-}
-
-function copierCode() {
-  const code = document.getElementById('generatedCodeVal').textContent;
-  navigator.clipboard.writeText(code).then(() => showToast('📋 Code copié !'));
-}
 
 // ── TOAST ──
 function showToast(msg, type = 'info') {
@@ -6692,15 +6608,6 @@ async function validerProvider(id) {
 async function rejeterProvider(id) { await sb.from('providers').update({statut:'rejete'}).eq('id',id); }
 async function suspendreProvider(id) { await sb.from('providers').update({statut:'suspendu'}).eq('id',id); }
 async function supprimerProvider(id) { await sb.from('providers').delete().eq('id',id); }
-async function genererCodeActivation(montant=50000,dureeJours=30) {
-  const code='YJ-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).substr(2,4).toUpperCase();
-  const { data } = await sb.from('activation_codes').insert({code,montant,duree_jours:dureeJours}).select().single();
-  return data;
-}
-async function getCodesActivation() {
-  const { data } = await sb.from('activation_codes').select('*,providers(nom,prenom,telephone)').order('created_at',{ascending:false}).limit(100);
-  return data||[];
-}
 async function geocoderAdresse(commune,quartier) {
   try {
     const q = encodeURIComponent(`${quartier}, ${commune}, Conakry, Guinée`);
@@ -7660,8 +7567,7 @@ function _adminShowSection(name) {
   document.querySelectorAll('#page-admin .admin-section').forEach(s=>s.classList.remove('active'));
   const el=document.getElementById('admin-'+name);if(el)el.classList.add('active');
   document.querySelectorAll('#page-admin .anav').forEach(n=>n.classList.remove('active'));
-  if(name==='codes') _adminLoadCodes();
-  else if(name==='rapports') renderRapports();
+  if(name==='rapports') renderRapports();
   else if(name==='notifications') renderAdminNotifSection();
 }
 
@@ -7674,10 +7580,6 @@ function _adminTableHTML(statut,data) {
   return renderTableHTML(statut, data);
 }
 
-function _adminCopierCode() {
-  const code=document.getElementById('generatedCodeVal')?.textContent;
-  if(code)navigator.clipboard.writeText(code).then(()=>showToast('📋 Code copié !'));
-}
 
 // ── LOGIN JS ──
 
@@ -8195,7 +8097,6 @@ function showAdmin(name) {
     valide: '<i class="fa-solid fa-circle-check" style="color:#059669;margin-right:6px;"></i>Prestataires validés',
     rejete: '<i class="fa-solid fa-circle-xmark" style="color:#DC2626;margin-right:6px;"></i>Prestataires rejetés',
     suspendu: '<i class="fa-solid fa-ban" style="color:#7C3AED;margin-right:6px;"></i>Suspendus',
-    codes: '<i class="fa-solid fa-key" style="color:#E85D04;margin-right:6px;"></i>Codes d\'activation',
     realisations: '<i class="fa-solid fa-images" style="color:#E85D04;margin-right:6px;"></i>Réalisations',
     carousel: '<i class="fa-solid fa-photo-film" style="color:#E85D04;margin-right:6px;"></i>Images à la une',
     missions: '<i class="fa-solid fa-bullseye" style="color:#E85D04;margin-right:6px;"></i>Missions'
