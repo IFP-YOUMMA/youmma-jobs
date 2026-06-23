@@ -6,8 +6,8 @@
 <title>YOUMMA JOBS | Trouvez votre artisan en Guinée — Électricien, Plombier, Maçon Conakry</title>
 <meta name="description" content="YOUMMA JOBS — Trouvez rapidement un artisan qualifié en Guinée. Électricien Conakry, plombier Guinée, maçon, soudeur, menuisier, mécanicien, carreleur, peintre. Profils vérifiés, contact direct WhatsApp."/>
 <meta name="keywords" content="artisan Guinée, électricien Conakry, plombier Guinée, maçon Conakry, soudeur Guinée, menuisier Guinée, mécanicien Conakry, carreleur, peintre, climaticien, couturier, artisan qualifié Guinée, prestataire vérifié Conakry, YOUMMA JOBS"/>
-<meta property="og:title" content="YOUMMA JOBS | Artisans qualifiés vérifiés en Guinée"/>
-<meta property="og:description" content="Trouvez rapidement le bon artisan pour tous vos projets en Guinée — Électriciens, plombiers, maçons, soudeurs et 100+ professionnels vérifiés."/>
+<meta property="og:title" content="YOUMMA JOBS | Artisans qualifiés en Guinée"/>
+<meta property="og:description" content="Trouvez le bon professionnel pour vos besoins en Guinée"/>
 <meta property="og:type" content="website"/>
 <meta name="robots" content="index, follow"/>
 <meta name="author" content="YOUMMA JOBS"/>
@@ -11410,7 +11410,7 @@ function mettreAJourOpenGraph(p) {
   if (!p || !p.id) return;
   const titre = ((p.prenom||'') + ' ' + (p.nom||'')).trim() + ' — ' + (p.metier||'') + ' à ' + (p.ville||'Conakry');
   const description = 'Professionnel disponible sur YOUMMAJOBS. ' + (p.badge_verifie ? 'Profil vérifié. ' : '') + 'Contactez-le directement sur yoummajobs.com';
-  const image = p.photo_url || 'https://yoummajobs.com/og-image.jpg';
+  const image = p.photo_url ? p.photo_url : 'https://yoummajobs.com/og-image.jpg';
   const url = 'https://yoummajobs.com/?profil=' + p.id;
   document.title = titre + ' | YOUMMA JOBS';
   const setMeta = (prop, content, attr) => {
@@ -11531,10 +11531,23 @@ async function incrementerPartage(type) {
         .update({ badge_ambassadeur: true, badge_ambassadeur_fin: expiration.toISOString() })
         .eq('id', pid);
       showToast('🏆 Félicitations ! Vous êtes Artisan Ambassadeur pour 30 jours !', 'success');
-    } else {
-      showToast('Partage comptabilisé ! (' + total + '/50)', 'success');
     }
-    await chargerInfosPartage(pid);
+
+    // Mise à jour temps réel de l'affichage
+    if (window.providerData) window.providerData.nb_partages = total;
+    const restant = Math.max(0, 50 - total);
+    const pct = Math.min(100, Math.round((total / 50) * 100));
+    const e1 = document.getElementById('nbPartagesDisplay');
+    const e2 = document.getElementById('progressBarFill');
+    const e3 = document.getElementById('statTotalPartages');
+    const e4 = document.getElementById('statutAmbassadeurDisplay');
+    const e5 = document.getElementById('progressLabel');
+    if (e1) e1.innerHTML = total + '<span style="font-size:13px;color:rgba(255,255,255,.5);font-weight:400;"> / 50 partages</span>';
+    if (e2) e2.style.width = pct + '%';
+    if (e3) e3.textContent = total;
+    if (e4) e4.textContent = restant > 0 ? restant + ' partages restants pour le badge' : '🏆 Badge Ambassadeur obtenu !';
+    if (e5) e5.textContent = total + '/50';
+    showToast('✅ Partage enregistré ! ' + total + '/50', 'success');
   } catch(e) { console.error('[Partage]', e); }
 }
 
