@@ -4874,19 +4874,7 @@ document.addEventListener('keydown', e => {
 
       
       <div class="abo-card">
-        <div class="abo-title" style="margin-bottom:14px;">🔑 Activer un code d'abonnement</div>
-        <div class="alert alert-info">
-          Après paiement (50 000 GNF), envoyez votre preuve de paiement sur WhatsApp. Notre équipe vous enverra un code d'activation.
-        </div>
-        <div class="code-section">
-          <div class="code-title">Entrez votre code d'activation :</div>
-          <div class="code-input-row">
-            <input type="text" class="code-input" id="codeInput" placeholder="YJ-XXXX-XXXX" maxlength="20"/>
-            <button class="btn-activer" onclick="activerCode()">Activer</button>
-          </div>
-        </div>
-
-        <div style="margin-top:24px;">
+        <div style="margin-top:0;">
           <div style="background:#fff;border-radius:16px;padding:20px;border:1.5px solid var(--bordure);margin-bottom:16px;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
               <div style="width:40px;height:40px;background:var(--orange);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">💳</div>
@@ -5567,20 +5555,6 @@ async function geocoderLocalisation() {
   }
 }
 
-// ── ACTIVATION CODE ──
-async function activerCode() {
-  const code = document.getElementById('codeInput').value.trim().toUpperCase();
-  if (!code) { showToast(`Entrez un code d'activation`, 'error'); return; }
-  const res = await activerAbonnement(code, providerId);
-  if (res.success) {
-    showToast('✅ ' + res.message, 'success');
-    document.getElementById('codeInput').value = '';
-    providerData = await getDashboardData(providerId);
-    updateAbonnementUI(providerData);
-  } else {
-    showToast(res.message || 'Code invalide', 'error');
-  }
-}
 
 // ── AVIS ──
 async function chargerAvis() {
@@ -7487,13 +7461,6 @@ async function _dashGeolocal() {
   else _dashToast('Impossible de géolocaliser','error');
 }
 
-async function _dashActiverCode() {
-  const code=document.getElementById('codeInput')?.value.trim().toUpperCase();
-  if(!code){_dashToast('Entrez un code','error');return;}
-  const res=await activerAbonnement(code,_dashProviderId);
-  if(res.success){_dashToast('✅ '+res.message,'success');document.getElementById('codeInput').value='';_dashData=await getDashboardData(_dashProviderId);_dashUpdateAbonnement(_dashData);}
-  else _dashToast(res.message||'Code invalide','error');
-}
 
 async function _dashChargerAvis() {
   const avis = await getAvis(_dashProviderId);
@@ -8105,12 +8072,11 @@ function showAdmin(name) {
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','codes','realisations','carousel','missions'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','realisations','carousel','missions'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (el) el.style.cssText = s===name ? ACTIVE : NORMAL;
   });
-  if (name==='codes') { if(typeof loadCodes==='function') loadCodes(); }
-  else if (name==='realisations') { if(typeof renderAdminRealisations==='function') renderAdminRealisations(); }
+  if (name==='realisations') { if(typeof renderAdminRealisations==='function') renderAdminRealisations(); }
   else if (name==='carousel') { if(typeof _carouselLoadAdmin==='function') _carouselLoadAdmin(); }
   else if (name==='missions') { renderAdminMissions(); }
   else if (name!=='dashboard') { if(typeof _adminLoadAll==='function') _adminLoadAll(); }
