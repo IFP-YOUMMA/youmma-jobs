@@ -12199,61 +12199,63 @@ style="position:fixed;bottom:24px;left:24px;z-index:9998;display:flex;align-item
     </div>
     <div style="display:flex;gap:8px;flex-shrink:0;">
       <button id="pwaInstallBtn" style="padding:10px 18px;background:linear-gradient(135deg,#E85D04,#F5C842);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;">📲 Installer</button>
-      <button onclick="document.getElementById('pwaInstallBanner').style.display='none';localStorage.setItem('youmma_pwa_dismissed','1');" style="padding:10px;background:rgba(255,255,255,.1);border:none;border-radius:10px;color:#fff;font-size:16px;cursor:pointer;">✕</button>
+      <button onclick="window._pwaDismissBanner()" style="padding:10px;background:rgba(255,255,255,.1);border:none;border-radius:10px;color:#fff;font-size:16px;cursor:pointer;">✕</button>
     </div>
   </div>
 </div>
 
 <script>
-var _pwaDeferredPrompt = null;
-var _pwaBanner = document.getElementById('pwaInstallBanner');
-var _pwaInstallBtn = document.getElementById('pwaInstallBtn');
-var _pwaInstallText = document.getElementById('pwaInstallText');
-var _pwaDismissed = localStorage.getItem('youmma_pwa_dismissed');
-var _pwaIsStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-var _pwaIsIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-var _pwaIsAndroid = /android/i.test(navigator.userAgent);
+(function() {
+  var banner = document.getElementById('pwaInstallBanner');
+  var installBtn = document.getElementById('pwaInstallBtn');
+  var deferredPrompt = null;
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var dismissedAt = parseInt(localStorage.getItem('youmma_pwa_t') || '0');
+  var isDismissed = dismissedAt && (Date.now() - dismissedAt) < 7 * 24 * 60 * 60 * 1000;
 
-// Afficher la bannière sur tous les mobiles (iOS + Android) si pas déjà installé ou ignoré
-if (!_pwaIsStandalone && !_pwaDismissed && (_pwaIsIOS || _pwaIsAndroid)) {
-  setTimeout(function() {
-    if (_pwaBanner) _pwaBanner.style.display = 'block';
-  }, 3000);
-}
-
-// Android Chrome : capturer l'événement d'installation natif
-window.addEventListener('beforeinstallprompt', function(e) {
-  e.preventDefault();
-  _pwaDeferredPrompt = e;
-});
-
-if (_pwaInstallBtn) {
-  _pwaInstallBtn.addEventListener('click', function() {
-    if (_pwaDeferredPrompt) {
-      // Android Chrome : déclencher l'installation native
-      _pwaDeferredPrompt.prompt();
-      _pwaDeferredPrompt.userChoice.then(function(choiceResult) {
-        if (choiceResult.outcome === 'accepted') {
-          if (_pwaBanner) _pwaBanner.style.display = 'none';
-          localStorage.setItem('youmma_pwa_dismissed', '1');
-        }
-        _pwaDeferredPrompt = null;
-      });
-    } else if (_pwaIsIOS) {
-      // iOS Safari : afficher les instructions manuelles
-      if (_pwaBanner) _pwaBanner.innerHTML = '<div style="max-width:500px;margin:0 auto;padding:4px 0;text-align:center;color:#fff;font-family:\'DM Sans\',sans-serif;">' +
-        '<div style="font-size:13px;font-weight:800;margin-bottom:6px;">📲 Installer sur iPhone / iPad</div>' +
-        '<div style="font-size:12px;opacity:.8;line-height:1.6;">Appuyez sur <strong>⎙ Partager</strong> en bas du navigateur<br>puis choisissez <strong>"Sur l\'écran d\'accueil"</strong></div>' +
-        '<button onclick="document.getElementById(\'pwaInstallBanner\').style.display=\'none\';localStorage.setItem(\'youmma_pwa_dismissed\',\'1\');" style="margin-top:10px;padding:8px 20px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-size:12px;cursor:pointer;">OK, compris</button>' +
-        '</div>';
+  function showBanner() {
+    if (banner && !isStandalone && !isDismissed) {
+      banner.style.display = 'block';
     }
-  });
-}
+  }
 
-window.addEventListener('appinstalled', function() {
-  if (_pwaBanner) _pwaBanner.style.display = 'none';
-  console.log('YOUMMA JOBS installée avec succès');
-});
+  function hideBanner() {
+    if (banner) banner.style.display = 'none';
+    localStorage.setItem('youmma_pwa_t', String(Date.now()));
+  }
+
+  window._pwaDismissBanner = hideBanner;
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    showBanner();
+  });
+
+  setTimeout(showBanner, 2500);
+
+  if (installBtn) {
+    installBtn.addEventListener('click', function() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(r) {
+          if (r.outcome === 'accepted') hideBanner();
+          deferredPrompt = null;
+        });
+      } else if (isIOS) {
+        if (banner) banner.innerHTML =
+          '<div style="max-width:500px;margin:0 auto;padding:6px 0;text-align:center;color:#fff;font-family:\'DM Sans\',sans-serif;">' +
+          '<div style="font-size:14px;font-weight:800;margin-bottom:8px;">📲 Installer sur iPhone / iPad</div>' +
+          '<div style="font-size:13px;opacity:.85;line-height:1.7;">Appuyez sur <strong style="background:rgba(255,255,255,.15);padding:2px 7px;border-radius:5px;">⎙ Partager</strong> en bas<br>puis <strong>"Sur l\'écran d\'accueil"</strong></div>' +
+          '<button onclick="window._pwaDismissBanner()" style="margin-top:12px;padding:9px 22px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);border-radius:8px;color:#fff;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif;">OK, compris</button>' +
+          '</div>';
+      }
+    });
+  }
+
+  window.addEventListener('appinstalled', hideBanner);
+})();
 </script>
 
 <!-- ══ SERVICE WORKER REGISTRATION ══ -->
