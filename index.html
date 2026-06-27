@@ -12131,11 +12131,17 @@ function ouvrirPageLegale(type) {
   if (!contenu) return;
 
   var modal = document.getElementById('modal-legal');
-  document.getElementById('ml-titre').textContent = contenu.titre;
-  document.getElementById('ml-body').innerHTML = contenu.html;
+  if (!modal) return;
+  var titre = document.getElementById('ml-titre');
+  var body  = document.getElementById('ml-body');
+  if (titre) titre.textContent = contenu.titre;
+  if (body)  body.innerHTML   = contenu.html;
+  modal.style.cssText = modal.style.cssText.replace('display:none','display:flex');
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
+window.ouvrirPageLegale = ouvrirPageLegale;
+window.ouvrirLegal      = ouvrirPageLegale;
 
 function ouvrirLegal(type) { ouvrirPageLegale(type); }
 
