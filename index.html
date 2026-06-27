@@ -12211,29 +12211,29 @@ style="position:fixed;bottom:24px;left:24px;z-index:9998;display:flex;align-item
   var deferredPrompt = null;
   var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  var dismissedAt = parseInt(localStorage.getItem('youmma_pwa_t') || '0');
-  var isDismissed = dismissedAt && (Date.now() - dismissedAt) < 7 * 24 * 60 * 60 * 1000;
-
-  function showBanner() {
-    if (banner && !isStandalone && !isDismissed) {
-      banner.style.display = 'block';
-    }
-  }
 
   function hideBanner() {
     if (banner) banner.style.display = 'none';
-    localStorage.setItem('youmma_pwa_t', String(Date.now()));
+    try { localStorage.setItem('youmma_pwa_t', String(Date.now())); } catch(e) {}
   }
-
   window._pwaDismissBanner = hideBanner;
+
+  function maybeShow() {
+    if (!banner || isStandalone) return;
+    try {
+      var t = parseInt(localStorage.getItem('youmma_pwa_t') || '0');
+      if (t && (Date.now() - t) < 7 * 24 * 60 * 60 * 1000) return;
+    } catch(e) {}
+    banner.style.display = 'block';
+  }
 
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     deferredPrompt = e;
-    showBanner();
+    maybeShow();
   });
 
-  setTimeout(showBanner, 2500);
+  setTimeout(maybeShow, 2000);
 
   if (installBtn) {
     installBtn.addEventListener('click', function() {
@@ -12248,7 +12248,7 @@ style="position:fixed;bottom:24px;left:24px;z-index:9998;display:flex;align-item
           '<div style="max-width:500px;margin:0 auto;padding:6px 0;text-align:center;color:#fff;font-family:\'DM Sans\',sans-serif;">' +
           '<div style="font-size:14px;font-weight:800;margin-bottom:8px;">📲 Installer sur iPhone / iPad</div>' +
           '<div style="font-size:13px;opacity:.85;line-height:1.7;">Appuyez sur <strong style="background:rgba(255,255,255,.15);padding:2px 7px;border-radius:5px;">⎙ Partager</strong> en bas<br>puis <strong>"Sur l\'écran d\'accueil"</strong></div>' +
-          '<button onclick="window._pwaDismissBanner()" style="margin-top:12px;padding:9px 22px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);border-radius:8px;color:#fff;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif;">OK, compris</button>' +
+          '<button onclick="window._pwaDismissBanner()" style="margin-top:12px;padding:9px 22px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);border-radius:8px;color:#fff;font-size:13px;cursor:pointer;">OK, compris</button>' +
           '</div>';
       }
     });
