@@ -16,6 +16,15 @@
 <meta name="theme-color" content="#1A1A4E"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="YOUMMA JOBS"/>
+<link rel="apple-touch-icon" href="/icons/icon-192x192.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png"/>
+<link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png"/>
+<link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128x128.png"/>
+<meta name="msapplication-TileImage" content="/icons/icon-144x144.png"/>
+<meta name="msapplication-TileColor" content="#1A1A4E"/>
 <link rel="canonical" href="https://yoummajobs.com"/>
 <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAADM0lEQVR42u2Xy2tdVRSHv7XPvu9XUm8wXtP0QdKgYnwEtDSCFKoTi6XVkQMHQgeCU/8AR4I4cezMgZ04caDOlKposSg+iEaRkkdJjSXm3pvm3nPPPXsvByc0Im1z0iiZ3D05HFjs/bHW+u3f2qKqyj4uwz6vAcAAwKYJ2tbJrQUjIv8vwPb+tz/IewUBs0uYVADNjR7OeUTA4Al7ntBnUGMRgeFSQK0oN0GMkf8OwHnl9Xe+YnmliXF9WqHlyEiWmeHrjNk1QGll78OPPMDs8QkemqihqqnLkioDYd/R3gixxSrnp5c45z6g2p6HqLO1S5HF5iQf/3qGX46f5sXnJlNnIhWAUYcpDfPmY98zu/w2/XaPMCiCySd9GceMd7/j1dpvvP/Fn3yYOc+ZZ4+mgjA769Sz4Qu8PLHE7NJbbLY8PlPCiMf4KPmqIwpKhH91eSn3HosXP2JhpYMxwk5WsyNAFCuNeoGz2U+JewG2VkeyeciVoVxPgopDiBgo1NBuyDN8wudf/r6tjr2UIFTLdGmVev8G0SNnkZU5ODQDi9+i1XsRY8FmwcWYuEdflaOuz8WFOWKdxgayFwBFRRjNtJCr82i3i8QRLP+Q3E7NFSgfQCMB30eCLD7qkbOObNRks8tNed51BowA2QJ0mtBchyAAH4O1SN8j91dADXgHQyWEPsSgQQ5j9uoFCuUMRJWDhJkhgsCAMUnKVRKYTB5MABqAMwQom8E9xJUG5Tx7a0KvSUBt/BhXqk+S8Zt4sdvmEAh6vQ3XWrB2A3dlDXvtD35aPczo1BSSognvCCBGUIUnpmpcHnuFuNLARm2cWBADHghjMAaHJec36JYO8XX5HCdPHERVMTvU4c4AW3Wo5WHm6VkuNN4grjUo+HUCF4I6wBO4kIJp0Rk6wrv+NU69cIpqyaL6TyO7zRlphlKvihFhbrnLpc8u8eDVC0x2LlOJ11GEtj3Az/Zxfqw+z8nTT/HwseHUV7GknYq9JoroRPDNfJPVhUV8cxX1ipbrjI6PceLREQpZsytHlN2M5f92ObdVJnOLbKVdcjfvAu8VIenD5H+roczuJyMZPEwGAAOA/Qb4G8BmYxfXKIexAAAAAElFTkSuQmCC"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12179,6 +12188,73 @@ style="position:fixed;bottom:24px;left:24px;z-index:9998;display:flex;align-item
     <div style="font-size:13px;font-weight:800;line-height:1.3;">Contactez YOUMMA JOBS</div>
   </div>
 </a>
+
+<!-- ══ PWA INSTALL BANNER ══ -->
+<div id="pwaInstallBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#1A1A4E,#0D0D2E);padding:16px 20px;box-shadow:0 -4px 24px rgba(0,0,0,.3);font-family:'DM Sans',sans-serif;">
+  <div style="max-width:500px;margin:0 auto;display:flex;align-items:center;gap:14px;">
+    <img src="/icons/icon-96x96.png" style="width:52px;height:52px;border-radius:14px;flex-shrink:0;" onerror="this.style.display='none'"/>
+    <div style="flex:1;">
+      <div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:2px;">Installer YOUMMA JOBS</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.6);">Ajoutez l'app sur votre téléphone</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0;">
+      <button id="pwaInstallBtn" style="padding:10px 18px;background:linear-gradient(135deg,#E85D04,#F5C842);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;">📲 Installer</button>
+      <button onclick="document.getElementById('pwaInstallBanner').style.display='none';localStorage.setItem('youmma_pwa_dismissed','1');" style="padding:10px;background:rgba(255,255,255,.1);border:none;border-radius:10px;color:#fff;font-size:16px;cursor:pointer;">✕</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var _pwaDeferredPrompt = null;
+var _pwaBanner = document.getElementById('pwaInstallBanner');
+var _pwaInstallBtn = document.getElementById('pwaInstallBtn');
+var _pwaDismissed = localStorage.getItem('youmma_pwa_dismissed');
+
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  _pwaDeferredPrompt = e;
+  if (!_pwaDismissed) {
+    setTimeout(function() {
+      if (_pwaBanner) _pwaBanner.style.display = 'block';
+    }, 3000);
+  }
+});
+
+if (_pwaInstallBtn) {
+  _pwaInstallBtn.addEventListener('click', function() {
+    if (_pwaDeferredPrompt) {
+      _pwaDeferredPrompt.prompt();
+      _pwaDeferredPrompt.userChoice.then(function(choiceResult) {
+        if (choiceResult.outcome === 'accepted') {
+          if (_pwaBanner) _pwaBanner.style.display = 'none';
+          localStorage.setItem('youmma_pwa_dismissed', '1');
+        }
+        _pwaDeferredPrompt = null;
+      });
+    }
+  });
+}
+
+window.addEventListener('appinstalled', function() {
+  if (_pwaBanner) _pwaBanner.style.display = 'none';
+  console.log('YOUMMA JOBS installée avec succès');
+});
+</script>
+
+<!-- ══ SERVICE WORKER REGISTRATION ══ -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(reg) {
+        console.log('YOUMMA JOBS PWA ready:', reg.scope);
+      })
+      .catch(function(err) {
+        console.log('SW Error:', err);
+      });
+  });
+}
+</script>
 
 </body>
 </html>
