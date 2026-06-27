@@ -600,8 +600,9 @@ body.admin-mode #page-admin.logged #adminWrap{
   #dashDispoBtnIn{display:flex!important;}
   /* Stats 2x2 */
   .stats-row{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}
-  /* Sections padding */
+  /* Sections padding + hauteur minimale */
   .section{padding:14px!important;}
+  .section.active{min-height:calc(100vh - 130px)!important;}
   /* Espace pour la bottom nav */
   #page-dashboard .main{padding-bottom:80px!important;}
   /* Form cols */
@@ -5400,12 +5401,13 @@ function showSection(name) {
     }
   });
   // Mettre à jour le titre topbar
-  const titles = { dashboard:'Tableau de bord', profil:'Mon profil', photos:'Photos & Galerie', documents:'Documents & Vérification', missions:'Mes missions', rapports:'Rapports', abonnement:'Abonnement', avis:'Mes avis' };
+  const titles = { dashboard:'Tableau de bord', profil:'Mon profil', photos:'Photos & Galerie', documents:'Documents & Vérification', missions:'Mes missions', rapports:'Rapports', abonnement:'Abonnement', avis:'Mes avis', partage:'Partage & Badge' };
   const tt = document.getElementById('topbarTitle');
   if (tt) tt.innerHTML = '<i class="fa-solid fa-chart-line" style="width:16px;"></i> ' + (titles[name] || name);
   // Scroll vers le haut du contenu principal
+  window.scrollTo(0, 0);
   const mainEl = document.querySelector('#page-dashboard .main');
-  if (mainEl) mainEl.scrollTop = 0;
+  if (mainEl) { mainEl.scrollTop = 0; mainEl.scrollLeft = 0; }
   // Charger les données si besoin
   if (name === 'documents') { const pid = providerId || _dashProviderId; if (pid) chargerDocuments(pid); }
   if (name === 'missions') { const pid = providerId || _dashProviderId; if (pid) chargerMissions(pid); }
@@ -6200,12 +6202,13 @@ function showSection(name) {
     }
   });
   // Mettre à jour le titre topbar
-  const titles = { dashboard:'Tableau de bord', profil:'Mon profil', photos:'Photos & Galerie', documents:'Documents & Vérification', missions:'Mes missions', rapports:'Rapports', abonnement:'Abonnement', avis:'Mes avis' };
+  const titles = { dashboard:'Tableau de bord', profil:'Mon profil', photos:'Photos & Galerie', documents:'Documents & Vérification', missions:'Mes missions', rapports:'Rapports', abonnement:'Abonnement', avis:'Mes avis', partage:'Partage & Badge' };
   const tt = document.getElementById('topbarTitle');
   if (tt) tt.innerHTML = '<i class="fa-solid fa-chart-line" style="width:16px;"></i> ' + (titles[name] || name);
   // Scroll vers le haut du contenu principal
+  window.scrollTo(0, 0);
   const mainEl = document.querySelector('#page-dashboard .main');
-  if (mainEl) mainEl.scrollTop = 0;
+  if (mainEl) { mainEl.scrollTop = 0; mainEl.scrollLeft = 0; }
   // Charger les données si besoin
   if (name === 'documents') { const pid = providerId || _dashProviderId; if (pid) chargerDocuments(pid); }
   if (name === 'missions') { const pid = providerId || _dashProviderId; if (pid) chargerMissions(pid); }
