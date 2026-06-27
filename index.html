@@ -4467,33 +4467,39 @@ document.addEventListener('keydown', e => {
       </div>
 
       
-      <div class="stats-grid">
-        <div class="stat-card" style="background:linear-gradient(135deg,#1A1A4E,#2D2D7E);border:none;color:#fff;">
-          <div class="stat-icon" style="color:#A5B4FC;">👁️</div>
-          <div class="stat-val" id="statVues" style="color:#fff;">0</div>
-          <div class="stat-label" style="color:rgba(255,255,255,.7);">Vues du profil</div>
+      <span id="statVues" style="display:none;">0</span>
+      <span id="statFavoris" style="display:none;">0</span>
+      <span id="statAppels" style="display:none;">0</span>
+      <span id="statWA" style="display:none;">0</span>
+      <span id="statAvis" style="display:none;">0</span>
+      <div id="dashStatsRow" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;scrollbar-width:none;-ms-overflow-style:none;">
+        <div style="flex-shrink:0;width:90px;background:linear-gradient(135deg,#1A1A4E,#2D2D8E);border-radius:16px;padding:14px 10px;text-align:center;">
+          <div style="font-size:20px;margin-bottom:4px;">👁️</div>
+          <div id="statVues2" style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#fff;">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.6);margin-top:2px;line-height:1.3;">Vues profil</div>
         </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,#E85D04,#F5A623);border:none;color:#fff;">
-          <div class="stat-icon" style="color:#fff;">❤️</div>
-          <div class="stat-val" id="statFavoris" style="color:#fff;">0</div>
-          <div class="stat-label" style="color:rgba(255,255,255,.85);">Favoris</div>
+        <div style="flex-shrink:0;width:90px;background:linear-gradient(135deg,#E85D04,#F5A623);border-radius:16px;padding:14px 10px;text-align:center;">
+          <div style="font-size:20px;margin-bottom:4px;">❤️</div>
+          <div id="statFavoris2" style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#fff;">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.8);margin-top:2px;line-height:1.3;">Favoris</div>
         </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,#0EA5E9,#0284C7);border:none;color:#fff;">
-          <div class="stat-icon" style="color:#fff;">📞</div>
-          <div class="stat-val" id="statAppels" style="color:#fff;">0</div>
-          <div class="stat-label" style="color:rgba(255,255,255,.85);">Appels</div>
+        <div style="flex-shrink:0;width:90px;background:linear-gradient(135deg,#0EA5E9,#0284C7);border-radius:16px;padding:14px 10px;text-align:center;">
+          <div style="font-size:20px;margin-bottom:4px;">📞</div>
+          <div id="statAppels2" style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#fff;">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.8);margin-top:2px;line-height:1.3;">Appels</div>
         </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,#25D366,#128C7E);border:none;color:#fff;">
-          <div class="stat-icon" style="color:#fff;">💬</div>
-          <div class="stat-val" id="statWA" style="color:#fff;">0</div>
-          <div class="stat-label" style="color:rgba(255,255,255,.85);">WhatsApp</div>
+        <div style="flex-shrink:0;width:90px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:16px;padding:14px 10px;text-align:center;">
+          <div style="font-size:20px;margin-bottom:4px;">💬</div>
+          <div id="statWA2" style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#fff;">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.8);margin-top:2px;line-height:1.3;">WhatsApp</div>
         </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,#F59E0B,#D97706);border:none;color:#fff;">
-          <div class="stat-icon" style="color:#fff;">⭐</div>
-          <div class="stat-val" id="statAvis" style="color:#fff;">0</div>
-          <div class="stat-label" style="color:rgba(255,255,255,.85);">Avis clients</div>
+        <div style="flex-shrink:0;width:90px;background:linear-gradient(135deg,#F5C842,#E85D04);border-radius:16px;padding:14px 10px;text-align:center;">
+          <div style="font-size:20px;margin-bottom:4px;">⭐</div>
+          <div id="statAvis2" style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#fff;">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.8);margin-top:2px;line-height:1.3;">Avis clients</div>
         </div>
       </div>
+      <style>#dashStatsRow::-webkit-scrollbar{display:none}</style>
 
       
       <div class="actions-grid">
@@ -7426,12 +7432,12 @@ function _dashUpdateUI() {
   const pbBadges = document.getElementById('pbBadges');
   if (pbBadges) pbBadges.innerHTML = badges.join('');
 
-  // Stats
-  set('statVues', p.nb_vues||0);
-  set('statFavoris', p.nb_favoris||0);
-  set('statAppels', p.nb_appels||0);
-  set('statWA', p.nb_whatsapp||0);
-  set('statAvis', p.nb_avis||0);
+  // Stats (anciens IDs cachés + nouveaux IDs visibles)
+  set('statVues', p.nb_vues||0);    set('statVues2', p.nb_vues||0);
+  set('statFavoris', p.nb_favoris||0); set('statFavoris2', p.nb_favoris||0);
+  set('statAppels', p.nb_appels||0);  set('statAppels2', p.nb_appels||0);
+  set('statWA', p.nb_whatsapp||0);   set('statWA2', p.nb_whatsapp||0);
+  set('statAvis', p.nb_avis||0);    set('statAvis2', p.nb_avis||0);
 
   _dashUpdateAbonnement(p);
   // Afficher section docs entreprise si applicable
