@@ -2362,9 +2362,9 @@ async function verifierSession() {
         <p>© 2025 YOUMMA JOBS · Tous droits réservés · Conakry, Guinée 🇬🇳</p>
         <p style="margin-top:3px;font-size:11px;color:rgba(255,255,255,.15);">Membre de YOUMMA GROUP · Plateforme N°1 des artisans en Guinée</p>
         <div style="margin-top:10px;display:flex;gap:18px;flex-wrap:wrap;">
-          <a href="javascript:void(0)" onclick="ouvrirLegal('cgu')" style="font-size:11.5px;color:rgba(255,255,255,.45);text-decoration:none;cursor:pointer;transition:.2s;" onmouseover="this.style.color='rgba(255,255,255,.85)'" onmouseout="this.style.color='rgba(255,255,255,.45)'">Conditions d'utilisation</a>
-          <a href="javascript:void(0)" onclick="ouvrirLegal('confidentialite')" style="font-size:11.5px;color:rgba(255,255,255,.45);text-decoration:none;cursor:pointer;transition:.2s;" onmouseover="this.style.color='rgba(255,255,255,.85)'" onmouseout="this.style.color='rgba(255,255,255,.45)'">Politique de confidentialité</a>
-          <a href="javascript:void(0)" onclick="ouvrirLegal('mentions')" style="font-size:11.5px;color:rgba(255,255,255,.45);text-decoration:none;cursor:pointer;transition:.2s;" onmouseover="this.style.color='rgba(255,255,255,.85)'" onmouseout="this.style.color='rgba(255,255,255,.45)'">Mentions légales</a>
+          <a href="javascript:void(0)" onclick="ouvrirPageLegale('cgu')" style="font-size:11.5px;color:rgba(255,255,255,.45);text-decoration:none;cursor:pointer;transition:.2s;" onmouseover="this.style.color='rgba(255,255,255,.85)'" onmouseout="this.style.color='rgba(255,255,255,.45)'">Conditions d'utilisation</a>
+          <a href="javascript:void(0)" onclick="ouvrirPageLegale('confidentialite')" style="font-size:11.5px;color:rgba(255,255,255,.45);text-decoration:none;cursor:pointer;transition:.2s;" onmouseover="this.style.color='rgba(255,255,255,.85)'" onmouseout="this.style.color='rgba(255,255,255,.45)'">Politique de confidentialité</a>
+          <a href="javascript:void(0)" onclick="ouvrirPageLegale('mentions')" style="font-size:11.5px;color:rgba(255,255,255,.45);text-decoration:none;cursor:pointer;transition:.2s;" onmouseover="this.style.color='rgba(255,255,255,.85)'" onmouseout="this.style.color='rgba(255,255,255,.45)'">Mentions légales</a>
         </div>
       </div>
       <div class="fpay">
@@ -12048,121 +12048,100 @@ window.loginSubmitHandler=loginSubmitHandler;
 
 
 <!-- ══ MODAL PAGES LÉGALES ══ -->
-<div id="modal-legal" onclick="if(event.target===this)fermerLegal()" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(10,10,30,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
-  <div style="background:#fff;border-radius:20px;max-width:680px;width:100%;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.35);">
-    <!-- Header modale -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid #F3F4F6;flex-shrink:0;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div id="ml-icon" style="width:36px;height:36px;border-radius:10px;background:#FFF7F0;display:flex;align-items:center;justify-content:center;font-size:18px;"></div>
-        <div>
-          <div id="ml-titre" style="font-family:'Libre Baskerville',serif;font-size:17px;font-weight:700;color:#1A1A4E;"></div>
-          <div style="font-size:11px;color:#9CA3AF;margin-top:1px;">YOUMMA JOBS · Conakry, Guinée</div>
-        </div>
-      </div>
-      <button onclick="fermerLegal()" style="width:32px;height:32px;border-radius:50%;background:#F3F4F6;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:#6B7280;flex-shrink:0;" title="Fermer">✕</button>
+<div id="modal-legal" onclick="if(event.target===this)fermerLegal()" style="display:none;position:fixed;inset:0;z-index:2147483646;background:rgba(10,10,30,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:flex-end;flex-direction:column;padding:0;box-sizing:border-box;">
+  <div id="ml-sheet" style="background:#fff;width:100%;max-width:600px;max-height:90vh;border-radius:20px 20px 0 0;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.25);">
+    <div id="ml-header" style="background:#1A1A4E;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div id="ml-titre" style="font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:#fff;line-height:1.3;"></div>
+      <button onclick="fermerLegal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:12px;">×</button>
     </div>
-    <!-- Corps scrollable -->
-    <div id="ml-body" style="overflow-y:auto;padding:24px;flex:1;font-size:14px;color:#374151;line-height:1.8;"></div>
-    <!-- Footer modale -->
-    <div style="padding:16px 24px;border-top:1px solid #F3F4F6;text-align:center;flex-shrink:0;">
-      <button onclick="fermerLegal()" style="padding:12px 32px;background:linear-gradient(135deg,#1A1A4E,#E85D04);border:none;border-radius:50px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Fermer</button>
+    <div id="ml-body" style="overflow-y:auto;padding:20px;flex:1;font-size:14px;color:#374151;line-height:1.8;-webkit-overflow-scrolling:touch;"></div>
+    <div style="padding:14px 20px;border-top:1px solid #F0F0F0;flex-shrink:0;">
+      <button onclick="fermerLegal()" style="width:100%;padding:14px;background:#1A1A4E;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">Fermer</button>
     </div>
   </div>
 </div>
 
 <script>
-var _legalContent = {
-  cgu: {
-    icon: '📋',
-    titre: "Conditions d'utilisation de YOUMMA JOBS",
-    body: `
-      <p style="background:#FFF7F0;border:1px solid rgba(232,93,4,.2);border-radius:10px;padding:14px 16px;margin:0 0 20px;font-size:13px;color:#92400E;">
-        En utilisant YOUMMA JOBS, vous acceptez les présentes conditions d'utilisation.
-      </p>
-      <h3 style="font-family:'Libre Baskerville',serif;color:#1A1A4E;font-size:15px;margin:0 0 10px;">Abonnement artisan</h3>
-      <p>Les artisans s'inscrivent sur la plateforme et bénéficient d'un abonnement mensuel de <strong>50 000 GNF par mois</strong>. Cet abonnement donne accès à la visibilité sur la plateforme, au tableau de bord et aux outils de gestion de profil.</p>
-      <h3 style="font-family:'Libre Baskerville',serif;color:#1A1A4E;font-size:15px;margin:20px 0 10px;">Suspension de compte</h3>
-      <p>YOUMMA JOBS se réserve le droit de <strong>suspendre tout compte</strong> ne respectant pas les règles de la plateforme : informations falsifiées, comportement frauduleux, non-paiement de l'abonnement ou plaintes répétées de clients.</p>
-      <h3 style="font-family:'Libre Baskerville',serif;color:#1A1A4E;font-size:15px;margin:20px 0 10px;">Utilisation gratuite pour les clients</h3>
-      <p>Les clients utilisent la plateforme <strong>gratuitement</strong>. La consultation des profils, le contact direct avec les artisans (WhatsApp, téléphone) et la lecture des avis ne donnent lieu à aucun frais.</p>
-      <h3 style="font-family:'Libre Baskerville',serif;color:#1A1A4E;font-size:15px;margin:20px 0 10px;">Litiges</h3>
-      <p>Tout litige entre YOUMMA JOBS et ses utilisateurs sera réglé <strong>à l'amiable</strong> dans un premier temps. En cas d'échec, les parties s'en remettront aux juridictions compétentes de la République de Guinée.</p>
-      <div style="margin-top:24px;padding:14px 16px;background:#F4F6FB;border-radius:10px;font-size:13px;color:#6B7280;">
-        Contact : <a href="mailto:contact.yoummajobs@gmail.com" style="color:#E85D04;font-weight:700;">contact.yoummajobs@gmail.com</a>
-      </div>`
-  },
-  confidentialite: {
-    icon: '🔒',
-    titre: 'Politique de confidentialité',
-    body: `
-      <p style="background:#F0FDF4;border:1px solid rgba(22,163,74,.2);border-radius:10px;padding:14px 16px;margin:0 0 20px;font-size:13px;color:#14532D;">
-        Vos données personnelles sont collectées et traitées avec le plus grand soin.
-      </p>
-      <h3 style="font-family:'Libre Baskerville',serif;color:#1A1A4E;font-size:15px;margin:0 0 10px;">Données collectées</h3>
-      <p>YOUMMA JOBS collecte les données personnelles <strong>uniquement pour la mise en relation</strong> entre clients et artisans : nom, prénom, téléphone, métier, commune, photo de profil et réalisations.</p>
-      <h3 style="font-family:'Libre Baskerville',serif;color:#1A1A4E;font-size:15px;margin:20px 0 10px;">Utilisation des données</h3>
-      <p>Les données sont utilisées exclusivement pour :</p>
-      <ul style="padding-left:20px;margin:0 0 16px;">
-        <li>Afficher le profil public de l'artisan</li>
-        <li>Permettre aux clients de prendre contact directement</li>
-        <li>Envoyer des notifications liées à l'abonnement</li>
-      </ul>
-      <h3 style="font-family:'Libre Baskerville',serif;color:#1A1A4E;font-size:15px;margin:20px 0 10px;">Protection des données</h3>
-      <p>Les données ne sont <strong>pas vendues à des tiers</strong>. Elles sont stockées de manière sécurisée sur nos serveurs (Supabase, hébergé en Europe). Les codes PIN sont hachés et ne sont jamais visibles en clair.</p>
-      <h3 style="font-family:'Libre Baskerville',serif;color:#1A1A4E;font-size:15px;margin:20px 0 10px;">Droit de suppression</h3>
-      <p>Les utilisateurs peuvent à tout moment <strong>demander la suppression de leurs données</strong> en envoyant un email à :</p>
-      <div style="margin-top:16px;padding:14px 16px;background:#F4F6FB;border-radius:10px;font-size:13px;color:#6B7280;">
-        <a href="mailto:contact.yoummajobs@gmail.com" style="color:#E85D04;font-weight:700;">contact.yoummajobs@gmail.com</a> · Réponse sous 72h
-      </div>`
-  },
-  mentions: {
-    icon: '🏢',
-    titre: 'Mentions légales',
-    body: `
-      <div style="display:grid;gap:14px;">
-        <div style="background:#F4F6FB;border-radius:12px;padding:18px 20px;border:1px solid #E5E7EB;">
-          <div style="font-size:11px;font-weight:700;color:#E85D04;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Éditeur</div>
-          <div style="font-weight:700;color:#1A1A4E;margin-bottom:4px;">YOUMMA JOBS GUINEE</div>
-          <div style="font-size:13px;color:#6B7280;">Membre de YOUMMA GROUP · Conakry, République de Guinée</div>
-        </div>
-        <div style="background:#F4F6FB;border-radius:12px;padding:18px 20px;border:1px solid #E5E7EB;">
-          <div style="font-size:11px;font-weight:700;color:#E85D04;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Contact</div>
-          <div style="font-size:14px;color:#374151;"><a href="mailto:contact.yoummajobs@gmail.com" style="color:#E85D04;font-weight:700;">contact.yoummajobs@gmail.com</a></div>
-          <div style="font-size:14px;color:#374151;margin-top:4px;"><a href="tel:+22461252510" style="color:#1A1A4E;font-weight:700;">+224 612 52 52 10</a></div>
-        </div>
-        <div style="background:#F4F6FB;border-radius:12px;padding:18px 20px;border:1px solid #E5E7EB;">
-          <div style="font-size:11px;font-weight:700;color:#E85D04;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Hébergement</div>
-          <div style="font-weight:700;color:#1A1A4E;margin-bottom:4px;">GitHub Pages</div>
-          <div style="font-size:13px;color:#6B7280;">GitHub Inc. · San Francisco, California, USA</div>
-        </div>
-        <div style="background:#F4F6FB;border-radius:12px;padding:18px 20px;border:1px solid #E5E7EB;">
-          <div style="font-size:11px;font-weight:700;color:#E85D04;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Paiement sécurisé</div>
-          <div style="font-weight:700;color:#1A1A4E;margin-bottom:4px;">Chap Chap Pay</div>
-          <div style="font-size:13px;color:#6B7280;">Orange Money · MTN MoMo · PayCard · Visa</div>
-        </div>
-        <div style="background:#FFF7F0;border-radius:12px;padding:18px 20px;border:1px solid rgba(232,93,4,.15);">
-          <div style="font-size:11px;font-weight:700;color:#E85D04;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Données personnelles</div>
-          <div style="font-size:13px;color:#6B7280;">Stockage sécurisé via Supabase (Union Européenne). Conformément à la loi guinéenne sur la protection des données, vous disposez d'un droit d'accès, de rectification et de suppression.</div>
-        </div>
-      </div>`
-  }
-};
+function ouvrirPageLegale(type) {
+  var H = '<h3 style="font-family:\'Libre Baskerville\',serif;color:#1A1A4E;font-size:15px;margin:18px 0 8px;">';
+  var contenus = {
+    cgu: {
+      titre: "Conditions d'utilisation — YOUMMA JOBS",
+      html: H+'Article 1 — Objet</h3><p>YOUMMA JOBS est une plateforme de mise en relation entre artisans, prestataires de services et clients en République de Guinée.</p>'+
+            H+'Article 2 — Inscription artisan</h3><p>L\'inscription est gratuite avec une période d\'essai de <strong>14 jours</strong>. Après l\'essai, un abonnement de <strong>50 000 GNF par mois</strong> est requis pour rester visible sur la plateforme.</p>'+
+            H+'Article 3 — Obligations des artisans</h3><p>L\'artisan s\'engage à fournir des informations exactes, à respecter ses engagements envers les clients et à maintenir un comportement professionnel.</p>'+
+            H+'Article 4 — Utilisation client</h3><p>Les clients utilisent la plateforme <strong>gratuitement</strong> pour rechercher et contacter des artisans.</p>'+
+            H+'Article 5 — Responsabilité</h3><p>YOUMMA JOBS est une plateforme intermédiaire. Elle ne peut être tenue responsable des litiges entre artisans et clients. Tout litige sera réglé à l\'amiable.</p>'+
+            H+'Article 6 — Suspension de compte</h3><p>YOUMMA JOBS se réserve le droit de suspendre tout compte ne respectant pas les présentes conditions.</p>'+
+            H+'Article 7 — Modification</h3><p>YOUMMA JOBS peut modifier ces conditions à tout moment. Les utilisateurs seront informés par SMS.</p>'+
+            '<div style="margin-top:20px;padding:14px;background:#F4F6FB;border-radius:10px;font-size:13px;color:#6B7280;">'+
+            'Contact : <a href="mailto:contact.yoummajobs@gmail.com" style="color:#E85D04;font-weight:700;">contact.yoummajobs@gmail.com</a><br>'+
+            'Téléphone : <a href="tel:+22461252510" style="color:#1A1A4E;font-weight:700;">+224 612 52 52 10</a></div>'
+    },
+    confidentialite: {
+      titre: "Politique de confidentialité — YOUMMA JOBS",
+      html: H+'1. Données collectées</h3><p>YOUMMA JOBS collecte les informations suivantes :</p>'+
+            '<ul style="padding-left:18px;margin:6px 0 12px;line-height:2;">'+
+            '<li>Nom, prénom, métier, ville</li><li>Numéro de téléphone</li>'+
+            '<li>Photo de profil</li><li>Documents de vérification (CNI, diplôme)</li></ul>'+
+            H+'2. Utilisation des données</h3><p>Les données sont utilisées uniquement pour :</p>'+
+            '<ul style="padding-left:18px;margin:6px 0 12px;line-height:2;">'+
+            '<li>La mise en relation artisan/client</li><li>L\'envoi de notifications SMS</li>'+
+            '<li>L\'amélioration de la plateforme</li></ul>'+
+            H+'3. Protection des données</h3><p>Vos données sont stockées de manière sécurisée sur <strong>Supabase</strong> (serveurs européens certifiés). Elles ne sont <strong>jamais vendues</strong> à des tiers.</p>'+
+            H+'4. Vos droits</h3><p>Vous pouvez demander la modification ou la suppression de vos données à tout moment en contactant :</p>'+
+            '<div style="margin-top:10px;padding:12px 14px;background:#F4F6FB;border-radius:10px;font-size:13px;color:#6B7280;">'+
+            '<a href="mailto:contact.yoummajobs@gmail.com" style="color:#E85D04;font-weight:700;">contact.yoummajobs@gmail.com</a></div>'+
+            H+'5. Cookies</h3><p>Le site utilise des cookies techniques uniquement pour le fonctionnement de la plateforme.</p>'+
+            '<div style="margin-top:20px;padding:14px;background:#F4F6FB;border-radius:10px;font-size:13px;color:#6B7280;">'+
+            'Contact : <a href="mailto:contact.yoummajobs@gmail.com" style="color:#E85D04;font-weight:700;">contact.yoummajobs@gmail.com</a></div>'
+    },
+    mentions: {
+      titre: "Mentions légales — YOUMMA JOBS",
+      html: '<div style="display:grid;gap:12px;">'+
+            '<div style="background:#F4F6FB;border-radius:12px;padding:16px 18px;border:1px solid #E5E7EB;">'+
+            '<div style="font-size:11px;font-weight:700;color:#E85D04;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Éditeur de la plateforme</div>'+
+            '<div style="font-weight:700;color:#1A1A4E;">YOUMMA JOBS GUINEE</div>'+
+            '<div style="font-size:13px;color:#6B7280;margin-top:3px;">Plateforme numérique de mise en relation · République de Guinée · Conakry</div></div>'+
+            '<div style="background:#F4F6FB;border-radius:12px;padding:16px 18px;border:1px solid #E5E7EB;">'+
+            '<div style="font-size:11px;font-weight:700;color:#E85D04;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Contact</div>'+
+            '<div style="font-size:14px;color:#374151;">Email : <a href="mailto:contact.yoummajobs@gmail.com" style="color:#E85D04;font-weight:700;">contact.yoummajobs@gmail.com</a></div>'+
+            '<div style="font-size:14px;color:#374151;margin-top:4px;">WhatsApp : <a href="tel:+22461252510" style="color:#1A1A4E;font-weight:700;">+224 612 52 52 10</a></div>'+
+            '<div style="font-size:13px;color:#6B7280;margin-top:4px;">Site web : yoummajobs.com</div></div>'+
+            '<div style="background:#F4F6FB;border-radius:12px;padding:16px 18px;border:1px solid #E5E7EB;">'+
+            '<div style="font-size:11px;font-weight:700;color:#E85D04;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Hébergement</div>'+
+            '<div style="font-weight:700;color:#1A1A4E;">GitHub Pages (Microsoft)</div>'+
+            '<div style="font-size:13px;color:#6B7280;margin-top:3px;">pages.github.com</div></div>'+
+            '<div style="background:#F4F6FB;border-radius:12px;padding:16px 18px;border:1px solid #E5E7EB;">'+
+            '<div style="font-size:11px;font-weight:700;color:#E85D04;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Base de données</div>'+
+            '<div style="font-weight:700;color:#1A1A4E;">Supabase</div>'+
+            '<div style="font-size:13px;color:#6B7280;margin-top:3px;">Serveurs : Union Européenne</div></div>'+
+            '<div style="background:#F4F6FB;border-radius:12px;padding:16px 18px;border:1px solid #E5E7EB;">'+
+            '<div style="font-size:11px;font-weight:700;color:#E85D04;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Paiement sécurisé</div>'+
+            '<div style="font-weight:700;color:#1A1A4E;">Chap Chap Pay</div>'+
+            '<div style="font-size:13px;color:#6B7280;margin-top:3px;">chapchappay.com</div></div>'+
+            '<div style="background:#FFF7F0;border-radius:12px;padding:16px 18px;border:1px solid rgba(232,93,4,.15);">'+
+            '<div style="font-size:11px;font-weight:700;color:#E85D04;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Propriété intellectuelle</div>'+
+            '<div style="font-size:13px;color:#6B7280;">Tous les contenus de YOUMMA JOBS (logo, textes, design) sont la propriété exclusive de YOUMMA JOBS GUINEE. Toute reproduction est interdite sans autorisation.</div></div>'+
+            '</div>'
+    }
+  };
 
-function ouvrirLegal(type) {
-  var c = _legalContent[type];
-  if (!c) return;
-  document.getElementById('ml-icon').textContent = c.icon;
-  document.getElementById('ml-titre').textContent = c.titre;
-  document.getElementById('ml-body').innerHTML = c.body;
-  var m = document.getElementById('modal-legal');
-  m.style.display = 'flex';
+  var contenu = contenus[type];
+  if (!contenu) return;
+
+  var modal = document.getElementById('modal-legal');
+  document.getElementById('ml-titre').textContent = contenu.titre;
+  document.getElementById('ml-body').innerHTML = contenu.html;
+  modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
 
+function ouvrirLegal(type) { ouvrirPageLegale(type); }
+
 function fermerLegal() {
   var m = document.getElementById('modal-legal');
-  m.style.display = 'none';
-  document.body.style.overflow = '';
+  if (m) { m.style.display = 'none'; document.body.style.overflow = ''; }
 }
 
 document.addEventListener('keydown', function(e) {
