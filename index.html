@@ -12208,21 +12208,29 @@ style="position:fixed;bottom:24px;left:24px;z-index:9998;display:flex;align-item
 var _pwaDeferredPrompt = null;
 var _pwaBanner = document.getElementById('pwaInstallBanner');
 var _pwaInstallBtn = document.getElementById('pwaInstallBtn');
+var _pwaInstallText = document.getElementById('pwaInstallText');
 var _pwaDismissed = localStorage.getItem('youmma_pwa_dismissed');
+var _pwaIsStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+var _pwaIsIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+var _pwaIsAndroid = /android/i.test(navigator.userAgent);
 
+// Afficher la bannière sur tous les mobiles (iOS + Android) si pas déjà installé ou ignoré
+if (!_pwaIsStandalone && !_pwaDismissed && (_pwaIsIOS || _pwaIsAndroid)) {
+  setTimeout(function() {
+    if (_pwaBanner) _pwaBanner.style.display = 'block';
+  }, 3000);
+}
+
+// Android Chrome : capturer l'événement d'installation natif
 window.addEventListener('beforeinstallprompt', function(e) {
   e.preventDefault();
   _pwaDeferredPrompt = e;
-  if (!_pwaDismissed) {
-    setTimeout(function() {
-      if (_pwaBanner) _pwaBanner.style.display = 'block';
-    }, 3000);
-  }
 });
 
 if (_pwaInstallBtn) {
   _pwaInstallBtn.addEventListener('click', function() {
     if (_pwaDeferredPrompt) {
+      // Android Chrome : déclencher l'installation native
       _pwaDeferredPrompt.prompt();
       _pwaDeferredPrompt.userChoice.then(function(choiceResult) {
         if (choiceResult.outcome === 'accepted') {
@@ -12231,6 +12239,13 @@ if (_pwaInstallBtn) {
         }
         _pwaDeferredPrompt = null;
       });
+    } else if (_pwaIsIOS) {
+      // iOS Safari : afficher les instructions manuelles
+      if (_pwaBanner) _pwaBanner.innerHTML = '<div style="max-width:500px;margin:0 auto;padding:4px 0;text-align:center;color:#fff;font-family:\'DM Sans\',sans-serif;">' +
+        '<div style="font-size:13px;font-weight:800;margin-bottom:6px;">📲 Installer sur iPhone / iPad</div>' +
+        '<div style="font-size:12px;opacity:.8;line-height:1.6;">Appuyez sur <strong>⎙ Partager</strong> en bas du navigateur<br>puis choisissez <strong>"Sur l\'écran d\'accueil"</strong></div>' +
+        '<button onclick="document.getElementById(\'pwaInstallBanner\').style.display=\'none\';localStorage.setItem(\'youmma_pwa_dismissed\',\'1\');" style="margin-top:10px;padding:8px 20px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-size:12px;cursor:pointer;">OK, compris</button>' +
+        '</div>';
     }
   });
 }
