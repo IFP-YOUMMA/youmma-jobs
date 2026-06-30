@@ -29,11 +29,11 @@ module.exports = async function(req, res) {
   const sid   = process.env.NIMBA_SID   || '1a3b6b6f9e6e5648f9492b07a26dbdd6';
   const token = process.env.NIMBA_TOKEN || 'iEIMmNfZQJGKdUWv6NU7CHNDSvLiVmGruwnMNLTU2-_8DLLpc1HGON6gsfictrB2dfkgv_QMXJWnFpt5jyatV_-V32V2It85RGIxjbEY7Mk';
 
-  const message = 'Votre code de verification YOUMMA JOBS : ' + code + '. Valable 10 minutes.';
+  const message = 'Votre code de vérification YOUMMA JOBS : ' + code + '. Valable 10 minutes.';
 
   const payload = JSON.stringify({
     to: [e164],
-    sender_name: 'NimbaSMS',
+    sender_name: 'YOUMMA JOBS',
     message: message
   });
 
