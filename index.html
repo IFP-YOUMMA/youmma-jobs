@@ -4249,64 +4249,6 @@ function filterProviders() {
   renderProviderCards();
 }
 
-// ── ADMIN RÉALISATIONS ──
-var _realData = [
-  {idx:0, label:'Réalisation 1', metier:'Construction', gradient:'linear-gradient(135deg,#1A1A4E,#C74B00)'},
-  {idx:1, label:'Réalisation 2', metier:'Électricité',  gradient:'linear-gradient(135deg,#1A0A4E,#7C3AED)'},
-  {idx:2, label:'Réalisation 3', metier:'Plomberie',    gradient:'linear-gradient(135deg,#0A2E1A,#0F6E56)'},
-  {idx:3, label:'Réalisation 4', metier:'Soudure',      gradient:'linear-gradient(135deg,#2E1A0A,#B45309)'},
-  {idx:4, label:'Réalisation 5', metier:'Menuiserie',   gradient:'linear-gradient(135deg,#2E0A0A,#92400E)'},
-];
-
-function renderAdminRealisations() {
-  const container = document.getElementById('adminRealCards');
-  if (!container) return;
-
-  container.innerHTML = _realData.map(s => {
-    // Lire les données depuis le carrousel si disponible
-    const titreEl = document.getElementById('real-titre-' + s.idx);
-    const descEl = document.getElementById('real-desc-' + s.idx);
-    const artisanEl = document.getElementById('real-artisan-' + s.idx);
-    const currentTitre = titreEl ? titreEl.textContent.trim() : '';
-    const currentDesc = descEl ? descEl.textContent.trim() : '';
-    const currentArtisan = artisanEl ? artisanEl.textContent.trim() : '';
-
-    // Preview toujours avec le dégradé par défaut
-    const previewHtml = `<div style="width:100%;height:100%;background:${s.gradient};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.05em;">${s.metier}</div>`;
-
-    return `
-    <div style="background:#fff;border-radius:16px;border:1.5px solid #E5E7EB;overflow:hidden;">
-      
-      <div style="aspect-ratio:4/3;overflow:hidden;background:#F4F6FB;">
-        <div id="areal-preview-wrap-${s.idx}" style="width:100%;height:100%;">${previewHtml}</div>
-      </div>
-      <div style="padding:16px;">
-        <div style="font-size:12px;font-weight:700;color:#1A1A4E;margin-bottom:12px;">${s.label} — ${s.metier}</div>
-        <div style="margin-bottom:8px;">
-          <label style="font-size:11px;font-weight:700;color:#6B7280;display:block;margin-bottom:3px;">Titre</label>
-          <input id="areal-titre-${s.idx}" value="${currentTitre}" style="width:100%;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;box-sizing:border-box;outline:none;"/>
-        </div>
-        <div style="margin-bottom:8px;">
-          <label style="font-size:11px;font-weight:700;color:#6B7280;display:block;margin-bottom:3px;">Description</label>
-          <textarea id="areal-desc-${s.idx}" style="width:100%;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12px;box-sizing:border-box;min-height:60px;resize:none;outline:none;">${currentDesc}</textarea>
-        </div>
-        <div style="margin-bottom:12px;">
-          <label style="font-size:11px;font-weight:700;color:#6B7280;display:block;margin-bottom:3px;">Artisan</label>
-          <input id="areal-artisan-${s.idx}" value="${currentArtisan}" style="width:100%;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;box-sizing:border-box;outline:none;"/>
-        </div>
-        
-        <label style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;background:#F4F6FB;border:2px dashed #E5E7EB;border-radius:10px;font-size:13px;font-weight:700;color:#1A1A4E;cursor:pointer;margin-bottom:8px;box-sizing:border-box;" onmouseover="this.style.borderColor='#E85D04';this.style.color='#E85D04'" onmouseout="this.style.borderColor='#E5E7EB';this.style.color='#1A1A4E'">
-          <i class="fa-solid fa-camera"></i> Choisir une image
-          <input type="file" accept="image/*" style="display:none;" onchange="previewRealImage(this,${s.idx})"/>
-        </label>
-        <button onclick="validerReal(${s.idx})" style="width:100%;padding:11px;background:#E85D04;border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-          <i class="fa-solid fa-check"></i> Valider et publier
-        </button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
 // ── KEYBOARD ──
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeModal(); fermerInscription(); }
@@ -5708,7 +5650,6 @@ async function chargerAvis() {
     <div onclick="showAdmin('valide')" id="amenu-valide" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-circle-check" style="width:16px;"></i> Validés</div>
     <div onclick="showAdmin('rejete')" id="amenu-rejete" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-circle-xmark" style="width:16px;"></i> Rejetés</div>
     <div onclick="showAdmin('suspendu')" id="amenu-suspendu" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-ban" style="width:16px;"></i> Suspendus</div>
-    <div onclick="showAdmin('realisations')" id="amenu-realisations" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-images" style="width:16px;"></i> Réalisations</div>
     <div onclick="showAdmin('carousel')" id="amenu-carousel" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-photo-film" style="width:16px;"></i> Images à la une</div>
     <div onclick="showAdmin('missions')" id="amenu-missions" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullseye" style="width:16px;"></i> Missions</div>
     <div onclick="showAdmin('ambassadeurs');chargerClassementAdmin();" id="amenu-ambassadeurs" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-trophy" style="width:16px;"></i> Ambassadeurs</div>
@@ -5798,11 +5739,6 @@ async function chargerAvis() {
             <i class="fa-solid fa-chart-line" style="color:#2563EB;font-size:18px;display:block;margin-bottom:8px;"></i>
             <div style="font-size:13px;font-weight:700;color:#1A1A4E;">Voir les rapports</div>
             <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Statistiques et analyses</div>
-          </button>
-          <button onclick="showAdmin('realisations')" style="background:#F5F3FF;border:1.5px solid #DDD6FE;border-radius:12px;padding:14px;text-align:left;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='#DDD6FE'" onmouseout="this.style.background='#F5F3FF'">
-            <i class="fa-solid fa-images" style="color:#7C3AED;font-size:18px;display:block;margin-bottom:8px;"></i>
-            <div style="font-size:13px;font-weight:700;color:#1A1A4E;">Réalisations</div>
-            <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Gérer les photos du site</div>
           </button>
         </div>
 
@@ -6047,46 +5983,6 @@ async function chargerAvis() {
         </div>
       </div>
     </div>
-
-    <div class="admin-section" id="admin-realisations">
-      <div class="admin-section-inner">
-
-        
-        <div class="adm-section-header" style="margin-bottom:20px;">
-          <div class="adm-section-title">
-            <i class="fa-solid fa-images" style="color:#E85D04;"></i> Gestion des réalisations
-            <span style="font-size:11px;font-weight:500;background:#FFF7F0;color:#E85D04;padding:3px 10px;border-radius:20px;margin-left:8px;">10 slots disponibles</span>
-          </div>
-          <button onclick="saveAllReals()" style="padding:9px 20px;background:#E85D04;border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Tout publier
-          </button>
-        </div>
-
-        
-        <div style="background:#EFF6FF;border-radius:12px;padding:14px 18px;margin-bottom:24px;display:flex;gap:12px;align-items:flex-start;">
-          <i class="fa-solid fa-circle-info" style="color:#2563EB;font-size:16px;flex-shrink:0;margin-top:1px;"></i>
-          <div style="font-size:13px;color:#1E40AF;line-height:1.6;">
-            <strong>Redimensionnement automatique :</strong> Les images sont automatiquement redimensionnées à <strong>1200×800px</strong> et compressées avant upload. Formats acceptés : JPG, PNG, WebP. Max 20 Mo.
-            <br>Les images publiées s'affichent immédiatement dans le <strong>carrousel sur la page d'accueil</strong>.
-          </div>
-        </div>
-
-        
-        <div id="adminRealGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;"></div>
-
-        
-        <div style="margin-top:28px;">
-          <div class="adm-section-title" style="font-size:14px;margin-bottom:14px;">
-            <i class="fa-solid fa-eye" style="color:#6B7280;"></i> Aperçu du carrousel (page d'accueil)
-          </div>
-          <div id="realPreviewCarousel" style="background:#1A1A4E;border-radius:16px;overflow:hidden;height:220px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);font-size:14px;">
-            <i class="fa-solid fa-images" style="font-size:28px;display:block;text-align:center;margin-bottom:8px;"></i>
-            Aucune image publiée
-          </div>
-        </div>
-      </div>
-
-  </div>
 
     <div class="admin-section" id="admin-carousel">
       <div class="admin-section-inner">
@@ -8185,7 +8081,6 @@ function showAdmin(name) {
     valide: '<i class="fa-solid fa-circle-check" style="color:#059669;margin-right:6px;"></i>Prestataires validés',
     rejete: '<i class="fa-solid fa-circle-xmark" style="color:#DC2626;margin-right:6px;"></i>Prestataires rejetés',
     suspendu: '<i class="fa-solid fa-ban" style="color:#7C3AED;margin-right:6px;"></i>Suspendus',
-    realisations: '<i class="fa-solid fa-images" style="color:#E85D04;margin-right:6px;"></i>Réalisations',
     carousel: '<i class="fa-solid fa-photo-film" style="color:#E85D04;margin-right:6px;"></i>Images à la une',
     missions: '<i class="fa-solid fa-bullseye" style="color:#E85D04;margin-right:6px;"></i>Missions'
   };
@@ -8193,12 +8088,11 @@ function showAdmin(name) {
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','realisations','carousel','missions'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','carousel','missions'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (el) el.style.cssText = s===name ? ACTIVE : NORMAL;
   });
-  if (name==='realisations') { if(typeof renderAdminRealisations==='function') renderAdminRealisations(); }
-  else if (name==='carousel') { if(typeof _carouselLoadAdmin==='function') _carouselLoadAdmin(); }
+  if (name==='carousel') { if(typeof _carouselLoadAdmin==='function') _carouselLoadAdmin(); }
   else if (name==='missions') { renderAdminMissions(); }
   else if (name!=='dashboard') { if(typeof _adminLoadAll==='function') _adminLoadAll(); }
 }
@@ -9847,241 +9741,6 @@ window._notifToastHide = _notifToastHide;
 window._notifStartPolling = _notifStartPolling;
 window._notifUpdateBadges = _notifUpdateBadges;
 window.renderAdminNotifSection = renderAdminNotifSection;
-
-// ══════════════════════════════════════════════════════════════════
-// RÉALISATIONS ADMIN — Upload + Affichage public
-// ══════════════════════════════════════════════════════════════════
-
-_realData = {}; // reset
-
-// Initialiser la grille admin réalisations
-async function renderAdminRealisations() {
-  const grid = document.getElementById('adminRealGrid');
-  if (!grid) return;
-  
-  // Charger depuis Supabase
-  try {
-    const { data } = await sb.from('site_config')
-      .select('cle,valeur').like('cle', 'realisation_%');
-    _realData = {};
-    (data || []).forEach(row => {
-      const idx = row.cle.replace('realisation_', '');
-      try { _realData[idx] = JSON.parse(row.valeur || '{}'); } catch(e) {}
-    });
-  } catch(e) { console.warn('realData:', e); }
-
-  const categories = ['Construction','Électricité','Plomberie','Soudure','Menuiserie','Informatique','Beauté','Éducation','Transport','Autre'];
-  const colors = ['#C74B00','#7C3AED','#059669','#B45309','#1A1A4E','#2563EB','#DB2777','#D97706','#0891B2','#6B7280'];
-
-  grid.innerHTML = categories.map((cat, i) => {
-    const r = _realData[i] || {};
-    const hasImg = !!r.imageUrl;
-    return `
-      <div class="adm-table-wrap" style="overflow:visible;">
-        <div id="areal-preview-wrap-${i}" style="aspect-ratio:4/3;background:linear-gradient(135deg,${colors[i]}22,${colors[i]}44);overflow:hidden;position:relative;cursor:pointer;border-radius:14px 14px 0 0;" onclick="document.getElementById('areal-file-${i}').click()">
-          ${hasImg
-            ? `<img src="${r.imageUrl}" style="width:100%;height:100%;object-fit:cover;" id="areal-img-${i}"/>`
-            : `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;">
-                <i class="fa-solid fa-camera-retro" style="font-size:28px;color:${colors[i]};opacity:.5;"></i>
-                <span style="font-size:11px;font-weight:600;color:${colors[i]};opacity:.6;">Cliquer pour ajouter</span>
-               </div>`}
-          <div style="position:absolute;top:8px;right:8px;background:${hasImg?'#ECFDF5':'#F3F4F6'};color:${hasImg?'#059669':'#9CA3AF'};border-radius:20px;padding:2px 8px;font-size:9.5px;font-weight:700;">
-            ${hasImg?'✅ Publié':'⚪ Vide'}
-          </div>
-          <div style="position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
-            <span style="color:#fff;font-size:12px;font-weight:700;"><i class="fa-solid fa-arrow-up-from-bracket"></i> Changer</span>
-          </div>
-          <input type="file" id="areal-file-${i}" accept="image/*" style="display:none;" onchange="previewRealImage(this,${i})"/>
-        </div>
-        <div style="padding:12px;">
-          <div style="font-size:9px;font-weight:700;color:#E85D04;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Réal. ${i+1} — ${cat}</div>
-          <input id="areal-titre-${i}" value="${r.titre||''}" placeholder="Titre de la réalisation" style="width:100%;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12px;box-sizing:border-box;outline:none;margin-bottom:6px;" onfocus="this.style.borderColor='#E85D04'" onblur="this.style.borderColor='#E5E7EB'"/>
-          <input id="areal-artisan-${i}" value="${r.artisan||''}" placeholder="Nom de l'artisan" style="width:100%;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12px;box-sizing:border-box;outline:none;margin-bottom:8px;" onfocus="this.style.borderColor='#E85D04'" onblur="this.style.borderColor='#E5E7EB'"/>
-          <button onclick="validerReal(${i})" style="width:100%;padding:9px;background:#E85D04;border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-cloud-arrow-up"></i> Publier</button>
-        </div>
-      </div>`;
-  }).join('');
-
-  _updateRealPreview();
-}
-
-
-// Mettre à jour l'aperçu carousel dans l'admin
-function _updateRealPreview() {
-  const preview = document.getElementById('realPreviewCarousel');
-  if (!preview) return;
-  const images = Object.values(_realData).filter(r => r.imageUrl).map(r => r.imageUrl);
-  if (!images.length) {
-    preview.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,.4);"><i class="fa-solid fa-images" style="font-size:28px;display:block;margin-bottom:8px;"></i>Aucune image publiée</div>';
-    return;
-  }
-  let ci = 0;
-  preview.innerHTML = `
-    <div style="position:relative;width:100%;height:100%;overflow:hidden;">
-      ${images.map((url, i) => `<img src="${url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .5s;opacity:${i===0?1:0};" id="rcSlide${i}"/>`).join('')}
-      <div style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;">
-        ${images.map((_, i) => `<div id="rcDot${i}" style="width:8px;height:8px;border-radius:50%;background:${i===0?'#fff':'rgba(255,255,255,.4)'};transition:background .3s;"></div>`).join('')}
-      </div>
-      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.4),transparent);display:flex;align-items:flex-end;padding:16px;">
-        <div style="color:#fff;font-size:14px;font-weight:700;" id="rcLabel">${Object.values(_realData).find(r=>r.imageUrl)?.titre||''}</div>
-      </div>
-    </div>`;
-  const vals = Object.values(_realData).filter(r => r.imageUrl);
-  setInterval(() => {
-    document.getElementById('rcSlide'+ci)?.style && (document.getElementById('rcSlide'+ci).style.opacity = 0);
-    document.getElementById('rcDot'+ci)?.style && (document.getElementById('rcDot'+ci).style.background = 'rgba(255,255,255,.4)');
-    ci = (ci + 1) % images.length;
-    document.getElementById('rcSlide'+ci)?.style && (document.getElementById('rcSlide'+ci).style.opacity = 1);
-    document.getElementById('rcDot'+ci)?.style && (document.getElementById('rcDot'+ci).style.background = '#fff');
-    const label = document.getElementById('rcLabel');
-    if (label && vals[ci]) label.textContent = vals[ci].titre || '';
-  }, 3000);
-}
-
-// Publier une réalisation
-async function validerReal(idx) {
-  const btn = document.getElementById('areal-btn-'+idx);
-  if (btn) { btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Publication...'; }
-
-  try {
-    const titre   = document.getElementById('areal-titre-'  +idx)?.value.trim() || '';
-    const desc    = document.getElementById('areal-desc-'   +idx)?.value.trim() || '';
-    const artisan = document.getElementById('areal-artisan-'+idx)?.value.trim() || '';
-    const file    = (window._realFiles || {})[idx];
-
-    let imageUrl = (_realData[idx] || {}).imageUrl || null;
-
-    if (file) {
-      // Redimensionner avant upload
-      let fileToUpload = file;
-      try { fileToUpload = await resizeRealImage(file); } catch(e) {}
-      
-      const fileName = 'realisations/real_' + idx + '_' + Date.now() + '.jpg';
-      const { error: uploadErr } = await sb.storage
-        .from('photos')
-        .upload(fileName, fileToUpload, { upsert: true, contentType: 'image/jpeg' });
-
-      if (uploadErr) {
-        // Essayer le bucket 'Photos' avec majuscule
-        const { error: uploadErr2, data: uploadData2 } = await sb.storage
-          .from('Photos')
-          .upload(fileName, fileToUpload, { upsert: true, contentType: 'image/jpeg' });
-        if (uploadErr2) throw new Error('Upload impossible: ' + (uploadErr.message || uploadErr2.message));
-        imageUrl = sb.storage.from('Photos').getPublicUrl(fileName).data.publicUrl;
-      } else {
-        imageUrl = sb.storage.from('photos').getPublicUrl(fileName).data.publicUrl;
-      }
-
-      // Nettoyer
-      if (window._realFiles) delete window._realFiles[idx];
-    }
-
-    if (!titre && !imageUrl) { showToast('❌ Ajoutez au moins un titre ou une image', 'error'); return; }
-
-    const payload = JSON.stringify({ titre, desc, artisan, imageUrl });
-    const { error } = await sb.from('site_config').upsert({ cle: 'realisation_'+idx, valeur: payload });
-    if (error) throw new Error(error.message);
-
-    _realData[idx] = { titre, desc, artisan, imageUrl };
-    showToast('✅ Réalisation ' + (parseInt(idx)+1) + ' publiée sur le site !');
-    
-    // Rafraîchir la carte
-    await renderAdminRealisations();
-    
-    // Rafraîchir le carousel public immédiatement
-    refreshPublicCarousel();
-
-  } catch(e) {
-    showToast('❌ Erreur: ' + e.message, 'error');
-  } finally {
-    if (btn) { btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-cloud-arrow-up"></i> Publier'; }
-  }
-}
-
-// Publier toutes les réalisations en une fois
-async function saveAllReals() {
-  showToast('⏳ Publication en cours...');
-  for (let i = 0; i < 5; i++) {
-    const titre = document.getElementById('areal-titre-'+i)?.value.trim();
-    const file = (window._realFiles||{})[i];
-    if (titre || file) await validerReal(i);
-  }
-  showToast('✅ Toutes les réalisations publiées !');
-}
-
-// Redimensionnement automatique pour réalisations (1200×800)
-async function resizeRealImage(file) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      const TARGET_W = 1200, TARGET_H = 800;
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      
-      // Recadrer en ratio 3:2
-      const targetRatio = TARGET_W / TARGET_H;
-      const imgRatio = w / h;
-      let cropW = w, cropH = h, cropX = 0, cropY = 0;
-      
-      if (imgRatio > targetRatio) {
-        cropW = Math.round(h * targetRatio);
-        cropX = Math.round((w - cropW) / 2);
-      } else {
-        cropH = Math.round(w / targetRatio);
-        cropY = Math.round((h - cropH) / 2);
-      }
-      
-      canvas.width = TARGET_W; canvas.height = TARGET_H;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, TARGET_W, TARGET_H);
-      
-      canvas.toBlob((blob) => {
-        resolve(new File([blob], 'realisation.jpg', { type: 'image/jpeg' }));
-      }, 'image/jpeg', 0.88);
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
-    img.src = url;
-  });
-}
-
-// Rafraîchir le carousel public sans recharger la page
-function refreshPublicCarousel() {
-  const data = Object.values(_realData).filter(r => r.imageUrl && r.titre);
-  if (!data.length) return;
-  
-  // Chercher le carousel sur la page d'accueil
-  const carousel = document.getElementById('publicRealCarousel');
-  if (!carousel) return;
-  
-  // Reconstruire le carousel
-  carousel.innerHTML = buildCarouselHTML(data);
-  initCarousel();
-}
-
-// Prévisualiser image avant upload
-function previewRealImage(input, idx) {
-  const file = input.files[0];
-  if (!file) return;
-  window._realFiles = window._realFiles || {};
-  window._realFiles[idx] = file;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const wrap = document.getElementById('areal-preview-wrap-' + idx);
-    if (wrap) {
-      const existingImg = wrap.querySelector('img');
-      if (existingImg) {
-        existingImg.src = e.target.result;
-      } else {
-        wrap.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;"/>` +
-          `<div style="position:absolute;top:10px;right:10px;background:#FFFBEB;color:#D97706;border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:700;">⏳ Non publié</div>` +
-          `<input type="file" id="areal-file-${idx}" accept="image/*" style="display:none;" onchange="previewRealImage(this,${idx})"/>`;
-      }
-    }
-  };
-  reader.readAsDataURL(file);
-}
 
 // ══════════════════════════════════════════════════════════════
 
