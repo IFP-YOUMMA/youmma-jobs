@@ -1323,8 +1323,7 @@ async function connexionPrestataire(telephone, password) {
     const sessionData = { provider_id: byTel.id, token, nom: byTel.nom, prenom: byTel.prenom };
     setSession(sessionData);
     // Essayer d'insérer en DB en arrière-plan
-    sb.from('provider_sessions').insert({ provider_id: byTel.id, token })
-      .then(() => {}).catch(e => console.warn('Session DB:', e.message));
+    (async () => { try { await sb.from('provider_sessions').insert({ provider_id: byTel.id, token }); } catch(e) { console.warn('Session DB:', e.message); } })();
     return { success:true, provider: byTel };
   } catch(e) { 
     return { success:false, message:'Erreur: ' + e.message }; 
@@ -2460,7 +2459,7 @@ if (typeof connexionPrestataire === 'undefined') {
       localStorage.setItem('yj_provider_session', JSON.stringify({
         provider_id: res.data.id, token: token, nom: res.data.nom, prenom: res.data.prenom
       }));
-      sb.from('provider_sessions').insert({provider_id: res.data.id, token: token}).then(function(){}).catch(function(){});
+      (async () => { try { await sb.from('provider_sessions').insert({provider_id: res.data.id, token: token}); } catch(e) {} })();
       return { success: true, provider: res.data };
     } catch(e) { return { success: false, message: e.message }; }
   };
@@ -2991,7 +2990,7 @@ if (typeof inscrirePrestataire === 'undefined') {
         var token = generateToken();
         setSession({provider_id:newId, token:token, nom:fd.nom, prenom:fd.prenom});
         providerId = newId; _dashProviderId = newId;
-        sb.from('provider_sessions').insert({provider_id:newId, token:token}).catch(function(){});
+        (async () => { try { await sb.from('provider_sessions').insert({provider_id:newId, token:token}); } catch(e) {} })();
 
         // Afficher succès
         [1,2,3].forEach(function(s){var el=document.getElementById('i-step'+s);if(el)el.style.display='none';});
@@ -8176,11 +8175,14 @@ async function _adminValidMission(missionId, statut, providerId) {
   if (error) { showToast('Erreur: '+error.message); return; }
   // Si validée → incrémenter nb_missions du prestataire
   if (statut === 'valide') {
-    await sb.rpc('increment_missions', { provider_id: providerId }).catch(async () => {
+    try {
+      const { error: rpcErr } = await sb.rpc('increment_missions', { provider_id: providerId });
+      if (rpcErr) throw rpcErr;
+    } catch(e) {
       // Fallback si RPC pas dispo
       const { data:p } = await sb.from('providers').select('nb_missions').eq('id', providerId).single();
       await sb.from('providers').update({ nb_missions: (p?.nb_missions||0)+1 }).eq('id', providerId);
-    });
+    }
   }
   showToast(statut==='valide'?'✅ Mission validée !':'Mission rejetée');
   chargerMissionsAdmin();
@@ -8367,8 +8369,8 @@ async function rptGetStatsMois(debut, fin) {
     const [r1, r2, r3, r4] = await Promise.all([
       sb.from('providers').select('id', {count:'exact'}).gte('created_at', debut).lte('created_at', fin + 'T23:59:59'),
       sb.from('providers').select('id', {count:'exact'}).eq('statut','valide').gte('created_at', debut).lte('created_at', fin + 'T23:59:59'),
-      sb.from('missions').select('id', {count:'exact'}).gte('created_at', debut).lte('created_at', fin + 'T23:59:59').catch(()=>({count:0})),
-      sb.from('codes_activation').select('id', {count:'exact'}).eq('statut','utilise').gte('created_at', debut).lte('created_at', fin + 'T23:59:59').catch(()=>({count:0})),
+      sb.from('missions').select('id', {count:'exact'}).gte('created_at', debut).lte('created_at', fin + 'T23:59:59').then(r => r, () => ({count:0})),
+      sb.from('codes_activation').select('id', {count:'exact'}).eq('statut','utilise').gte('created_at', debut).lte('created_at', fin + 'T23:59:59').then(r => r, () => ({count:0})),
     ]);
     return { inscriptions: r1.count||0, valides: r2.count||0, missions: r3.count||0, codesActives: r4.count||0 };
   } catch(e) { return { inscriptions:0, valides:0, missions:0, codesActives:0 }; }
