@@ -8262,6 +8262,20 @@ async function _adminAction(type, id) {
       const essai_fin = new Date(Date.now()+14*24*60*60*1000).toISOString();
       const {error} = await sb.from('providers').update({statut:'valide',essai_actif:true,essai_fin}).eq('id',id);
       if (error) throw new Error(error.message);
+      // SMS bienvenue — récupérer telephone + prenom puis appeler l'API
+      try {
+        const {data:prov} = await sb.from('providers').select('telephone,prenom').eq('id',id).single();
+        if (prov?.telephone && prov?.prenom) {
+          await fetch('/api/send-welcome', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({telephone: prov.telephone, prenom: prov.prenom})
+          });
+          console.log('[Admin] SMS bienvenue envoyé à', prov.prenom, prov.telephone);
+        }
+      } catch(smsErr) {
+        console.log('[Admin] Erreur SMS bienvenue (non bloquant):', smsErr.message);
+      }
     } else if (type==='rejeter') {
       await sb.from('providers').update({statut:'rejete'}).eq('id',id);
     } else if (type==='suspendre') {
