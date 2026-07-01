@@ -1604,27 +1604,6 @@ async function verifierSession() {
         </button>
         <!-- Dots navigation -->
         <div id="expDots" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:4;display:flex;gap:6px;align-items:center;"></div>
-        <!-- Mini profil prestataire disponible (×1 fade) -->
-        <div id="provMiniWrap" style="position:absolute;bottom:20px;left:20px;z-index:10;pointer-events:auto;display:none;">
-          <div id="provMiniCard" style="display:inline-flex;align-items:center;gap:10px;background:rgba(8,8,24,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:9px 14px 9px 9px;box-shadow:0 4px 24px rgba(0,0,0,.45);transition:opacity .5s ease;opacity:0;cursor:pointer;max-width:230px;">
-            <!-- Avatar -->
-            <div id="provMiniAvatarWrap" style="width:42px;height:42px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2.5px solid #E85D04;background:#1A1A4E;display:flex;align-items:center;justify-content:center;">
-              <img id="provMiniImg" style="width:100%;height:100%;object-fit:cover;display:none;" src="" alt="" loading="lazy" decoding="async">
-              <span id="provMiniIni" style="color:#fff;font-size:14px;font-weight:800;line-height:1;"></span>
-            </div>
-            <!-- Infos -->
-            <div style="min-width:0;flex:1;">
-              <div id="provMiniName" style="color:#fff;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;"></div>
-              <div id="provMiniMetier" style="color:#E85D04;font-size:10.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;"></div>
-              <div id="provMiniLoc" style="color:rgba(255,255,255,.5);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;"></div>
-            </div>
-            <!-- Badge disponible -->
-            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
-              <span style="width:8px;height:8px;border-radius:50%;background:#22C55E;display:block;box-shadow:0 0 6px #22C55E;"></span>
-              <span style="color:#22C55E;font-size:8px;font-weight:700;white-space:nowrap;line-height:1;">Disponible</span>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="hero-actions">
         <button class="btn-hero-main" onclick="document.getElementById('artisans').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-magnifying-glass"></i> Trouver un artisan</button>
@@ -1639,45 +1618,6 @@ async function verifierSession() {
     </div>
     <div class="hero-visual">
       <div class="hero-orb"></div>
-      <div class="hero-cards-stack">
-        <div class="float-notif fn-top">
-          <div class="fn-icon" style="background:#E6FBF3;">✅</div>
-          <div><div class="fn-label">Vérifié par YOUMMA</div><div class="fn-val">Amadou Diallo</div></div>
-        </div>
-        <div class="hcard-main">
-          <div class="hc-header">
-            <div class="hc-avatar">AD</div>
-            <div style="flex:1;">
-              <div class="hc-name">Amadou Diallo</div>
-              <div class="hc-job"> Électricien certifié · Ratoma</div>
-              <div class="hc-badges">
-                <span class="hc-badge hcb-verifie"><i class="fa-solid fa-check"></i> Vérifié</span>
-                <span class="hc-badge hcb-top"><i class="fa-solid fa-trophy" style="color:#F5C842;"></i> Top Artisan</span>
-                <span class="hc-badge hcb-express"> Express</span>
-              </div>
-            </div>
-          </div>
-          <div class="hc-skills">
-            <span class="hc-skill">Installation électrique</span>
-            <span class="hc-skill">Dépannage</span>
-            <span class="hc-skill">Câblage</span>
-            <span class="hc-skill">Tableau électrique</span>
-          </div>
-          <div class="hc-stats">
-            <div class="hcs"><div class="hcs-val">142</div><div class="hcs-label"><i class="fa-solid fa-eye"></i> Vues</div></div>
-            <div class="hcs"><div class="hcs-val">47</div><div class="hcs-label"><i class="fa-solid fa-bullseye"></i> Missions</div></div>
-            <div class="hcs"><div class="hcs-val">5.0</div><div class="hcs-label"><i class="fa-solid fa-star" style="color:#F5C842;"></i> Note</div></div>
-          </div>
-          <div class="hc-actions">
-            <button class="btn-hca wa" onclick="openWA('+224620538290','Amadou Diallo')"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
-            <button class="btn-hca call" onclick="callProvider('+224620538290')"><i class="fa-solid fa-phone"></i> Appeler</button>
-          </div>
-        </div>
-        <div class="float-notif fn-bot">
-          <div class="fn-icon" style="background:#FEF9C3;"><i class="fa-solid fa-star" style="color:#F5C842;"></i></div>
-          <div><div class="fn-label">Note moyenne</div><div class="fn-val">4.8 / 5 ★</div></div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -10806,80 +10746,11 @@ function _dispoNowInit(){
 
 if (document.readyState === 'complete') {
   _expInit();
-  _provMiniInit();
   _dispoNowInit();
 } else {
-  window.addEventListener('load', function() { _expInit(); _provMiniInit(); _dispoNowInit(); });
+  window.addEventListener('load', function() { _expInit(); _dispoNowInit(); });
 }
 
-// ── Mini profil prestataire disponible (×1 avec fade, 5s) ──
-var _provMiniTimer = null;
-async function _provMiniInit() {
-  var wrap = document.getElementById('provMiniWrap');
-  var card = document.getElementById('provMiniCard');
-  if (!wrap || !card) return;
-
-  // Masquer par défaut jusqu'au chargement
-  wrap.style.display = 'none';
-  if (_provMiniTimer) { clearInterval(_provMiniTimer); _provMiniTimer = null; }
-
-  var providers = [];
-  try {
-    var res = await sb.from('providers')
-      .select('id,prenom,nom,metier,photo_url,disponibilite,ville,commune,quartier')
-      .ilike('disponibilite','%disponible%')
-      .limit(50);
-    if (!res.error) providers = res.data || [];
-  } catch(e) {}
-
-  if (!providers.length) {
-    wrap.style.display = 'none';
-    return;
-  }
-
-  var idx = 0;
-
-  function _fill(p) {
-    var imgEl  = document.getElementById('provMiniImg');
-    var iniEl  = document.getElementById('provMiniIni');
-    var nameEl = document.getElementById('provMiniName');
-    var metEl  = document.getElementById('provMiniMetier');
-    var locEl  = document.getElementById('provMiniLoc');
-    if (!imgEl) return;
-    var ini = ((p.prenom || '?').charAt(0) + (p.nom || '').charAt(0)).toUpperCase();
-    if (p.photo_url) {
-      imgEl.src = p.photo_url;
-      imgEl.style.display = 'block';
-      iniEl.style.display = 'none';
-    } else {
-      imgEl.style.display = 'none';
-      iniEl.style.display = 'block';
-      iniEl.textContent = ini;
-    }
-    nameEl.textContent = ((p.prenom || '') + ' ' + (p.nom || '')).trim();
-    metEl.textContent  = p.metier || '';
-    var locTxt = [p.quartier, p.commune, p.ville].filter(Boolean).join(', ');
-    locEl.textContent  = locTxt ? '📍 ' + locTxt : '';
-    card.onclick = p.id
-      ? (function(id) { return function(e) { e.stopPropagation(); if (typeof openModal === 'function') openModal(id); }; })(p.id)
-      : null;
-  }
-
-  function _tick() {
-    card.style.opacity = '0';
-    setTimeout(function() {
-      _fill(providers[idx % providers.length]);
-      idx = (idx + 1) % providers.length;
-      card.style.opacity = '1';
-    }, 500);
-  }
-
-  wrap.style.display = 'block';
-  _fill(providers[0]);
-  idx = 1 % providers.length;
-  setTimeout(function() { card.style.opacity = '1'; }, 50);
-  _provMiniTimer = setInterval(_tick, 5000);
-}
 
 // ══════════════════════════════════════════════════════════════════
 // CAROUSEL IMAGES À LA UNE — Admin (table carousel_images)
