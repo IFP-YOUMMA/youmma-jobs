@@ -2907,10 +2907,21 @@ if (typeof inscrirePrestataire === 'undefined') {
   function init(){
     var b1=document.getElementById('i-btn1'),b2=document.getElementById('i-btn2'),ba2=document.getElementById('i-back2'),b3=document.getElementById('i-submit'),ba3=document.getElementById('i-back3');
     if(b1)b1.onclick=async function(){
-      var p=(document.getElementById('i-prenom')||{}).value||'',n=(document.getElementById('i-nom')||{}).value||'',t=(document.getElementById('i-tel')||{}).value||'';
+      var isEnt=(_typeCompte==='entreprise');
+      var t=(document.getElementById('i-tel')||{}).value||'';
       var pin=(document.getElementById('i-pin1')||{}).value+(document.getElementById('i-pin2')||{}).value+(document.getElementById('i-pin3')||{}).value+(document.getElementById('i-pin4')||{}).value;
-      if(!p.trim()||!n.trim()||!t.trim()){showErr('Remplissez tous les champs');return;}
+      if(isEnt){
+        var ne=(document.getElementById('i-nom-entreprise')||{}).value||'';
+        var pr=(document.getElementById('i-prenom-rep')||{}).value||'';
+        var nr=(document.getElementById('i-nom-rep')||{}).value||'';
+        if(!ne.trim()||!pr.trim()||!nr.trim()||!t.trim()){showErr('Remplissez tous les champs');return;}
+      } else {
+        var p=(document.getElementById('i-prenom')||{}).value||'',n=(document.getElementById('i-nom')||{}).value||'';
+        if(!p.trim()||!n.trim()||!t.trim()){showErr('Remplissez tous les champs');return;}
+      }
       if(pin.length<4){showErr('Entrez votre code PIN 4 chiffres');return;}
+      var cgu=document.getElementById('i-cgu');
+      if(cgu&&!cgu.checked){showErr("Veuillez accepter nos conditions d'utilisation pour continuer");return;}
       // Envoi SMS Nimba
       var origText=b1.textContent;
       b1.disabled=true;b1.textContent='Envoi du code SMS…';
@@ -2931,9 +2942,10 @@ if (typeof inscrirePrestataire === 'undefined') {
       b3.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Création du compte...';
       var pin=(document.getElementById('i-pin1').value||'')+(document.getElementById('i-pin2').value||'')+(document.getElementById('i-pin3').value||'')+(document.getElementById('i-pin4').value||'');
       var tel=document.getElementById('i-tel').value.trim();
+      var isEnt=(_typeCompte==='entreprise');
       var fd={
-        prenom:document.getElementById('i-prenom').value.trim(),
-        nom:document.getElementById('i-nom').value.trim(),
+        prenom:isEnt?((document.getElementById('i-prenom-rep')||{}).value||'').trim():document.getElementById('i-prenom').value.trim(),
+        nom:isEnt?((document.getElementById('i-nom-rep')||{}).value||'').trim():document.getElementById('i-nom').value.trim(),
         telephone:tel,
         password:pin,
         categorie:document.getElementById('i-cat').value,
@@ -2942,6 +2954,9 @@ if (typeof inscrirePrestataire === 'undefined') {
         ville:(document.getElementById('i-ville')||{}).value||'Conakry',
         commune:(document.getElementById('i-commune')||{}).value||null,
         quartier:((document.getElementById('i-quartier')||{}).value||'').trim()||null,
+        type_compte:isEnt?'entreprise':'particulier',
+        nom_entreprise:isEnt?((document.getElementById('i-nom-entreprise')||{}).value||'').trim():null,
+        role_entreprise:isEnt?((document.getElementById('i-role-entreprise')||{}).value||null):null,
         skills:[]
       };
       try{
@@ -2959,6 +2974,9 @@ if (typeof inscrirePrestataire === 'undefined') {
           password_hash:hash, metier:fd.metier, categorie:fd.categorie,
           description:fd.description, ville:fd.ville,
           commune:fd.commune, quartier:fd.quartier,
+          type_compte:fd.type_compte,
+          nom_entreprise:fd.nom_entreprise,
+          role_entreprise:fd.role_entreprise,
           statut:'en_attente', skills:[], note_moyenne:4.5,
           nb_vues:0, nb_favoris:0, nb_appels:0, nb_whatsapp:0, nb_avis:0
         }]).select().single();
