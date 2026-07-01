@@ -5351,6 +5351,7 @@ function showSection(name) {
   const mainEl = document.querySelector('#page-dashboard .main');
   if (mainEl) { mainEl.scrollTop = 0; mainEl.scrollLeft = 0; }
   // Charger les données si besoin
+  if (name === 'photos') { if (typeof chargerPhotos === 'function') chargerPhotos(); }
   if (name === 'documents') { const pid = providerId || _dashProviderId; if (pid) chargerDocuments(pid); }
   if (name === 'missions') { const pid = providerId || _dashProviderId; if (pid) chargerMissions(pid); }
   if (name === 'rapports') { if (typeof _provRapports === 'function') _provRapports(); }
@@ -5374,23 +5375,32 @@ function renderPhotos() {
   const profil = providerPhotos.find(p => p.type === 'profil');
   const reals = providerPhotos.filter(p => p.type === 'realisation');
 
-  // Photo profil preview
+  // Photo profil preview — fallback sur photo_url du profil si aucune dans provider_photos
   const preview = document.getElementById('profilPhotoPreview');
-  if (profil) {
-    preview.innerHTML = `<img src="${profil.url}" style="width:100%;height:100%;object-fit:cover;"/>`;
-  } else {
-    const p = providerData;
-    preview.textContent = (p?.prenom?.[0] || '') + (p?.nom?.[0] || '');
+  if (preview) {
+    if (profil) {
+      preview.innerHTML = `<img src="${profil.url}" style="width:100%;height:100%;object-fit:cover;"/>`;
+    } else if (providerData?.photo_url) {
+      preview.innerHTML = `<img src="${providerData.photo_url}" style="width:100%;height:100%;object-fit:cover;"/>`;
+    } else {
+      const p = providerData;
+      preview.textContent = (p?.prenom?.[0] || '') + (p?.nom?.[0] || '');
+    }
   }
 
   // Réalisations grid
   const grid = document.getElementById('realisationsGrid');
+  if (!grid) return;
   const slots = [];
   reals.forEach(photo => {
     slots.push(`
-      <div class="photo-slot filled">
-        <img src="${photo.url}" alt="Réalisation" loading="lazy"/>
-        <button class="photo-delete" onclick="supprimerPhoto('${photo.id}')">×</button>
+      <div style="position:relative;border-radius:12px;overflow:hidden;background:#F9FAFB;border:1.5px solid var(--bordure);">
+        <img src="${photo.url}" style="width:100%;height:180px;object-fit:cover;display:block;" alt="Réalisation" onerror="this.style.display='none'"/>
+        <div style="padding:10px;display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="${photo.url}" target="_blank" style="flex:1;padding:8px;background:var(--bleu);color:#fff;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;text-align:center;">🔍 Voir</a>
+          <a href="${photo.url}" download target="_blank" style="flex:1;padding:8px;background:#F0FFF4;color:#16A34A;border:1.5px solid #16A34A;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;text-align:center;">⬇️ Télécharger</a>
+          <button onclick="supprimerPhoto('${photo.id}')" style="padding:8px 12px;background:#FEF2F2;color:#DC2626;border:1.5px solid #DC2626;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">🗑️</button>
+        </div>
       </div>
     `);
   });
@@ -5409,6 +5419,20 @@ function renderPhotos() {
 
   const lbl = document.getElementById('addRealLabel');
   if (lbl) lbl.style.display = reals.length >= 5 ? 'none' : 'block';
+}
+
+async function chargerPhotos() {
+  let pid = providerId || _dashProviderId;
+  if (!pid) { try { const s=JSON.parse(localStorage.getItem('yj_provider_session')); if(s?.provider_id) pid=s.provider_id; } catch(e){} }
+  if (!pid) return;
+  providerPhotos = await getProviderPhotos(pid);
+  _dashPhotos = providerPhotos;
+  if (!providerData?.photo_url) {
+    providerData = await getDashboardData(pid);
+    _dashData = providerData;
+  }
+  renderPhotos();
+  _dashRenderPhotos();
 }
 
 async function uploadPhoto(input, type) {
@@ -6106,6 +6130,7 @@ function showSection(name) {
   const mainEl = document.querySelector('#page-dashboard .main');
   if (mainEl) { mainEl.scrollTop = 0; mainEl.scrollLeft = 0; }
   // Charger les données si besoin
+  if (name === 'photos') { if (typeof chargerPhotos === 'function') chargerPhotos(); }
   if (name === 'documents') { const pid = providerId || _dashProviderId; if (pid) chargerDocuments(pid); }
   if (name === 'missions') { const pid = providerId || _dashProviderId; if (pid) chargerMissions(pid); }
   if (name === 'rapports') { if (typeof _provRapports === 'function') _provRapports(); }
@@ -7380,14 +7405,19 @@ function _dashRenderPhotos() {
   const preview = document.getElementById('profilPhotoPreview');
   if (preview) {
     if (profil) preview.innerHTML=`<img src="${profil.url}" style="width:100%;height:100%;object-fit:cover;"/>`;
+    else if (_dashData?.photo_url) preview.innerHTML=`<img src="${_dashData.photo_url}" style="width:100%;height:100%;object-fit:cover;"/>`;
     else preview.textContent=(_dashData?.prenom?.[0]||'')+(_dashData?.nom?.[0]||'');
   }
   const grid = document.getElementById('realisationsGrid');
   if (!grid) return;
   const slots = reals.map(photo=>`
-    <div class="photo-slot filled">
-      <img src="${photo.url}" alt="Réalisation" loading="lazy"/>
-      <button class="photo-delete" onclick="_dashSupprimerPhoto('${photo.id}')">×</button>
+    <div style="position:relative;border-radius:12px;overflow:hidden;background:#F9FAFB;border:1.5px solid var(--bordure);">
+      <img src="${photo.url}" style="width:100%;height:180px;object-fit:cover;display:block;" alt="Réalisation" onerror="this.style.display='none'"/>
+      <div style="padding:10px;display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="${photo.url}" target="_blank" style="flex:1;padding:8px;background:var(--bleu);color:#fff;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;text-align:center;">🔍 Voir</a>
+        <a href="${photo.url}" download target="_blank" style="flex:1;padding:8px;background:#F0FFF4;color:#16A34A;border:1.5px solid #16A34A;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;text-align:center;">⬇️ Télécharger</a>
+        <button onclick="supprimerPhoto('${photo.id}')" style="padding:8px 12px;background:#FEF2F2;color:#DC2626;border:1.5px solid #DC2626;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">🗑️</button>
+      </div>
     </div>`);
   if (reals.length<5) slots.push(`<label class="photo-slot" style="cursor:pointer;"><div style="font-size:28px;"><i class="fa-solid fa-camera"></i></div><div class="add-text">Ajouter</div><input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_dashUploadPhoto(this,'realisation')"/></label>`);
   grid.innerHTML = slots.join('');
