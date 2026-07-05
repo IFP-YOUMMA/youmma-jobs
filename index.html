@@ -5381,13 +5381,16 @@ function renderPhotos() {
 async function chargerPhotos() {
   let pid = providerId || _dashProviderId;
   if (!pid) { try { const s=JSON.parse(localStorage.getItem('yj_provider_session')); if(s?.provider_id) pid=s.provider_id; } catch(e){} }
+  console.log('[chargerPhotos] pid:', pid);
   if (!pid) return;
   providerPhotos = await getProviderPhotos(pid);
   _dashPhotos = providerPhotos;
-  if (!providerData?.photo_url) {
+  // Toujours rafraîchir _dashData pour que _dashRenderPhotos ait les bonnes données
+  if (!_dashData || !providerData) {
     providerData = await getDashboardData(pid);
     _dashData = providerData;
   }
+  console.log('[chargerPhotos] photos:', providerPhotos.length, '| providerData.id:', providerData?.id);
   renderPhotos();
   _dashRenderPhotos();
 }
@@ -6420,7 +6423,8 @@ async function updateProviderProfile(providerId, updates) {
   return { success:!error, data, error };
 }
 async function getProviderPhotos(providerId) {
-  const { data } = await sb.from('provider_photos').select('id,url,type,ordre,provider_id').eq('provider_id',providerId).order('ordre',{ ascending:true });
+  const { data, error } = await sb.from('provider_photos').select('id,url,type,ordre,provider_id').eq('provider_id',providerId).order('ordre',{ ascending:true });
+  console.log('Photos chargées:', data, error);
   return data||[];
 }
 
@@ -7357,6 +7361,7 @@ function _dashUpdateAbonnement(p) {
 }
 
 function _dashRenderPhotos() {
+  if (!Array.isArray(_dashPhotos)) _dashPhotos = [];
   const profil = _dashPhotos.find(p=>p.type==='profil');
   const reals = _dashPhotos.filter(p=>p.type==='realisation');
   const preview = document.getElementById('profilPhotoPreview');
