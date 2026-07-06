@@ -12183,19 +12183,30 @@ window._soumettreProjet = async function() {
       commune: commune||null, montant: montant,
       client_nom: nom, client_telephone: tel, statut: 'ouvert'
     };
-    var res = await sb.from('missions').insert(payload);
+    var res = await sb.from('missions').insert(payload).select('id').single();
     // Fallback 1 : colonnes nouvelles absentes
     if (res.error && (res.error.code === '42703' || (res.error.message||'').includes('column'))) {
-      res = await sb.from('missions').insert({ description: desc, statut: 'ouvert', client_nom: nom, montant: montant });
+      res = await sb.from('missions').insert({ description: desc, statut: 'ouvert', client_nom: nom, montant: montant }).select('id').single();
     }
     // Fallback 2 : statut 'ouvert' non autorisé → 'en_attente'
     if (res.error && (res.error.message||'').toLowerCase().includes('statut')) {
       payload.statut = 'en_attente';
-      res = await sb.from('missions').insert(payload);
+      res = await sb.from('missions').insert(payload).select('id').single();
     }
     if (res.error) throw res.error;
+    // Alerter les prestataires ciblés (SMS + notifications cloche)
+    var missionId = res.data && res.data.id;
+    if (missionId) {
+      try {
+        await fetch(SUPABASE_URL + '/functions/v1/notif-projet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+          body: JSON.stringify({ mission_id: missionId })
+        });
+      } catch(efErr) { console.warn('[notif-projet] Appel Edge Function échoué:', efErr.message); }
+    }
     window.fermerProjetPub();
-    if (typeof showToast === 'function') showToast('✅ Projet publié ! Les artisans vont vous contacter avec leurs devis.', 'success');
+    if (typeof showToast === 'function') showToast('✅ Projet publié ! Les artisans de votre zone ont été alertés et vont vous envoyer leurs devis.', 'success');
   } catch(e) {
     affErr('Erreur : ' + (e.message||'Veuillez réessayer.'));
     if (btn) { btn.disabled = false; btn.textContent = '🚀 Publier mon projet'; }
