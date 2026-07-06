@@ -1222,7 +1222,10 @@ function filterProviders() {
       || (p.ville||'').toLowerCase().includes(q) || (p.commune||'').toLowerCase().includes(q)
       || (p.skills||[]).some(s=>s.toLowerCase().includes(q))
       || (p.desc||'').toLowerCase().includes(q);
-    const mc = !cat || p.cat === cat || (p.cat||'').includes(cat);
+    const _catObj = cat ? (window.CATEGORIES||[]).find(c=>c.nom===cat) : null;
+    const mc = !cat || p.cat === cat
+      || (_catObj && (_catObj.dbValues||[]).some(v => p.cat===v))
+      || (!_catObj && (p.cat||'').includes(cat));
     // Filtre localisation : cherche dans ville, commune ET quartier
     const pLoc = ((p.ville||'') + ' ' + (p.commune||'') + ' ' + (p.quartier||'')).toLowerCase();
     const mv = !locVal || pLoc.includes(locVal);
@@ -1666,14 +1669,6 @@ async function verifierSession() {
         <span class="search-field-icon">📂</span>
         <select id="catFilter" onchange="filterProviders()">
           <option value="">Toutes catégories</option>
-          <option value="Artisans"> Artisans</option>
-          <option value="Santé &amp; Beauté">🏥 Santé &amp; Beauté</option>
-          <option value="Construction &amp; BTP"> Construction &amp; BTP</option>
-          <option value="IT"> IT &amp; Digital</option>
-          <option value="Éducation">📚 Éducation</option>
-          <option value="Transport"> Transport</option>
-          <option value="Juridique">⚖️ Services Pro</option>
-          <option value="Services Express"> Services Express</option>
         </select>
       </div>
       <div class="search-divider"></div>
@@ -6572,169 +6567,45 @@ async function geocoderAdresse(commune,quartier) {
 
 var CATEGORIES = [
   {
-    id: 'construction-btp',
-    nom: 'Construction & BTP',
+    id: 'btp-construction-immobilier',
+    nom: 'BTP, Construction & Immobilier',
     emoji: '🏗️',
     couleur: '#B45309',
     bg: '#FEF3C7',
     badgeClass: 'pb-artisan',
-    count: '15+',
-    desc: 'Maçons, carreleurs, peintres, ferraillers',
-    sous: ['Maçon','Carreleur','Peintre en bâtiment','Coffreur','Ferrailleur','Étancheur','Charpentier','Plâtrier']
+    // Anciennes valeurs Supabase mappées à cette catégorie (compatibilité profils existants)
+    dbValues: ['Construction & BTP','Électricité & Énergie','Plomberie & Assainissement','Menuiserie & Métallerie','Climatisation & Électroménager','Sécurité & Surveillance','Artisans'],
+    sous: ['Maçon','Ferrailleur','Plombier','Charpentier','Carreleur',"Conducteur d'engins",'Topographe','Géomètre','Briquetier','Menuisier bois','Menuisier aluminium','Ébéniste','Soudeur','Métallier','Vitrier','Architecte',"Architecte d'intérieur",'Dessinateur BTP','Ingénieur civil','Ingénieur électricien','Ingénieur mécanicien','Électricien bâtiment','Électricien industriel','Installateur solaire','Installateur de groupe électrogène','Peintre bâtiment','Décorateur intérieur','Staffeur','Climaticien','Frigoriste','Forgeron','Potier','Bijoutier','Tisserand','Vannier','Sculpteur','Agent immobilier','Expert immobilier','Gestionnaire immobilier']
   },
   {
-    id: 'electricite-energie',
-    nom: 'Électricité & Énergie',
-    emoji: '⚡',
-    couleur: '#D97706',
-    bg: '#FEF3C7',
-    badgeClass: 'pb-artisan',
-    count: '12+',
-    desc: 'Électriciens, solaire, groupe électrogène',
-    sous: ['Électricien','Installateur solaire','Technicien groupe électrogène','Installateur caméra','Technicien réseau','Électricien industriel']
-  },
-  {
-    id: 'plomberie-assainissement',
-    nom: 'Plomberie & Assainissement',
-    emoji: '🚰',
-    couleur: '#0369A1',
-    bg: '#E0F2FE',
-    badgeClass: 'pb-artisan',
-    count: '10+',
-    desc: 'Plombiers, débouchage, pompe à eau',
-    sous: ['Plombier','Déboucheur de canalisation','Technicien pompe à eau','Fontainier','Installateur sanitaire']
-  },
-  {
-    id: 'menuiserie-metallerie',
-    nom: 'Menuiserie & Métallerie',
-    emoji: '🪚',
-    couleur: '#92400E',
-    bg: '#FEF3C7',
-    badgeClass: 'pb-artisan',
-    count: '10+',
-    desc: 'Menuisiers, soudeurs, serruriers',
-    sous: ['Menuisier bois','Menuisier aluminium','Soudeur','Serrurier','Forgeron','Vitrier','Chaudronnier']
-  },
-  {
-    id: 'climatisation-electromenager',
-    nom: 'Climatisation & Électroménager',
-    emoji: '❄️',
-    couleur: '#0891B2',
-    bg: '#ECFEFF',
-    badgeClass: 'pb-artisan',
-    count: '8+',
-    desc: 'Clim, réfrigérateur, électroménager',
-    sous: ['Technicien climatiseur','Réparateur réfrigérateur','Réparateur électroménager','Technicien froid','Installateur pompe à chaleur']
-  },
-  {
-    id: 'automobile-moto',
-    nom: 'Automobile & Moto',
+    id: 'auto-transport-technique',
+    nom: 'Automobile, Transport & Services Techniques',
     emoji: '🚗',
     couleur: '#B45309',
-    bg: '#FEF3C7',
+    bg: '#FFF7ED',
     badgeClass: 'pb-transport',
-    count: '10+',
-    desc: 'Mécaniciens, électriciens auto, vulcanisateurs',
-    sous: ['Mécanicien auto','Électricien auto','Vulcanisateur','Laveur automobile','Carrossier','Mécanicien moto','Diagnosticien auto']
+    dbValues: ['Automobile & Moto','Transport & Livraison','Informatique & Digital','Événementiel','IT','Transport'],
+    sous: ['Mécanicien automobile','Électricien automobile','Tôlier','Peintre automobile','Vulcanisateur','Mécanicien moto','Laveur automobile','Chauffeur','Chauffeur professionnel','Chauffeur poids lourd','Livreur','Coursier moto','Déménageur','Logisticien','Transitaire','Commissionnaire en douane','Technicien informatique','Développeur Web','Développeur Mobile','Développeur logiciel','Graphiste','Community Manager','Monteur vidéo','Motion Designer','Technicien réseau','Administrateur système','Expert en cybersécurité','Spécialiste en intelligence artificielle','Installateur de caméras de surveillance',"Installateur d'alarmes",'Photographe','Vidéaste','Pilote de drone','Créateur de contenu','Décorateur événementiel','DJ','Animateur']
   },
   {
-    id: 'transport-livraison',
-    nom: 'Transport & Livraison',
-    emoji: '🚚',
-    couleur: '#B45309',
-    bg: '#FEF3C7',
-    badgeClass: 'pb-transport',
-    count: '8+',
-    desc: 'Chauffeurs, livreurs, déménageurs',
-    sous: ['Chauffeur VTC','Livreur','Déménageur','Transporteur','Moto-taxi','Transport scolaire','Coursier']
-  },
-  {
-    id: 'services-domicile',
-    nom: 'Services à Domicile',
+    id: 'services-domicile-particuliers',
+    nom: 'Services à domicile & aux particuliers',
     emoji: '🏠',
     couleur: '#2E7D32',
     bg: '#E8F5E9',
     badgeClass: 'pb-immobilier',
-    count: '12+',
-    desc: 'Ménage, jardiniers, gardiens, nounous',
-    sous: ['Femme de ménage','Jardinier','Gardien','Nounou / Baby-sitter','Aide aux personnes âgées','Agent de nettoyage','Cuisinier à domicile']
+    dbValues: ['Services à Domicile','Cuisine & Traiteur','Beauté & Mode','Santé & Bien-être','Santé','Formation & Coaching','Éducation'],
+    sous: ['Femme de ménage','Homme de ménage','Agent de nettoyage','Baby-sitter','Nounou','Garde-malade','Cuisinier à domicile','Jardinier','Paysagiste','Coiffeur','Coiffeuse','Barbier','Tresseuse','Esthéticienne','Maquilleuse','Styliste ongulaire','Masseur','Spa thérapeute','Enseignant','Professeur','Formateur','Répétiteur','Coach','Traducteur','Interprète']
   },
   {
-    id: 'cuisine-traiteur',
-    nom: 'Cuisine & Traiteur',
-    emoji: '🍽️',
-    couleur: '#B45309',
-    bg: '#FFF7ED',
-    badgeClass: 'pb-artisan',
-    count: '8+',
-    desc: 'Cuisiniers, traiteurs, pâtissiers',
-    sous: ['Cuisinier / Cuisinière','Traiteur','Pâtissier','Boulanger','Chef à domicile','Pizzaïolo']
-  },
-  {
-    id: 'beaute-mode',
-    nom: 'Beauté & Mode',
-    emoji: '💄',
-    couleur: '#9D174D',
-    bg: '#FCE4EC',
-    badgeClass: 'pb-sante',
-    count: '10+',
-    desc: 'Coiffeurs, barbiers, maquilleuses, couturiers',
-    sous: ['Coiffeur / Coiffeuse','Barbier','Maquilleuse','Couturier(e)','Esthéticienne','Manucure / Pédicure','Tresseur / Tresseuse']
-  },
-  {
-    id: 'evenementiel',
-    nom: 'Événementiel',
-    emoji: '🎉',
-    couleur: '#7C3AED',
-    bg: '#EDE9FE',
-    badgeClass: 'pb-express',
-    count: '8+',
-    desc: 'Photographes, DJ, décorateurs',
-    sous: ['Photographe','Vidéaste','DJ','Décorateur événementiel','Animateur','Sonoriste','MC / Présentateur']
-  },
-  {
-    id: 'informatique-digital',
-    nom: 'Informatique & Digital',
-    emoji: '💻',
-    couleur: '#2D2D6B',
-    bg: '#E0E0F8',
-    badgeClass: 'pb-it',
-    count: '12+',
-    desc: 'Développeurs, graphistes, réparateurs',
-    sous: ['Développeur web','Développeur mobile','Graphiste / Designer','Community Manager','Réparateur informatique','Technicien réseau','Data analyste']
-  },
-  {
-    id: 'formation-coaching',
-    nom: 'Formation & Coaching',
-    emoji: '📚',
-    couleur: '#1A73E8',
-    bg: '#E8F0FE',
-    badgeClass: 'pb-education',
-    count: '8+',
-    desc: 'Formateurs, profs particuliers, coachs',
-    sous: ['Formateur informatique','Professeur particulier','Coach professionnel','Tuteur scolaire','Formateur en langues','Consultant en orientation']
-  },
-  {
-    id: 'securite-surveillance',
-    nom: 'Sécurité & Surveillance',
-    emoji: '🛡️',
+    id: 'services-professionnels',
+    nom: 'Services professionnels',
+    emoji: '💼',
     couleur: '#1E40AF',
     bg: '#DBEAFE',
     badgeClass: 'pb-it',
-    count: '6+',
-    desc: 'Gardiens, agents, installateurs caméra',
-    sous: ['Gardien','Agent de sécurité','Installateur caméra','Vigile','Rondier','Technicien alarme']
-  },
-  {
-    id: 'sante-bien-etre',
-    nom: 'Santé & Bien-être',
-    emoji: '🏥',
-    couleur: '#1B5E20',
-    bg: '#E0F8E9',
-    badgeClass: 'pb-sante',
-    count: '8+',
-    desc: 'Infirmiers, aides-soignants, kiné',
-    sous: ['Infirmier(e) à domicile','Aide-soignant(e)','Kinésithérapeute','Sage-femme','Médecin généraliste','Psychologue','Nutritionniste']
+    dbValues: ['Juridique'],
+    sous: ['Comptable','Expert-comptable','Fiscaliste','Contrôleur de gestion','Conseiller financier','Analyste financier','Avocat','Juriste','Notaire','Huissier de justice','Médiateur','Conseiller juridique','Médecin','Infirmier','Sage-femme','Kinésithérapeute','Psychologue','Nutritionniste','Pharmacien','Commercial','Responsable commercial','Conseiller client','Téléconseiller','Consultant','Consultant RH']
   }
 ];
 
@@ -6751,14 +6622,11 @@ function renderCategoriesGrid(containerId = 'catsGrid') {
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = CATEGORIES.map((cat, i) => `
-    <a href="#prestataires" class="cat-card ${i === 0 ? 'highlight' : ''} ${cat.id === 'services-express' ? 'express' : ''}"
+    <a href="#prestataires" class="cat-card ${i === 0 ? 'highlight' : ''}"
        onclick="filterCat('${cat.nom}')">
       <div class="cat-emoji">${cat.emoji}</div>
-      <div class="cat-name">
-        ${cat.nom}
-        ${cat.badge_urgent ? '<span class="badge-urgent">URGENT</span>' : ''}
-      </div>
-      <div class="cat-count">${cat.desc}</div>
+      <div class="cat-name">${cat.nom}</div>
+      <div class="cat-count">${cat.sous.length} métiers</div>
     </a>
   `).join('');
 }
@@ -6976,6 +6844,11 @@ async function loadProvidersFromSupabase() {
       'Formation & Coaching':{bg:'#E8F0FE',color:'#1A73E8'},
       'Sécurité & Surveillance':{bg:'#DBEAFE',color:'#1E40AF'},
       'Santé & Bien-être':{bg:'#E0F8E9',color:'#1B5E20'},
+      // Nouvelles catégories
+      'BTP, Construction & Immobilier':{bg:'#FEF3C7',color:'#B45309'},
+      'Automobile, Transport & Services Techniques':{bg:'#FFF7ED',color:'#B45309'},
+      'Services à domicile & aux particuliers':{bg:'#E8F5E9',color:'#2E7D32'},
+      'Services professionnels':{bg:'#DBEAFE',color:'#1E40AF'},
       // legacy
       'Artisans':{bg:'#FDE8D8',color:'#C74B00'},'Santé':{bg:'#E0F8E9',color:'#1B5E20'},
       'Juridique':{bg:'#FEF3C7',color:'#B45309'},'IT':{bg:'#E0E0F8',color:'#2D2D6B'},
