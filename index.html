@@ -12171,8 +12171,12 @@ window._soumettreProjet = async function() {
     if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; }
   };
 
-  if (!titre || !desc || !nom || !tel) { affErr('Veuillez remplir tous les champs obligatoires (*).'); return; }
-  if (!/^6\d{8}$/.test(tel)) { affErr('Numéro de téléphone invalide — 9 chiffres commençant par 6 (ex : 622334455).'); return; }
+  // Validation champ par champ avec messages précis
+  if (!titre) { affErr('Veuillez renseigner le titre du projet.'); return; }
+  if (!desc)  { affErr('Veuillez décrire votre besoin.'); return; }
+  if (!nom)   { affErr('Veuillez indiquer votre nom.'); return; }
+  if (!tel)   { affErr('Veuillez indiquer votre numéro de téléphone.'); return; }
+  if (!/^6\d{8}$/.test(tel)) { affErr('Numéro invalide — 9 chiffres commençant par 6 (ex : 622334455).'); return; }
   if (errEl) errEl.style.display = 'none';
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Publication en cours...'; }
 
@@ -12186,11 +12190,19 @@ window._soumettreProjet = async function() {
       client_nom: nom, client_telephone: tel, statut: 'ouvert'
     };
     var res = await sb.from('missions').insert(payload).select('id').single();
-    // Fallback 1 : colonnes nouvelles absentes
+    // Fallback 1 : colonnes optionnelles absentes (categorie/commune/client_telephone)
+    // → payload minimal qui inclut TOUJOURS titre (NOT NULL) + description + client_nom
     if (res.error && (res.error.code === '42703' || (res.error.message||'').includes('column'))) {
-      res = await sb.from('missions').insert({ description: desc, statut: 'ouvert', client_nom: nom, montant: montant }).select('id').single();
+      var minimal = { titre: titre, description: desc, client_nom: nom, statut: payload.statut };
+      if (montant) minimal.montant = montant;
+      res = await sb.from('missions').insert(minimal).select('id').single();
+      // Sous-fallback : statut invalide dans le payload minimal aussi
+      if (res.error && (res.error.message||'').toLowerCase().includes('statut')) {
+        minimal.statut = 'en_attente';
+        res = await sb.from('missions').insert(minimal).select('id').single();
+      }
     }
-    // Fallback 2 : statut 'ouvert' non autorisé → 'en_attente'
+    // Fallback 2 : statut 'ouvert' non valide sur le payload complet → 'en_attente'
     if (res.error && (res.error.message||'').toLowerCase().includes('statut')) {
       payload.statut = 'en_attente';
       res = await sb.from('missions').insert(payload).select('id').single();
