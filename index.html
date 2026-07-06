@@ -8057,8 +8057,11 @@ async function _adminValidDoc(id, docType, statut) {
 }
 
 // ══════════════════════════════════════════════════════════
-// ADMIN — PRÉVISUALISATION PROFIL PRESTATAIRE
+// ADMIN — PRÉVISUALISATION + ÉDITION PROFIL PRESTATAIRE
 // ══════════════════════════════════════════════════════════
+
+var _adminProfilData = null;
+var _adminProfilPhotos = null;
 
 async function adminVoirProfil(id) {
   let modal = document.getElementById('adminProfilModal');
@@ -8069,107 +8072,269 @@ async function adminVoirProfil(id) {
     document.body.appendChild(modal);
   }
   modal.style.cssText = 'display:flex;align-items:flex-start;justify-content:center;position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);padding:20px;overflow-y:auto;';
-  modal.innerHTML = `<div style="background:#fff;border-radius:20px;width:100%;max-width:620px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);">
-    <div style="padding:48px;text-align:center;"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:#E85D04;"></i><div style="color:#9CA3AF;margin-top:12px;font-size:14px;">Chargement du profil...</div></div>
-  </div>`;
-
+  modal.innerHTML = `<div style="background:#fff;border-radius:20px;width:100%;max-width:640px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);"><div style="padding:48px;text-align:center;"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:#E85D04;"></i><div style="color:#9CA3AF;margin-top:12px;font-size:14px;">Chargement du profil...</div></div></div>`;
   const onKey = e => { if (e.key === 'Escape') adminVoirProfilFermer(); };
   document.addEventListener('keydown', onKey);
   modal._removeKey = () => document.removeEventListener('keydown', onKey);
-
   try {
     const [{data:p, error:perr}, {data:photos}] = await Promise.all([
       sb.from('providers').select('*').eq('id', id).single(),
       sb.from('provider_photos').select('id,url,type,ordre').eq('provider_id', id).order('ordre', {ascending:true})
     ]);
     if (perr || !p) { adminVoirProfilFermer(); showToast('Profil introuvable', 'error'); return; }
-
-    const nom = `${p.prenom||''} ${p.nom||''}`.trim() || '—';
-    const ini = ((p.prenom||'?')[0] + (p.nom||'?')[0]).toUpperCase();
-    const fd = d => d ? new Date(d).toLocaleDateString('fr-FR') : '—';
-    const statMap = {valide:'#ECFDF5,#059669,✅ Validé',en_attente:'#FFFBEB,#D97706,⏳ En attente',rejete:'#FEF2F2,#DC2626,❌ Rejeté',suspendu:'#FFF7ED,#C2410C,🚫 Suspendu'};
-    const [sBg, sCol, sLabel] = (statMap[p.statut]||'#F3F4F6,#9CA3AF,—').split(',');
-
-    const photosHTML = (photos||[]).length
-      ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;">${(photos||[]).slice(0,6).map(ph=>`<img src="${ph.url}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid #E5E7EB;cursor:pointer;" onclick="window.open('${ph.url}','_blank')">`).join('')}</div>`
-      : `<div style="text-align:center;padding:16px;background:#F9FAFB;border-radius:10px;color:#9CA3AF;font-size:12.5px;">Aucune photo de réalisation</div>`;
-
-    const skillsHTML = Array.isArray(p.skills) && p.skills.length
-      ? p.skills.map(s=>`<span style="background:#F0F4FF;color:#3B5BDB;border-radius:20px;padding:3px 10px;font-size:11.5px;font-weight:600;">${s}</span>`).join(' ')
-      : '<span style="color:#9CA3AF;font-size:12px;">Aucune compétence renseignée</span>';
-
-    const docCNI = p.doc_cni_url
-      ? `<a href="${p.doc_cni_url}" target="_blank" style="color:#2563EB;font-size:12px;font-weight:600;text-decoration:none;">🪪 Voir CNI</a> <span style="font-size:11px;color:${p.doc_cni_statut==='valide'?'#16A34A':'#D97706'};">(${p.doc_cni_statut==='valide'?'Validée':'En attente'})</span>`
-      : '<span style="color:#9CA3AF;font-size:12px;">🪪 Non fournie</span>';
-    const docDip = p.doc_diplome_url
-      ? `<a href="${p.doc_diplome_url}" target="_blank" style="color:#D97706;font-size:12px;font-weight:600;text-decoration:none;">🎓 Voir diplôme</a> <span style="font-size:11px;color:${p.doc_diplome_statut==='valide'?'#16A34A':'#D97706'};">(${p.doc_diplome_statut==='valide'?'Validé':'En attente'})</span>`
-      : '<span style="color:#9CA3AF;font-size:12px;">🎓 Non fourni</span>';
-
-    const actionBtns = [];
-    if (p.statut !== 'valide')   actionBtns.push(`<button onclick="adminVoirProfilFermer();_adminAction('valider','${p.id}')" style="padding:10px 20px;background:#16A34A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">✅ Valider</button>`);
-    if (p.statut !== 'rejete')   actionBtns.push(`<button onclick="adminVoirProfilFermer();_adminAction('rejeter','${p.id}')" style="padding:10px 20px;background:#DC2626;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">❌ Rejeter</button>`);
-    if (p.statut !== 'suspendu') actionBtns.push(`<button onclick="adminVoirProfilFermer();_adminAction('suspendre','${p.id}')" style="padding:10px 20px;background:#F59E0B;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">🚫 Suspendre</button>`);
-
-    modal.innerHTML = `
-    <div style="background:#fff;border-radius:20px;width:100%;max-width:620px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);">
-      <div style="background:linear-gradient(135deg,#1A1A4E,#2D2D7E);padding:24px 28px;position:relative;">
-        <button onclick="adminVoirProfilFermer()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;">×</button>
-        <div style="display:flex;align-items:center;gap:16px;">
-          <div style="width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.15);border:2.5px solid rgba(255,255,255,.3);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
-            ${p.photo_url?`<img src="${p.photo_url}" style="width:100%;height:100%;object-fit:cover;">`:`<span style="color:#fff;font-size:22px;font-weight:800;">${ini}</span>`}
-          </div>
-          <div>
-            <div style="color:#fff;font-size:19px;font-weight:800;margin-bottom:4px;">${nom}</div>
-            <div style="color:rgba(255,255,255,.75);font-size:13px;">${p.metier||'—'} · ${p.ville||'Conakry'}${p.commune?', '+p.commune:''}</div>
-            <div style="margin-top:8px;"><span style="background:${sBg};color:${sCol};border-radius:20px;padding:3px 11px;font-size:11px;font-weight:700;">${sLabel}</span></div>
-          </div>
-        </div>
-      </div>
-      <div style="padding:22px 28px;max-height:58vh;overflow-y:auto;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
-          <div style="background:#F9FAFB;border-radius:12px;padding:12px;">
-            <div style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Catégorie</div>
-            <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${p.categorie||'—'}</div>
-          </div>
-          <div style="background:#F9FAFB;border-radius:12px;padding:12px;">
-            <div style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Téléphone</div>
-            <div style="font-size:13px;font-weight:700;color:#1A1A4E;"><a href="tel:${p.telephone}" style="color:#1A1A4E;text-decoration:none;">${p.telephone||'—'}</a></div>
-          </div>
-          <div style="background:#F9FAFB;border-radius:12px;padding:12px;">
-            <div style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Disponibilité</div>
-            <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${p.disponibilite||'—'}</div>
-          </div>
-          <div style="background:#F9FAFB;border-radius:12px;padding:12px;">
-            <div style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Inscrit le</div>
-            <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${fd(p.created_at)}</div>
-          </div>
-        </div>
-        ${p.description?`<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Description</div><div style="background:#F9FAFB;border-radius:12px;padding:14px;font-size:13px;color:#374151;line-height:1.65;">${p.description}</div></div>`:''}
-        <div style="margin-bottom:18px;">
-          <div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Compétences</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;">${skillsHTML}</div>
-        </div>
-        <div style="margin-bottom:18px;">
-          <div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Documents</div>
-          <div style="background:#F9FAFB;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">${docCNI}${p.doc_cni_statut==='en_attente'&&p.doc_cni_url?`<button onclick="adminVoirProfilFermer();_adminValidDoc('${p.id}','cni','valide')" style="padding:5px 12px;background:#ECFDF5;color:#16A34A;border:1.5px solid #86EFAC;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">✅ Valider</button>`:''}</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">${docDip}${p.doc_diplome_statut==='en_attente'&&p.doc_diplome_url?`<button onclick="adminVoirProfilFermer();_adminValidDoc('${p.id}','diplome','valide')" style="padding:5px 12px;background:#FFFBEB;color:#D97706;border:1.5px solid #FDE68A;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">✅ Valider</button>`:''}</div>
-          </div>
-        </div>
-        <div>
-          <div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Photos de réalisations (${(photos||[]).length})</div>
-          ${photosHTML}
-        </div>
-      </div>
-      <div style="padding:16px 28px;border-top:1px solid #F0F0F8;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-        ${actionBtns.join('')}
-        <button onclick="adminVoirProfilFermer()" style="padding:10px 20px;background:#F3F4F6;color:#374151;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Fermer</button>
-      </div>
-    </div>`;
+    _adminProfilData = p;
+    _adminProfilPhotos = photos || [];
+    _adminRenderVue(p, _adminProfilPhotos);
   } catch(e) {
     console.error('[adminVoirProfil]', e);
     adminVoirProfilFermer();
     showToast('Erreur lors du chargement du profil', 'error');
+  }
+}
+
+function _adminRenderVue(p, photos) {
+  const modal = document.getElementById('adminProfilModal');
+  if (!modal) return;
+  const nom = ((p.prenom||'') + ' ' + (p.nom||'')).trim() || '—';
+  const ini = ((p.prenom||'?')[0] + (p.nom||'?')[0]).toUpperCase();
+  const fd = d => d ? new Date(d).toLocaleDateString('fr-FR') : '—';
+  const statMap = {valide:'#ECFDF5,#059669,✅ Validé',en_attente:'#FFFBEB,#D97706,⏳ En attente',rejete:'#FEF2F2,#DC2626,❌ Rejeté',suspendu:'#FFF7ED,#C2410C,🚫 Suspendu'};
+  const [sBg, sCol, sLabel] = (statMap[p.statut]||'#F3F4F6,#9CA3AF,—').split(',');
+  const nomFich = nom.replace(/\s+/g,'_');
+
+  // Documents list
+  const docs = [];
+  if (p.doc_cni_url)         docs.push({url:p.doc_cni_url,       label:'🪪 Pièce d\'identité (CNI)',    fichier:'CNI_'+nomFich+'.jpg',      statut:p.doc_cni_statut,     docType:'cni'});
+  if (p.doc_diplome_url)     docs.push({url:p.doc_diplome_url,   label:'🎓 Diplôme / Attestation',      fichier:'Diplome_'+nomFich+'.jpg',  statut:p.doc_diplome_statut, docType:'diplome'});
+  if (p.doc_rccm_url)        docs.push({url:p.doc_rccm_url,      label:'📋 Document RCCM',              fichier:'RCCM_'+nomFich+'.pdf',     statut:null,                 docType:null});
+  if (p.logo_entreprise_url) docs.push({url:p.logo_entreprise_url,label:'🏢 Logo entreprise',           fichier:'Logo_'+nomFich+'.jpg',     statut:null,                 docType:null});
+  if (p.photo_url)           docs.push({url:p.photo_url,          label:'📸 Photo de profil',            fichier:'Photo_'+nomFich+'.jpg',    statut:null,                 docType:null});
+
+  const docRowStyle = 'display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F3F4F6;';
+  const btnSeeStyle = 'padding:4px 9px;background:#EFF6FF;color:#2563EB;border-radius:7px;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;';
+  const btnDlStyle  = 'padding:4px 9px;background:#F0FDF4;color:#16A34A;border:none;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;';
+  const btnValStyle = 'padding:4px 9px;background:#ECFDF5;color:#16A34A;border:1.5px solid #86EFAC;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;';
+
+  const docsHTML = docs.length
+    ? docs.map(d => {
+        const statutBadge = d.statut ? ' <span style="font-size:10px;color:'+(d.statut==='valide'?'#16A34A':'#D97706')+';font-weight:600;">('+( d.statut==='valide'?'Validé':'En attente')+')</span>' : '';
+        const valBtn = (d.docType && d.statut === 'en_attente')
+          ? '<button onclick="adminVoirProfilFermer();_adminValidDoc(\''+p.id+'\',\''+d.docType+'\',\'valide\')" style="'+btnValStyle+'">✅ Valider</button>' : '';
+        return '<div style="'+docRowStyle+'">'
+          + '<span style="font-size:12.5px;flex:1;color:#374151;">'+d.label+statutBadge+'</span>'
+          + '<a href="'+d.url+'" target="_blank" style="'+btnSeeStyle+'">👁️ Voir</a>'
+          + '<button onclick="adminTelechargerDoc(\''+d.url+'\',\''+d.fichier+'\')" style="'+btnDlStyle+'">⬇️ DL</button>'
+          + valBtn
+          + '</div>';
+      }).join('')
+    : '<div style="text-align:center;padding:16px;color:#9CA3AF;font-size:12.5px;">Aucun document fourni</div>';
+
+  // Photos réalisations grid
+  const photosHTML = (photos||[]).length
+    ? '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;">'
+        + (photos||[]).slice(0,6).map((ph,i) =>
+            '<div style="position:relative;">'
+            + '<img src="'+ph.url+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid #E5E7EB;cursor:pointer;" onclick="window.open(\''+ph.url+'\',\'_blank\')">'
+            + '<button onclick="adminTelechargerDoc(\''+ph.url+'\',\'Realisation'+(i+1)+'_'+nomFich+'.jpg\')" title="Télécharger" style="position:absolute;bottom:5px;right:5px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:6px;font-size:10px;padding:2px 7px;cursor:pointer;">⬇️</button>'
+            + '</div>'
+          ).join('')
+        + '</div>'
+    : '<div style="text-align:center;padding:16px;background:#F9FAFB;border-radius:10px;color:#9CA3AF;font-size:12.5px;">Aucune photo de réalisation</div>';
+
+  // Compétences
+  const skillsHTML = Array.isArray(p.skills) && p.skills.length
+    ? p.skills.map(s=>'<span style="background:#F0F4FF;color:#3B5BDB;border-radius:20px;padding:3px 10px;font-size:11.5px;font-weight:600;">'+s+'</span>').join(' ')
+    : '<span style="color:#9CA3AF;font-size:12px;">Aucune compétence renseignée</span>';
+
+  // Info entreprise
+  const entHTML = (p.type_compte === 'entreprise' && p.nom_entreprise)
+    ? '<div style="background:#FFF7ED;border-radius:12px;padding:12px;margin-bottom:18px;border:1px solid #FDE8D8;">'
+        + '<div style="font-size:10px;color:#C2410C;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">🏢 Entreprise</div>'
+        + '<div style="font-size:13px;font-weight:700;color:#1A1A4E;">'+p.nom_entreprise+'</div>'
+        + (p.nif_entreprise ? '<div style="font-size:12px;color:#9CA3AF;margin-top:2px;">NIF : '+p.nif_entreprise+'</div>' : '')
+        + (p.role_entreprise ? '<div style="font-size:12px;color:#9CA3AF;margin-top:2px;">Rôle : '+p.role_entreprise+'</div>' : '')
+        + '</div>'
+    : '';
+
+  // Action buttons
+  const actionBtns = [];
+  if (p.statut !== 'valide')   actionBtns.push('<button onclick="adminVoirProfilFermer();_adminAction(\'valider\',\''+p.id+'\')" style="padding:10px 18px;background:#16A34A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">✅ Valider</button>');
+  if (p.statut !== 'rejete')   actionBtns.push('<button onclick="adminVoirProfilFermer();_adminAction(\'rejeter\',\''+p.id+'\')" style="padding:10px 18px;background:#DC2626;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">❌ Rejeter</button>');
+  if (p.statut !== 'suspendu') actionBtns.push('<button onclick="adminVoirProfilFermer();_adminAction(\'suspendre\',\''+p.id+'\')" style="padding:10px 18px;background:#F59E0B;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">🚫 Suspendre</button>');
+
+  const avatarHTML = p.photo_url
+    ? '<img src="'+p.photo_url+'" style="width:100%;height:100%;object-fit:cover;">'
+    : '<span style="color:#fff;font-size:22px;font-weight:800;">'+ini+'</span>';
+
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:20px;width:100%;max-width:640px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);">'
+    // Header
+    + '<div style="background:linear-gradient(135deg,#1A1A4E,#2D2D7E);padding:24px 28px;position:relative;">'
+      + '<button onclick="adminVoirProfilFermer()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>'
+      + '<div style="display:flex;align-items:center;gap:16px;">'
+        + '<div style="width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.15);border:2.5px solid rgba(255,255,255,.3);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;">'+avatarHTML+'</div>'
+        + '<div>'
+          + '<div style="color:#fff;font-size:19px;font-weight:800;margin-bottom:4px;">'+nom+'</div>'
+          + '<div style="color:rgba(255,255,255,.75);font-size:13px;">'+(p.metier||'—')+' · '+(p.ville||'Conakry')+(p.commune?', '+p.commune:'')+'</div>'
+          + '<div style="margin-top:8px;"><span style="background:'+sBg+';color:'+sCol+';border-radius:20px;padding:3px 11px;font-size:11px;font-weight:700;">'+sLabel+'</span></div>'
+        + '</div>'
+      + '</div>'
+    + '</div>'
+    // Body
+    + '<div style="padding:22px 28px;max-height:60vh;overflow-y:auto;">'
+      + entHTML
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">'
+        + '<div style="background:#F9FAFB;border-radius:12px;padding:12px;"><div style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Catégorie</div><div style="font-size:13px;font-weight:700;color:#1A1A4E;">'+(p.categorie||'—')+'</div></div>'
+        + '<div style="background:#F9FAFB;border-radius:12px;padding:12px;"><div style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Téléphone</div><div style="font-size:13px;font-weight:700;color:#1A1A4E;"><a href="tel:'+(p.telephone||'')+'" style="color:#1A1A4E;text-decoration:none;">'+(p.telephone||'—')+'</a></div></div>'
+        + '<div style="background:#F9FAFB;border-radius:12px;padding:12px;"><div style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Disponibilité</div><div style="font-size:13px;font-weight:700;color:#1A1A4E;">'+(p.disponibilite||'—')+'</div></div>'
+        + '<div style="background:#F9FAFB;border-radius:12px;padding:12px;"><div style="font-size:10px;color:#9CA3AF;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Inscrit le</div><div style="font-size:13px;font-weight:700;color:#1A1A4E;">'+fd(p.created_at)+'</div></div>'
+      + '</div>'
+      + (p.description ? '<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Description</div><div style="background:#F9FAFB;border-radius:12px;padding:14px;font-size:13px;color:#374151;line-height:1.65;">'+p.description+'</div></div>' : '')
+      + '<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Compétences</div><div style="display:flex;flex-wrap:wrap;gap:6px;">'+skillsHTML+'</div></div>'
+      + '<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Documents ('+docs.length+')</div><div style="background:#F9FAFB;border-radius:12px;padding:10px 14px;">'+docsHTML+'</div></div>'
+      + '<div><div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Photos de réalisations ('+(photos||[]).length+')</div>'+photosHTML+'</div>'
+    + '</div>'
+    // Footer
+    + '<div style="padding:16px 28px;border-top:1px solid #F0F0F8;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">'
+      + actionBtns.join('')
+      + '<button onclick="_adminModeEdit()" style="padding:10px 18px;background:linear-gradient(135deg,#1A1A4E,#E85D04);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">✏️ Modifier</button>'
+      + '<button onclick="adminVoirProfilFermer()" style="padding:10px 18px;background:#F3F4F6;color:#374151;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Fermer</button>'
+    + '</div>'
+    + '</div>';
+}
+
+function _adminModeEdit() {
+  const p = _adminProfilData;
+  if (!p) return;
+  const modal = document.getElementById('adminProfilModal');
+  if (!modal) return;
+  const nom = ((p.prenom||'') + ' ' + (p.nom||'')).trim() || '—';
+  const ini = ((p.prenom||'?')[0] + (p.nom||'?')[0]).toUpperCase();
+
+  const catOptions = (window.CATEGORIES||[]).map(c =>
+    '<option value="'+c.nom+'" '+(p.categorie===c.nom?'selected':'')+'>'+c.nom+'</option>'
+  ).join('');
+  const curCat = (window.CATEGORIES||[]).find(c => c.nom === p.categorie) || (window.CATEGORIES||[])[0];
+  const metiersOptions = curCat ? curCat.sous.map(m =>
+    '<option value="'+m+'" '+(p.metier===m?'selected':'')+'>'+m+'</option>'
+  ).join('') : '';
+
+  const inpStyle = 'width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;color:#1A1A4E;outline:none;box-sizing:border-box;font-family:inherit;';
+  const selStyle = 'width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;color:#1A1A4E;outline:none;background:#fff;';
+  const lbl = t => '<div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;">'+t+'</div>';
+  const inp = (id, val, type) => '<input id="'+id+'" type="'+(type||'text')+'" value="'+(val||'').replace(/"/g,'&quot;')+'" style="'+inpStyle+'">';
+  const grp = (label, field) => '<div>'+lbl(label)+field+'</div>';
+
+  const isEnt = p.type_compte === 'entreprise';
+  const avatarHTML = p.photo_url
+    ? '<img src="'+p.photo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">'
+    : '<span style="color:#fff;font-size:18px;font-weight:800;">'+ini+'</span>';
+
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:20px;width:100%;max-width:640px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);">'
+    + '<div style="background:linear-gradient(135deg,#1A1A4E,#E85D04);padding:24px 28px;position:relative;">'
+      + '<button onclick="adminVoirProfilFermer()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>'
+      + '<div style="display:flex;align-items:center;gap:14px;">'
+        + '<div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.3);overflow:hidden;">'+avatarHTML+'</div>'
+        + '<div><div style="color:#fff;font-size:16px;font-weight:800;">Modifier le profil</div><div style="color:rgba(255,255,255,.75);font-size:12.5px;">'+nom+'</div></div>'
+      + '</div>'
+    + '</div>'
+    + '<div style="padding:22px 28px;max-height:60vh;overflow-y:auto;">'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">'
+        + grp('Prénom', inp('edt-prenom', p.prenom))
+        + grp('Nom', inp('edt-nom', p.nom))
+        + grp('Téléphone', inp('edt-tel', p.telephone, 'tel'))
+        + grp('Statut',
+            '<select id="edt-statut" style="'+selStyle+'">'
+            + '<option value="en_attente" '+(p.statut==='en_attente'?'selected':'')+'>⏳ En attente</option>'
+            + '<option value="valide" '+(p.statut==='valide'?'selected':'')+'>✅ Validé</option>'
+            + '<option value="rejete" '+(p.statut==='rejete'?'selected':'')+'>❌ Rejeté</option>'
+            + '<option value="suspendu" '+(p.statut==='suspendu'?'selected':'')+'>🚫 Suspendu</option>'
+            + '</select>')
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">'
+        + grp('Catégorie', '<select id="edt-cat" onchange="_adminEdtUpdateMetiers()" style="'+selStyle+'">'+catOptions+'</select>')
+        + grp('Métier', '<select id="edt-metier" style="'+selStyle+'">'+metiersOptions+'</select>')
+        + grp('Commune', inp('edt-commune', p.commune))
+        + grp('Quartier', inp('edt-quartier', p.quartier))
+      + '</div>'
+      + '<div style="margin-bottom:14px;">'
+        + grp('Type de compte',
+            '<select id="edt-type" onchange="_adminEdtToggleEnt()" style="'+selStyle+'">'
+            + '<option value="particulier" '+(p.type_compte!=='entreprise'?'selected':'')+'>👤 Particulier</option>'
+            + '<option value="entreprise" '+(p.type_compte==='entreprise'?'selected':'')+'>🏢 Entreprise</option>'
+            + '</select>')
+      + '</div>'
+      + '<div id="edt-ent-section" style="display:'+(isEnt?'grid':'none')+';grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">'
+        + grp('Nom entreprise', inp('edt-nom-ent', p.nom_entreprise))
+        + grp('NIF entreprise', inp('edt-nif', p.nif_entreprise))
+      + '</div>'
+      + '<div style="margin-bottom:14px;">'
+        + grp('Description / Bio', '<textarea id="edt-desc" rows="3" style="'+inpStyle+'resize:vertical;">'+(p.description||'')+'</textarea>')
+      + '</div>'
+    + '</div>'
+    + '<div style="padding:16px 28px;border-top:1px solid #F0F0F8;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">'
+      + '<button onclick="adminEnregistrerProfil(\''+p.id+'\')" style="padding:10px 20px;background:#16A34A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">💾 Enregistrer</button>'
+      + '<button onclick="_adminRenderVue(_adminProfilData,_adminProfilPhotos)" style="padding:10px 20px;background:#F3F4F6;color:#374151;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>'
+    + '</div>'
+    + '</div>';
+}
+
+function _adminEdtUpdateMetiers() {
+  const catSel = document.getElementById('edt-cat');
+  const metSel = document.getElementById('edt-metier');
+  if (!catSel || !metSel) return;
+  const cat = (window.CATEGORIES||[]).find(c => c.nom === catSel.value);
+  metSel.innerHTML = cat ? cat.sous.map(m=>'<option value="'+m+'">'+m+'</option>').join('') : '';
+}
+
+function _adminEdtToggleEnt() {
+  const type = (document.getElementById('edt-type')||{}).value;
+  const sec = document.getElementById('edt-ent-section');
+  if (sec) sec.style.display = type === 'entreprise' ? 'grid' : 'none';
+}
+
+async function adminEnregistrerProfil(id) {
+  const g = i => ((document.getElementById(i)||{}).value || '');
+  const updates = {
+    prenom:        g('edt-prenom').trim(),
+    nom:           g('edt-nom').trim(),
+    telephone:     g('edt-tel').trim(),
+    statut:        g('edt-statut'),
+    categorie:     g('edt-cat'),
+    metier:        g('edt-metier'),
+    commune:       g('edt-commune').trim() || null,
+    quartier:      g('edt-quartier').trim() || null,
+    description:   g('edt-desc').trim() || null,
+    type_compte:   g('edt-type'),
+    nom_entreprise: g('edt-type') === 'entreprise' ? (g('edt-nom-ent').trim() || null) : null,
+    nif_entreprise: g('edt-type') === 'entreprise' ? (g('edt-nif').trim() || null) : null,
+  };
+  try {
+    const { data, error } = await sb.from('providers').update(updates).eq('id', id).select().single();
+    if (error) throw error;
+    showToast('✅ Profil mis à jour !', 'success');
+    _adminProfilData = data;
+    _adminRenderVue(data, _adminProfilPhotos);
+    await loadAll();
+  } catch(e) {
+    showToast('Erreur : ' + e.message, 'error');
+  }
+}
+
+async function adminTelechargerDoc(url, nomFichier) {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const lien = document.createElement('a');
+    lien.href = URL.createObjectURL(blob);
+    lien.download = nomFichier;
+    document.body.appendChild(lien);
+    lien.click();
+    lien.remove();
+    URL.revokeObjectURL(lien.href);
+  } catch(e) {
+    showToast('Erreur de téléchargement : ' + e.message, 'error');
   }
 }
 
