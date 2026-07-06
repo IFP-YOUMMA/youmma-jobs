@@ -1609,8 +1609,8 @@ async function verifierSession() {
         <div id="expDots" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:4;display:flex;gap:6px;align-items:center;"></div>
       </div>
       <div class="hero-actions">
-        <button class="btn-hero-main" onclick="document.getElementById('artisans').scrollIntoView({behavior:'smooth'})"><i class="fa-solid fa-magnifying-glass"></i> Trouver un artisan</button>
-        <button class="btn-hero-outline" onclick="ouvrirInscription()">🚀 Devenir artisan</button>
+        <button class="btn-hero-main" onclick="ouvrirPublierProjet()">📋 Publier un projet</button>
+        <button class="btn-hero-outline" onclick="ouvrirVoirProjets()">💼 Voir les projets</button>
       </div>
       <div class="hero-kpis">
         <div class="kpi"><div class="kpi-num" data-target="500">0+</div><div class="kpi-label">Prestataires vérifiés</div></div>
@@ -12092,6 +12092,306 @@ style="position:fixed;bottom:24px;left:24px;z-index:9998;display:flex;align-item
   window.addEventListener('appinstalled', hideBanner);
   setTimeout(showBanner, 2000);
 })();
+</script>
+
+
+<!-- ══ PROJETS CLIENTS + DEVIS PRESTATAIRES ══ -->
+<script>
+(function() {
+
+var _inpS = 'width:100%;padding:10px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;color:#1A1A4E;outline:none;box-sizing:border-box;font-family:inherit;';
+var _selS = 'width:100%;padding:10px 13px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;color:#1A1A4E;outline:none;background:#fff;';
+
+function _lbl(t) { return '<div style="font-size:11.5px;font-weight:700;color:#6B7280;margin-bottom:5px;">'+t+'</div>'; }
+function _grp(label, field) { return '<div style="display:flex;flex-direction:column;">'+_lbl(label)+field+'</div>'; }
+
+function _makeModal(id) {
+  var m = document.getElementById(id);
+  if (!m) {
+    m = document.createElement('div');
+    m.id = id;
+    document.body.appendChild(m);
+  }
+  m.style.cssText = 'display:flex;align-items:flex-start;justify-content:center;position:fixed;inset:0;z-index:999998;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);padding:16px;overflow-y:auto;';
+  return m;
+}
+
+// ────────────────────────────────────────────────
+// BOUTON 1 — Publier un projet
+// ────────────────────────────────────────────────
+window.ouvrirPublierProjet = function() {
+  var modal = _makeModal('projetPubModal');
+  modal.onclick = function(e) { if (e.target === modal) window.fermerProjetPub(); };
+
+  var catOpts = '<option value="">-- Choisir --</option>'
+    + (window.CATEGORIES||[]).map(function(c) {
+        return '<option value="'+c.nom+'">'+c.emoji+' '+c.nom+'</option>';
+      }).join('');
+
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:20px;width:100%;max-width:560px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);">'
+    +'<div style="background:linear-gradient(135deg,#E85D04,#C74B00);padding:22px 26px;position:relative;">'
+      +'<button onclick="window.fermerProjetPub()" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>'
+      +'<div style="color:#fff;font-size:19px;font-weight:800;margin-bottom:3px;">📋 Décrivez votre besoin</div>'
+      +'<div style="color:rgba(255,255,255,.8);font-size:12.5px;">Les artisans qualifiés vous contactent avec leurs devis</div>'
+    +'</div>'
+    +'<div style="padding:22px 26px;max-height:62vh;overflow-y:auto;display:flex;flex-direction:column;gap:13px;">'
+      +_grp('Titre du projet *','<input id="ppTitre" type="text" placeholder="Ex : Réparation fuite d\'eau cuisine" style="'+_inpS+'">')
+      +_grp('Catégorie','<select id="ppCat" style="'+_selS+'">'+catOpts+'</select>')
+      +_grp('Description du besoin *','<textarea id="ppDesc" rows="3" placeholder="Décrivez votre projet : quoi, où, quand..." style="'+_inpS+'resize:vertical;"></textarea>')
+      +_grp('Commune / Quartier','<input id="ppCommune" type="text" placeholder="Ex : Ratoma, Sonfonia" style="'+_inpS+'">')
+      +_grp('Budget approximatif en GNF (facultatif)','<input id="ppBudget" type="number" placeholder="Ex : 500000" style="'+_inpS+'">')
+      +_grp('Votre nom *','<input id="ppNom" type="text" placeholder="Prénom et Nom" style="'+_inpS+'">')
+      +_grp('Votre téléphone *','<input id="ppTel" type="tel" placeholder="6XX XX XX XX" style="'+_inpS+'">')
+    +'</div>'
+    +'<div style="padding:14px 26px;border-top:1px solid #F0F0F8;">'
+      +'<div id="ppErreur" style="color:#DC2626;font-size:12.5px;margin-bottom:9px;display:none;background:#FEF2F2;border-radius:8px;padding:8px 12px;"></div>'
+      +'<button id="ppSubmitBtn" onclick="window._soumettreProjet()" style="width:100%;padding:13px;background:linear-gradient(135deg,#E85D04,#C74B00);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">🚀 Publier mon projet</button>'
+    +'</div>'
+    +'</div>';
+};
+
+window.fermerProjetPub = function() {
+  var m = document.getElementById('projetPubModal');
+  if (m) m.style.display = 'none';
+};
+
+window._soumettreProjet = async function() {
+  var titre  = (document.getElementById('ppTitre')||{value:''}).value.trim();
+  var cat    = (document.getElementById('ppCat')||{value:''}).value;
+  var desc   = (document.getElementById('ppDesc')||{value:''}).value.trim();
+  var commune= (document.getElementById('ppCommune')||{value:''}).value.trim();
+  var budget = (document.getElementById('ppBudget')||{value:''}).value.trim();
+  var nom    = (document.getElementById('ppNom')||{value:''}).value.trim();
+  var tel    = (document.getElementById('ppTel')||{value:''}).value.trim().replace(/[\s\-\.]/g,'');
+  var errEl  = document.getElementById('ppErreur');
+  var btn    = document.getElementById('ppSubmitBtn');
+
+  var affErr = function(msg) {
+    if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; }
+  };
+
+  if (!titre || !desc || !nom || !tel) { affErr('Veuillez remplir tous les champs obligatoires (*).'); return; }
+  if (!/^6\d{8}$/.test(tel)) { affErr('Numéro de téléphone invalide — 9 chiffres commençant par 6 (ex : 622334455).'); return; }
+  if (errEl) errEl.style.display = 'none';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Publication en cours...'; }
+
+  try {
+    var montant = budget ? parseInt(budget, 10) : null;
+    var payload = {
+      titre: titre, categorie: cat||null, description: desc,
+      commune: commune||null, montant: montant,
+      client_nom: nom, client_telephone: tel, statut: 'ouvert'
+    };
+    var res = await sb.from('missions').insert(payload);
+    // Fallback 1 : colonnes nouvelles absentes
+    if (res.error && (res.error.code === '42703' || (res.error.message||'').includes('column'))) {
+      res = await sb.from('missions').insert({ description: desc, statut: 'ouvert', client_nom: nom, montant: montant });
+    }
+    // Fallback 2 : statut 'ouvert' non autorisé → 'en_attente'
+    if (res.error && (res.error.message||'').toLowerCase().includes('statut')) {
+      payload.statut = 'en_attente';
+      res = await sb.from('missions').insert(payload);
+    }
+    if (res.error) throw res.error;
+    window.fermerProjetPub();
+    if (typeof showToast === 'function') showToast('✅ Projet publié ! Les artisans vont vous contacter avec leurs devis.', 'success');
+  } catch(e) {
+    affErr('Erreur : ' + (e.message||'Veuillez réessayer.'));
+    if (btn) { btn.disabled = false; btn.textContent = '🚀 Publier mon projet'; }
+  }
+};
+
+// ────────────────────────────────────────────────
+// BOUTON 2 — Voir les projets disponibles
+// ────────────────────────────────────────────────
+window.ouvrirVoirProjets = function() {
+  var modal = _makeModal('projetsListModal');
+  modal.onclick = function(e) { if (e.target === modal) window.fermerVoirProjets(); };
+
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:20px;width:100%;max-width:680px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);">'
+    +'<div style="background:linear-gradient(135deg,#1A1A4E,#2D2D7E);padding:20px 26px;display:flex;align-items:center;justify-content:space-between;">'
+      +'<div>'
+        +'<div style="color:#fff;font-size:18px;font-weight:800;">💼 Projets disponibles</div>'
+        +'<div style="color:rgba(255,255,255,.7);font-size:12px;margin-top:2px;">Missions publiées par des clients</div>'
+      +'</div>'
+      +'<button onclick="window.fermerVoirProjets()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>'
+    +'</div>'
+    +'<div id="projetsListBody" style="padding:18px 22px;max-height:70vh;overflow-y:auto;">'
+      +'<div style="text-align:center;padding:32px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:22px;color:#E85D04;"></i></div>'
+    +'</div>'
+    +'</div>';
+
+  window._chargerProjets();
+};
+
+window.fermerVoirProjets = function() {
+  var m = document.getElementById('projetsListModal');
+  if (m) m.style.display = 'none';
+};
+
+window._chargerProjets = async function() {
+  var body = document.getElementById('projetsListBody');
+  if (!body) return;
+  try {
+    // Projets clients = missions sans provider_id (publiés depuis le hero)
+    var res = await sb.from('missions')
+      .select('id,titre,categorie,description,commune,montant,statut,created_at')
+      .is('provider_id', null)
+      .order('created_at', {ascending:false})
+      .limit(40);
+    if (res.error) throw res.error;
+    var data = res.data || [];
+    if (data.length === 0) {
+      body.innerHTML = '<div style="text-align:center;padding:44px;color:#9CA3AF;font-size:14px;"><div style="font-size:44px;margin-bottom:12px;">📭</div>Aucun projet pour le moment.<br>Revenez bientôt !</div>';
+      return;
+    }
+    body.innerHTML = data.map(function(m) { return window._renderProjetCard(m); }).join('');
+  } catch(e) {
+    body.innerHTML = '<div style="text-align:center;padding:28px;color:#DC2626;font-size:13px;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>Erreur de chargement : '+e.message+'</div>';
+  }
+};
+
+function _tempsRelatif(dateStr) {
+  var diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (diff < 60)     return 'il y a quelques secondes';
+  if (diff < 3600)   return 'il y a ' + Math.floor(diff/60) + ' min';
+  if (diff < 86400)  return 'il y a ' + Math.floor(diff/3600) + ' h';
+  var j = Math.floor(diff/86400);
+  if (j < 7)        return 'il y a ' + j + ' jour' + (j > 1 ? 's' : '');
+  return new Date(dateStr).toLocaleDateString('fr-FR');
+}
+
+window._renderProjetCard = function(m) {
+  var titre = (m.titre || '').trim() || (m.description||'').substring(0,55)+'...';
+  var desc  = m.description || '';
+  var shortDesc = desc.length > 150 ? desc.substring(0,150) + '…' : desc;
+  var catBadge = m.categorie
+    ? '<span style="background:#FEF3C7;color:#B45309;border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;white-space:nowrap;">'+m.categorie+'</span>'
+    : '';
+  var budget = m.montant ? Number(m.montant).toLocaleString('fr-FR') + ' GNF' : 'Budget à discuter';
+  var lieu   = m.commune ? '📍 ' + m.commune : '📍 Conakry';
+  var ago    = _tempsRelatif(m.created_at);
+  var safeId = String(m.id);
+  var safeTitre = titre.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
+  return '<div style="background:#F9FAFB;border-radius:14px;padding:15px 17px;margin-bottom:11px;border:1.5px solid #E5E7EB;">'
+    + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px;">'
+      + '<div style="font-size:14px;font-weight:800;color:#1A1A4E;line-height:1.3;flex:1;">'+titre+'</div>'
+      + catBadge
+    + '</div>'
+    + '<div style="font-size:13px;color:#6B7280;line-height:1.55;margin-bottom:10px;">'+shortDesc+'</div>'
+    + '<div style="display:flex;align-items:center;gap:14px;font-size:11.5px;color:#9CA3AF;margin-bottom:12px;flex-wrap:wrap;">'
+      + '<span>'+lieu+'</span>'
+      + '<span>💰 '+budget+'</span>'
+      + '<span>🕐 '+ago+'</span>'
+    + '</div>'
+    + '<button onclick="window.ouvrirDevis(\''+safeId+'\',\''+safeTitre+'\')" style="padding:8px 18px;background:#E85D04;color:#fff;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;" onmouseover="this.style.background=\'#C74B00\'" onmouseout="this.style.background=\'#E85D04\'">✍️ Faire un devis</button>'
+    + '</div>';
+};
+
+// ────────────────────────────────────────────────
+// DEVIS PRESTATAIRE
+// ────────────────────────────────────────────────
+window.ouvrirDevis = function(missionId, missionTitre) {
+  var session = null;
+  try { session = JSON.parse(localStorage.getItem('yj_provider_session')); } catch(e) {}
+
+  var modal = _makeModal('devisModal');
+  modal.style.zIndex = '999999';
+  modal.onclick = function(e) { if (e.target === modal) window.fermerDevis(); };
+
+  if (!session || !session.provider_id) {
+    modal.innerHTML =
+      '<div style="background:#fff;border-radius:20px;width:100%;max-width:420px;margin:auto;padding:32px 28px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.2);">'
+      +'<div style="font-size:48px;margin-bottom:14px;">🔒</div>'
+      +'<div style="font-size:17px;font-weight:800;color:#1A1A4E;margin-bottom:8px;">Connexion requise</div>'
+      +'<div style="font-size:13px;color:#6B7280;margin-bottom:24px;line-height:1.55;">Connectez-vous en tant que prestataire pour envoyer un devis à ce client.</div>'
+      +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">'
+        +'<button onclick="window.fermerDevis();(function(){document.querySelectorAll(\'.page\').forEach(function(p){p.classList.remove(\'active\');p.style.display=\'\';});var mc=document.getElementById(\'mainContent\');if(mc)mc.style.cssText=\'display:none!important\';var mn=document.getElementById(\'mainNav\');if(mn)mn.style.cssText=\'display:none!important\';var pl=document.getElementById(\'page-login\');if(pl){pl.classList.add(\'active\');pl.style.cssText=\'display:block!important\';window.scrollTo(0,0);}})()" style="padding:11px 22px;background:#1A1A4E;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">🔑 Se connecter</button>'
+        +'<button onclick="window.fermerDevis()" style="padding:11px 22px;background:#F3F4F6;color:#374151;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Fermer</button>'
+      +'</div>'
+      +'</div>';
+    return;
+  }
+
+  var prestataireName = ((session.prenom||'') + ' ' + (session.nom||'')).trim() || 'Prestataire';
+
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:20px;width:100%;max-width:520px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);">'
+    +'<div style="background:linear-gradient(135deg,#E85D04,#C74B00);padding:20px 26px;position:relative;">'
+      +'<button onclick="window.fermerDevis()" style="position:absolute;top:12px;right:12px;background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>'
+      +'<div style="color:#fff;font-size:18px;font-weight:800;margin-bottom:3px;">✍️ Faire un devis</div>'
+      +'<div style="color:rgba(255,255,255,.85);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Projet : '+missionTitre+'</div>'
+    +'</div>'
+    +'<div style="padding:20px 26px;display:flex;flex-direction:column;gap:13px;">'
+      +'<div style="background:#F0FDF4;border-radius:10px;padding:9px 13px;font-size:12.5px;color:#166534;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-circle-check"></i>Connecté : <strong>'+prestataireName+'</strong></div>'
+      +_grp('Montant proposé (GNF) *','<input id="dvMontant" type="number" placeholder="Ex : 750000" style="'+_inpS+'">')
+      +_grp('Délai de réalisation *','<input id="dvDelai" type="text" placeholder="Ex : 3 jours, 1 semaine..." style="'+_inpS+'">')
+      +_grp('Message au client *','<textarea id="dvMessage" rows="4" placeholder="Présentez-vous et expliquez votre approche pour ce projet..." style="'+_inpS+'resize:vertical;"></textarea>')
+    +'</div>'
+    +'<div style="padding:14px 26px;border-top:1px solid #F0F0F8;">'
+      +'<div id="dvErreur" style="color:#DC2626;font-size:12.5px;margin-bottom:9px;display:none;background:#FEF2F2;border-radius:8px;padding:8px 12px;"></div>'
+      +'<button id="dvSubmitBtn" onclick="window._envoyerDevis(\''+String(missionId)+'\')" style="width:100%;padding:13px;background:linear-gradient(135deg,#E85D04,#C74B00);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">📤 Envoyer mon devis</button>'
+    +'</div>'
+    +'</div>';
+};
+
+window.fermerDevis = function() {
+  var m = document.getElementById('devisModal');
+  if (m) m.style.display = 'none';
+};
+
+window._envoyerDevis = async function(missionId) {
+  var session = null;
+  try { session = JSON.parse(localStorage.getItem('yj_provider_session')); } catch(e) {}
+  if (!session || !session.provider_id) { if (typeof showToast === 'function') showToast('Session expirée, reconnectez-vous', 'error'); return; }
+
+  var montant = (document.getElementById('dvMontant')||{value:''}).value.trim();
+  var delai   = (document.getElementById('dvDelai')||{value:''}).value.trim();
+  var message = (document.getElementById('dvMessage')||{value:''}).value.trim();
+  var errEl   = document.getElementById('dvErreur');
+  var btn     = document.getElementById('dvSubmitBtn');
+
+  var affErr = function(msg) { if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; } };
+
+  if (!montant || !delai || !message) { affErr('Veuillez remplir tous les champs.'); return; }
+  if (errEl) errEl.style.display = 'none';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi...'; }
+
+  try {
+    // Vérifier si devis déjà envoyé
+    var chk = await sb.from('devis')
+      .select('id')
+      .eq('mission_id', missionId)
+      .eq('provider_id', session.provider_id)
+      .limit(1);
+    if (!chk.error && chk.data && chk.data.length > 0) {
+      affErr('Vous avez déjà envoyé un devis pour ce projet.');
+      if (btn) { btn.disabled = false; btn.textContent = '📤 Envoyer mon devis'; }
+      return;
+    }
+
+    var ins = await sb.from('devis').insert({
+      mission_id: missionId,
+      provider_id: session.provider_id,
+      montant: parseInt(montant, 10),
+      delai: delai,
+      message: message,
+      statut: 'envoye'
+    });
+    if (ins.error) throw ins.error;
+
+    window.fermerDevis();
+    if (typeof showToast === 'function') showToast('✅ Devis envoyé ! Le client sera informé.', 'success');
+  } catch(e) {
+    affErr('Erreur : ' + (e.message||'Veuillez réessayer.'));
+    if (btn) { btn.disabled = false; btn.textContent = '📤 Envoyer mon devis'; }
+  }
+};
+
+})(); // IIFE end
 </script>
 
 <!-- ══ SERVICE WORKER REGISTRATION ══ -->
