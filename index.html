@@ -12176,6 +12176,8 @@ window._soumettreProjet = async function() {
   if (errEl) errEl.style.display = 'none';
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Publication en cours...'; }
 
+  // ── 1. INSERT dans missions — try/catch dédié ──
+  var missionId = null;
   try {
     var montant = budget ? parseInt(budget, 10) : null;
     var payload = {
@@ -12194,22 +12196,26 @@ window._soumettreProjet = async function() {
       res = await sb.from('missions').insert(payload).select('id').single();
     }
     if (res.error) throw res.error;
-    // Alerter les prestataires ciblés (SMS + notifications cloche)
-    var missionId = res.data && res.data.id;
-    if (missionId) {
-      try {
-        await fetch(SUPABASE_URL + '/functions/v1/notif-projet', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
-          body: JSON.stringify({ mission_id: missionId })
-        });
-      } catch(efErr) { console.warn('[notif-projet] Appel Edge Function échoué:', efErr.message); }
-    }
-    window.fermerProjetPub();
-    if (typeof showToast === 'function') showToast('✅ Projet publié ! Les artisans de votre zone ont été alertés et vont vous envoyer leurs devis.', 'success');
+    missionId = res.data && res.data.id;
   } catch(e) {
     affErr('Erreur : ' + (e.message||'Veuillez réessayer.'));
     if (btn) { btn.disabled = false; btn.textContent = '🚀 Publier mon projet'; }
+    return;
+  }
+
+  // ── 2. Succès INSERT — fermer et confirmer IMMÉDIATEMENT ──
+  window.fermerProjetPub();
+  if (typeof showToast === 'function') showToast('✅ Projet publié ! Les artisans de votre zone ont été alertés et vont vous envoyer leurs devis.', 'success');
+
+  // ── 3. Alerter les prestataires — fire-and-forget, jamais visible au client ──
+  if (missionId) {
+    try {
+      fetch('https://slawwbhlakilnviwzyrb.supabase.co/functions/v1/notif-projet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+        body: JSON.stringify({ mission_id: missionId })
+      }).catch(function(efErr) { console.error('[notif-projet] fetch échoué:', efErr.message); });
+    } catch(efErr) { console.error('[notif-projet] Appel Edge Function échoué:', efErr.message); }
   }
 };
 
