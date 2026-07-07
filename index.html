@@ -12385,6 +12385,77 @@ var _selS = 'width:100%;padding:10px 13px;border:1.5px solid #E5E7EB;border-radi
 function _lbl(t) { return '<div style="font-size:11.5px;font-weight:700;color:#6B7280;margin-bottom:5px;">'+t+'</div>'; }
 function _grp(label, field) { return '<div style="display:flex;flex-direction:column;">'+_lbl(label)+field+'</div>'; }
 
+var _ppAudioBlob = null; // blob vocal publication projet
+var _dvAudioBlob = null; // blob vocal devis prestataire
+
+function creerEnregistreurVocal(containerId, onAudioReady) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var mediaRecorder = null, chunks = [], timerInterval = null, secondes = 0, audioBlob = null;
+  var BTN_REC  = 'width:100%;padding:14px;border:2px dashed #E85D04;border-radius:12px;background:#FFF7F0;color:#E85D04;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;touch-action:manipulation;box-sizing:border-box;';
+  var BTN_STOP = 'width:100%;padding:14px;border:none;border-radius:12px;background:#DC2626;color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;touch-action:manipulation;box-sizing:border-box;';
+  var BTN_RETRY= 'margin-top:8px;padding:8px 16px;background:#fff;border:1.5px solid #FECACA;border-radius:8px;color:#DC2626;font-size:12px;cursor:pointer;touch-action:manipulation;';
+
+  function render(state) {
+    if (state === 'idle') {
+      container.innerHTML = '<button type="button" id="'+containerId+'Btn" style="'+BTN_REC+'">🎤 Enregistrer un message vocal</button>';
+      document.getElementById(containerId+'Btn').onclick = demarrer;
+    } else if (state === 'recording') {
+      container.innerHTML = '<button type="button" id="'+containerId+'Btn" style="'+BTN_STOP+'">⏹️ Arrêter &nbsp;<span id="'+containerId+'Timer" style="font-size:13px;opacity:.85;font-weight:500;">0s / 60s</span></button>';
+      document.getElementById(containerId+'Btn').onclick = arreter;
+    } else if (state === 'done') {
+      var url = URL.createObjectURL(audioBlob);
+      container.innerHTML =
+        '<audio controls preload="auto" src="'+url+'" style="width:100%;border-radius:8px;margin-bottom:8px;"></audio>'
+        +'<button type="button" id="'+containerId+'Restart" style="width:100%;padding:10px 14px;background:#F3F4F6;border:1.5px solid #E5E7EB;border-radius:10px;color:#6B7280;font-size:12.5px;font-weight:600;cursor:pointer;min-height:48px;touch-action:manipulation;">🗑️ Recommencer</button>';
+      document.getElementById(containerId+'Restart').onclick = function() { audioBlob = null; onAudioReady(null); render('idle'); };
+    }
+  }
+
+  async function demarrer() {
+    try {
+      var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      chunks = []; secondes = 0;
+      var mimeType = '';
+      if (typeof MediaRecorder !== 'undefined') {
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) mimeType = 'audio/webm;codecs=opus';
+        else if (MediaRecorder.isTypeSupported('audio/webm'))        mimeType = 'audio/webm';
+        else if (MediaRecorder.isTypeSupported('audio/mp4'))         mimeType = 'audio/mp4';
+      }
+      mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType: mimeType } : {});
+      mediaRecorder.ondataavailable = function(e) { if (e.data && e.data.size > 0) chunks.push(e.data); };
+      mediaRecorder.onstop = function() {
+        stream.getTracks().forEach(function(t) { t.stop(); });
+        clearInterval(timerInterval);
+        audioBlob = new Blob(chunks, { type: mimeType || 'audio/webm' });
+        onAudioReady(audioBlob);
+        render('done');
+      };
+      mediaRecorder.start(250);
+      render('recording');
+      timerInterval = setInterval(function() {
+        secondes++;
+        var el = document.getElementById(containerId+'Timer');
+        if (el) el.textContent = secondes + 's / 60s';
+        if (secondes >= 60) arreter();
+      }, 1000);
+    } catch(err) {
+      var msg = (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError' || err.name === 'SecurityError')
+        ? '🔒 Autorisez le micro pour enregistrer'
+        : '⚠️ Micro non disponible';
+      container.innerHTML = '<div style="padding:12px 14px;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:10px;color:#DC2626;font-size:13px;text-align:center;">'
+        + msg + '<br><button type="button" id="'+containerId+'RetryBtn" style="'+BTN_RETRY+'">Réessayer</button></div>';
+      document.getElementById(containerId+'RetryBtn').onclick = function() { render('idle'); };
+    }
+  }
+
+  function arreter() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+  }
+
+  render('idle');
+}
+
 function _makeModal(id) {
   var m = document.getElementById(id);
   if (!m) {
@@ -12418,7 +12489,11 @@ window.ouvrirPublierProjet = function() {
     +'<div style="padding:22px 26px;max-height:62vh;overflow-y:auto;display:flex;flex-direction:column;gap:13px;">'
       +_grp('Titre du projet *','<input id="ppTitre" type="text" placeholder="Ex : Réparation fuite d\'eau cuisine" style="'+_inpS+'">')
       +_grp('Catégorie','<select id="ppCat" style="'+_selS+'">'+catOpts+'</select>')
-      +_grp('Description du besoin *','<textarea id="ppDesc" rows="3" placeholder="Décrivez votre projet : quoi, où, quand..." style="'+_inpS+'resize:vertical;"></textarea>')
+      +_grp('Description du besoin (facultatif si vocal)','<textarea id="ppDesc" rows="3" placeholder="Décrivez votre projet : quoi, où, quand..." style="'+_inpS+'resize:vertical;"></textarea>')
+      +'<div style="display:flex;flex-direction:column;gap:6px;">'
+        +'<div style="font-size:11.5px;font-weight:700;color:#6B7280;">Décrivez à la voix <span style="font-weight:400;color:#9CA3AF;">(français, soussou, pular, malinké...)</span></div>'
+        +'<div id="ppVocal"></div>'
+      +'</div>'
       +_grp('Commune / Quartier','<input id="ppCommune" type="text" placeholder="Ex : Ratoma, Sonfonia" style="'+_inpS+'">')
       +_grp('Budget approximatif en GNF (facultatif)','<input id="ppBudget" type="number" placeholder="Ex : 500000" style="'+_inpS+'">')
       +_grp('Votre nom *','<input id="ppNom" type="text" placeholder="Prénom et Nom" style="'+_inpS+'">')
@@ -12429,6 +12504,8 @@ window.ouvrirPublierProjet = function() {
       +'<button id="ppSubmitBtn" onclick="window._soumettreProjet()" style="width:100%;padding:13px;background:linear-gradient(135deg,#E85D04,#C74B00);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">🚀 Publier mon projet</button>'
     +'</div>'
     +'</div>';
+  _ppAudioBlob = null;
+  setTimeout(function() { creerEnregistreurVocal('ppVocal', function(b) { _ppAudioBlob = b; }); }, 0);
 };
 
 window.fermerProjetPub = function() {
@@ -12453,7 +12530,7 @@ window._soumettreProjet = async function() {
 
   // Validation champ par champ avec messages précis
   if (!titre) { affErr('Veuillez renseigner le titre du projet.'); return; }
-  if (!desc)  { affErr('Veuillez décrire votre besoin.'); return; }
+  if (!desc && !_ppAudioBlob)  { affErr('Veuillez décrire votre besoin (texte ou message vocal).'); return; }
   if (!nom)   { affErr('Veuillez indiquer votre nom.'); return; }
   if (!tel)   { affErr('Veuillez indiquer votre numéro de téléphone.'); return; }
   if (!/^6\d{8}$/.test(tel)) { affErr('Numéro invalide — 9 chiffres commençant par 6 (ex : 622334455).'); return; }
@@ -12499,7 +12576,25 @@ window._soumettreProjet = async function() {
   window.fermerProjetPub();
   if (typeof showToast === 'function') showToast('✅ Projet publié ! Les artisans de votre zone ont été alertés et vont vous envoyer leurs devis.', 'success');
 
-  // ── 3. Alerter les prestataires — fire-and-forget, jamais visible au client ──
+  // ── 3. Upload vocal en arrière-plan ──
+  (function(blob, mid) {
+    if (!blob || !mid) return;
+    (async function() {
+      try {
+        var ext = blob.type.includes('mp4') ? 'mp4' : 'webm';
+        var path = 'projets/' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
+        var up = await sb.storage.from('vocaux').upload(path, blob, { contentType: blob.type });
+        if (!up.error) {
+          var pu = sb.storage.from('vocaux').getPublicUrl(path);
+          var audioUrl = pu.data && pu.data.publicUrl;
+          if (audioUrl) await sb.from('missions').update({ audio_url: audioUrl }).eq('id', mid);
+        } else console.error('[vocal-projet] upload:', up.error.message);
+      } catch(e) { console.error('[vocal-projet]', e.message); }
+    })();
+  })(_ppAudioBlob, missionId);
+  _ppAudioBlob = null;
+
+  // ── 4. Alerter les prestataires — fire-and-forget, jamais visible au client ──
   if (missionId) {
     try {
       fetch('https://slawwbhlakilnviwzyrb.supabase.co/functions/v1/notif-projet', {
@@ -12546,7 +12641,7 @@ window._chargerProjets = async function() {
   try {
     // Projets clients = missions ouvertes publiées depuis le hero (titre non null)
     var res = await sb.from('missions')
-      .select('id,titre,description,commune,montant,categorie,statut,created_at')
+      .select('id,titre,description,commune,montant,categorie,statut,created_at,audio_url')
       .eq('statut', 'ouvert')
       .not('titre', 'is', null)
       .order('created_at', {ascending:false})
@@ -12597,6 +12692,12 @@ window._renderProjetCard = function(m) {
       + '<span>💰 '+budget+'</span>'
       + '<span>🕐 '+ago+'</span>'
     + '</div>'
+    + (m.audio_url
+        ? '<div style="margin-bottom:12px;">'
+            + '<div style="font-size:11.5px;color:#6B7280;margin-bottom:5px;display:flex;align-items:center;gap:5px;"><span style="font-size:14px;">🎤</span>Écouter le besoin du client</div>'
+            + '<audio controls preload="none" src="'+m.audio_url+'" style="width:100%;height:36px;border-radius:8px;"></audio>'
+          + '</div>'
+        : '')
     + '<button onclick="window.ouvrirDevis(\''+safeId+'\',\''+safeTitre+'\')" style="padding:8px 18px;background:#E85D04;color:#fff;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;" onmouseover="this.style.background=\'#C74B00\'" onmouseout="this.style.background=\'#E85D04\'">✍️ Faire un devis</button>'
     + '</div>';
 };
@@ -12639,13 +12740,19 @@ window.ouvrirDevis = function(missionId, missionTitre) {
       +'<div style="background:#F0FDF4;border-radius:10px;padding:9px 13px;font-size:12.5px;color:#166534;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-circle-check"></i>Connecté : <strong>'+prestataireName+'</strong></div>'
       +_grp('Montant proposé (GNF) *','<input id="dvMontant" type="number" placeholder="Ex : 750000" style="'+_inpS+'">')
       +_grp('Délai de réalisation *','<input id="dvDelai" type="text" placeholder="Ex : 3 jours, 1 semaine..." style="'+_inpS+'">')
-      +_grp('Message au client *','<textarea id="dvMessage" rows="4" placeholder="Présentez-vous et expliquez votre approche pour ce projet..." style="'+_inpS+'resize:vertical;"></textarea>')
+      +_grp('Message au client (facultatif si vocal)','<textarea id="dvMessage" rows="3" placeholder="Présentez-vous et expliquez votre approche..." style="'+_inpS+'resize:vertical;"></textarea>')
+      +'<div style="display:flex;flex-direction:column;gap:6px;">'
+        +'<div style="font-size:11.5px;font-weight:700;color:#6B7280;">Ou expliquez votre devis à la voix</div>'
+        +'<div id="dvVocal"></div>'
+      +'</div>'
     +'</div>'
     +'<div style="padding:14px 26px;border-top:1px solid #F0F0F8;">'
       +'<div id="dvErreur" style="color:#DC2626;font-size:12.5px;margin-bottom:9px;display:none;background:#FEF2F2;border-radius:8px;padding:8px 12px;"></div>'
       +'<button id="dvSubmitBtn" onclick="window._envoyerDevis(\''+String(missionId)+'\')" style="width:100%;padding:13px;background:linear-gradient(135deg,#E85D04,#C74B00);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">📤 Envoyer mon devis</button>'
     +'</div>'
     +'</div>';
+  _dvAudioBlob = null;
+  setTimeout(function() { creerEnregistreurVocal('dvVocal', function(b) { _dvAudioBlob = b; }); }, 0);
 };
 
 window.fermerDevis = function() {
@@ -12666,7 +12773,7 @@ window._envoyerDevis = async function(missionId) {
 
   var affErr = function(msg) { if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; } };
 
-  if (!montant || !delai || !message) { affErr('Veuillez remplir tous les champs.'); return; }
+  if (!montant || !delai || (!message && !_dvAudioBlob)) { affErr('Veuillez saisir un montant, un délai, et un message (texte ou vocal).'); return; }
   if (errEl) errEl.style.display = 'none';
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi...'; }
 
@@ -12699,7 +12806,25 @@ window._envoyerDevis = async function(missionId) {
   window.fermerDevis();
   if (typeof showToast === 'function') showToast('✅ Devis envoyé ! Le client a été informé par SMS.', 'success');
 
-  // ── 3. SMS au client — fire-and-forget, jamais visible au prestataire ──
+  // ── 3. Upload vocal en arrière-plan ──
+  (function(blob, did) {
+    if (!blob || !did) return;
+    (async function() {
+      try {
+        var ext = blob.type.includes('mp4') ? 'mp4' : 'webm';
+        var path = 'devis/' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
+        var up = await sb.storage.from('vocaux').upload(path, blob, { contentType: blob.type });
+        if (!up.error) {
+          var pu = sb.storage.from('vocaux').getPublicUrl(path);
+          var audioUrl = pu.data && pu.data.publicUrl;
+          if (audioUrl) await sb.from('devis').update({ audio_url: audioUrl }).eq('id', did);
+        } else console.error('[vocal-devis] upload:', up.error.message);
+      } catch(e) { console.error('[vocal-devis]', e.message); }
+    })();
+  })(_dvAudioBlob, devisId);
+  _dvAudioBlob = null;
+
+  // ── 4. SMS au client — fire-and-forget, jamais visible au prestataire ──
   if (devisId) {
     try {
       fetch('https://slawwbhlakilnviwzyrb.supabase.co/functions/v1/notif-devis', {
