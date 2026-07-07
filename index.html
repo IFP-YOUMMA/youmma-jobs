@@ -5082,7 +5082,7 @@ async function declarerMission() {
 async function chargerMissions(pid) {
   const list = document.getElementById('missionsList');
   if (!list) return;
-  const { data } = await sb.from('missions').select('id,description,client_nom,date_mission,montant,statut,created_at').eq('provider_id',pid).order('created_at',{ascending:false});
+  const { data } = await sb.from('missions').select('id,description,client_nom,date_mission,montant,statut,created_at').eq('prestataire_id',pid).order('created_at',{ascending:false});
   if (!data||data.length===0) {
     list.innerHTML = '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;background:#F9FAFB;border-radius:12px;"><i class="fa-solid fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;opacity:.4;"></i>Aucune mission déclarée</div>';
     return;
@@ -5120,7 +5120,7 @@ async function _provRapports() {
 
   try {
     const [missRes, revRes] = await Promise.all([
-      sb.from('missions').select('id,description,montant,date_mission,statut,client_nom,created_at').eq('provider_id', pid).order('created_at', {ascending:false}),
+      sb.from('missions').select('id,description,montant,date_mission,statut,client_nom,created_at').eq('prestataire_id', pid).order('created_at', {ascending:false}),
       sb.from('reviews').select('note,created_at').eq('provider_id', pid).eq('valide', true)
     ]);
 
@@ -8050,8 +8050,8 @@ async function chargerMissionsAdmin() {
         </div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;">
-        <button onclick="_adminValidMission('${m.id}','valide','${m.provider_id}')" style="padding:7px 14px;background:rgba(34,197,94,.12);color:#16A34A;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">✅ Valider</button>
-        <button onclick="_adminValidMission('${m.id}','rejete','${m.provider_id}')" style="padding:7px 14px;background:rgba(239,68,68,.08);color:#DC2626;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">❌ Rejeter</button>
+        <button onclick="_adminValidMission('${m.id}','valide','${m.prestataire_id}')" style="padding:7px 14px;background:rgba(34,197,94,.12);color:#16A34A;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">✅ Valider</button>
+        <button onclick="_adminValidMission('${m.id}','rejete','${m.prestataire_id}')" style="padding:7px 14px;background:rgba(239,68,68,.08);color:#DC2626;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">❌ Rejeter</button>
       </div>
     </div>`).join('');
 }
@@ -10426,7 +10426,7 @@ async function renderAdminMissions() {
 
   try {
     const filtreStatut = document.getElementById('missFilterStatut')?.value || '';
-    const COLS = 'id,titre,description,statut,montant,created_at,updated_at,client_nom,client_tel,provider_id,categorie,ville,note,avis';
+    const COLS = 'id,titre,description,statut,montant,created_at,updated_at,client_nom,client_tel,prestataire_id,categorie,ville,note,avis';
 
     const buildQuery = (cols) => {
       let q = sb.from('missions').select(cols).order('created_at', { ascending: false }).limit(100);
@@ -10496,7 +10496,7 @@ async function renderAdminMissions() {
             <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${m.client_nom||'—'}</div>
             <div style="font-size:11px;color:#9CA3AF;">${m.client_tel||''}</div>
           </td>
-          <td style="padding:12px 14px;font-size:12.5px;color:#374151;">${m.provider_id ? '👤 Assigné' : '<span style="color:#9CA3AF;">Non assigné</span>'}</td>
+          <td style="padding:12px 14px;font-size:12.5px;color:#374151;">${m.prestataire_id ? '👤 Assigné' : '<span style="color:#9CA3AF;">Non assigné</span>'}</td>
           <td style="padding:12px 14px;">
             <div style="font-size:13px;color:#374151;">${m.titre||m.categorie||'—'}</div>
             <div style="font-size:11px;color:#9CA3AF;">${m.ville||''}</div>
@@ -12544,10 +12544,11 @@ window._chargerProjets = async function() {
   var body = document.getElementById('projetsListBody');
   if (!body) return;
   try {
-    // Projets clients = missions sans provider_id (publiés depuis le hero)
+    // Projets clients = missions ouvertes publiées depuis le hero (titre non null)
     var res = await sb.from('missions')
-      .select('id,titre,categorie,description,commune,montant,statut,created_at')
-      .is('provider_id', null)
+      .select('id,titre,description,commune,montant,categorie,statut,created_at')
+      .eq('statut', 'ouvert')
+      .not('titre', 'is', null)
       .order('created_at', {ascending:false})
       .limit(40);
     if (res.error) throw res.error;
