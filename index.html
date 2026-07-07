@@ -12525,18 +12525,6 @@ function _creerChoixSaisie(cid, taId, taPlaceholder, onAudioReady) {
   };
 }
 
-window._ppSelCat = function(nom, idx) {
-  var inp = document.getElementById('ppCat');
-  if (inp) inp.value = nom;
-  for (var i = 0; i < (window.CATEGORIES||[]).length; i++) {
-    var btn = document.getElementById('ppCatBtn'+i);
-    if (!btn) continue;
-    btn.style.borderColor = (i === idx) ? '#E85D04' : '#E5E7EB';
-    btn.style.background  = (i === idx) ? '#FFF7F0' : '#fff';
-    var sp = btn.querySelector('span');
-    if (sp) sp.style.color = (i === idx) ? '#C74B00' : '#374151';
-  }
-};
 
 window._signalerVocal = async function(type, elementId) {
   if (!confirm('Signaler ce message vocal comme inapproprié ?')) return;
@@ -12571,13 +12559,6 @@ window.ouvrirPublierProjet = function() {
   var modal = _makeModal('projetPubModal');
   modal.onclick = function(e) { if (e.target === modal) window.fermerProjetPub(); };
 
-  var catGrid = (window.CATEGORIES||[]).map(function(c, i) {
-    var short = c.nom.length > 28 ? c.nom.substring(0,28)+'…' : c.nom;
-    return '<button type="button" id="ppCatBtn'+i+'" onclick="window._ppSelCat(\''+c.nom.replace(/'/g,"\\'")+'\','+i+')" '
-      +'style="padding:14px 8px;border:2px solid #E5E7EB;border-radius:14px;background:#fff;cursor:pointer;text-align:center;min-height:72px;touch-action:manipulation;font-size:24px;line-height:1.3;box-sizing:border-box;">'
-      +c.emoji+'<br><span style="font-size:10.5px;font-weight:700;color:#374151;display:block;margin-top:4px;line-height:1.2;">'+short+'</span></button>';
-  }).join('');
-
   modal.innerHTML =
     '<div style="background:#fff;border-radius:20px;width:100%;max-width:560px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);">'
     +'<div style="background:linear-gradient(135deg,#E85D04,#C74B00);padding:22px 26px;position:relative;">'
@@ -12587,11 +12568,6 @@ window.ouvrirPublierProjet = function() {
     +'</div>'
     +'<div style="padding:22px 26px;max-height:62vh;overflow-y:auto;display:flex;flex-direction:column;gap:13px;">'
       +_grp('Titre du projet *','<input id="ppTitre" type="text" placeholder="Ex : Réparation fuite d\'eau cuisine" style="'+_inpS+'">')
-      +'<div>'
-        +_lbl('Catégorie (optionnel)')
-        +'<input type="hidden" id="ppCat" value="">'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'+catGrid+'</div>'
-      +'</div>'
       +'<div>'
         +_lbl('Comment décrivez-vous votre besoin ?')
         +'<div id="ppChoix"></div>'
@@ -12617,7 +12593,6 @@ window.fermerProjetPub = function() {
 
 window._soumettreProjet = async function() {
   var titre  = (document.getElementById('ppTitre')||{value:''}).value.trim();
-  var cat    = (document.getElementById('ppCat')||{value:''}).value;
   var desc   = (document.getElementById('ppDesc')||{value:''}).value.trim();
   var commune= (document.getElementById('ppCommune')||{value:''}).value.trim();
   var budget = (document.getElementById('ppBudget')||{value:''}).value.trim();
@@ -12645,7 +12620,7 @@ window._soumettreProjet = async function() {
     var montant = budget ? parseInt(budget, 10) : null;
     var mode_saisie = (desc && _ppAudioBlob) ? 'mixte' : _ppAudioBlob ? 'vocal' : 'texte';
     var payload = {
-      titre: titre, categorie: cat||null, description: desc || null,
+      titre: titre, categorie: null, description: desc || null,
       commune: commune||null, montant: montant,
       client_nom: nom, client_telephone: tel, statut: 'ouvert',
       mode_saisie: mode_saisie
