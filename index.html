@@ -7821,6 +7821,16 @@ window.addEventListener('load', async function() {
   else if (typeof SOON_MODULES !== 'undefined' && SOON_MODULES[hash]) {
     openSoonPage(hash);
   }
+  else if (hash.startsWith('devis-projet=')) {
+    const _dpId = hash.replace('devis-projet=','').trim();
+    document.body.classList.add('on-home');
+    const _dpMc = document.getElementById('mainContent');
+    const _dpMn = document.getElementById('mainNav');
+    if (_dpMc) _dpMc.style.cssText = 'display:block!important;';
+    if (_dpMn) _dpMn.style.cssText = '';
+    if (typeof _realNavigate==='function') _realNavigate('home');
+    setTimeout(function() { if (typeof window.ouvrirDevisProjet==='function') window.ouvrirDevisProjet(_dpId); }, 400);
+  }
   else {
     // Afficher home directement sans dépendre des wrappers navigate
     document.body.classList.add('on-home');
@@ -7858,7 +7868,16 @@ window.addEventListener('hashchange', async function() {
   if (hash === 'login') { if(typeof _realNavigate==='function') _realNavigate('login'); return; }
   if (hash === 'nouveautes') { if(typeof openSoonHub==='function') openSoonHub(); return; }
   if (typeof SOON_MODULES !== 'undefined' && SOON_MODULES[hash]) { if(typeof openSoonPage==='function') openSoonPage(hash); return; }
-  
+  if (hash.startsWith('devis-projet=')) {
+    const _hcId = hash.replace('devis-projet=','').trim();
+    document.body.classList.add('on-home'); document.body.classList.remove('on-admin','admin-mode','on-dashboard');
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); p.style.display=''; });
+    const _hcMc = document.getElementById('mainContent'); const _hcMn = document.getElementById('mainNav');
+    if (_hcMc) _hcMc.style.cssText = 'display:block!important;'; if (_hcMn) _hcMn.style.cssText = '';
+    setTimeout(function() { if (typeof window.ouvrirDevisProjet==='function') window.ouvrirDevisProjet(_hcId); }, 200);
+    return;
+  }
+
   // Ancres de la page d'accueil (tarifs, prestataires, categories, etc.)
   // Afficher mainContent directement sans passer par navigate()
   const mc = document.getElementById('mainContent');
@@ -12653,7 +12672,21 @@ window._soumettreProjet = async function() {
 
   // ── 2. Succès INSERT — fermer et confirmer IMMÉDIATEMENT ──
   window.fermerProjetPub();
-  if (typeof showToast === 'function') showToast('✅ Projet publié ! Les artisans de votre zone ont été alertés et vont vous envoyer leurs devis.', 'success');
+  var _lienD = 'https://yoummajobs.com/#devis-projet=' + missionId;
+  var _sucModal = _makeModal('projetSuccesModal');
+  _sucModal.onclick = function(e) { if (e.target === _sucModal) _sucModal.style.display = 'none'; };
+  _sucModal.innerHTML =
+    '<div style="background:#fff;border-radius:20px;width:100%;max-width:480px;margin:auto;padding:32px 28px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,.2);">'
+      +'<div style="font-size:52px;margin-bottom:14px;">✅</div>'
+      +'<div style="font-size:18px;font-weight:800;color:#1A1A4E;margin-bottom:8px;">Projet publié !</div>'
+      +'<div style="font-size:13.5px;color:#6B7280;line-height:1.6;margin-bottom:22px;">Les artisans de votre zone ont été alertés.<br>Vous recevrez un SMS à chaque nouveau devis reçu.</div>'
+      +'<div style="background:#F9FAFB;border:1.5px solid #E5E7EB;border-radius:12px;padding:14px 16px;margin-bottom:18px;text-align:left;">'
+        +'<div style="font-size:11.5px;font-weight:700;color:#6B7280;margin-bottom:8px;">Conservez ce lien pour consulter vos devis :</div>'
+        +'<div style="font-size:11.5px;color:#1A1A4E;word-break:break-all;background:#fff;border-radius:8px;padding:8px 10px;border:1px solid #E5E7EB;margin-bottom:10px;font-family:monospace;">'+_lienD+'</div>'
+        +'<button id="ppCopyLienBtn" data-lien="'+_lienD+'" onclick="window._copierLienDevis(this)" style="width:100%;padding:11px;background:#FFF7F0;border:1.5px solid #E85D04;border-radius:10px;color:#E85D04;font-size:13.5px;font-weight:700;cursor:pointer;touch-action:manipulation;">📋 Copier le lien</button>'
+      +'</div>'
+      +'<button onclick="document.getElementById(\'projetSuccesModal\').style.display=\'none\'" style="width:100%;padding:12px;background:#1A1A4E;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;">OK, fermer</button>'
+    +'</div>';
 
   // ── 3. Upload vocal en arrière-plan ──
   (function(blob, mid) {
@@ -12914,6 +12947,180 @@ window._envoyerDevis = async function(missionId) {
         body: JSON.stringify({ devis_id: devisId })
       }).catch(function(e) { console.error('[notif-devis] fetch:', e.message); });
     } catch(e) { console.error('[notif-devis]', e.message); }
+  }
+};
+
+// ────────────────────────────────────────────────
+// UTILITAIRE COPIER LIEN
+// ────────────────────────────────────────────────
+window._copierLienDevis = function(btn) {
+  var t = btn.getAttribute('data-lien') || '';
+  function marquer() { btn.textContent = '✓ Lien copié !'; btn.style.background = '#F0FDF4'; btn.style.color = '#16A34A'; btn.style.borderColor = '#16A34A'; }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).then(marquer).catch(function() {
+      try { var ta=document.createElement('textarea'); ta.value=t; ta.style.cssText='position:fixed;opacity:0;'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); marquer(); } catch(ex) {}
+    });
+  } else {
+    try { var ta=document.createElement('textarea'); ta.value=t; ta.style.cssText='position:fixed;opacity:0;'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); marquer(); } catch(ex) {}
+  }
+};
+
+// ────────────────────────────────────────────────
+// PAGE PUBLIQUE — DEVIS REÇUS (client sans compte)
+// ────────────────────────────────────────────────
+window.fermerDevisProjet = function() {
+  var m = document.getElementById('devisProjModal');
+  if (m) m.style.display = 'none';
+  if (history.pushState) history.pushState('', document.title, window.location.pathname + window.location.search);
+};
+
+window.ouvrirDevisProjet = async function(missionId) {
+  var modal = _makeModal('devisProjModal');
+  modal.onclick = function(e) { if (e.target === modal) window.fermerDevisProjet(); };
+
+  var CARD = 'background:#F9FAFB;border-radius:16px;padding:16px 18px;margin-bottom:14px;border:1.5px solid #E5E7EB;';
+
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:20px;width:100%;max-width:680px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);">'
+    +'<div id="dpHeader" style="background:linear-gradient(135deg,#1A1A4E,#2D2D7E);padding:20px 26px;display:flex;align-items:center;justify-content:space-between;">'
+      +'<div style="color:#fff;font-size:15px;font-weight:800;flex:1;padding-right:10px;">📋 Vos devis</div>'
+      +'<button onclick="window.fermerDevisProjet()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">×</button>'
+    +'</div>'
+    +'<div id="dpBody" style="padding:18px 22px;max-height:75vh;overflow-y:auto;">'
+      +'<div style="text-align:center;padding:44px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:26px;color:#E85D04;"></i></div>'
+    +'</div>'
+    +'</div>';
+
+  try {
+    // 1. Mission
+    var mRes = await sb.from('missions').select('id,titre').eq('id', missionId).single();
+    if (mRes.error) throw new Error('Projet introuvable (id: ' + missionId + ')');
+    var mission = mRes.data;
+    var dpH = document.getElementById('dpHeader');
+    if (dpH) dpH.querySelector('div').textContent = '📋 Devis reçus pour : ' + (mission.titre || 'votre projet');
+
+    // 2. Devis + providers (jointure, fallback 2 requêtes)
+    var devisList = [];
+    var dRes = await sb.from('devis')
+      .select('id,montant,delai,message,audio_url,statut,created_at,provider_id,providers(prenom,nom,metier,commune,telephone,photo_url)')
+      .eq('mission_id', missionId)
+      .order('montant', {ascending: true});
+
+    if (!dRes.error) {
+      devisList = dRes.data || [];
+    } else {
+      var d2 = await sb.from('devis')
+        .select('id,montant,delai,message,audio_url,statut,created_at,provider_id')
+        .eq('mission_id', missionId).order('montant', {ascending: true});
+      if (d2.error) throw d2.error;
+      devisList = d2.data || [];
+      if (devisList.length > 0) {
+        var pids = devisList.map(function(d){ return d.provider_id; }).filter(Boolean);
+        pids = pids.filter(function(v,i,a){ return a.indexOf(v)===i; });
+        var p2 = await sb.from('providers').select('id,prenom,nom,metier,commune,telephone').in('id', pids);
+        var pmap = {};
+        (p2.data||[]).forEach(function(p){ pmap[p.id] = p; });
+        devisList = devisList.map(function(d){ return Object.assign({}, d, { providers: pmap[d.provider_id] || {} }); });
+      }
+    }
+
+    var body = document.getElementById('dpBody');
+    if (!body) return;
+
+    if (devisList.length === 0) {
+      body.innerHTML =
+        '<div style="text-align:center;padding:48px 20px;">'
+          +'<div style="font-size:56px;margin-bottom:14px;">⏳</div>'
+          +'<div style="font-size:16px;font-weight:800;color:#1A1A4E;margin-bottom:10px;">Vos devis arrivent !</div>'
+          +'<div style="font-size:13.5px;color:#6B7280;line-height:1.65;">Les artisans ont été alertés et préparent leurs offres.<br>Vous recevrez un SMS à chaque nouveau devis reçu.</div>'
+        +'</div>';
+      return;
+    }
+
+    var _ecoutes = {};
+    var _progres = {};
+
+    body.innerHTML = devisList.map(function(d) {
+      var p       = d.providers || {};
+      var prenom  = (p.prenom || '').trim();
+      var nomInit = p.nom ? p.nom.charAt(0).toUpperCase() + '.' : '';
+      var metier  = p.metier || 'Artisan';
+      var commune = p.commune ? ' · ' + p.commune : '';
+      var initiale= (prenom.charAt(0) || '?').toUpperCase();
+      var montant = d.montant ? Number(d.montant).toLocaleString('fr-FR') + ' GNF' : 'À convenir';
+      var delai   = d.delai || 'À confirmer';
+      var hasAudio = !!d.audio_url;
+      var telRaw  = p.telephone ? String(p.telephone).replace(/[\s\-\.\+]/g,'') : '';
+      var e164    = telRaw ? (telRaw.startsWith('224') ? telRaw : '224' + telRaw.replace(/^0/,'')) : '';
+
+      var contactBtns = e164
+        ? '<div style="display:flex;gap:10px;flex-wrap:wrap;">'
+            +'<a href="tel:+'+e164+'" style="flex:1;min-width:130px;padding:12px 14px;background:#1A1A4E;color:#fff;border-radius:12px;text-decoration:none;font-size:14px;font-weight:700;text-align:center;display:block;touch-action:manipulation;">📞 Appeler '+prenom+'</a>'
+            +'<a href="https://wa.me/'+e164+'" target="_blank" rel="noopener" style="flex:1;min-width:130px;padding:12px 14px;background:#25D366;color:#fff;border-radius:12px;text-decoration:none;font-size:14px;font-weight:700;text-align:center;display:block;touch-action:manipulation;">💬 WhatsApp</a>'
+          +'</div>'
+        : '<div style="font-size:12.5px;color:#9CA3AF;text-align:center;padding:8px 0;">Téléphone non renseigné</div>';
+
+      return '<div style="'+CARD+'">'
+        +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">'
+          +'<div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#E85D04,#C74B00);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0;">'+initiale+'</div>'
+          +'<div><div style="font-size:14.5px;font-weight:800;color:#1A1A4E;">'+prenom+' '+nomInit+'</div>'
+            +'<div style="font-size:12px;color:#6B7280;margin-top:2px;">'+metier+commune+'</div></div>'
+        +'</div>'
+        +'<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">'
+          +'<div style="flex:1;min-width:110px;background:#FFF7F0;border-radius:10px;padding:10px 14px;">'
+            +'<div style="font-size:10px;color:#9CA3AF;font-weight:700;letter-spacing:.04em;">💰 MONTANT</div>'
+            +'<div style="font-size:15px;font-weight:800;color:#E85D04;margin-top:3px;">'+montant+'</div>'
+          +'</div>'
+          +'<div style="flex:1;min-width:110px;background:#F0FDF4;border-radius:10px;padding:10px 14px;">'
+            +'<div style="font-size:10px;color:#9CA3AF;font-weight:700;letter-spacing:.04em;">⏱️ DÉLAI</div>'
+            +'<div style="font-size:14px;font-weight:700;color:#16A34A;margin-top:3px;">'+delai+'</div>'
+          +'</div>'
+        +'</div>'
+        +(d.message ? '<div style="font-size:13px;color:#374151;line-height:1.6;margin-bottom:14px;padding:11px 13px;background:#fff;border:1px solid #F0F0F8;border-radius:10px;">'+d.message+'</div>' : '')
+        +(hasAudio
+          ? '<div style="background:linear-gradient(135deg,#FFF7F0,#FEF3E8);border:1.5px solid #FDBA74;border-radius:12px;padding:13px 14px;margin-bottom:14px;">'
+              +'<div style="font-size:12.5px;font-weight:700;color:#C74B00;margin-bottom:9px;display:flex;align-items:center;gap:6px;"><span style="font-size:16px;">🎤</span>'+(prenom||'L\'artisan')+' explique son devis — Écoutez :</div>'
+              +'<audio id="dpAudio_'+d.id+'" controls preload="none" src="'+d.audio_url+'" style="width:100%;border-radius:8px;"></audio>'
+            +'</div>'
+          : '')
+        +(hasAudio
+          ? '<div id="dpGrise_'+d.id+'">'
+              +'<button disabled style="width:100%;padding:12px;background:#F3F4F6;color:#9CA3AF;border:1.5px solid #E5E7EB;border-radius:12px;font-size:13px;font-weight:600;cursor:not-allowed;min-height:48px;">🔒 Écoutez le message pour contacter '+(prenom||'l\'artisan')+'</button>'
+            +'</div>'
+            +'<div id="dpContact_'+d.id+'" style="display:none;">'
+              +'<div style="background:#F0FDF4;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:12.5px;color:#16A34A;font-weight:700;">✓ Écouté — Vous pouvez maintenant contacter '+(prenom||'l\'artisan')+'</div>'
+              +contactBtns
+            +'</div>'
+          : contactBtns)
+        +'</div>';
+    }).join('');
+
+    // Bind audio → déblocage
+    devisList.forEach(function(d) {
+      if (!d.audio_url) return;
+      var audio = document.getElementById('dpAudio_'+d.id);
+      if (!audio) return;
+      _progres[d.id] = 0;
+      function debloquer() {
+        if (_ecoutes[d.id]) return;
+        _ecoutes[d.id] = true;
+        var g = document.getElementById('dpGrise_'+d.id);
+        var c = document.getElementById('dpContact_'+d.id);
+        if (g) g.style.display = 'none';
+        if (c) c.style.display = '';
+      }
+      audio.addEventListener('ended', debloquer);
+      audio.addEventListener('timeupdate', function() {
+        if (!audio.duration) return;
+        _progres[d.id] = Math.max(_progres[d.id]||0, audio.currentTime / audio.duration);
+        if (_progres[d.id] >= 0.8) debloquer();
+      });
+    });
+
+  } catch(e) {
+    var b = document.getElementById('dpBody');
+    if (b) b.innerHTML = '<div style="text-align:center;padding:32px;color:#DC2626;font-size:13px;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>Erreur : '+e.message+'</div>';
+    console.error('[devis-projet]', e.message);
   }
 };
 
