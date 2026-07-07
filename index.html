@@ -12877,19 +12877,52 @@ window._envoyerDevis = async function(missionId) {
   try { session = JSON.parse(localStorage.getItem('yj_provider_session')); } catch(e) {}
   if (!session || !session.provider_id) { if (typeof showToast === 'function') showToast('Session expirée, reconnectez-vous', 'error'); return; }
 
-  var montant = (document.getElementById('dvMontant')||{value:''}).value.trim();
-  var delai   = (document.getElementById('dvDelai')||{value:''}).value.trim();
-  var message = (document.getElementById('dvMessage')||{value:''}).value.trim();
-  var errEl   = document.getElementById('dvErreur');
-  var btn     = document.getElementById('dvSubmitBtn');
+  var montant  = (document.getElementById('dvMontant')||{value:''}).value.trim();
+  var delai    = (document.getElementById('dvDelai')||{value:''}).value.trim();
+  var message  = (document.getElementById('dvMessage')||{value:''}).value.trim();
+  var errEl    = document.getElementById('dvErreur');
+  var btn      = document.getElementById('dvSubmitBtn');
+  var blobPris = _dvAudioBlob; // capture immédiate avant tout reset ou fermeture
 
   var affErr = function(msg) { if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; } };
 
-  if (!montant || !delai || (!message && !_dvAudioBlob)) { affErr('Ajoutez un message : tapez du texte ou enregistrez un vocal.'); return; }
+  if (!montant || !delai || (!message && !blobPris)) { affErr('Ajoutez un message : tapez du texte ou enregistrez un vocal.'); return; }
   if (errEl) errEl.style.display = 'none';
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi...'; }
 
-  // ── 1. Vérification anti-doublon + INSERT — try/catch dédié ──
+  // ── 1. Upload vocal EN AMONT (bloquant) — audio_url sera inclus dans l'INSERT ──
+  var audioUrl = null;
+  if (blobPris) {
+    if (btn) btn.textContent = '⏳ Envoi du vocal...';
+    try {
+      var ext  = blobPris.type.includes('mp4') ? 'mp4' : 'webm';
+      var path = 'devis/' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
+      var up   = await sb.storage.from('vocaux').upload(path, blobPris, { contentType: blobPris.type });
+      if (up.error) {
+        console.error('Upload vocal devis échoué — error:', up.error.message, up.error);
+        if (!message) {
+          affErr('L\'envoi du vocal a échoué. Réessayez ou décrivez votre devis par écrit.');
+          if (btn) { btn.disabled = false; btn.textContent = '📤 Envoyer mon devis'; }
+          return;
+        }
+        // sinon : on continue sans audio (message texte présent)
+      } else {
+        var pu = sb.storage.from('vocaux').getPublicUrl(path);
+        audioUrl = pu.data && pu.data.publicUrl;
+        if (!audioUrl) console.error('Upload vocal devis : getPublicUrl vide pour path', path);
+      }
+    } catch(e) {
+      console.error('Upload vocal devis exception:', e.message, e);
+      if (!message) {
+        affErr('L\'envoi du vocal a échoué. Réessayez ou décrivez votre devis par écrit.');
+        if (btn) { btn.disabled = false; btn.textContent = '📤 Envoyer mon devis'; }
+        return;
+      }
+    }
+    if (btn) btn.textContent = '⏳ Enregistrement du devis...';
+  }
+
+  // ── 2. Anti-doublon + INSERT avec audio_url déjà connu ──
   var devisId = null;
   try {
     var chk = await sb.from('devis').select('id').eq('mission_id', missionId).eq('provider_id', session.provider_id).limit(1);
@@ -12898,45 +12931,30 @@ window._envoyerDevis = async function(missionId) {
       if (btn) { btn.disabled = false; btn.textContent = '📤 Envoyer mon devis'; }
       return;
     }
-    var dv_mode = (message && _dvAudioBlob) ? 'mixte' : _dvAudioBlob ? 'vocal' : 'texte';
+    var dv_mode = (message && audioUrl) ? 'mixte' : audioUrl ? 'vocal' : 'texte';
     var ins = await sb.from('devis').insert({
-      mission_id: missionId,
+      mission_id:  missionId,
       provider_id: session.provider_id,
-      montant: parseInt(montant, 10),
-      delai: delai,
-      message: message || null,
-      statut: 'envoye',
+      montant:     parseInt(montant, 10),
+      delai:       delai,
+      message:     message || null,
+      audio_url:   audioUrl || null,
+      statut:      'envoye',
       mode_saisie: dv_mode
     }).select('id').single();
     if (ins.error) throw ins.error;
     devisId = ins.data && ins.data.id;
   } catch(e) {
+    console.error('Insert devis échoué:', e.message, e);
     affErr('Erreur : ' + (e.message||'Veuillez réessayer.'));
     if (btn) { btn.disabled = false; btn.textContent = '📤 Envoyer mon devis'; }
     return;
   }
+  _dvAudioBlob = null;
 
-  // ── 2. Succès — fermer et confirmer IMMÉDIATEMENT ──
+  // ── 3. Succès — fermer et confirmer IMMÉDIATEMENT ──
   window.fermerDevis();
   if (typeof showToast === 'function') showToast('✅ Devis envoyé ! Le client a été informé par SMS.', 'success');
-
-  // ── 3. Upload vocal en arrière-plan ──
-  (function(blob, did) {
-    if (!blob || !did) return;
-    (async function() {
-      try {
-        var ext = blob.type.includes('mp4') ? 'mp4' : 'webm';
-        var path = 'devis/' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
-        var up = await sb.storage.from('vocaux').upload(path, blob, { contentType: blob.type });
-        if (!up.error) {
-          var pu = sb.storage.from('vocaux').getPublicUrl(path);
-          var audioUrl = pu.data && pu.data.publicUrl;
-          if (audioUrl) await sb.from('devis').update({ audio_url: audioUrl }).eq('id', did);
-        } else console.error('[vocal-devis] upload:', up.error.message);
-      } catch(e) { console.error('[vocal-devis]', e.message); }
-    })();
-  })(_dvAudioBlob, devisId);
-  _dvAudioBlob = null;
 
   // ── 4. SMS au client — fire-and-forget, jamais visible au prestataire ──
   if (devisId) {
