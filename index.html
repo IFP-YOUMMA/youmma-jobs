@@ -12697,7 +12697,7 @@ window._envoyerDevis = async function(missionId) {
 
   // ── 2. Succès — fermer et confirmer IMMÉDIATEMENT ──
   window.fermerDevis();
-  if (typeof showToast === 'function') showToast('✅ Devis envoyé ! Le client recevra un SMS.', 'success');
+  if (typeof showToast === 'function') showToast('✅ Devis envoyé ! Le client a été informé par SMS.', 'success');
 
   // ── 3. SMS au client — fire-and-forget, jamais visible au prestataire ──
   if (devisId) {
