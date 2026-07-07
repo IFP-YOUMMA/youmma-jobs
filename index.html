@@ -12670,19 +12670,15 @@ window._envoyerDevis = async function(missionId) {
   if (errEl) errEl.style.display = 'none';
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi...'; }
 
+  // ── 1. Vérification anti-doublon + INSERT — try/catch dédié ──
+  var devisId = null;
   try {
-    // Vérifier si devis déjà envoyé
-    var chk = await sb.from('devis')
-      .select('id')
-      .eq('mission_id', missionId)
-      .eq('provider_id', session.provider_id)
-      .limit(1);
+    var chk = await sb.from('devis').select('id').eq('mission_id', missionId).eq('provider_id', session.provider_id).limit(1);
     if (!chk.error && chk.data && chk.data.length > 0) {
       affErr('Vous avez déjà envoyé un devis pour ce projet.');
       if (btn) { btn.disabled = false; btn.textContent = '📤 Envoyer mon devis'; }
       return;
     }
-
     var ins = await sb.from('devis').insert({
       mission_id: missionId,
       provider_id: session.provider_id,
@@ -12690,14 +12686,28 @@ window._envoyerDevis = async function(missionId) {
       delai: delai,
       message: message,
       statut: 'envoye'
-    });
+    }).select('id').single();
     if (ins.error) throw ins.error;
-
-    window.fermerDevis();
-    if (typeof showToast === 'function') showToast('✅ Devis envoyé ! Le client sera informé.', 'success');
+    devisId = ins.data && ins.data.id;
   } catch(e) {
     affErr('Erreur : ' + (e.message||'Veuillez réessayer.'));
     if (btn) { btn.disabled = false; btn.textContent = '📤 Envoyer mon devis'; }
+    return;
+  }
+
+  // ── 2. Succès — fermer et confirmer IMMÉDIATEMENT ──
+  window.fermerDevis();
+  if (typeof showToast === 'function') showToast('✅ Devis envoyé ! Le client recevra un SMS.', 'success');
+
+  // ── 3. SMS au client — fire-and-forget, jamais visible au prestataire ──
+  if (devisId) {
+    try {
+      fetch('https://slawwbhlakilnviwzyrb.supabase.co/functions/v1/notif-devis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+        body: JSON.stringify({ devis_id: devisId })
+      }).catch(function(e) { console.error('[notif-devis] fetch:', e.message); });
+    } catch(e) { console.error('[notif-devis]', e.message); }
   }
 };
 
