@@ -3534,6 +3534,7 @@ function ouvrirProfil(id) {
       dispo:data.disponibilite||'Disponible',
       tarif:data.tarif||null, experience:data.experience||null,
       portfolio:data.portfolio||[], avis:[], _supabase:true,
+      nb_avis: data.nb_avis || 0,
       type_compte:data.type_compte||'particulier',
       nom_entreprise:data.nom_entreprise||null,
     };
@@ -3824,6 +3825,8 @@ function openModal(id) {
   const isExpressModal = p.dispo === 'express';
   const isOccupeModal  = p.dispo === 'Occupé';
   const dispoClass = isOccupeModal ? 'led-red' : 'led-green';
+  // Note réelle uniquement si des avis existent (évite le 4.0 fictif par défaut)
+  const _hasNote = (p.nb_avis || 0) > 0 || (!p._supabase && (p.note || 0) > 0);
 
   document.getElementById('modalContent').innerHTML = `
     
@@ -3859,9 +3862,9 @@ function openModal(id) {
         <div style="font-size:22px;font-weight:800;color:var(--bleu);font-family:'Libre Baskerville',serif;">${p.missions}</div>
         <div style="font-size:11px;color:var(--gris);margin-top:2px;"><i class="fa-solid fa-bullseye"></i> Missions</div>
       </div>
-      <div style="background:#FFFBEB;border-radius:14px;padding:14px;text-align:center;border:1px solid #FDE68A;">
-        <div style="font-size:22px;font-weight:800;color:#D97706;font-family:'Libre Baskerville',serif;">${p.note} ★</div>
-        <div style="font-size:11px;color:var(--gris);margin-top:2px;">Note moyenne</div>
+      <div style="background:${_hasNote?'#FFFBEB':'var(--fond2)'};border-radius:14px;padding:14px;text-align:center;border:1px solid ${_hasNote?'#FDE68A':'var(--bordure)'};">
+        <div style="font-size:${_hasNote?'22':'17'}px;font-weight:800;color:${_hasNote?'#D97706':'var(--gris)'};font-family:'Libre Baskerville',serif;">${_hasNote?p.note+' ★':'Nouveau'}</div>
+        <div style="font-size:11px;color:var(--gris);margin-top:2px;">${_hasNote?'Note moyenne':'Pas encore noté'}</div>
       </div>
     </div>
 
@@ -3953,7 +3956,9 @@ function openModal(id) {
         if (section) section.style.display = 'none';
       } else {
         container.innerHTML = reals.map(ph => `
-          <div style="aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--fond2);cursor:zoom-in;" onclick="_yjLightbox('${ph.url}')">
+          <div style="aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--fond2);cursor:zoom-in;min-height:100px;"
+               data-url="${ph.url}" data-cap="${(ph.caption||'').replace(/"/g,'&quot;')}"
+               onclick="_yjLightbox(this.getAttribute('data-url'),this.getAttribute('data-cap'))">
             <img src="${ph.url}" style="width:100%;height:100%;object-fit:cover;" loading="lazy"/>
           </div>`).join('');
       }
@@ -6460,8 +6465,8 @@ async function updateProviderProfile(providerId, updates) {
   return { success:!error, data, error };
 }
 async function getProviderPhotos(providerId) {
-  const { data, error } = await sb.from('provider_photos').select('id,url,type,ordre,provider_id').eq('provider_id',providerId).order('ordre',{ ascending:true });
-  console.log('Photos chargées:', data, error);
+  const { data, error } = await sb.from('provider_photos').select('id,url,type,ordre,provider_id,caption').eq('provider_id',providerId).order('ordre',{ ascending:true });
+  if (error) console.error('[getProviderPhotos]', error.message);
   return data||[];
 }
 
@@ -6546,17 +6551,23 @@ async function deleteProviderPhoto(photoId, providerId) {
   if (photo.type==='profil') await sb.from('providers').update({ photo_url:null }).eq('id',providerId);
   return { success:true };
 }
-function _yjLightbox(url) {
+function _yjLightbox(url, caption) {
   var lb = document.getElementById('_yjLb');
   if (!lb) {
     lb = document.createElement('div');
     lb.id = '_yjLb';
-    lb.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:12px;';
+    lb.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:zoom-out;padding:12px;gap:10px;';
     lb.onclick = function() { lb.style.display = 'none'; };
-    lb.innerHTML = '<img id="_yjLbImg" style="max-width:95vw;max-height:92vh;border-radius:12px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.5);" />';
+    lb.innerHTML = '<img id="_yjLbImg" style="max-width:95vw;max-height:85vh;border-radius:12px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.5);"/>'
+      + '<div id="_yjLbCap" style="display:none;color:#fff;font-size:13px;text-align:center;max-width:90vw;background:rgba(0,0,0,.5);padding:6px 16px;border-radius:20px;line-height:1.4;"></div>';
     document.body.appendChild(lb);
   }
   document.getElementById('_yjLbImg').src = url;
+  var capEl = document.getElementById('_yjLbCap');
+  if (capEl) {
+    if (caption) { capEl.textContent = caption; capEl.style.display = 'block'; }
+    else capEl.style.display = 'none';
+  }
   lb.style.display = 'flex';
 }
 async function enregistrerVue(pid) { await sb.rpc('increment_views',{p_id:pid}); }

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS provider_photos (
   provider_id  UUID NOT NULL REFERENCES providers(id) ON DELETE CASCADE,
   url          TEXT NOT NULL,
   type         TEXT NOT NULL DEFAULT 'realisation' CHECK (type IN ('profil','realisation')),
+  caption      TEXT,
   ordre        INT  NOT NULL DEFAULT 0,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
