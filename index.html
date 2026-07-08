@@ -12921,7 +12921,8 @@ window._envoyerDevis = async function(missionId) {
   var message  = (document.getElementById('dvMessage')||{value:''}).value.trim();
   var errEl    = document.getElementById('dvErreur');
   var btn      = document.getElementById('dvSubmitBtn');
-  var blobPris = _dvAudioBlob; // capture immédiate avant tout reset ou fermeture
+  var blobPris = _dvAudioBlob; // capture immédiate — avant tout reset ou fermeture de modale
+  console.log('[devis] blobPris:', blobPris ? blobPris.size + ' bytes (' + blobPris.type + ')' : 'null');
 
   var affErr = function(msg) { if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; } };
 
@@ -12936,19 +12937,21 @@ window._envoyerDevis = async function(missionId) {
     try {
       var ext  = blobPris.type.includes('mp4') ? 'mp4' : 'webm';
       var path = 'devis/' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
+      console.log('[devis-upload] démarrage — path:', path, 'type:', blobPris.type, 'size:', blobPris.size);
       var up   = await sb.storage.from('vocaux').upload(path, blobPris, { contentType: blobPris.type });
       if (up.error) {
-        console.error('Upload vocal devis échoué — error:', up.error.message, up.error);
+        console.error('[devis-upload] ÉCHEC upload — message:', up.error.message, '| statusCode:', up.error.statusCode, '| error:', up.error);
         if (!message) {
           affErr('L\'envoi du vocal a échoué. Réessayez ou décrivez votre devis par écrit.');
           if (btn) { btn.disabled = false; btn.textContent = '📤 Envoyer mon devis'; }
           return;
         }
-        // sinon : on continue sans audio (message texte présent)
+        // texte présent : on continue sans audio (dégradation gracieuse)
       } else {
         var pu = sb.storage.from('vocaux').getPublicUrl(path);
         audioUrl = pu.data && pu.data.publicUrl;
-        if (!audioUrl) console.error('Upload vocal devis : getPublicUrl vide pour path', path);
+        console.log('[devis-upload] OK — audioUrl:', audioUrl || '(vide!)');
+        if (!audioUrl) console.error('[devis-upload] getPublicUrl vide pour path:', path);
       }
     } catch(e) {
       console.error('Upload vocal devis exception:', e.message, e);
@@ -12972,24 +12975,19 @@ window._envoyerDevis = async function(missionId) {
     }
     var dv_mode = (message && audioUrl) ? 'mixte' : audioUrl ? 'vocal' : 'texte';
     var vocal_ecoute = !!(window._dvVocalClientPresent);
-    var payloadBase = {
-      mission_id:  missionId,
-      provider_id: session.provider_id,
-      montant:     parseInt(montant, 10),
-      delai:       delai,
-      message:     message || null,
-      audio_url:   audioUrl || null,
-      statut:      'envoye',
-      mode_saisie: dv_mode
-    };
-    var ins = await sb.from('devis').insert(Object.assign({}, payloadBase, { vocal_ecoute: vocal_ecoute })).select('id').single();
-    if (ins.error) {
-      if (ins.error.message && ins.error.message.includes('vocal_ecoute')) {
-        console.warn('Colonne vocal_ecoute absente, réessai sans elle');
-        ins = await sb.from('devis').insert(payloadBase).select('id').single();
-      }
-      if (ins.error) throw ins.error;
-    }
+    console.log('[devis-insert] mode_saisie:', dv_mode, '| audio_url:', audioUrl || 'null', '| vocal_ecoute:', vocal_ecoute);
+    var ins = await sb.from('devis').insert({
+      mission_id:   missionId,
+      provider_id:  session.provider_id,
+      montant:      parseInt(montant, 10),
+      delai:        delai,
+      message:      message || null,
+      audio_url:    audioUrl || null,
+      statut:       'envoye',
+      mode_saisie:  dv_mode,
+      vocal_ecoute: vocal_ecoute
+    }).select('id').single();
+    if (ins.error) throw ins.error;
     devisId = ins.data && ins.data.id;
   } catch(e) {
     console.error('Insert devis échoué:', e.message, e);
