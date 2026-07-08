@@ -893,29 +893,31 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
   /* ── MODAL PROFIL PRESTATAIRE ── */
   .modal-overlay{overflow:hidden!important;max-width:100vw!important;position:fixed!important;inset:0!important}
   .modal{
-    width:100%!important;max-width:100vw!important;
+    width:calc(100vw - 24px)!important;max-width:calc(100vw - 24px)!important;
+    margin:0 auto!important;
     box-sizing:border-box!important;overflow:hidden!important;
     border-radius:20px 20px 0 0!important;max-height:90vh!important
   }
   .modal-body{
     overflow-y:auto!important;overflow-x:hidden!important;
-    max-height:calc(90vh - 56px)!important;box-sizing:border-box!important;
-    padding:12px 14px 80px!important;-webkit-overflow-scrolling:touch!important
+    width:100%!important;max-height:calc(90vh - 56px)!important;
+    box-sizing:border-box!important;padding:12px 14px 80px!important;
+    -webkit-overflow-scrolling:touch!important
   }
-  /* Grille stats (3 colonnes) → 2 colonnes sur mobile */
+  /* Grille stats : 3 colonnes compactes sur une seule rangée */
   #modalContent .mp-stats-grid,
   #modalContent>[style*="grid-template-columns:repeat(3"],
   #modalContent [style*="grid-template-columns:repeat(3"]{
-    grid-template-columns:repeat(2,1fr)!important
+    grid-template-columns:repeat(3,1fr)!important;gap:6px!important
   }
-  /* Grille 2 colonnes → 1 colonne sur très petit */
+  /* Grille 2 colonnes → 1 colonne */
   #modalContent [style*="grid-template-columns:1fr 1fr"]{
     grid-template-columns:1fr!important
   }
-  /* Grille photos → 2 colonnes */
-  #modalPhotos{grid-template-columns:repeat(2,1fr)!important}
-  /* Actions du profil → empilement vertical */
-  .mp-actions-row{flex-direction:column!important;gap:8px!important;width:100%!important}
+  /* Grille photos : 3 colonnes (2 colonnes sous 400px — voir @media 400px) */
+  #modalPhotos{grid-template-columns:repeat(3,1fr)!important;gap:6px!important}
+  /* Actions du profil : grid 1 colonne — boutons pleine largeur empilés */
+  .mp-actions-row{display:grid!important;grid-template-columns:1fr!important;gap:8px!important;width:100%!important}
   .btn-mp-wa,.btn-mp-call,.btn-mp-maps{
     width:100%!important;justify-content:center!important;box-sizing:border-box!important
   }
@@ -975,12 +977,12 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
   .search-field{min-width:0!important;width:100%!important;box-sizing:border-box!important}
 }
 
+/* ── Grille photos : 2 colonnes sous 400px ── */
+@media(max-width:400px){
+  #modalPhotos{grid-template-columns:repeat(2,1fr)!important}
+}
 /* ── Très petit < 380px — contraintes supplémentaires ── */
 @media(max-width:380px){
-  #modalContent [style*="grid-template-columns:repeat(3"]{
-    grid-template-columns:1fr!important
-  }
-  #modalPhotos{grid-template-columns:1fr!important}
   .mp-actions-row{gap:6px!important}
   .btn-mp-wa,.btn-mp-call,.btn-mp-maps{font-size:12.5px!important;padding:11px!important}
   .form-row-2{gap:8px!important}
