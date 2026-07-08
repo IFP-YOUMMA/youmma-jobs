@@ -1622,9 +1622,10 @@ async function verifierSession() {
           <span style="display:flex;align-items:center;gap:7px;font-size:15px;font-weight:700;"><span class="yj-mic-pulse">🎤</span> Vous avez une panne&nbsp;?</span>
           <span style="font-size:12px;font-weight:500;opacity:.88;line-height:1.3;text-align:center;">Dites-le, un artisan vous répond</span>
         </button>
-        <button class="btn-hero-outline" onclick="ouvrirVoirProjets()" style="flex-direction:column;align-items:center;gap:3px;min-height:64px;">
+        <button class="btn-hero-outline" onclick="ouvrirVoirProjets()" style="position:relative;flex-direction:column;align-items:center;gap:3px;min-height:64px;">
+          <span id="heroMissionsCount" style="display:none;position:absolute;top:7px;right:9px;background:#E53E3E;color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px;white-space:nowrap;animation:yjBadgePulse 2s ease-in-out infinite;box-shadow:0 2px 8px rgba(229,62,62,.5);z-index:2;min-width:22px;text-align:center;letter-spacing:.2px;line-height:1.4;"></span>
           <span style="font-size:15px;font-weight:700;">💼 Des clients vous attendent</span>
-          <span style="font-size:12px;font-weight:500;opacity:.88;line-height:1.3;text-align:center;">Écoutez leurs besoins, proposez votre prix</span>
+          <span id="heroMissionsSubtitle" style="font-size:12px;font-weight:500;opacity:.88;line-height:1.3;text-align:center;">Écoutez leurs besoins, proposez votre prix</span>
         </button>
       </div>
       <div class="hero-kpis">
@@ -7759,6 +7760,7 @@ function navigate(page) {
     if (_mbn) _mbn.style.display = 'none';
     window.scrollTo(0,0);
     if (typeof _expInit === 'function') setTimeout(_expInit, 50);
+    if (typeof _heroLoadMissionsCount === 'function') setTimeout(_heroLoadMissionsCount, 200);
   } else if (page === 'admin') {
     document.body.classList.add('on-admin','admin-mode');
     if (mc) mc.style.cssText = 'display:none!important';
@@ -7802,6 +7804,67 @@ function navigate(page) {
   }
 }
 window._realNavigate = navigate;
+
+/* ── BADGE COMPTEUR PROJETS HERO ── */
+(function() {
+  var _heroCountTimer = null;
+  var _heroRealtimeCh = null;
+
+  function _applyHeroCount(count) {
+    var badge    = document.getElementById('heroMissionsCount');
+    var subtitle = document.getElementById('heroMissionsSubtitle');
+    if (!badge || !subtitle) return;
+    if (count > 0) {
+      badge.textContent = count <= 9 ? String(count) : '9+';
+      badge.style.display = 'inline-block';
+      var p = count === 1;
+      subtitle.textContent = count + (p ? ' projet attend votre devis' : ' projets attendent votre devis');
+    } else {
+      badge.style.display = 'none';
+      subtitle.textContent = 'Écoutez leurs besoins, proposez votre prix';
+    }
+  }
+
+  window._heroLoadMissionsCount = async function() {
+    try {
+      var res = await sb.from('missions').select('id', { count: 'exact', head: true }).eq('statut', 'ouvert');
+      _applyHeroCount(res.count || 0);
+    } catch(e) { /* silencieux */ }
+  };
+
+  // Realtime + fallback polling 60 s
+  function _heroStartRealtime() {
+    try {
+      if (_heroRealtimeCh) { sb.removeChannel(_heroRealtimeCh); _heroRealtimeCh = null; }
+      _heroRealtimeCh = sb.channel('missions-count')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'missions' },
+          function() { _heroLoadMissionsCount(); })
+        .subscribe(function(status) {
+          if (status !== 'SUBSCRIBED') {
+            // Realtime indisponible : polling toutes les 60 s
+            if (!_heroCountTimer) {
+              _heroCountTimer = setInterval(_heroLoadMissionsCount, 60000);
+            }
+          }
+        });
+    } catch(e) {
+      if (!_heroCountTimer) {
+        _heroCountTimer = setInterval(_heroLoadMissionsCount, 60000);
+      }
+    }
+  }
+
+  // Lancement au chargement de la page
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      _heroLoadMissionsCount();
+      _heroStartRealtime();
+    });
+  } else {
+    _heroLoadMissionsCount();
+    _heroStartRealtime();
+  }
+})();
 
 /* ── DASHBOARD LAYOUT JS — surclasse tout le CSS ── */
 function applyDashboardLayout() {
