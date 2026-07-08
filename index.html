@@ -3894,9 +3894,11 @@ function openModal(id) {
     ` : ''}
 
     
-    <div class="mp-section-title"><i class="fa-solid fa-images"></i> Réalisations</div>
-    <div id="modalPhotos" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;">
-      <div style="text-align:center;color:var(--gris);font-size:12px;grid-column:1/-1;padding:14px;">Chargement des photos...</div>
+    <div id="modalRealsSection">
+      <div class="mp-section-title"><i class="fa-solid fa-images"></i> Réalisations</div>
+      <div id="modalPhotos" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;">
+        <div style="text-align:center;color:var(--gris);font-size:12px;grid-column:1/-1;padding:14px;">Chargement...</div>
+      </div>
     </div>
 
     
@@ -3944,25 +3946,24 @@ function openModal(id) {
   if (p._supabase && p.id) {
     getProviderPhotos(p.id).then(photos => {
       const container = document.getElementById('modalPhotos');
+      const section   = document.getElementById('modalRealsSection');
       if (!container) return;
       const reals = photos.filter(ph => ph.type === 'realisation');
       if (reals.length === 0) {
-        container.innerHTML = `<div style="text-align:center;color:var(--gris);font-size:12.5px;grid-column:1/-1;padding:14px;"><i class="fa-solid fa-image" style="font-size:24px;opacity:.3;display:block;margin-bottom:8px;"></i>Aucune réalisation ajoutée</div>`;
+        if (section) section.style.display = 'none';
       } else {
         container.innerHTML = reals.map(ph => `
-          <div style="aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--fond2);">
-            <img src="${ph.url}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onclick="window.open('${ph.url}','_blank')" title="Voir en grand"/>
+          <div style="aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--fond2);cursor:zoom-in;" onclick="_yjLightbox('${ph.url}')">
+            <img src="${ph.url}" style="width:100%;height:100%;object-fit:cover;" loading="lazy"/>
           </div>`).join('');
       }
     }).catch(() => {
-      const c = document.getElementById('modalPhotos');
-      if (c) c.innerHTML = '';
+      const section = document.getElementById('modalRealsSection');
+      if (section) section.style.display = 'none';
     });
   } else {
-    const c = document.getElementById('modalPhotos');
-    if (c) c.innerHTML = (p.portfolio||[]).length
-      ? `<div style="color:var(--gris);font-size:12px;grid-column:1/-1;">${(p.portfolio||[]).map(item=>`<span class="pc2-skill">${item}</span>`).join('')}</div>`
-      : `<div style="text-align:center;color:var(--gris);font-size:12.5px;grid-column:1/-1;padding:14px;">Aucune réalisation</div>`;
+    const section = document.getElementById('modalRealsSection');
+    if (section) section.style.display = 'none';
   }
 
   mettreAJourOpenGraph(p);
@@ -5303,12 +5304,8 @@ function renderPhotos() {
   reals.forEach(photo => {
     slots.push(`
       <div style="position:relative;border-radius:12px;overflow:hidden;background:#F9FAFB;border:1.5px solid var(--bordure);">
-        <img src="${photo.url}" style="width:100%;height:180px;object-fit:cover;display:block;" alt="Réalisation" onerror="this.style.display='none'"/>
-        <div style="padding:10px;display:flex;gap:8px;flex-wrap:wrap;">
-          <a href="${photo.url}" target="_blank" style="flex:1;padding:8px;background:var(--bleu);color:#fff;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;text-align:center;">🔍 Voir</a>
-          <a href="${photo.url}" download target="_blank" style="flex:1;padding:8px;background:#F0FFF4;color:#16A34A;border:1.5px solid #16A34A;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;text-align:center;">⬇️ Télécharger</a>
-          <button onclick="supprimerPhoto('${photo.id}')" style="padding:8px 12px;background:#FEF2F2;color:#DC2626;border:1.5px solid #DC2626;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">🗑️</button>
-        </div>
+        <img src="${photo.url}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;cursor:zoom-in;" alt="Réalisation" onerror="this.style.display='none'" onclick="_yjLightbox('${photo.url}')"/>
+        <button onclick="supprimerPhoto('${photo.id}')" style="position:absolute;top:6px;right:6px;width:34px;height:34px;background:rgba(220,38,38,.85);color:#fff;border:none;border-radius:50%;font-size:14px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;" title="Supprimer">🗑️</button>
       </div>
     `);
   });
@@ -6522,17 +6519,17 @@ async function uploadProviderPhoto(providerId, file, type='realisation') {
   let fileToUpload = file;
   try { fileToUpload = await resizeImage(file, type); } catch(e) { fileToUpload = file; }
 
-  const filename = `${providerId}/${type}_${Date.now()}.jpg`;
-  const { error:uploadError } = await sb.storage.from('Photos').upload(filename, fileToUpload, { cacheControl:'3600', upsert:false, contentType:'image/jpeg' });
-  if (uploadError) return { success:false, message:uploadError.message };
-  const { data:urlData } = sb.storage.from('Photos').getPublicUrl(filename);
+  const filename = `${type === 'profil' ? 'profils' : 'realisations'}/${providerId}/${Date.now()}.jpg`;
+  const { error:uploadError } = await sb.storage.from('photos').upload(filename, fileToUpload, { cacheControl:'3600', upsert:false, contentType:'image/jpeg' });
+  if (uploadError) { console.error('[uploadProviderPhoto] ÉCHEC upload:', uploadError.message, '| statusCode:', uploadError.statusCode, uploadError); return { success:false, message:uploadError.message }; }
+  const { data:urlData } = sb.storage.from('photos').getPublicUrl(filename);
   const publicUrl = urlData.publicUrl;
   if (type==='profil') {
     const oldProfil = photos.find(p => p.type==='profil');
     if (oldProfil) {
       await sb.from('provider_photos').delete().eq('id',oldProfil.id);
-      const op = oldProfil.url.split('Photos/')[1];
-      if (op) await sb.storage.from('Photos').remove([op]);
+      const op = oldProfil.url.split('/photos/')[1];
+      if (op) await sb.storage.from('photos').remove([op]);
     }
     await sb.from('providers').update({ photo_url:publicUrl }).eq('id',providerId);
   }
@@ -6542,11 +6539,24 @@ async function uploadProviderPhoto(providerId, file, type='realisation') {
 async function deleteProviderPhoto(photoId, providerId) {
   const { data:photo } = await sb.from('provider_photos').select('id,url,type,provider_id').eq('id',photoId).single();
   if (!photo) return { success:false };
-  const path = photo.url.split('Photos/')[1];
-  if (path) await sb.storage.from('Photos').remove([path]);
+  const path = photo.url.split('/photos/')[1];
+  if (path) await sb.storage.from('photos').remove([path]);
   await sb.from('provider_photos').delete().eq('id',photoId);
   if (photo.type==='profil') await sb.from('providers').update({ photo_url:null }).eq('id',providerId);
   return { success:true };
+}
+function _yjLightbox(url) {
+  var lb = document.getElementById('_yjLb');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.id = '_yjLb';
+    lb.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:12px;';
+    lb.onclick = function() { lb.style.display = 'none'; };
+    lb.innerHTML = '<img id="_yjLbImg" style="max-width:95vw;max-height:92vh;border-radius:12px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.5);" />';
+    document.body.appendChild(lb);
+  }
+  document.getElementById('_yjLbImg').src = url;
+  lb.style.display = 'flex';
 }
 async function enregistrerVue(pid) { await sb.rpc('increment_views',{p_id:pid}); }
 async function enregistrerAppel(pid) { await sb.rpc('increment_calls',{p_id:pid}); }
@@ -7351,12 +7361,8 @@ function _dashRenderPhotos() {
   if (!grid) return;
   const slots = reals.map(photo=>`
     <div style="position:relative;border-radius:12px;overflow:hidden;background:#F9FAFB;border:1.5px solid var(--bordure);">
-      <img src="${photo.url}" style="width:100%;height:180px;object-fit:cover;display:block;" alt="Réalisation" onerror="this.style.display='none'"/>
-      <div style="padding:10px;display:flex;gap:8px;flex-wrap:wrap;">
-        <a href="${photo.url}" target="_blank" style="flex:1;padding:8px;background:var(--bleu);color:#fff;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;text-align:center;">🔍 Voir</a>
-        <a href="${photo.url}" download target="_blank" style="flex:1;padding:8px;background:#F0FFF4;color:#16A34A;border:1.5px solid #16A34A;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;text-align:center;">⬇️ Télécharger</a>
-        <button onclick="supprimerPhoto('${photo.id}')" style="padding:8px 12px;background:#FEF2F2;color:#DC2626;border:1.5px solid #DC2626;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">🗑️</button>
-      </div>
+      <img src="${photo.url}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;cursor:zoom-in;" alt="Réalisation" onerror="this.style.display='none'" onclick="_yjLightbox('${photo.url}')"/>
+      <button onclick="_dashSupprimerPhoto('${photo.id}')" style="position:absolute;top:6px;right:6px;width:34px;height:34px;background:rgba(220,38,38,.85);color:#fff;border:none;border-radius:50%;font-size:14px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;" title="Supprimer">🗑️</button>
     </div>`);
   if (reals.length<5) slots.push(`<label class="photo-slot" style="cursor:pointer;"><div style="font-size:28px;"><i class="fa-solid fa-camera"></i></div><div class="add-text">Ajouter</div><input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_dashUploadPhoto(this,'realisation')"/></label>`);
   grid.innerHTML = slots.join('');
@@ -13164,7 +13170,7 @@ window._envoyerDevis = async function(missionId) {
     if (btn) btn.textContent = '⏳ Envoi du vocal...';
     try {
       var ext  = blobPris.type.includes('mp4') ? 'mp4' : 'webm';
-      var path = 'devis/' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
+      var path = 'projets/dv_' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
       console.log('[devis-upload] démarrage — path:', path, 'type:', blobPris.type, 'size:', blobPris.size);
       var up   = await sb.storage.from('vocaux').upload(path, blobPris, { contentType: blobPris.type });
       if (up.error) {
