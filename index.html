@@ -11125,31 +11125,13 @@ function _expApply(images) {
     }).join('');
     _expCount = _expFallback.length;
   }
-  // Slide artisan certifié
-  var as = document.createElement('div');
-  as.className = '_exp-slide';
-  as.dataset.type = 'artisan';
-  as.dataset.name = 'YOUMMA JOBS';
-  as.dataset.metier = 'Des professionnels vérifiés';
-  as.dataset.loc = 'Conakry, Guinée';
-  as.dataset.verifie = '1';
-  as.dataset.ini = 'YJ';
-  as.style.cssText = baseStyle + 'background-image:url(\'images/artisan-hero.jpg\');opacity:0;';
-  slides.appendChild(as);
-  _expCount++;
-  // Slide YOUMMA ÉQUIPES (toujours ajouté en dernier)
-  var ys = document.createElement('div');
-  ys.className = '_exp-slide';
-  ys.dataset.type = 'youmma';
-  ys.style.cssText = baseStyle + 'background:linear-gradient(135deg,#1A1A4E 0%,#E85D04 100%);opacity:0;';
-  ys.innerHTML = '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;z-index:3;text-align:center;"><div style="font-size:38px;margin-bottom:12px;">🔧</div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Service Premium</div><div style="font-family:\'Libre Baskerville\',serif;font-size:clamp(18px,3vw,24px);font-weight:700;color:#fff;margin-bottom:6px;line-height:1.2;">Artisan introuvable ?</div><div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:20px;line-height:1.5;">YOUMMA JOBS vous fournit directement<br>un professionnel certifié · Conakry</div><a href="https://wa.me/22461252510?text=Bonjour%20YOUMMA%20JOBS%2C%20je%20cherche%20un%20artisan" target="_blank" onclick="event.stopPropagation()" style="padding:12px 24px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:50px;color:#fff;font-size:13px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(37,211,102,.4);">📱 Contacter sur WhatsApp</a></div>';
-  slides.appendChild(ys);
-  _expCount++;
   _expIdx = 0;
   _expBuildDots(_expCount);
   _expGo(0);
   clearInterval(_expTimer);
-  _expTimer = setInterval(function() { _expGo(_expIdx + 1); }, 12000);
+  if (_expCount > 1) {
+    _expTimer = setInterval(function() { _expGo(_expIdx + 1); }, 12000);
+  }
 }
 
 async function _expInit() {
