@@ -5584,7 +5584,7 @@ async function chargerAvis() {
     <div onclick="showAdmin('suspendu')" id="amenu-suspendu" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-ban" style="width:16px;"></i> Suspendus</div>
     <div onclick="showAdmin('carousel')" id="amenu-carousel" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-photo-film" style="width:16px;"></i> Images à la une</div>
     <div onclick="showAdmin('missions')" id="amenu-missions" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullseye" style="width:16px;"></i> Missions</div>
-    <div onclick="showAdmin('projets_clients')" id="amenu-projets_clients" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-clipboard-list" style="width:16px;"></i> Projets clients</div>
+    <div onclick="showAdmin('projets_clients')" id="amenu-projets_clients" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-clipboard-list" style="width:16px;flex-shrink:0;"></i> Projets clients<span id="adminPcBadge" style="display:none;margin-left:auto;background:#E53E3E;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center;line-height:1.4;animation:yjBadgePulse 2s ease-in-out infinite;"></span></div>
     <div onclick="showAdmin('ambassadeurs');chargerClassementAdmin();" id="amenu-ambassadeurs" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-trophy" style="width:16px;"></i> Ambassadeurs</div>
     <div onclick="showAdmin('rapports')" id="amenu-rapports" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-chart-line" style="width:16px;"></i> Rapports</div>
     <div onclick="showAdmin('notifications')" id="amenu-notifications" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:9px;">
@@ -5998,7 +5998,7 @@ async function chargerAvis() {
         </div>
 
         <!-- KPIs -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
+        <div class="pc-kpis-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px;">
           <div style="background:#fff;border-radius:14px;padding:14px;border:1.5px solid #F0F0F8;text-align:center;">
             <div style="font-size:22px;font-weight:800;color:#1A1A4E;" id="pcKpiTotal">—</div>
             <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;">Total projets</div>
@@ -6015,6 +6015,19 @@ async function chargerAvis() {
             <div style="font-size:22px;font-weight:800;color:#DC2626;" id="pcKpiSansDevis">—</div>
             <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;">Sans devis ⚠️</div>
           </div>
+          <div style="background:#FFFBEB;border-radius:14px;padding:14px;border:1.5px solid #FDE68A;text-align:center;cursor:pointer;transition:box-shadow .2s;" onclick="_adminToggleSignalements()" onmouseover="this.style.boxShadow='0 4px 16px rgba(217,119,6,.2)'" onmouseout="this.style.boxShadow=''">
+            <div style="font-size:22px;font-weight:800;color:#D97706;" id="pcKpiSignalements">—</div>
+            <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;">⚠️ Signalements</div>
+          </div>
+        </div>
+
+        <!-- Panel signalements (masqué par défaut) -->
+        <div id="pcSignalementsPanel" style="display:none;background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:14px;padding:16px;margin-bottom:18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div style="font-size:14px;font-weight:800;color:#92400E;">⚠️ Signalements non traités</div>
+            <button onclick="document.getElementById('pcSignalementsPanel').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#92400E;line-height:1;">×</button>
+          </div>
+          <div id="pcSignalementsList" style="font-size:13px;color:#92400E;">Chargement...</div>
         </div>
 
         <!-- Tableau (desktop) / cartes (mobile) -->
@@ -6059,6 +6072,10 @@ async function chargerAvis() {
 @keyframes pulse-red {
   0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,.5); }
   50%      { box-shadow: 0 0 0 5px rgba(239,68,68,0); }
+}
+/* Projets clients — KPIs 5 colonnes → 2 sur mobile */
+@media(max-width:640px){
+  .pc-kpis-grid{grid-template-columns:repeat(2,1fr)!important;}
 }
 /* Projets clients — table → cartes sur mobile */
 @media(max-width:640px){
@@ -10655,6 +10672,8 @@ async function _adminChargerProjets() {
     var sansDevis = _pcProjets.filter(function(m){ return !_pcDevisCounts[m.id]; }).length;
     var _s = function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
     _s('pcKpiTotal',total); _s('pcKpiOuverts',ouverts); _s('pcKpiDevis',totalDevis); _s('pcKpiSansDevis',sansDevis);
+    _adminUpdatePcBadge(ouverts);
+    _adminLoadSignalementsCount();
 
     if (!_pcProjets.length) {
       tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-folder-open" style="font-size:28px;display:block;margin-bottom:10px;"></i>Aucun projet client publié</td></tr>';
@@ -10676,7 +10695,7 @@ async function _adminChargerProjets() {
       var commune= m.commune || m.ville || '—';
       return '<tr style="border-bottom:1px solid #F0F0F8;" onmouseover="this.style.background=\'#FAFAFA\'" onmouseout="this.style.background=\'#fff\'">'
         +'<td data-label="Projet" style="'+TD+'">'
-          +'<div style="font-weight:700;color:#1A1A4E;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(m.titre||'—')+'</div>'
+          +'<div style="font-weight:700;color:#1A1A4E;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(m.titre||'—')+(m.audio_url?' <span title="Message vocal" style="font-size:12px;vertical-align:middle;">🎤</span>':'')+'</div>'
           +(m.categorie?'<span style="font-size:10.5px;background:#FFF7F0;color:#E85D04;padding:2px 7px;border-radius:8px;display:inline-block;margin-top:3px;">'+m.categorie+'</span>':'')
         +'</td>'
         +'<td data-label="Client" style="'+TD+'">'
@@ -10748,7 +10767,13 @@ async function _adminVoirProjet(missionId) {
       : '<span style="background:#F3F4F6;color:#6B7280;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">Fermé</span>';
 
     var html =
-      '<div style="background:#F8FAFC;border-radius:12px;padding:14px 16px;margin-bottom:18px;">'
+      (m.audio_url
+        ? '<div style="background:#FFF7F0;border:1.5px solid #FDE8D8;border-radius:12px;padding:12px 14px;margin-bottom:16px;">'
+          +'<div style="font-size:12px;font-weight:700;color:#E85D04;margin-bottom:8px;">🎤 Message vocal du client :</div>'
+          +'<audio controls preload="none" src="'+m.audio_url+'" style="width:100%;border-radius:8px;"></audio>'
+          +'</div>'
+        : '')
+      +'<div style="background:#F8FAFC;border-radius:12px;padding:14px 16px;margin-bottom:18px;">'
         +'<div style="font-size:11px;color:#9CA3AF;text-transform:uppercase;font-weight:700;margin-bottom:8px;">Informations projet</div>'
         +IR('Titre', m.titre||'—')
         +IR('Description', '<span style="white-space:pre-wrap;line-height:1.55;">'+(m.description||'—')+'</span>')
@@ -10793,7 +10818,16 @@ async function _adminVoirProjet(missionId) {
               +'<div style="font-size:13px;font-weight:700;color:#1A1A4E;">'+(d.delai||'—')+'</div>'
             +'</div>'
           +'</div>'
-          +(d.message?'<div style="font-size:12.5px;color:#6B7280;background:#F9FAFB;border-radius:8px;padding:8px 12px;line-height:1.6;">'+d.message+'</div>':'')
+          +(d.message?'<div style="font-size:12.5px;color:#6B7280;background:#F9FAFB;border-radius:8px;padding:8px 12px;line-height:1.6;margin-bottom:6px;">'+d.message+'</div>':'')
+          +(d.audio_url
+            ? '<div style="background:#F0FDF4;border-radius:8px;padding:10px 12px;margin-bottom:6px;">'
+              +'<div style="font-size:11px;font-weight:700;color:#16A34A;margin-bottom:6px;">🎤 Message vocal de l\'artisan :</div>'
+              +'<audio controls preload="none" src="'+d.audio_url+'" style="width:100%;"></audio>'
+              +'</div>'
+            : '')
+          +(d.vocal_ecoute
+            ? '<div><span style="font-size:11px;background:#ECFDF5;color:#059669;padding:3px 9px;border-radius:20px;font-weight:700;">✓ A écouté le besoin du client</span></div>'
+            : '')
         +'</div>';
       }).join('');
     }
@@ -10826,6 +10860,135 @@ async function _adminSupprimerProjet(missionId) {
     if (typeof showToast === 'function') showToast('Projet supprimé.', 'success');
   } catch(e) { alert('Erreur : '+e.message); }
 }
+
+// ── ADMIN PROJETS — badge sidebar + realtime + signalements ──
+
+function _adminUpdatePcBadge(count) {
+  var badge = document.getElementById('adminPcBadge');
+  if (!badge) return;
+  if (count > 0) { badge.textContent = count <= 99 ? String(count) : '99+'; badge.style.display = 'inline-block'; }
+  else badge.style.display = 'none';
+}
+
+async function _adminLoadSignalementsCount() {
+  try {
+    var r = await sb.from('signalements').select('id', { count: 'exact', head: true }).eq('traite', false);
+    var n = r.count || 0;
+    var el = document.getElementById('pcKpiSignalements'); if (el) el.textContent = n;
+  } catch(e) { /* silencieux */ }
+}
+
+function _adminToggleSignalements() {
+  var panel = document.getElementById('pcSignalementsPanel');
+  if (!panel) return;
+  if (panel.style.display === 'none') { panel.style.display = 'block'; _adminChargerSignalements(); }
+  else panel.style.display = 'none';
+}
+
+async function _adminChargerSignalements() {
+  var list = document.getElementById('pcSignalementsList');
+  if (!list) return;
+  list.innerHTML = '<div style="color:#92400E;padding:8px 0;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>';
+  try {
+    var r = await sb.from('signalements').select('*').eq('traite', false).order('date_signalement', { ascending: false });
+    var sigs = r.data || [];
+    if (!sigs.length) { list.innerHTML = '<div style="color:#059669;font-weight:600;">✅ Aucun signalement non traité</div>'; return; }
+
+    // Charger éléments concernés
+    var mIds = sigs.filter(function(s){ return s.type==='projet'; }).map(function(s){ return s.element_id; });
+    var dIds = sigs.filter(function(s){ return s.type==='devis'; }).map(function(s){ return s.element_id; });
+    var mMap = {}, dMap = {};
+    if (mIds.length) { var mr = await sb.from('missions').select('id,titre,audio_url').in('id', mIds); (mr.data||[]).forEach(function(m){ mMap[m.id]=m; }); }
+    if (dIds.length) { var dr = await sb.from('devis').select('id,montant,audio_url,mission_id').in('id', dIds); (dr.data||[]).forEach(function(d){ dMap[d.id]=d; }); }
+
+    list.innerHTML = sigs.map(function(s) {
+      var elem = s.type==='projet' ? mMap[s.element_id] : dMap[s.element_id];
+      var label = s.type==='projet'
+        ? '📋 Projet : ' + (elem && elem.titre ? '"'+elem.titre+'"' : '#'+String(s.element_id).slice(0,8))
+        : '💰 Devis : ' + (elem && elem.montant ? Number(elem.montant).toLocaleString('fr-FR')+' GNF' : '#'+String(s.element_id).slice(0,8));
+      var date = new Date(s.date_signalement).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+      var audioUrl = elem && elem.audio_url ? elem.audio_url : null;
+      var safeId = String(s.id).replace(/'/g,"\\'");
+      var safeType = String(s.type);
+      var safeElemId = String(s.element_id).replace(/'/g,"\\'");
+      return '<div style="background:#fff;border:1.5px solid #FDE68A;border-radius:10px;padding:12px 14px;margin-bottom:10px;">'
+        +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
+          +'<div>'
+            +'<div style="font-size:13px;font-weight:700;color:#92400E;">'+label+'</div>'
+            +'<div style="font-size:11px;color:#D97706;margin-top:2px;">'+date+'</div>'
+          +'</div>'
+          +'<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+            +'<button onclick="_adminTraiterSignalement(\''+safeId+'\',\'ok\',\''+safeType+'\',\''+safeElemId+'\')" style="padding:5px 10px;background:#ECFDF5;color:#059669;border:1.5px solid #86EFAC;border-radius:7px;font-size:11.5px;font-weight:700;cursor:pointer;">✓ Sans problème</button>'
+            +(audioUrl?'<button onclick="_adminTraiterSignalement(\''+safeId+'\',\'delete_vocal\',\''+safeType+'\',\''+safeElemId+'\')" style="padding:5px 10px;background:#FEF2F2;color:#DC2626;border:1.5px solid #FECACA;border-radius:7px;font-size:11.5px;font-weight:700;cursor:pointer;">🗑️ Supprimer le vocal</button>':'')
+          +'</div>'
+        +'</div>'
+        +(audioUrl
+          ? '<div style="background:#F9FAFB;border-radius:8px;padding:8px 10px;">'
+            +'<div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:5px;">🎤 Vocal signalé :</div>'
+            +'<audio controls preload="none" src="'+audioUrl+'" style="width:100%;"></audio>'
+            +'</div>'
+          : '<div style="font-size:12px;color:#9CA3AF;font-style:italic;">Aucun vocal associé</div>')
+      +'</div>';
+    }).join('');
+  } catch(e) {
+    if (list) list.innerHTML = '<div style="color:#DC2626;">Erreur : '+e.message+'</div>';
+  }
+}
+
+async function _adminTraiterSignalement(sigId, action, type, elemId) {
+  if (action === 'delete_vocal') {
+    if (!confirm('Supprimer le vocal de cet élément et marquer le signalement comme traité ?')) return;
+    try {
+      var table = type === 'projet' ? 'missions' : 'devis';
+      await sb.from(table).update({ audio_url: null }).eq('id', elemId);
+    } catch(e) { alert('Erreur suppression vocal : '+e.message); return; }
+  }
+  try {
+    await sb.from('signalements').update({ traite: true }).eq('id', sigId);
+    if (typeof showToast === 'function') showToast(action==='ok' ? '✓ Signalement traité' : '🗑️ Vocal supprimé', 'success');
+    _adminChargerSignalements();
+    _adminLoadSignalementsCount();
+  } catch(e) { alert('Erreur : '+e.message); }
+}
+
+// Realtime admin : nouveaux projets
+(function() {
+  var _adminPcRtCh = null;
+  function _adminStartPcRealtime() {
+    try {
+      if (_adminPcRtCh) { sb.removeChannel(_adminPcRtCh); _adminPcRtCh = null; }
+      _adminPcRtCh = sb.channel('admin-missions-rt')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'missions' }, function(payload) {
+          // Incrémenter badge si projet titre non null (nouveau système)
+          if (payload.new && payload.new.titre) {
+            var badge = document.getElementById('adminPcBadge');
+            var cur = badge && badge.style.display !== 'none' ? (parseInt(badge.textContent, 10) || 0) : 0;
+            _adminUpdatePcBadge(cur + 1);
+            // Toast discret si l'admin est sur la page admin
+            if (document.body.classList.contains('admin-mode') && typeof showToast === 'function') {
+              showToast('📋 Nouveau projet publié !', 'info');
+            }
+            // Re-charger si le panel projets est visible
+            var sec = document.getElementById('admin-projets_clients');
+            if (sec && sec.classList.contains('active')) { setTimeout(_adminChargerProjets, 500); }
+          }
+        })
+        .subscribe(function(status) {
+          if (status !== 'SUBSCRIBED') {
+            setInterval(function() {
+              var badge = document.getElementById('adminPcBadge');
+              if (badge) _adminLoadSignalementsCount();
+            }, 60000);
+          }
+        });
+    } catch(e) { /* silencieux */ }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _adminStartPcRealtime);
+  } else {
+    _adminStartPcRealtime();
+  }
+})();
 
 async function missOuvrirDetail(id) {
   const m = _allMissions.find(x => x.id === id);
