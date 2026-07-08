@@ -6445,7 +6445,7 @@ async function getProviders({ categorie='', recherche='', limite=20, offset=0 }=
   // Colonnes de base garanties dans le schéma providers
   const COLS_BASE = 'id,nom,prenom,metier,categorie,ville,commune,quartier,photo_url,note_moyenne,nb_vues,telephone,skills,description,statut,disponibilite,doc_cni_statut,doc_diplome_statut,created_at';
   // Colonnes optionnelles (peuvent manquer selon version du schéma) — tentée séparément
-  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,latitude,longitude,tarif,experience,type_compte,nom_entreprise';
+  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,latitude,longitude,tarif,experience,type_compte,nom_entreprise,badge_ambassadeur,badge_ambassadeur_fin';
 
   try {
     let query = sb.from('providers')
@@ -6486,7 +6486,7 @@ async function getProviders({ categorie='', recherche='', limite=20, offset=0 }=
 
 async function getDashboardData(providerId) {
   const COLS_BASE = 'id,prenom,nom,metier,categorie,ville,commune,quartier,telephone,photo_url,description,skills,statut,note_moyenne,nb_vues,essai_actif,essai_fin,abonnement_actif,abonnement_fin,created_at,disponibilite';
-  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,nb_partages,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise';
+  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,nb_partages,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise,badge_ambassadeur,badge_ambassadeur_fin';
   try {
     let res = await sb.from('providers')
       .select(COLS_BASE + ',' + COLS_OPT)
