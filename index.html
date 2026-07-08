@@ -6520,16 +6520,16 @@ async function uploadProviderPhoto(providerId, file, type='realisation') {
   try { fileToUpload = await resizeImage(file, type); } catch(e) { fileToUpload = file; }
 
   const filename = `${type === 'profil' ? 'profils' : 'realisations'}/${providerId}/${Date.now()}.jpg`;
-  const { error:uploadError } = await sb.storage.from('photos').upload(filename, fileToUpload, { cacheControl:'3600', upsert:false, contentType:'image/jpeg' });
+  const { error:uploadError } = await sb.storage.from('Photos').upload(filename, fileToUpload, { cacheControl:'3600', upsert:false, contentType:'image/jpeg' });
   if (uploadError) { console.error('[uploadProviderPhoto] ÉCHEC upload:', uploadError.message, '| statusCode:', uploadError.statusCode, uploadError); return { success:false, message:uploadError.message }; }
-  const { data:urlData } = sb.storage.from('photos').getPublicUrl(filename);
+  const { data:urlData } = sb.storage.from('Photos').getPublicUrl(filename);
   const publicUrl = urlData.publicUrl;
   if (type==='profil') {
     const oldProfil = photos.find(p => p.type==='profil');
     if (oldProfil) {
       await sb.from('provider_photos').delete().eq('id',oldProfil.id);
-      const op = oldProfil.url.split('/photos/')[1];
-      if (op) await sb.storage.from('photos').remove([op]);
+      const op = oldProfil.url.split('Photos/')[1];
+      if (op) await sb.storage.from('Photos').remove([op]);
     }
     await sb.from('providers').update({ photo_url:publicUrl }).eq('id',providerId);
   }
@@ -6539,8 +6539,8 @@ async function uploadProviderPhoto(providerId, file, type='realisation') {
 async function deleteProviderPhoto(photoId, providerId) {
   const { data:photo } = await sb.from('provider_photos').select('id,url,type,provider_id').eq('id',photoId).single();
   if (!photo) return { success:false };
-  const path = photo.url.split('/photos/')[1];
-  if (path) await sb.storage.from('photos').remove([path]);
+  const path = photo.url.split('Photos/')[1];
+  if (path) await sb.storage.from('Photos').remove([path]);
   await sb.from('provider_photos').delete().eq('id',photoId);
   if (photo.type==='profil') await sb.from('providers').update({ photo_url:null }).eq('id',providerId);
   return { success:true };
@@ -10150,7 +10150,7 @@ async function uploadDocEntreprise(input, type) {
 
     const ext = file.name.split('.').pop().toLowerCase();
     const fileName = `entreprise/${pid}/${type}_${Date.now()}.${ext}`;
-    const { error } = await sb.storage.from('photos').upload(fileName, fileToUpload, { upsert: true });
+    const { error } = await sb.storage.from('Photos').upload(fileName, fileToUpload, { upsert: true });
     let url;
     if (error) {
       // Essayer bucket Photos
@@ -10158,7 +10158,7 @@ async function uploadDocEntreprise(input, type) {
       if (e2) throw new Error(e2.message);
       url = sb.storage.from('Photos').getPublicUrl(fileName).data.publicUrl;
     } else {
-      url = sb.storage.from('photos').getPublicUrl(fileName).data.publicUrl;
+      url = sb.storage.from('Photos').getPublicUrl(fileName).data.publicUrl;
     }
 
     // Sauvegarder l'URL dans providers
@@ -11568,12 +11568,12 @@ async function _carouselUpload() {
       const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
       const fileName = 'carousel_' + Date.now() + '.' + ext;
 
-      const { error: upErr } = await sb.storage.from('photos').upload(fileName, file, {
+      const { error: upErr } = await sb.storage.from('Photos').upload(fileName, file, {
         cacheControl: '3600', upsert: false, contentType: file.type
       });
       if (upErr) throw new Error(upErr.message);
 
-      const { data: urlData } = sb.storage.from('photos').getPublicUrl(fileName);
+      const { data: urlData } = sb.storage.from('Photos').getPublicUrl(fileName);
       const publicUrl = urlData.publicUrl;
 
       const maxOrdre = _carouselItems.length ? Math.max(..._carouselItems.map(c => c.ordre || 0)) : 0;
