@@ -6510,6 +6510,7 @@ async function resizeImage(file, type='realisation') {
   });
 }
 
+// Bucket 'Photos' (majuscule) = profils / réalisations / documents / logos
 async function uploadProviderPhoto(providerId, file, type='realisation') {
   const photos = await getProviderPhotos(providerId);
   const reals = photos.filter(p => p.type==='realisation');
@@ -10132,6 +10133,7 @@ function setTypeCompte(type) {
   }
 }
 
+// Bucket 'Photos' (majuscule) = profils / réalisations / documents / logos
 // Upload document entreprise (RCCM, logo)
 async function uploadDocEntreprise(input, type) {
   const file = input.files[0];
@@ -11551,6 +11553,7 @@ async function _carouselDelete(id) {
   _expInit();
 }
 
+// Bucket 'photos' (minuscule) = carousel uniquement
 async function _carouselUpload() {
   const input = document.getElementById('carouselFileInput');
   const titreEl = document.getElementById('carouselNewTitre');
@@ -11568,12 +11571,12 @@ async function _carouselUpload() {
       const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
       const fileName = 'carousel_' + Date.now() + '.' + ext;
 
-      const { error: upErr } = await sb.storage.from('Photos').upload(fileName, file, {
+      const { error: upErr } = await sb.storage.from('photos').upload(fileName, file, {
         cacheControl: '3600', upsert: false, contentType: file.type
       });
       if (upErr) throw new Error(upErr.message);
 
-      const { data: urlData } = sb.storage.from('Photos').getPublicUrl(fileName);
+      const { data: urlData } = sb.storage.from('photos').getPublicUrl(fileName);
       const publicUrl = urlData.publicUrl;
 
       const maxOrdre = _carouselItems.length ? Math.max(..._carouselItems.map(c => c.ordre || 0)) : 0;
