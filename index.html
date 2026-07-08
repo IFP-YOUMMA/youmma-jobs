@@ -1014,6 +1014,9 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
   to{opacity:1;transform:translateY(0)}
 }
 
+/* sidebar notif badge masqué quand vide */
+.sidebar-notif-badge.hidden{display:none!important}
+
 /* ── PAGES NON-ACTIVES — TOUJOURS CACHÉES ── */
 #page-dashboard:not(.active),
 #page-login:not(.active),
@@ -8079,6 +8082,9 @@ window.addEventListener('hashchange', async function() {
 <script>
 // ── FONCTIONS ADMIN ──
 function _showAdminPanel() {
+  // Masquer le bouton flottant YOUMMA ÉQUIPES dans l'admin
+  const _fe = document.getElementById('btnYoummaEquipes');
+  if (_fe) _fe.style.display = 'none';
   // Activer le mode admin sur body
   document.body.classList.add('admin-mode', 'on-admin');
   document.body.classList.remove('on-home', 'on-dashboard');
@@ -8182,6 +8188,9 @@ async function initAdmin() {
 function logoutAdmin() {
   localStorage.removeItem('yj_admin_session');
   adminData = null;
+  // Réafficher le bouton flottant YOUMMA ÉQUIPES
+  const _fe = document.getElementById('btnYoummaEquipes');
+  if (_fe) _fe.style.removeProperty('display');
   // Détruire l'overlay admin
   const overlay = document.getElementById('_adminOverlay');
   if (overlay) overlay.style.display = 'none';
@@ -8213,12 +8222,15 @@ function showAdmin(name) {
     carousel: '<i class="fa-solid fa-photo-film" style="color:#E85D04;margin-right:6px;"></i>Images à la une',
     missions: '<i class="fa-solid fa-bullseye" style="color:#E85D04;margin-right:6px;"></i>Missions',
     projets_clients: '<i class="fa-solid fa-clipboard-list" style="color:#E85D04;margin-right:6px;"></i>Projets clients',
+    ambassadeurs: '<i class="fa-solid fa-trophy" style="color:#F5C842;margin-right:6px;"></i>Ambassadeurs',
+    rapports: '<i class="fa-solid fa-chart-line" style="color:#E85D04;margin-right:6px;"></i>Rapports',
+    notifications: '<i class="fa-solid fa-bell" style="color:#E85D04;margin-right:6px;"></i>Notifications',
   };
   const tt = document.getElementById('adminTopbarTitle');
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','carousel','missions','projets_clients'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','carousel','missions','projets_clients','ambassadeurs','rapports','notifications'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (el) el.style.cssText = s===name ? ACTIVE : NORMAL;
   });
@@ -12081,21 +12093,40 @@ async function chargerClassementAdmin() {
     }
     tbody.innerHTML = data.map(function(p, i) {
       const nom = ((p.prenom || '') + ' ' + (p.nom || '')).trim() || '—';
+      const nomSafe = nom.replace(/'/g, "\\'");
+      const _finDate = p.badge_ambassadeur_fin ? new Date(p.badge_ambassadeur_fin) : null;
+      const _now = new Date();
+      const _badgeActif = p.badge_ambassadeur && _finDate && _finDate > _now;
+      // Badge
       const badgeHtml = p.badge_ambassadeur
-        ? '<span style="background:linear-gradient(135deg,#F5C842,#E85D04);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;">🏆 Ambassadeur</span>'
+        ? (_badgeActif
+          ? '<span style="background:linear-gradient(135deg,#F5C842,#E85D04);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;">🏆 Ambassadeur</span>'
+          : '<span style="background:#E5E7EB;color:#6B7280;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;">Expiré</span>')
         : '<span style="color:#D1D5DB;font-size:12px;">—</span>';
-      const expireHtml = p.badge_ambassadeur_fin
-        ? new Date(p.badge_ambassadeur_fin).toLocaleDateString('fr-FR')
-        : '<span style="color:#D1D5DB;">—</span>';
+      // Expire le
+      let expireHtml;
+      if (_finDate) {
+        const _diffMs = _finDate - _now;
+        const _diffJ = Math.ceil(_diffMs / 86400000);
+        if (_diffMs > 0) {
+          expireHtml = _finDate.toLocaleDateString('fr-FR') + ' <span style="color:#059669;font-size:10.5px;font-weight:700;">(' + _diffJ + ' j)</span>';
+        } else {
+          expireHtml = '<span style="color:#DC2626;font-size:11px;font-weight:700;">Expiré</span>';
+        }
+      } else {
+        expireHtml = '<span style="color:#D1D5DB;">—</span>';
+      }
+      // Bouton action
+      const actionBtn = _badgeActif
+        ? '<button onclick="retirerBadgeAmb(\'' + p.id + '\',\'' + nomSafe + '\')" style="padding:5px 12px;background:#fff;border:1.5px solid #FCA5A5;border-radius:8px;color:#DC2626;font-size:11.5px;font-weight:700;cursor:pointer;">Retirer</button>'
+        : '<button onclick="attribuerBadgeAmb(\'' + p.id + '\',' + (p.nb_partages||0) + ',\'' + nomSafe + '\')" style="padding:5px 12px;background:#FFF7F0;border:1.5px solid #FDE8D8;border-radius:8px;color:#E85D04;font-size:11.5px;font-weight:700;cursor:pointer;">Attribuer 🏆</button>';
       return '<tr style="border-bottom:1px solid #F3F4F6;">' +
         '<td style="padding:10px 12px;font-size:13px;color:#6B7280;">' + (i + 1) + '</td>' +
         '<td style="padding:10px 12px;"><div style="font-size:13px;font-weight:700;color:#1A1A4E;">' + nom + '</div><div style="font-size:11px;color:#9CA3AF;">' + (p.metier || '') + '</div></td>' +
         '<td style="padding:10px 12px;text-align:center;font-size:14px;font-weight:700;color:#E85D04;">' + (p.nb_partages || 0) + '</td>' +
         '<td style="padding:10px 12px;text-align:center;">' + badgeHtml + '</td>' +
         '<td style="padding:10px 12px;text-align:center;font-size:11.5px;color:#9CA3AF;">' + expireHtml + '</td>' +
-        '<td style="padding:10px 12px;text-align:center;">' +
-          '<button onclick="attribuerBadgeAmb(\'' + p.id + '\')" style="padding:5px 12px;background:#FFF7F0;border:1.5px solid #FDE8D8;border-radius:8px;color:#E85D04;font-size:11.5px;font-weight:700;cursor:pointer;">Attribuer 🏆</button>' +
-        '</td>' +
+        '<td style="padding:10px 12px;text-align:center;">' + actionBtn + '</td>' +
       '</tr>';
     }).join('');
   } catch(e) {
@@ -12103,13 +12134,27 @@ async function chargerClassementAdmin() {
   }
 }
 
-async function attribuerBadgeAmb(providerId) {
+async function attribuerBadgeAmb(providerId, nbPartages, nomPrest) {
+  if ((nbPartages || 0) < 50) {
+    const ok = confirm('⚠️ ' + (nomPrest || 'Ce prestataire') + ' n\'a que ' + (nbPartages || 0) + ' partages sur 50 requis.\nAttribuer le badge quand même ?');
+    if (!ok) return;
+  }
   const expiration = new Date();
   expiration.setDate(expiration.getDate() + 30);
   await sb.from('providers')
     .update({ badge_ambassadeur: true, badge_ambassadeur_fin: expiration.toISOString() })
     .eq('id', providerId);
   showToast('🏆 Badge Ambassadeur attribué pour 30 jours !', 'success');
+  chargerClassementAdmin();
+}
+
+async function retirerBadgeAmb(providerId, nomPrest) {
+  const ok = confirm('Retirer le badge Ambassadeur de ' + (nomPrest || 'ce prestataire') + ' ?');
+  if (!ok) return;
+  await sb.from('providers')
+    .update({ badge_ambassadeur: false, badge_ambassadeur_fin: null })
+    .eq('id', providerId);
+  showToast('Badge Ambassadeur retiré.', 'success');
   chargerClassementAdmin();
 }
 
