@@ -4235,8 +4235,8 @@ document.addEventListener('keydown', e => {
   
   <nav class="sidebar-nav">
     <a class="nav-item active" href="javascript:void(0)" onclick="showSection('dashboard')">
-      <span class="icon"><i class="fa-solid fa-chart-bar"></i></span>
-      <span>Tableau de bord</span>
+      <span class="icon"><i class="fa-solid fa-house"></i></span>
+      <span>Accueil</span>
     </a>
     <a class="nav-item" href="javascript:void(0)" onclick="showSection('profil')">
       <span class="icon"><i class="fa-solid fa-user"></i></span>
@@ -4244,31 +4244,31 @@ document.addEventListener('keydown', e => {
     </a>
     <a class="nav-item" href="javascript:void(0)" onclick="showSection('photos')">
       <span class="icon"><i class="fa-solid fa-camera"></i></span>
-      <span>Photos & Galerie</span>
+      <span>Mes photos</span>
     </a>
     <a class="nav-item" href="javascript:void(0)" onclick="showSection('documents')">
       <span class="icon"><i class="fa-solid fa-shield-halved"></i></span>
       <span>Documents</span>
     </a>
     <a class="nav-item" href="javascript:void(0)" onclick="showSection('missions')">
-      <span class="icon"><i class="fa-solid fa-bullseye"></i></span>
-      <span>Mes missions</span>
+      <span class="icon"><i class="fa-solid fa-briefcase"></i></span>
+      <span>Mes devis</span>
     </a>
     <a class="nav-item" href="javascript:void(0)" onclick="showSection('rapports')">
       <span class="icon"><i class="fa-solid fa-chart-line"></i></span>
-      <span>Rapports</span>
+      <span>Mes statistiques</span>
     </a>
     <a class="nav-item" href="javascript:void(0)" onclick="showSection('abonnement')">
       <span class="icon"><i class="fa-solid fa-credit-card"></i></span>
-      <span>Abonnement</span>
+      <span>Mon compte</span>
     </a>
     <a class="nav-item" href="javascript:void(0)" onclick="showSection('avis')">
       <span class="icon"><i class="fa-solid fa-star"></i></span>
-      <span>Mes avis</span>
+      <span>Avis clients</span>
     </a>
     <a class="nav-item" href="javascript:void(0)" onclick="showSection('partage')">
       <span class="icon"><i class="fa-solid fa-share-nodes"></i></span>
-      <span>Partage & Badge</span>
+      <span>Parrainage</span>
     </a>
     <a class="nav-item" href="javascript:void(0)" onclick="navigate('home')">
       <span class="icon"><i class="fa-solid fa-globe"></i></span>
@@ -4333,138 +4333,87 @@ document.addEventListener('keydown', e => {
     
     <div class="section active" id="section-dashboard">
 
-      <div class="alert alert-info" id="alertStatut" style="display:none;"></div>
-
-      <!-- Widget disponibilité mobile (visible sur mobile, caché desktop via CSS) -->
-      <div id="dashDispoBtnIn" style="margin-bottom:14px;padding:12px 14px;background:#F0FDF4;border-radius:14px;border:1.5px solid #86EFAC;transition:all .2s;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;">
-          <span id="dashDotIn" style="width:9px;height:9px;border-radius:50%;background:#22C55E;display:inline-block;flex-shrink:0;animation:pulse-green 1.5s infinite;"></span>
-          <span style="font-size:10px;color:#16A34A;font-weight:600;">Disponibilité actuelle :</span>
-          <span style="font-size:12px;font-weight:700;color:#1A1A4E;" id="dashLabelIn">Je suis Disponible</span>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button onclick="_dashSetDispo('Disponible')" style="flex:1;padding:16px 8px;border-radius:12px;border:2px solid #86EFAC;background:linear-gradient(135deg,#F0FDF4,#DCFCE7);cursor:pointer;font-size:14px;font-weight:700;color:#16A34A;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'DM Sans',sans-serif;transition:all .2s;">
-            <span style="width:9px;height:9px;border-radius:50%;background:#22C55E;display:inline-block;flex-shrink:0;"></span>Disponible
-          </button>
-          <button onclick="_dashSetDispo('Occupé')" style="flex:1;padding:16px 8px;border-radius:12px;border:2px solid #FECACA;background:linear-gradient(135deg,#FFF5F5,#FEE2E2);cursor:pointer;font-size:14px;font-weight:700;color:#DC2626;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'DM Sans',sans-serif;transition:all .2s;">
-            <span style="width:9px;height:9px;border-radius:50%;background:#EF4444;display:inline-block;flex-shrink:0;"></span>Occupé
-          </button>
-        </div>
+      <!-- ═══ IDs CACHÉS — compatibilité JS (ne pas supprimer) ═══ -->
+      <div aria-hidden="true" style="display:none;">
+        <div class="alert alert-info" id="alertStatut"></div>
+        <span id="statVues">0</span><span id="statFavoris">0</span><span id="statAppels">0</span><span id="statWA">0</span><span id="statAvis">0</span>
+        <span id="statVues2">0</span><span id="statFavoris2">0</span><span id="statAppels2">0</span><span id="statWA2">0</span><span id="statAvis2">0</span>
+        <div id="dashStatsRow"></div>
+        <div id="pbAvatar" class="pb-avatar-placeholder">?</div>
+        <span id="pbName">—</span><span id="pbJob">—</span><span id="pbVille">—</span><span id="pbCommune">—</span><span id="pbBadges"></span>
+        <a id="pbMapsBtn"></a>
+        <div id="dashDispoBtnIn"><span id="dashDotIn"></span><span id="dashLabelIn">Je suis Disponible</span></div>
+        <div id="aboStatusBadge" class="abo-status-expired">—</div>
+        <div id="aboType">—</div><div id="aboFin">—</div><div id="aboJours">—</div>
+        <div id="aboProgress" style="width:0%"></div>
+        <div id="progressBarFill" style="width:0%"></div>
+        <div id="progressLabel">0/50</div>
+        <div id="statutAmbassadeurDisplay">—</div>
+        <div id="badgeAmbassadeur"></div>
+        <div id="nbPartagesDisplay">0</div>
+        <div id="rangAmbassadeurDisplay">#-</div>
+        <div id="expirationBadge"></div>
       </div>
 
-
-      <div class="profile-banner">
-        <div class="pb-avatar-wrap">
-          <div id="pbAvatar" class="pb-avatar-placeholder">?</div>
-          <div class="pb-edit-photo" onclick="showSection('photos')" title="Changer la photo"><i class="fa-solid fa-camera"></i></div>
+      <!-- ═══ SALUTATION ═══ -->
+      <div style="margin-bottom:18px;">
+        <div style="font-size:26px;font-weight:800;color:#1A1A4E;line-height:1.25;margin-bottom:9px;">Bonjour <span id="dashGreetPrenom">...</span> 👋</div>
+        <div id="dashAboSimpleBadge" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;background:#F3F4F6;color:#6B7280;">
+          <span id="dashAboSimpleText">Vérification...</span>
         </div>
-        <div class="pb-info">
-          <div class="pb-name" id="pbName">Chargement...</div>
-          <div class="pb-job" id="pbJob">—</div>
-          <div class="pb-badges" id="pbBadges"></div>
+        <div id="dashAboRenewBtn" style="display:none;margin-top:10px;">
+          <button onclick="showSection('abonnement')" style="width:100%;padding:16px;background:linear-gradient(135deg,#E85D04,#C74B00);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:56px;font-family:'DM Sans',sans-serif;">Renouveler maintenant →</button>
         </div>
-        <div style="position:relative;z-index:1;text-align:right;">
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;"><i class="fa-solid fa-location-dot"></i> Localisation</div>
-          <div style="font-size:14px;color:#fff;font-weight:600;" id="pbVille">—</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.5);" id="pbCommune">—</div>
-          <a id="pbMapsBtn" style="display:none;" class="maps-btn" target="_blank"> Google Maps</a>
-        </div>
+        <div id="dashStatutAlert" style="display:none;margin-top:9px;padding:11px 14px;border-radius:12px;font-size:13.5px;font-weight:600;"></div>
       </div>
 
-      
-      <span id="statVues" style="display:none;">0</span>
-      <span id="statFavoris" style="display:none;">0</span>
-      <span id="statAppels" style="display:none;">0</span>
-      <span id="statWA" style="display:none;">0</span>
-      <span id="statAvis" style="display:none;">0</span>
-      <div id="dashStatsRow" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;scrollbar-width:none;-ms-overflow-style:none;">
-        <div style="flex-shrink:0;width:90px;background:linear-gradient(135deg,#1A1A4E,#2D2D8E);border-radius:16px;padding:14px 10px;text-align:center;">
-          <div style="font-size:20px;margin-bottom:4px;">👁️</div>
-          <div id="statVues2" style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#fff;">0</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.6);margin-top:2px;line-height:1.3;">Vues profil</div>
+      <!-- ═══ TRAVAUX DISPONIBLES ═══ -->
+      <div style="margin-bottom:18px;background:linear-gradient(135deg,#1A1A4E,#2D2D8E);border-radius:18px;padding:20px 18px;position:relative;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <div style="font-size:30px;line-height:1;flex-shrink:0;">🔔</div>
+          <div>
+            <div style="font-size:18px;font-weight:800;color:#fff;line-height:1.2;">Travaux disponibles</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.75);margin-top:3px;" id="dashTravauxSubtitle">Recherche en cours...</div>
+          </div>
+          <span id="dashTravauxBadge" style="display:none;position:absolute;top:14px;right:14px;background:#DC2626;color:#fff;font-size:12px;font-weight:800;padding:4px 10px;border-radius:20px;animation:pulse-btn 1.5s infinite;white-space:nowrap;"></span>
         </div>
-        <div style="flex-shrink:0;width:90px;background:linear-gradient(135deg,#E85D04,#F5A623);border-radius:16px;padding:14px 10px;text-align:center;">
-          <div style="font-size:20px;margin-bottom:4px;">❤️</div>
-          <div id="statFavoris2" style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#fff;">0</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.8);margin-top:2px;line-height:1.3;">Favoris</div>
-        </div>
-        <div style="flex-shrink:0;width:90px;background:linear-gradient(135deg,#0EA5E9,#0284C7);border-radius:16px;padding:14px 10px;text-align:center;">
-          <div style="font-size:20px;margin-bottom:4px;">📞</div>
-          <div id="statAppels2" style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#fff;">0</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.8);margin-top:2px;line-height:1.3;">Appels</div>
-        </div>
-        <div style="flex-shrink:0;width:90px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:16px;padding:14px 10px;text-align:center;">
-          <div style="font-size:20px;margin-bottom:4px;">💬</div>
-          <div id="statWA2" style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#fff;">0</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.8);margin-top:2px;line-height:1.3;">WhatsApp</div>
-        </div>
-        <div style="flex-shrink:0;width:90px;background:linear-gradient(135deg,#F5C842,#E85D04);border-radius:16px;padding:14px 10px;text-align:center;">
-          <div style="font-size:20px;margin-bottom:4px;">⭐</div>
-          <div id="statAvis2" style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#fff;">0</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.8);margin-top:2px;line-height:1.3;">Avis clients</div>
-        </div>
-      </div>
-      <style>#dashStatsRow::-webkit-scrollbar{display:none}</style>
-
-      
-      <div class="actions-grid">
-        <a class="action-btn" href="javascript:void(0)" onclick="showSection('profil')">
-          <div class="action-icon"><i class="fa-solid fa-pen"></i></div>
-          <div class="action-label">Modifier mon profil</div>
-        </a>
-        <a class="action-btn" href="javascript:void(0)" onclick="showSection('photos')">
-          <div class="action-icon"><i class="fa-solid fa-camera"></i></div>
-          <div class="action-label">Ajouter une photo</div>
-        </a>
-        <a class="action-btn" href="javascript:void(0)" onclick="showSection('abonnement')" style="background:linear-gradient(135deg,#E85D04,#F5A623);border:none;color:#fff;">
-          <div class="action-icon" style="color:#fff;"><i class="fa-solid fa-credit-card"></i></div>
-          <div class="action-label" style="color:#fff;">Renouveler abonnement</div>
-        </a>
-        <a class="action-btn" href="https://wa.me/22461252510?text=Bonjour%20YOUMMA%20JOBS%2C%20besoin%20d'aide" target="_blank" style="background:linear-gradient(135deg,#25D366,#128C7E);border:none;color:#fff;">
-          <div class="action-icon" style="color:#fff;"><i class="fa-brands fa-whatsapp"></i></div>
-          <div class="action-label" style="color:#fff;">Support WhatsApp</div>
-        </a>
-      </div>
-
-      
-      <div class="abo-card">
-        <div class="abo-header">
-          <div class="abo-title"><i class="fa-solid fa-credit-card"></i> Abonnement</div>
-          <div id="aboStatusBadge" class="abo-status-expired">Vérifie...</div>
-        </div>
-        <div class="abo-info">
-          <div class="abo-info-item"><div class="abo-info-label">Statut</div><div class="abo-info-val" id="aboType">—</div></div>
-          <div class="abo-info-item"><div class="abo-info-label">Date d'expiration</div><div class="abo-info-val" id="aboFin">—</div></div>
-          <div class="abo-info-item"><div class="abo-info-label">Jours restants</div><div class="abo-info-val" id="aboJours">—</div></div>
-        </div>
-        <div class="progress-bar"><div class="progress-fill" id="aboProgress" style="width:0%"></div></div>
-        <button onclick="showSection('abonnement')" style="padding:10px 20px;background:#E85D04;border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">
-          Activer / Renouveler mon abonnement →
+        <button onclick="window.ouvrirVoirProjets?window.ouvrirVoirProjets():showToast('Chargement...','info')"
+          style="width:100%;padding:16px;background:#E85D04;color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;touch-action:manipulation;min-height:56px;font-family:'DM Sans',sans-serif;">
+          Voir les travaux →
         </button>
       </div>
 
-      <!-- Carte Partage & Badge Ambassadeur -->
-      <div class="abo-card" style="border:1.5px solid #FDE8D8;">
-        <div class="abo-header">
-          <div class="abo-title"><i class="fa-solid fa-share-nodes" style="color:#E85D04;"></i> Partage & Badge Ambassadeur</div>
-          <div id="badgeAmbassadeur" style="display:none;background:linear-gradient(135deg,#F5C842,#E85D04);color:#fff;font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:20px;">🏆 Ambassadeur</div>
+      <!-- ═══ GRILLE 2×2 ═══ -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+        <div id="dashDispoCard" onclick="_dashToggleDispo()"
+          style="background:#fff;border-radius:18px;padding:18px 12px;border:2px solid #86EFAC;cursor:pointer;min-height:110px;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;transition:border-color .2s;">
+          <div id="dashDispoCardDot" style="width:18px;height:18px;border-radius:50%;background:#22C55E;display:inline-block;animation:pulse-green 1.5s infinite;"></div>
+          <div style="font-size:15px;font-weight:800;color:#1A1A4E;line-height:1.2;" id="dashDispoCardTitle">Je suis disponible</div>
+          <div style="font-size:11.5px;color:#16A34A;line-height:1.3;" id="dashDispoCardSub">Les clients peuvent me contacter</div>
         </div>
-        <div id="statutAmbassadeurDisplay" style="font-size:12.5px;color:#6B7280;margin-bottom:12px;">Chargement...</div>
-        <!-- Barre de progression -->
-        <div style="margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <span style="font-size:12px;font-weight:700;color:var(--texte);">Progression Ambassadeur</span>
-            <span id="progressLabel" style="font-size:12px;color:var(--orange);font-weight:700;">0/50</span>
-          </div>
-          <div style="height:8px;background:var(--fond);border-radius:4px;overflow:hidden;">
-            <div id="progressBarFill" style="height:100%;background:linear-gradient(90deg,var(--orange),#F5C842);border-radius:4px;transition:width .6s ease;width:0%;"></div>
-          </div>
-          <div style="font-size:11px;color:var(--gris);margin-top:5px;text-align:center;">50 partages = Badge 🏆 valable 30 jours</div>
+        <div onclick="showSection('photos')"
+          style="background:#fff;border-radius:18px;padding:18px 12px;border:2px solid #E5E7EB;cursor:pointer;min-height:110px;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;">
+          <div style="font-size:32px;">📸</div>
+          <div style="font-size:15px;font-weight:800;color:#1A1A4E;">Mes photos</div>
         </div>
-        <button onclick="showSection('partage')" style="width:100%;padding:10px;background:#FFF7F0;border:1.5px solid #FDE8D8;border-radius:10px;color:#E85D04;font-size:13px;font-weight:700;cursor:pointer;">
-          Partager & gagner le badge →
-        </button>
+        <div onclick="showSection('profil')"
+          style="background:#fff;border-radius:18px;padding:18px 12px;border:2px solid #E5E7EB;cursor:pointer;min-height:110px;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;">
+          <div style="font-size:32px;">👤</div>
+          <div style="font-size:15px;font-weight:800;color:#1A1A4E;">Mon profil</div>
+        </div>
+        <div onclick="showSection('abonnement')"
+          style="background:#fff;border-radius:18px;padding:18px 12px;border:2px solid #FDE8D8;cursor:pointer;min-height:110px;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;">
+          <div style="font-size:32px;">💰</div>
+          <div style="font-size:15px;font-weight:800;color:#1A1A4E;">Mon compte</div>
+        </div>
       </div>
+
+      <!-- ═══ AIDE WHATSAPP ═══ -->
+      <a href="https://wa.me/22461252510?text=Bonjour%2C%20j%27ai%20besoin%20d%27aide%20avec%20mon%20compte%20YOUMMA%20JOBS"
+        target="_blank"
+        style="display:flex;align-items:center;gap:10px;padding:14px 18px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:14px;text-decoration:none;color:#166534;font-size:14px;font-weight:700;touch-action:manipulation;margin-bottom:6px;">
+        ❓ Besoin d'aide ? Écrivez-nous sur WhatsApp
+      </a>
     </div>
 
     
@@ -5305,7 +5254,7 @@ function showSection(name) {
     }
   });
   // Mettre à jour le titre topbar
-  const titles = { dashboard:'Tableau de bord', profil:'Mon profil', photos:'Photos & Galerie', documents:'Documents & Vérification', missions:'Mes missions', rapports:'Rapports', abonnement:'Abonnement', avis:'Mes avis', partage:'Partage & Badge' };
+  const titles = { dashboard:'Accueil', profil:'Mon profil', photos:'Mes photos', documents:'Documents', missions:'Mes devis', rapports:'Mes statistiques', abonnement:'Mon compte', avis:'Avis clients', partage:'Parrainage' };
   const tt = document.getElementById('topbarTitle');
   if (tt) tt.innerHTML = '<i class="fa-solid fa-chart-line" style="width:16px;"></i> ' + (titles[name] || name);
   // Scroll vers le haut du contenu principal
@@ -5322,7 +5271,7 @@ function showSection(name) {
   if (mbn) {
     if (window.innerWidth <= 639) {
       mbn.style.display = 'block';
-      ['dashboard','profil','photos','abonnement','partage'].forEach(function(s) {
+      ['dashboard','missions','profil','abonnement'].forEach(function(s) {
         var btn = document.getElementById('mbn' + s.charAt(0).toUpperCase() + s.slice(1));
         if (btn) btn.style.color = (s === name) ? '#E85D04' : 'rgba(255,255,255,.5)';
       });
@@ -5576,23 +5525,20 @@ async function chargerAvis() {
 
 </script>
 
-<!-- Mobile bottom navigation bar -->
+<!-- Mobile bottom navigation bar (dashboard) -->
 <nav id="mobileBottomNav" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9998;background:#1A1A4E;border-top:1px solid rgba(255,255,255,.1);padding:6px 0 env(safe-area-inset-bottom,6px);box-shadow:0 -4px 20px rgba(0,0,0,.3);">
   <div style="display:flex;align-items:center;justify-content:space-around;max-width:600px;margin:0 auto;">
     <button onclick="showSection('dashboard')" id="mbnDashboard" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;transition:color .2s;">
-      <i class="fa-solid fa-chart-bar" style="font-size:18px;"></i><span>Accueil</span>
+      <i class="fa-solid fa-house" style="font-size:18px;"></i><span>Accueil</span>
+    </button>
+    <button onclick="window.ouvrirVoirProjets?window.ouvrirVoirProjets():showToast('Chargement...','info')" id="mbnMissions" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;transition:color .2s;">
+      <i class="fa-solid fa-briefcase" style="font-size:18px;"></i><span>Travaux</span>
     </button>
     <button onclick="showSection('profil')" id="mbnProfil" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;transition:color .2s;">
-      <i class="fa-solid fa-user" style="font-size:18px;"></i><span>Profil</span>
-    </button>
-    <button onclick="showSection('photos')" id="mbnPhotos" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;transition:color .2s;">
-      <i class="fa-solid fa-camera" style="font-size:18px;"></i><span>Photos</span>
+      <i class="fa-solid fa-user" style="font-size:18px;"></i><span>Mon profil</span>
     </button>
     <button onclick="showSection('abonnement')" id="mbnAbonnement" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;transition:color .2s;">
-      <i class="fa-solid fa-credit-card" style="font-size:18px;"></i><span>Abonnement</span>
-    </button>
-    <button onclick="showSection('partage')" id="mbnPartage" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;transition:color .2s;">
-      <i class="fa-solid fa-share-nodes" style="font-size:18px;"></i><span>Partage</span>
+      <i class="fa-solid fa-credit-card" style="font-size:18px;"></i><span>Mon compte</span>
     </button>
   </div>
 </nav>
@@ -6162,7 +6108,7 @@ function showSection(name) {
     }
   });
   // Mettre à jour le titre topbar
-  const titles = { dashboard:'Tableau de bord', profil:'Mon profil', photos:'Photos & Galerie', documents:'Documents & Vérification', missions:'Mes missions', rapports:'Rapports', abonnement:'Abonnement', avis:'Mes avis', partage:'Partage & Badge' };
+  const titles = { dashboard:'Accueil', profil:'Mon profil', photos:'Mes photos', documents:'Documents', missions:'Mes devis', rapports:'Mes statistiques', abonnement:'Mon compte', avis:'Avis clients', partage:'Parrainage' };
   const tt = document.getElementById('topbarTitle');
   if (tt) tt.innerHTML = '<i class="fa-solid fa-chart-line" style="width:16px;"></i> ' + (titles[name] || name);
   // Scroll vers le haut du contenu principal
@@ -6179,7 +6125,7 @@ function showSection(name) {
   if (mbn) {
     if (window.innerWidth <= 639) {
       mbn.style.display = 'block';
-      ['dashboard','profil','photos','abonnement','partage'].forEach(function(s) {
+      ['dashboard','missions','profil','abonnement'].forEach(function(s) {
         var btn = document.getElementById('mbn' + s.charAt(0).toUpperCase() + s.slice(1));
         if (btn) btn.style.color = (s === name) ? '#E85D04' : 'rgba(255,255,255,.5)';
       });
@@ -7147,6 +7093,7 @@ async function chargerDashboard(pid) {
     }
   }
   _dashUpdateUI();
+  _dashLoadTravauxCount();
   _dashPhotos = await getProviderPhotos(pid);
   _dashRenderPhotos();
   _dashChargerAvis();
@@ -7185,6 +7132,15 @@ function _dashUpdateDispoBtn(state) {
   if (btnIn)   { btnIn.style.background = gc; btnIn.style.borderColor = bc; }
   if (dotIn)   { dotIn.style.background = dc; dotIn.style.animationName = isOccupe ? 'pulse-red' : 'pulse-green'; }
   if (labelIn) labelIn.textContent = tx;
+  // Carte dispo simplifiée
+  const card      = document.getElementById('dashDispoCard');
+  const cardDot   = document.getElementById('dashDispoCardDot');
+  const cardTitle = document.getElementById('dashDispoCardTitle');
+  const cardSub   = document.getElementById('dashDispoCardSub');
+  if (card)      { card.style.borderColor = bc; card.style.background = isOccupe ? '#FFF5F5' : '#F0FDF4'; }
+  if (cardDot)   { cardDot.style.background = dc; cardDot.style.animationName = isOccupe ? 'pulse-red' : 'pulse-green'; }
+  if (cardTitle) cardTitle.textContent = isOccupe ? 'Je suis occupé(e)' : 'Je suis disponible';
+  if (cardSub)   { cardSub.textContent = isOccupe ? 'Appuyer pour me rendre disponible' : 'Les clients peuvent me contacter'; cardSub.style.color = isOccupe ? '#DC2626' : '#16A34A'; }
 }
 
 function _dashShowDispoMenu() {
@@ -7221,8 +7177,10 @@ async function _dashSetDispo(state) {
   if (btn) { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; }
 }
 
-// Alias pour compatibilité
-function _dashToggleDispo() { _dashShowDispoMenu(); }
+function _dashToggleDispo() {
+  const cur = (_dashData && _dashData.disponibilite) || 'Disponible';
+  _dashSetDispo(cur === 'Occupé' ? 'Disponible' : 'Occupé');
+}
 
 function _dashUpdateUI() {
   const p = _dashData;
@@ -7230,6 +7188,16 @@ function _dashUpdateUI() {
   const ini = (p.prenom?.[0]||'')+(p.nom?.[0]||'');
   const nomComplet = (p.prenom||'') + ' ' + (p.nom||'');
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  // Salutation simplifiée
+  set('dashGreetPrenom', p.prenom || '...');
+  // Alerte statut simplifiée
+  const statAlert = document.getElementById('dashStatutAlert');
+  if (statAlert) {
+    if (p.statut==='en_attente')  { statAlert.style.display='block'; statAlert.style.background='#FEF3C7'; statAlert.style.color='#92400E'; statAlert.textContent='⏳ Votre profil est en cours de validation. Vous serez contacté(e) sous 24h.'; }
+    else if (p.statut==='rejete') { statAlert.style.display='block'; statAlert.style.background='#FEF2F2'; statAlert.style.color='#DC2626'; statAlert.textContent='❌ Votre profil a été rejeté. Contactez-nous sur WhatsApp.'; }
+    else if (p.statut==='suspendu') { statAlert.style.display='block'; statAlert.style.background='#FEF2F2'; statAlert.style.color='#DC2626'; statAlert.textContent='🚫 Votre profil est suspendu. Contactez le support.'; }
+    else statAlert.style.display='none';
+  }
   set('chipName', nomComplet);
   set('chipJob', p.metier||'—');
   _dashUpdateDispoBtn(p.disponibilite);
@@ -7316,6 +7284,43 @@ function _dashUpdateAbonnement(p) {
     if(j) j.textContent=jours>0?jours+' jours':'Expiré';
     if(pr) pr.style.width=pct+'%';
   });
+  // Badge abonnement simplifié
+  const aboSimpleText  = document.getElementById('dashAboSimpleText');
+  const aboSimpleBadge = document.getElementById('dashAboSimpleBadge');
+  const aboRenewBtn    = document.getElementById('dashAboRenewBtn');
+  if (aboSimpleText && aboSimpleBadge) {
+    if (actif && isEssai) {
+      aboSimpleBadge.style.background = '#FEF3C7'; aboSimpleBadge.style.color = '#92400E';
+      aboSimpleText.textContent = '🕐 Essai gratuit — ' + jours + ' jours restants';
+      if (aboRenewBtn) aboRenewBtn.style.display = 'block';
+    } else if (actif) {
+      aboSimpleBadge.style.background = '#F0FDF4'; aboSimpleBadge.style.color = '#166534';
+      aboSimpleText.textContent = '✅ Compte actif — ' + jours + ' jours restants';
+      if (aboRenewBtn) aboRenewBtn.style.display = 'none';
+    } else {
+      aboSimpleBadge.style.background = '#FEF2F2'; aboSimpleBadge.style.color = '#DC2626';
+      aboSimpleText.textContent = '❌ Compte inactif — Renouveler';
+      if (aboRenewBtn) aboRenewBtn.style.display = 'block';
+    }
+  }
+}
+
+async function _dashLoadTravauxCount() {
+  try {
+    var { count } = await sb.from('missions').select('id', { count: 'exact', head: true }).eq('statut', 'ouvert');
+    var sub = document.getElementById('dashTravauxSubtitle');
+    var badge = document.getElementById('dashTravauxBadge');
+    if (count > 0) {
+      if (sub) sub.textContent = count + ' projet' + (count > 1 ? 's' : '') + ' en attente de devis';
+      if (badge) { badge.textContent = count + ' nouveau' + (count > 1 ? 'x' : ''); badge.style.display = 'inline-block'; }
+    } else {
+      if (sub) sub.textContent = 'Aucun projet pour le moment — revenez plus tard';
+      if (badge) badge.style.display = 'none';
+    }
+  } catch(e) {
+    var sub2 = document.getElementById('dashTravauxSubtitle');
+    if (sub2) sub2.textContent = 'Appuyez pour voir les projets';
+  }
 }
 
 function _dashRenderPhotos() {
