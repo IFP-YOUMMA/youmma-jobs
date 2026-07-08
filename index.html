@@ -12792,6 +12792,7 @@ window._renderProjetCard = function(m) {
   var ago    = _tempsRelatif(m.created_at);
   var safeId = String(m.id);
   var safeTitre = titre.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var safeAudio = (m.audio_url || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
   return '<div style="background:#F9FAFB;border-radius:14px;padding:15px 17px;margin-bottom:11px;border:1.5px solid #E5E7EB;">'
     + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px;">'
@@ -12811,14 +12812,14 @@ window._renderProjetCard = function(m) {
             + '<div style="text-align:right;margin-top:3px;"><button type="button" onclick="window._signalerVocal(\'mission\',\''+safeId+'\')" style="background:none;border:none;color:#D1D5DB;font-size:11px;cursor:pointer;padding:2px 0;touch-action:manipulation;">⚠️ Signaler ce message</button></div>'
           + '</div>'
         : '')
-    + '<button onclick="window.ouvrirDevis(\''+safeId+'\',\''+safeTitre+'\')" style="padding:8px 18px;background:#E85D04;color:#fff;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;" onmouseover="this.style.background=\'#C74B00\'" onmouseout="this.style.background=\'#E85D04\'">✍️ Faire un devis</button>'
+    + '<button onclick="window.ouvrirDevis(\''+safeId+'\',\''+safeTitre+'\',\''+safeAudio+'\')" style="padding:8px 18px;background:#E85D04;color:#fff;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;" onmouseover="this.style.background=\'#C74B00\'" onmouseout="this.style.background=\'#E85D04\'">✍️ Faire un devis</button>'
     + '</div>';
 };
 
 // ────────────────────────────────────────────────
 // DEVIS PRESTATAIRE
 // ────────────────────────────────────────────────
-window.ouvrirDevis = function(missionId, missionTitre) {
+window.ouvrirDevis = function(missionId, missionTitre, missionAudioUrl) {
   var session = null;
   try { session = JSON.parse(localStorage.getItem('yj_provider_session')); } catch(e) {}
 
@@ -12841,6 +12842,9 @@ window.ouvrirDevis = function(missionId, missionTitre) {
   }
 
   var prestataireName = ((session.prenom||'') + ' ' + (session.nom||'')).trim() || 'Prestataire';
+  var hasAudio = !!(missionAudioUrl && missionAudioUrl.trim());
+  var lockStyle = hasAudio ? 'pointer-events:none;opacity:0.5;user-select:none;' : '';
+  window._dvVocalClientPresent = hasAudio;
 
   modal.innerHTML =
     '<div style="background:#fff;border-radius:20px;width:100%;max-width:520px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);">'
@@ -12849,21 +12853,56 @@ window.ouvrirDevis = function(missionId, missionTitre) {
       +'<div style="color:#fff;font-size:18px;font-weight:800;margin-bottom:3px;">✍️ Faire un devis</div>'
       +'<div style="color:rgba(255,255,255,.85);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Projet : '+missionTitre+'</div>'
     +'</div>'
+    +(hasAudio
+      ? '<div id="dvAudioClientBloc" style="margin:16px 26px 0 26px;background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:12px;padding:13px 15px;">'
+          +'<div style="font-size:13px;font-weight:700;color:#C74B00;margin-bottom:8px;">🎤 Écoutez d\'abord le besoin du client :</div>'
+          +'<audio id="dvClientAudio" controls preload="none" src="'+missionAudioUrl+'" style="width:100%;height:38px;border-radius:8px;display:block;"></audio>'
+          +'<div id="dvEcouteStatut" style="margin-top:7px;font-size:12px;color:#92400E;">Écoutez le message pour pouvoir proposer votre devis</div>'
+        +'</div>'
+      : '')
     +'<div style="padding:20px 26px;display:flex;flex-direction:column;gap:13px;">'
-      +'<div style="background:#F0FDF4;border-radius:10px;padding:9px 13px;font-size:12.5px;color:#166534;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-circle-check"></i>Connecté : <strong>'+prestataireName+'</strong></div>'
-      +_grp('Montant proposé (GNF) *','<input id="dvMontant" type="number" placeholder="Ex : 750000" style="'+_inpS+'">')
-      +_grp('Délai de réalisation *','<input id="dvDelai" type="text" placeholder="Ex : 3 jours, 1 semaine..." style="'+_inpS+'">')
-      +'<div>'
-        +_lbl('Comment expliquez-vous votre devis ?')
-        +'<div id="dvChoix"></div>'
+      +'<div id="dvFormLockWrap" style="display:flex;flex-direction:column;gap:13px;'+lockStyle+'">'
+        +'<div style="background:#F0FDF4;border-radius:10px;padding:9px 13px;font-size:12.5px;color:#166534;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-circle-check"></i>Connecté : <strong>'+prestataireName+'</strong></div>'
+        +_grp('Montant proposé (GNF) *','<input id="dvMontant" type="number" placeholder="Ex : 750000" style="'+_inpS+'">')
+        +_grp('Délai de réalisation *','<input id="dvDelai" type="text" placeholder="Ex : 3 jours, 1 semaine..." style="'+_inpS+'">')
+        +'<div>'
+          +_lbl('Comment expliquez-vous votre devis ?')
+          +'<div id="dvChoix"></div>'
+        +'</div>'
       +'</div>'
     +'</div>'
     +'<div style="padding:14px 26px;border-top:1px solid #F0F0F8;">'
       +'<div id="dvErreur" style="color:#DC2626;font-size:12.5px;margin-bottom:9px;display:none;background:#FEF2F2;border-radius:8px;padding:8px 12px;"></div>'
-      +'<button id="dvSubmitBtn" onclick="window._envoyerDevis(\''+String(missionId)+'\')" style="width:100%;padding:13px;background:linear-gradient(135deg,#E85D04,#C74B00);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">📤 Envoyer mon devis</button>'
+      +'<button id="dvSubmitBtn" onclick="window._envoyerDevis(\''+String(missionId)+'\')" style="width:100%;padding:13px;background:linear-gradient(135deg,#E85D04,#C74B00);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;'+lockStyle+'">📤 Envoyer mon devis</button>'
     +'</div>'
     +'</div>';
   _dvAudioBlob = null;
+
+  if (hasAudio) {
+    var _dvProgresEcoute = 0;
+    var _dvEcouteOK = false;
+    function _debloquerFormulaireDevis() {
+      if (_dvEcouteOK) return;
+      _dvEcouteOK = true;
+      var wrap = document.getElementById('dvFormLockWrap');
+      var btn  = document.getElementById('dvSubmitBtn');
+      var stat = document.getElementById('dvEcouteStatut');
+      if (wrap) { wrap.style.pointerEvents = ''; wrap.style.opacity = ''; wrap.style.userSelect = ''; }
+      if (btn)  { btn.style.pointerEvents = ''; btn.style.opacity = ''; }
+      if (stat) { stat.innerHTML = '<span style="color:#166534;font-weight:700;">✓ Message écouté</span>'; }
+    }
+    setTimeout(function() {
+      var aud = document.getElementById('dvClientAudio');
+      if (!aud) return;
+      aud.addEventListener('timeupdate', function() {
+        if (!this.duration) return;
+        if (this.currentTime > _dvProgresEcoute) _dvProgresEcoute = this.currentTime;
+        if (_dvProgresEcoute / this.duration >= 0.8) _debloquerFormulaireDevis();
+      });
+      aud.addEventListener('ended', function() { _debloquerFormulaireDevis(); });
+    }, 0);
+  }
+
   setTimeout(function() { _creerChoixSaisie('dvChoix', 'dvMessage', 'Présentez-vous et expliquez votre approche...', function(b) { _dvAudioBlob = b; }); }, 0);
 };
 
@@ -12932,7 +12971,8 @@ window._envoyerDevis = async function(missionId) {
       return;
     }
     var dv_mode = (message && audioUrl) ? 'mixte' : audioUrl ? 'vocal' : 'texte';
-    var ins = await sb.from('devis').insert({
+    var vocal_ecoute = !!(window._dvVocalClientPresent);
+    var payloadBase = {
       mission_id:  missionId,
       provider_id: session.provider_id,
       montant:     parseInt(montant, 10),
@@ -12941,8 +12981,15 @@ window._envoyerDevis = async function(missionId) {
       audio_url:   audioUrl || null,
       statut:      'envoye',
       mode_saisie: dv_mode
-    }).select('id').single();
-    if (ins.error) throw ins.error;
+    };
+    var ins = await sb.from('devis').insert(Object.assign({}, payloadBase, { vocal_ecoute: vocal_ecoute })).select('id').single();
+    if (ins.error) {
+      if (ins.error.message && ins.error.message.includes('vocal_ecoute')) {
+        console.warn('Colonne vocal_ecoute absente, réessai sans elle');
+        ins = await sb.from('devis').insert(payloadBase).select('id').single();
+      }
+      if (ins.error) throw ins.error;
+    }
     devisId = ins.data && ins.data.id;
   } catch(e) {
     console.error('Insert devis échoué:', e.message, e);
