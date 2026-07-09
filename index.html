@@ -14,6 +14,8 @@
 <meta property="og:image" content="https://yoummajobs.com/og-image.jpg"/>
 <meta property="og:url" content="https://yoummajobs.com"/>
 <meta name="theme-color" content="#1A1A4E"/>
+<!-- Fond blanc immédiat si arrivée via QR #verif= (avant tout JS) -->
+<script>if(window.location.hash.toLowerCase().indexOf('verif=')===1){document.documentElement.style.background='#fff';}</script>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <link rel="manifest" href="/manifest.json"/>
@@ -36,6 +38,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+console.log('[INIT] hash au chargement:', window.location.hash);
 
 // ── STUB GLOBAL openSoonHub (chargé tôt pour les onclick HTML) ──
 function openSoonHub() {
@@ -13049,7 +13052,7 @@ window.loginSubmitHandler=loginSubmitHandler;
 
 
 <!-- ══ PAGE VÉRIFICATION QR ══ -->
-<div class="page" id="page-verif">
+<div class="page" id="page-verif" style="background:#ffffff !important;min-height:100vh;">
   <!-- header : DIV (pas nav) pour éviter le CSS global nav{position:fixed} -->
   <div class="verif-header">
     <button onclick="_verifRetour()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.85);padding:7px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;"><i class="fa-solid fa-arrow-left" style="font-size:11px;"></i> Retour</button>
@@ -14073,6 +14076,9 @@ async function _verifLoad(matricule) {
   var _retour = '<div style="text-align:center;"><button class="verif-btn-back" onclick="_verifRetour()">← Retour au site</button></div>';
 
   try {
+    var _testAnon = await sb.from('providers').select('matricule, nom').limit(3);
+    console.log('[VERIF] test lecture anon:', JSON.stringify(_testAnon.data));
+
     var _res = await sb.from('providers')
       .select('id,prenom,nom,matricule,metier,commune,statut,photo_url,badge_ambassadeur,badge_ambassadeur_fin')
       .eq('matricule', matricule)
