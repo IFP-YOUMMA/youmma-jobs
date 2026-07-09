@@ -8252,8 +8252,9 @@ window.addEventListener('resize', function() {
 window.addEventListener('load', async function() {
   const hash = location.hash.replace('#','').toLowerCase().trim();
   if (hash.startsWith('verif=')) {
-    const _mat = hash.replace('verif=','').trim().toUpperCase().replace(/[^A-Z0-9\-]/g,'');
-    console.log('[VERIF] matricule nettoyé:', _mat);
+    const _rawHash = window.location.hash.replace('#verif=', '');
+    const _mat = _rawHash.replace(/[^A-Z0-9\-]/gi, '').toUpperCase().trim();
+    console.log('[VERIF] hash brut:', _rawHash, '| matricule nettoyé:', _mat);
     document.body.style.background = '#f5f5f5';
     navigate('verif');
     _verifLoad(_mat);
@@ -8307,8 +8308,9 @@ window.addEventListener('hashchange', async function() {
   
   // #verif= intercepté en priorité absolue (page publique, aucune auth requise)
   if (hash.startsWith('verif=')) {
-    const _hcMat = hash.replace('verif=','').trim().toUpperCase().replace(/[^A-Z0-9\-]/g,'');
-    console.log('[VERIF] matricule nettoyé:', _hcMat);
+    const _rawHash2 = window.location.hash.replace('#verif=', '');
+    const _hcMat = _rawHash2.replace(/[^A-Z0-9\-]/gi, '').toUpperCase().trim();
+    console.log('[VERIF] hash brut:', _rawHash2, '| matricule nettoyé:', _hcMat);
     document.body.style.background = '#f5f5f5';
     navigate('verif');
     _verifLoad(_hcMat);
@@ -14320,6 +14322,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/sw.js')
       .then(function(reg) {
+        reg.update(); // force la vérification d'une mise à jour au chargement
         console.log('YOUMMA JOBS PWA ready:', reg.scope);
       })
       .catch(function(err) {
