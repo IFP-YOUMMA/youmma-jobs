@@ -3941,17 +3941,19 @@ function openModal(id) {
     <div style="background:linear-gradient(145deg,var(--bleu),var(--bleu-mid));border-radius:18px;padding:22px;margin-bottom:16px;position:relative;overflow:hidden;">
       <div style="position:absolute;top:-24px;right:-24px;width:100px;height:100px;border-radius:50%;background:rgba(232,93,4,.2);"></div>
       <div style="position:absolute;bottom:-16px;left:30%;width:80px;height:80px;border-radius:50%;background:rgba(245,200,66,.1);"></div>
-      <div style="display:flex;gap:14px;align-items:flex-start;position:relative;z-index:1;">
-        <div class="mp2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;">
-          ${p.photo_url
-            ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${p.nom}"/>`
-            : p.ini}
+      <div style="display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;">
+        <div style="text-align:center;margin-bottom:12px;">
+          <div class="mp2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;margin:0 auto;">
+            ${p.photo_url
+              ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${p.nom}"/>`
+              : p.ini}
+          </div>
+          ${p.matricule ? `<div style="margin-top:8px;"><div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.5px;font-weight:500;">Matricule</div><div style="font-size:15px;color:#E8650A;font-weight:700;letter-spacing:1px;">${p.matricule}</div></div>` : ''}
         </div>
-        <div style="flex:1;min-width:0;">
-          ${p.matricule ? `<div style="margin-bottom:6px;"><div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.5px;font-weight:500;">Matricule</div><div style="font-size:15px;color:#E8650A;font-weight:700;letter-spacing:1px;">${p.matricule}</div></div>` : ''}
+        <div style="text-align:center;width:100%;">
           <div style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:3px;">${p.nom}</div>
           <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px;">${p.metier} · <i class="fa-solid fa-location-dot"></i> ${p.ville}</div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;">${badgesHtml}</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;">${badgesHtml}</div>
           ${badgeAmbValide ? `
           <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#F5C518,#E85D04);color:#fff;border-radius:25px;padding:8px 18px;font-size:12px;font-weight:800;letter-spacing:.04em;box-shadow:0 4px 16px rgba(232,93,4,.4);margin:8px 0;width:fit-content;">
             🏆 Artisan Ambassadeur YOUMMA JOBS
