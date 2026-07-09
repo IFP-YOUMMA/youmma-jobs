@@ -3763,16 +3763,16 @@ function renderProviders() {
 
       
       <div class="pc2-top">
-        <div class="pc2-avatar-col">
+        <div class="pc2-avatar-col" style="display:flex;flex-direction:column;align-items:center;">
           <div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;">
             ${p.photo_url
               ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${p.nom}"/>`
               : p.ini}
           </div>
           <div class="pc2-online-badge"></div>
+          ${p.matricule ? `<div style="text-align:center;margin-top:6px;"><div style="font-size:8px;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;font-weight:500;">Matricule</div><div style="font-size:11px;color:#E8650A;font-weight:700;letter-spacing:.5px;white-space:nowrap;">${p.matricule}</div></div>` : ''}
         </div>
         <div class="pc2-info" style="flex:1;min-width:0;">
-          ${p.matricule ? `<div style="margin-bottom:4px;"><div style="font-size:9px;color:#9CA3AF;text-transform:uppercase;letter-spacing:1.5px;font-weight:500;">Matricule</div><div style="font-size:13px;color:#E8650A;font-weight:700;letter-spacing:1px;">${p.matricule}</div></div>` : ''}
           <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px;">
             <div class="pc2-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
               ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom_entreprise : p.nom}
