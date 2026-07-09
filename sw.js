@@ -14,6 +14,13 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  const url = event.request.url;
+
+  // Ne jamais intercepter les requêtes Supabase (API, auth, Edge Functions)
+  if (url.includes('supabase.co') || url.includes('supabase.com')) {
+    return;
+  }
+
   if (event.request.mode === 'navigate') {
     event.respondWith(fetch(event.request));
     return;

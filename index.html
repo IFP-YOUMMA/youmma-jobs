@@ -8252,7 +8252,8 @@ window.addEventListener('resize', function() {
 window.addEventListener('load', async function() {
   const hash = location.hash.replace('#','').toLowerCase().trim();
   if (hash.startsWith('verif=')) {
-    const _mat = hash.replace('verif=','').trim().toUpperCase();
+    const _mat = hash.replace('verif=','').trim().toUpperCase().replace(/[^A-Z0-9\-]/g,'');
+    console.log('[VERIF] matricule nettoyé:', _mat);
     document.body.style.background = '#f5f5f5';
     navigate('verif');
     _verifLoad(_mat);
@@ -8306,7 +8307,8 @@ window.addEventListener('hashchange', async function() {
   
   // #verif= intercepté en priorité absolue (page publique, aucune auth requise)
   if (hash.startsWith('verif=')) {
-    const _hcMat = hash.replace('verif=','').trim().toUpperCase();
+    const _hcMat = hash.replace('verif=','').trim().toUpperCase().replace(/[^A-Z0-9\-]/g,'');
+    console.log('[VERIF] matricule nettoyé:', _hcMat);
     document.body.style.background = '#f5f5f5';
     navigate('verif');
     _verifLoad(_hcMat);
