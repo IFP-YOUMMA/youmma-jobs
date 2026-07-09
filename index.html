@@ -5636,6 +5636,9 @@ async function chargerAvis() {
     <div onclick="showAdmin('valide')" id="amenu-valide" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-circle-check" style="width:16px;"></i> Validés</div>
     <div onclick="showAdmin('rejete')" id="amenu-rejete" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-circle-xmark" style="width:16px;"></i> Rejetés</div>
     <div onclick="showAdmin('suspendu')" id="amenu-suspendu" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-ban" style="width:16px;"></i> Suspendus</div>
+    <div style="border-top:1px solid rgba(255,255,255,.12);margin:6px 0 8px;"></div>
+    <div onclick="showAdmin('enregistrer')" id="amenu-enregistrer" style="padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,101,10,.18);display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-user-plus" style="width:16px;color:#E8650A;"></i> <span style="color:#E8650A;">➕ Enregistrer</span></div>
+    <div style="border-top:1px solid rgba(255,255,255,.12);margin:8px 0 6px;"></div>
     <div onclick="showAdmin('carousel')" id="amenu-carousel" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-photo-film" style="width:16px;"></i> Images à la une</div>
     <div onclick="showAdmin('missions')" id="amenu-missions" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullseye" style="width:16px;"></i> Missions</div>
     <div onclick="showAdmin('projets_clients')" id="amenu-projets_clients" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-clipboard-list" style="width:16px;flex-shrink:0;"></i> Projets clients<span id="adminPcBadge" style="display:none;margin-left:auto;background:#E53E3E;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center;line-height:1.4;animation:yjBadgePulse 2s ease-in-out infinite;"></span></div>
@@ -5786,6 +5789,7 @@ async function chargerAvis() {
             <i class="fa-solid fa-clock" style="color:#D97706;"></i> En attente
             <span class="adm-section-badge" id="badgeAttente">0</span>
           </div>
+          <input class="adm-search-input" id="searchEnAttente" placeholder="Matricule, nom, téléphone..." oninput="filterTable('en_attente',this.value)"/>
         </div>
         <div id="tableEnAttente"></div>
       </div>
@@ -5813,6 +5817,7 @@ async function chargerAvis() {
             <i class="fa-solid fa-circle-xmark" style="color:#DC2626;"></i> Prestataires rejetés
             <span class="adm-section-badge" id="badgeRejete">0</span>
           </div>
+          <input class="adm-search-input" id="searchRejete" placeholder="Matricule, nom, téléphone..." oninput="filterTable('rejete',this.value)"/>
         </div>
         <div id="tableRejete"></div>
       </div>
@@ -5826,13 +5831,178 @@ async function chargerAvis() {
             <i class="fa-solid fa-ban" style="color:#7C3AED;"></i> Prestataires suspendus
             <span class="adm-section-badge" id="badgeSuspendu">0</span>
           </div>
+          <input class="adm-search-input" id="searchSuspendu" placeholder="Matricule, nom, téléphone..." oninput="filterTable('suspendu',this.value)"/>
         </div>
         <div id="tableSuspendu"></div>
       </div>
     </div>
 
 
-    
+    <!-- ══ ENREGISTRER UN PRESTATAIRE ══ -->
+    <div class="admin-section" id="admin-enregistrer">
+      <div class="admin-section-inner">
+
+        <!-- En-tête + compteur session -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;">
+          <div>
+            <div class="adm-section-title"><i class="fa-solid fa-user-plus" style="color:#E8650A;"></i> Enregistrer un prestataire</div>
+            <div style="font-size:12px;color:#6B7280;margin-top:4px;">Saisie directe lors des journées de formation — compte validé immédiatement</div>
+          </div>
+          <div style="background:linear-gradient(135deg,#E8650A,#1B2A4A);color:#fff;border-radius:14px;padding:10px 20px;text-align:center;min-width:150px;flex-shrink:0;">
+            <div id="admEnrCountNum" style="font-family:'Libre Baskerville',serif;font-size:26px;font-weight:700;line-height:1;">0</div>
+            <div style="font-size:10.5px;color:rgba(255,255,255,.7);margin-top:2px;">enregistrés aujourd'hui</div>
+          </div>
+        </div>
+
+        <!-- Bannière succès (cachée) -->
+        <div id="admEnrSuccess" style="display:none;background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border:2px solid #34D399;border-radius:16px;padding:20px 24px;margin-bottom:24px;text-align:center;">
+          <div style="font-size:28px;margin-bottom:6px;">✅</div>
+          <div style="font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:#065F46;">Compte créé avec succès</div>
+          <div style="font-size:26px;font-weight:800;color:#059669;letter-spacing:.1em;margin:8px 0 4px;font-family:'Libre Baskerville',serif;" id="admEnrMatricule">—</div>
+          <div style="font-size:13px;color:#065F46;" id="admEnrSuccessName"></div>
+          <div style="font-size:11px;color:#6B7280;margin-top:6px;">Mot de passe temporaire : 4 derniers chiffres du téléphone</div>
+        </div>
+
+        <!-- Formulaire -->
+        <div style="background:#F9FAFB;border-radius:16px;padding:20px;border:1.5px solid #E5E7EB;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;" id="admEnrFormGrid">
+
+            <!-- Prénom -->
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;">Prénom <span style="color:#E8650A;">*</span></label>
+              <input id="admEnrPrenom" type="text" placeholder="Ex : Mamadou" autocomplete="off"
+                style="width:100%;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;box-sizing:border-box;background:#fff;transition:border-color .15s;"
+                onfocus="this.style.borderColor='#E8650A'" onblur="this.style.borderColor='#E5E7EB'"/>
+            </div>
+
+            <!-- Nom -->
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;">Nom de famille <span style="color:#E8650A;">*</span></label>
+              <input id="admEnrNom" type="text" placeholder="Ex : DIALLO" autocomplete="off"
+                style="width:100%;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;box-sizing:border-box;background:#fff;transition:border-color .15s;"
+                onfocus="this.style.borderColor='#E8650A'" onblur="this.style.borderColor='#E5E7EB'"/>
+            </div>
+
+            <!-- Téléphone -->
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;">Téléphone <span style="color:#E8650A;">*</span> <span style="font-size:10px;color:#9CA3AF;font-weight:500;">(9 chiffres)</span></label>
+              <div style="position:relative;">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12.5px;color:#6B7280;font-weight:600;pointer-events:none;line-height:1;">+224</span>
+                <input id="admEnrTel" type="tel" placeholder="6XXXXXXXX" maxlength="9" autocomplete="off"
+                  style="width:100%;padding:10px 12px 10px 54px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;box-sizing:border-box;background:#fff;transition:border-color .15s;"
+                  oninput="this.value=this.value.replace(/\D/g,'');document.getElementById('admEnrWaSame')?.checked&&(document.getElementById('admEnrWa').value=this.value)"
+                  onfocus="this.style.borderColor='#E8650A'" onblur="this.style.borderColor='#E5E7EB';_admEnrCheckTel(this.value)"/>
+              </div>
+              <div id="admEnrTelWarn" style="display:none;margin-top:6px;padding:8px 12px;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:8px;font-size:12px;color:#DC2626;font-weight:600;"></div>
+            </div>
+
+            <!-- WhatsApp -->
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;">WhatsApp</label>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
+                <input type="checkbox" id="admEnrWaSame" onchange="_admEnrWaToggle()"
+                  style="width:16px;height:16px;cursor:pointer;accent-color:#E8650A;flex-shrink:0;">
+                <label for="admEnrWaSame" style="font-size:12px;color:#374151;cursor:pointer;">Identique au téléphone</label>
+              </div>
+              <div style="position:relative;" id="admEnrWaWrap">
+                <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12.5px;color:#6B7280;font-weight:600;pointer-events:none;line-height:1;">+224</span>
+                <input id="admEnrWa" type="tel" placeholder="6XXXXXXXX" maxlength="9" autocomplete="off"
+                  style="width:100%;padding:10px 12px 10px 54px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;box-sizing:border-box;background:#fff;transition:border-color .15s;"
+                  oninput="this.value=this.value.replace(/\D/g,'')"
+                  onfocus="this.style.borderColor='#E8650A'" onblur="this.style.borderColor='#E5E7EB'"/>
+              </div>
+            </div>
+
+            <!-- Catégorie -->
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;">Catégorie <span style="color:#E8650A;">*</span></label>
+              <select id="admEnrCat" onchange="_admEnrCatChange(this.value)"
+                style="width:100%;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;box-sizing:border-box;background:#fff;cursor:pointer;transition:border-color .15s;"
+                onfocus="this.style.borderColor='#E8650A'" onblur="this.style.borderColor='#E5E7EB'">
+                <option value="">— Choisir une catégorie —</option>
+              </select>
+            </div>
+
+            <!-- Métier -->
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;">Métier <span style="color:#E8650A;">*</span></label>
+              <select id="admEnrMetier"
+                style="width:100%;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;box-sizing:border-box;background:#fff;cursor:pointer;transition:border-color .15s;"
+                onfocus="this.style.borderColor='#E8650A'" onblur="this.style.borderColor='#E5E7EB'">
+                <option value="">— Choisir la catégorie d'abord —</option>
+              </select>
+            </div>
+
+            <!-- Expérience -->
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;">Années d'expérience</label>
+              <input id="admEnrExp" type="number" min="0" max="60" placeholder="0"
+                style="width:100%;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;box-sizing:border-box;background:#fff;transition:border-color .15s;"
+                onfocus="this.style.borderColor='#E8650A'" onblur="this.style.borderColor='#E5E7EB'"/>
+            </div>
+
+            <!-- Commune -->
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;">Commune / Ville <span style="color:#E8650A;">*</span></label>
+              <select id="admEnrCommune"
+                style="width:100%;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;box-sizing:border-box;background:#fff;cursor:pointer;transition:border-color .15s;"
+                onfocus="this.style.borderColor='#E8650A'" onblur="this.style.borderColor='#E5E7EB'">
+                <option value="">— Choisir —</option>
+                <optgroup label="Conakry">
+                  <option value="Kaloum">Kaloum</option>
+                  <option value="Dixinn">Dixinn</option>
+                  <option value="Matam">Matam</option>
+                  <option value="Matoto">Matoto</option>
+                  <option value="Ratoma">Ratoma</option>
+                </optgroup>
+                <optgroup label="Autres villes">
+                  <option value="Kindia">Kindia</option>
+                  <option value="Kankan">Kankan</option>
+                  <option value="Labé">Labé</option>
+                  <option value="Mamou">Mamou</option>
+                  <option value="Boké">Boké</option>
+                  <option value="Nzérékoré">Nzérékoré</option>
+                  <option value="Faranah">Faranah</option>
+                  <option value="Siguiri">Siguiri</option>
+                  <option value="Guéckédou">Guéckédou</option>
+                  <option value="Kamsar">Kamsar</option>
+                  <option value="Fria">Fria</option>
+                  <option value="Coyah">Coyah</option>
+                  <option value="Dubréka">Dubréka</option>
+                  <option value="Forécariah">Forécariah</option>
+                  <option value="Télimélé">Télimélé</option>
+                  <option value="Pita">Pita</option>
+                  <option value="Dalaba">Dalaba</option>
+                  <option value="Koundara">Koundara</option>
+                  <option value="Tougué">Tougué</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- Quartier / Adresse -->
+            <div style="grid-column:1 / -1;">
+              <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:5px;">Quartier / Adresse</label>
+              <input id="admEnrQuartier" type="text" placeholder="Ex : Kipé, Hamdallaye, Cité de l'Air..."
+                style="width:100%;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;box-sizing:border-box;background:#fff;transition:border-color .15s;"
+                onfocus="this.style.borderColor='#E8650A'" onblur="this.style.borderColor='#E5E7EB'"/>
+            </div>
+
+            <!-- Bouton -->
+            <div style="grid-column:1 / -1;margin-top:6px;">
+              <button type="button" onclick="_admEnrSave()" id="admEnrBtn"
+                style="width:100%;padding:14px;background:linear-gradient(135deg,#E8650A,#1B2A4A);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'DM Sans',sans-serif;box-shadow:0 4px 16px rgba(232,101,10,.35);transition:opacity .2s;"
+                onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
+                <i class="fa-solid fa-user-plus"></i> Enregistrer et nouveau
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
     <div class="admin-section" id="admin-rapports">
       <div class="admin-section-inner">
 
@@ -6205,7 +6375,7 @@ function showSection(name) {
 
 // ── LOAD DATA ──
 async function getProvidersAdmin({ statut='',limite=100 }={}) {
-  let q = sb.from('providers').select('id,prenom,nom,metier,categorie,ville,commune,telephone,statut,note_moyenne,nb_vues,photo_url,created_at,essai_actif,essai_fin,abonnement_actif,abonnement_fin,disponibilite,doc_cni_url,doc_cni_statut,doc_diplome_url,doc_diplome_statut').order('created_at',{ascending:false}).limit(limite);
+  let q = sb.from('providers').select('id,prenom,nom,matricule,metier,categorie,ville,commune,telephone,statut,note_moyenne,nb_vues,photo_url,created_at,essai_actif,essai_fin,abonnement_actif,abonnement_fin,disponibilite,doc_cni_url,doc_cni_statut,doc_diplome_url,doc_diplome_statut').order('created_at',{ascending:false}).limit(limite);
   if (statut) q = q.eq('statut',statut);
   const { data } = await q;
   return data||[];
@@ -6334,6 +6504,7 @@ function renderTableHTML(statut, data) {
           <div>
             <div class="adm-provider-name">${nom}</div>
             <div class="adm-provider-job">${p.metier||'—'}</div>
+            ${p.matricule?`<div style="font-size:10px;color:#9CA3AF;font-weight:600;letter-spacing:.04em;margin-top:1px;">${p.matricule}</div>`:''}
           </div>
         </div>
       </td>
@@ -6368,14 +6539,18 @@ function renderTableHTML(statut, data) {
 
 function filterTable(statut, query) {
   const q = query.toLowerCase();
-  const filtered = (allProviders[statut] || []).filter(p =>
+  const data = (window._allProviders&&window._allProviders[statut]) || allProviders[statut] || [];
+  const filtered = data.filter(p =>
     p.nom?.toLowerCase().includes(q) ||
     p.prenom?.toLowerCase().includes(q) ||
     p.telephone?.includes(q) ||
+    (p.matricule||'').toLowerCase().includes(q) ||
     p.metier?.toLowerCase().includes(q) ||
     p.ville?.toLowerCase().includes(q)
   );
-  renderTable(statut, filtered);
+  const ids = {en_attente:'tableEnAttente',valide:'tableValide',rejete:'tableRejete',suspendu:'tableSuspendu'};
+  const el = document.getElementById(ids[statut]);
+  if (el) el.innerHTML = renderTableHTML(statut, filtered);
 }
 
 // ── ACTIONS ──
@@ -7571,7 +7746,7 @@ async function _adminLoadAll() {
   const setA=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
   setA('statTotal',stats.total); setA('statAttente',stats.en_attente); setA('statValides',stats.valides); setA('statRejetes',stats.rejetes); setA('statSuspendu',stats.suspendu);
   const statuts=['en_attente','valide','rejete','suspendu'];
-  await Promise.all(statuts.map(async s=>{_allProviders[s]=await getProvidersAdmin({statut:s});_adminRenderTable(s,_allProviders[s]);}));
+  await Promise.all(statuts.map(async s=>{_allProviders[s]=await getProvidersAdmin({statut:s});allProviders[s]=_allProviders[s];_adminRenderTable(s,_allProviders[s]);}));
   // Mettre à jour les badges de comptage dans la nav
   const b = (id, n) => { const el=document.getElementById(id); if(el) el.textContent=n; };
   b('badgeAttente', stats.en_attente||0);
@@ -8223,6 +8398,7 @@ function showAdmin(name) {
     missions: '<i class="fa-solid fa-bullseye" style="color:#E85D04;margin-right:6px;"></i>Missions',
     projets_clients: '<i class="fa-solid fa-clipboard-list" style="color:#E85D04;margin-right:6px;"></i>Projets clients',
     ambassadeurs: '<i class="fa-solid fa-trophy" style="color:#F5C842;margin-right:6px;"></i>Ambassadeurs',
+    enregistrer: '<i class="fa-solid fa-user-plus" style="color:#E8650A;margin-right:6px;"></i>Enregistrer un prestataire',
     rapports: '<i class="fa-solid fa-chart-line" style="color:#E85D04;margin-right:6px;"></i>Rapports',
     notifications: '<i class="fa-solid fa-bell" style="color:#E85D04;margin-right:6px;"></i>Notifications',
   };
@@ -8230,13 +8406,14 @@ function showAdmin(name) {
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','carousel','missions','projets_clients','ambassadeurs','rapports','notifications'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','enregistrer','carousel','missions','projets_clients','ambassadeurs','rapports','notifications'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (el) el.style.cssText = s===name ? ACTIVE : NORMAL;
   });
   if (name==='carousel') { if(typeof _carouselLoadAdmin==='function') _carouselLoadAdmin(); }
   else if (name==='missions') { renderAdminMissions(); }
   else if (name==='projets_clients') { _adminChargerProjets(); }
+  else if (name==='enregistrer') { _admEnrInit(); }
   else if (name!=='dashboard') { if(typeof _adminLoadAll==='function') _adminLoadAll(); }
 }
 
@@ -8295,14 +8472,15 @@ function actionsHTML(p) {
 }
 
 async function _adminAction(type, id) {
-  const labels = {valider:'Valider ce prestataire ?',rejeter:'Rejeter ?',suspendre:'Suspendre ?',supprimer:'SUPPRIMER définitivement ?'};
-  if (!window.confirm(labels[type]||type)) return;
+  if (type !== 'supprimer') {
+    const labels = {valider:'Valider ce prestataire ?',rejeter:'Rejeter ?',suspendre:'Suspendre ?'};
+    if (!window.confirm(labels[type]||type)) return;
+  }
   try {
     if (type==='valider') {
       const essai_fin = new Date(Date.now()+14*24*60*60*1000).toISOString();
       const {error} = await sb.from('providers').update({statut:'valide',essai_actif:true,essai_fin}).eq('id',id);
       if (error) throw new Error(error.message);
-      // SMS bienvenue — récupérer telephone + prenom puis appeler l'API
       try {
         const {data:prov} = await sb.from('providers').select('telephone,prenom').eq('id',id).single();
         if (prov?.telephone && prov?.prenom) {
@@ -8311,17 +8489,24 @@ async function _adminAction(type, id) {
             headers: {'Content-Type':'application/json'},
             body: JSON.stringify({telephone: prov.telephone, prenom: prov.prenom})
           });
-          console.log('[Admin] SMS bienvenue envoyé à', prov.prenom, prov.telephone);
         }
-      } catch(smsErr) {
-        console.log('[Admin] Erreur SMS bienvenue (non bloquant):', smsErr.message);
-      }
+      } catch(smsErr) { console.log('[Admin] SMS bienvenue (non bloquant):', smsErr.message); }
     } else if (type==='rejeter') {
       await sb.from('providers').update({statut:'rejete'}).eq('id',id);
     } else if (type==='suspendre') {
       await sb.from('providers').update({statut:'suspendu'}).eq('id',id);
     } else if (type==='supprimer') {
-      await sb.from('providers').delete().eq('id',id);
+      // Récupérer nom + matricule pour la confirmation
+      const {data:pData} = await sb.from('providers').select('prenom,nom,matricule').eq('id',id).single();
+      const fullName = `${pData?.prenom||''} ${pData?.nom||''}`.trim() || 'ce prestataire';
+      const mat = pData?.matricule || '—';
+      if (!window.confirm(`⚠️ SUPPRESSION DÉFINITIVE\n\nSupprimer définitivement ${fullName} (${mat}) ?\nSon matricule sera définitivement invalidé.\n\nCette action est irréversible.`)) return;
+      // Suppression cascadée des données liées
+      await sb.from('devis').delete().eq('provider_id', id);
+      await sb.from('provider_photos').delete().eq('provider_id', id);
+      try { await sb.from('notifications').delete().eq('receiver_id', id); } catch(e) {}
+      try { await sb.from('partages_log').delete().eq('provider_id', id); } catch(e) {}
+      await sb.from('providers').delete().eq('id', id);
     }
     showToast('Action effectuée avec succès');
     await loadAll();
@@ -12168,6 +12353,190 @@ async function retirerBadgeAmb(providerId, nomPrest) {
     .eq('id', providerId);
   showToast('Badge Ambassadeur retiré.', 'success');
   chargerClassementAdmin();
+}
+
+// ══════════════════════════════════════════════════════════════
+// ADMIN — ENREGISTREMENT PRESTATAIRES EN FORMATION
+// ══════════════════════════════════════════════════════════════
+var _admEnrSessionCount = 0;
+
+function _admEnrInit() {
+  // Peupler le select catégorie (une seule fois)
+  var catSel = document.getElementById('admEnrCat');
+  if (catSel && catSel.options.length <= 1) {
+    (window.CATEGORIES || []).forEach(function(cat) {
+      var opt = document.createElement('option');
+      opt.value = cat.nom;
+      opt.textContent = (cat.emoji || '') + ' ' + cat.nom;
+      catSel.appendChild(opt);
+    });
+  }
+  // Focus sur prénom
+  setTimeout(function() { document.getElementById('admEnrPrenom')?.focus(); }, 150);
+}
+
+function _admEnrWaToggle() {
+  var cb = document.getElementById('admEnrWaSame');
+  var wrap = document.getElementById('admEnrWaWrap');
+  var inp = document.getElementById('admEnrWa');
+  if (!cb) return;
+  if (cb.checked) {
+    if (wrap) wrap.style.opacity = '0.45';
+    if (inp) { inp.disabled = true; inp.value = document.getElementById('admEnrTel')?.value || ''; }
+  } else {
+    if (wrap) wrap.style.opacity = '1';
+    if (inp) inp.disabled = false;
+  }
+}
+
+async function _admEnrCheckTel(raw) {
+  var warn = document.getElementById('admEnrTelWarn');
+  if (!warn) return;
+  warn.style.display = 'none';
+  var digits = (raw || '').replace(/\D/g, '');
+  if (digits.length < 9) return;
+  var tel9 = digits.slice(-9);
+  try {
+    var res = await sb.from('providers').select('matricule,prenom,nom').ilike('telephone', '%' + tel9).limit(1);
+    if (res.data && res.data.length > 0) {
+      var p = res.data[0];
+      var name = ((p.prenom || '') + ' ' + (p.nom || '')).trim();
+      warn.innerHTML = '⚠️ Ce numéro existe déjà &mdash; <strong>' + (p.matricule || '—') + '</strong>' + (name ? ' · ' + name : '');
+      warn.style.display = 'block';
+    }
+  } catch(e) {}
+}
+
+function _admEnrCatChange(catNom) {
+  var sel = document.getElementById('admEnrMetier');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Choisir un métier —</option>';
+  var cat = (window.CATEGORIES || []).find(function(c) { return c.nom === catNom; });
+  if (!cat) return;
+  (cat.sous || []).forEach(function(m) {
+    var opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = m;
+    sel.appendChild(opt);
+  });
+}
+
+async function _admEnrSave() {
+  var prenom   = (document.getElementById('admEnrPrenom')?.value || '').trim();
+  var nom      = (document.getElementById('admEnrNom')?.value || '').trim();
+  var telRaw   = (document.getElementById('admEnrTel')?.value || '').replace(/\D/g, '');
+  var waSame   = document.getElementById('admEnrWaSame')?.checked;
+  var waRaw    = waSame ? telRaw : (document.getElementById('admEnrWa')?.value || '').replace(/\D/g, '');
+  var cat      = document.getElementById('admEnrCat')?.value || '';
+  var metier   = document.getElementById('admEnrMetier')?.value || '';
+  var expRaw   = document.getElementById('admEnrExp')?.value || '';
+  var commune  = document.getElementById('admEnrCommune')?.value || '';
+  var quartier = (document.getElementById('admEnrQuartier')?.value || '').trim();
+
+  // Validation
+  if (!prenom) { showToast('⚠️ Prénom obligatoire', 'warning'); return; }
+  if (!nom)    { showToast('⚠️ Nom obligatoire', 'warning'); return; }
+  if (telRaw.length < 9) { showToast('⚠️ Téléphone invalide — 9 chiffres requis', 'warning'); return; }
+  if (!cat)    { showToast('⚠️ Catégorie obligatoire', 'warning'); return; }
+  if (!metier) { showToast('⚠️ Métier obligatoire', 'warning'); return; }
+  if (!commune){ showToast('⚠️ Commune obligatoire', 'warning'); return; }
+
+  // Bloquer si doublon détecté
+  var warn = document.getElementById('admEnrTelWarn');
+  if (warn && warn.style.display !== 'none') { showToast('⚠️ Ce numéro existe déjà — vérifiez', 'warning'); return; }
+
+  // Normalisation téléphone
+  var tel9 = telRaw.slice(-9);
+  var telephone = '224' + tel9;
+  var wa = waRaw.length >= 9 ? '224' + waRaw.slice(-9) : telephone;
+
+  // Ville automatique
+  var CONAKRY_COMMUNES = ['Kaloum','Dixinn','Matam','Matoto','Ratoma'];
+  var ville = CONAKRY_COMMUNES.indexOf(commune) !== -1 ? 'Conakry' : commune;
+  var communeField = CONAKRY_COMMUNES.indexOf(commune) !== -1 ? commune : null;
+
+  var btn = document.getElementById('admEnrBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement...'; }
+
+  try {
+    // Mot de passe temporaire = 4 derniers chiffres du téléphone
+    var tmpPwd = tel9.slice(-4);
+    var hash = await hashPassword(tmpPwd);
+
+    var result = await sb.from('providers').insert({
+      prenom: prenom,
+      nom: nom,
+      telephone: telephone,
+      metier: metier,
+      categorie: cat,
+      ville: ville,
+      commune: communeField,
+      quartier: quartier || null,
+      experience: expRaw ? String(expRaw) : null,
+      statut: 'valide',
+      password_hash: hash,
+      disponibilite: 'Disponible',
+      type_compte: 'particulier',
+    }).select('id,matricule,prenom,nom').single();
+
+    if (result.error) {
+      if (result.error.code === '23505') showToast('⚠️ Ce numéro est déjà inscrit', 'warning');
+      else showToast('Erreur : ' + result.error.message, 'error');
+      return;
+    }
+
+    var data = result.data;
+    var mat = data?.matricule || '—';
+    var fullName = ((data?.prenom || '') + ' ' + (data?.nom || '')).trim();
+
+    // Incrémenter compteur session
+    _admEnrSessionCount++;
+    var cntEl = document.getElementById('admEnrCountNum');
+    if (cntEl) cntEl.textContent = _admEnrSessionCount;
+
+    // Afficher bannière succès
+    var succDiv = document.getElementById('admEnrSuccess');
+    var matEl   = document.getElementById('admEnrMatricule');
+    var nameEl  = document.getElementById('admEnrSuccessName');
+    if (succDiv) succDiv.style.display = 'block';
+    if (matEl)  matEl.textContent = mat;
+    if (nameEl) nameEl.textContent = fullName + ' — ' + metier;
+    if (succDiv) succDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    showToast('✅ Compte créé : ' + mat, 'success');
+
+    // Vider et recentrer le formulaire
+    _admEnrReset();
+
+    // Auto-cacher la bannière après 10s
+    setTimeout(function() { if (succDiv) succDiv.style.display = 'none'; }, 10000);
+
+    // Rafraîchir les listes admin
+    if (typeof _adminLoadAll === 'function') _adminLoadAll();
+
+  } catch(e) {
+    showToast('Erreur : ' + (e.message || 'Inconnue'), 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Enregistrer et nouveau'; }
+  }
+}
+
+function _admEnrReset() {
+  var ids = ['admEnrPrenom','admEnrNom','admEnrTel','admEnrWa','admEnrExp','admEnrQuartier'];
+  ids.forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+  var selIds = ['admEnrCat','admEnrCommune'];
+  selIds.forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+  var cb = document.getElementById('admEnrWaSame');
+  if (cb) cb.checked = false;
+  var metierSel = document.getElementById('admEnrMetier');
+  if (metierSel) metierSel.innerHTML = '<option value="">— Choisir la catégorie d\'abord —</option>';
+  var warn = document.getElementById('admEnrTelWarn');
+  if (warn) warn.style.display = 'none';
+  var waInp = document.getElementById('admEnrWa');
+  if (waInp) waInp.disabled = false;
+  var waWrap = document.getElementById('admEnrWaWrap');
+  if (waWrap) waWrap.style.opacity = '1';
+  setTimeout(function() { document.getElementById('admEnrPrenom')?.focus(); }, 80);
 }
 
 function loginSubmitHandler(){var tel=document.getElementById("telephone")?.value;var pin=["lpin1","lpin2","lpin3","lpin4"].map(function(id){return document.getElementById(id)?.value||"";}).join("");var errBox=document.getElementById("errorBox");var btn=document.getElementById("loginSubmitBtn");if(errBox)errBox.style.display="none";if(!tel||tel.trim().length<8){if(errBox){errBox.textContent="Entrez un numero valide";errBox.style.display="block";}return;}if(pin.length<4){if(errBox){errBox.textContent="Entrez votre code PIN 4 chiffres";errBox.style.display="block";}return;}if(btn)btn.disabled=true;(async function(){try{var res=await connexionPrestataire(tel.trim(),pin);if(res.success){var pid=res.provider&&res.provider.id;if(pid){document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");p.style.display="";});document.getElementById("page-login").style.cssText="display:none!important";document.body.classList.add("on-dashboard");document.body.classList.remove("on-home","on-admin");var pd=document.getElementById("page-dashboard");if(pd){pd.classList.add("active");pd.style.cssText="display:block!important";window.scrollTo(0,0);}if(typeof chargerDashboard==="function")await chargerDashboard(pid);}}else{if(errBox){errBox.textContent=res.message||"Telephone ou PIN incorrect";errBox.style.display="block";}}}catch(e){if(errBox){errBox.textContent="Erreur: "+e.message;errBox.style.display="block";}}if(btn)btn.disabled=false;})();}
