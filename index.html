@@ -11507,8 +11507,7 @@ async function _dispoNowLoad() {
         :'<span style="font-size:22px;font-weight:800;color:#fff;">'+ini+'</span>';
       var locTxt=[p.quartier,p.commune,p.ville].filter(Boolean).join(', ');
       var loc=locTxt?'<div style="font-size:11px;color:#6B7280;text-align:center;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;">📍 '+locTxt+'</div>':'';
-      var oc=p.id?'onclick="ouvrirProfil('+JSON.stringify(p.id)+')" style="cursor:pointer;"':'';
-      return '<div class="dispo-now-card" '+oc+'>'
+      return '<div class="dispo-now-card"'+(p.id?' data-pid="'+p.id+'"':'')+'>'
         +'<div style="width:64px;height:64px;border-radius:50%;overflow:hidden;border:3px solid #E85D04;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:'+col+';margin-bottom:10px;">'+av+'</div>'
         +'<div style="font-weight:700;font-size:14px;color:#1A1A4E;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;">'+full+'</div>'
         +'<div style="font-size:12px;color:#E85D04;font-weight:600;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;margin-top:2px;">'+(p.metier||'')+'</div>'
@@ -11522,6 +11521,19 @@ async function _dispoNowLoad() {
     var dur=Math.max(18, list.length*3.5);
     track.style.animationDuration=dur+'s';
     track.style.animationPlayState='running';
+    // Délégation unique sur la section : tap → profil, swipe → ignoré
+    var _sec=document.getElementById('disponibles-maintenant');
+    if(_sec&&!_sec._dispoDelegated){
+      var _txs=0,_tys=0,_moved=false;
+      _sec.addEventListener('touchstart',function(e){_txs=e.touches[0].clientX;_tys=e.touches[0].clientY;_moved=false;},{passive:true});
+      _sec.addEventListener('touchmove',function(e){if(Math.abs(e.touches[0].clientX-_txs)>10||Math.abs(e.touches[0].clientY-_tys)>10)_moved=true;},{passive:true});
+      _sec.addEventListener('click',function(e){
+        if(_moved){_moved=false;return;}
+        var c=e.target.closest('.dispo-now-card[data-pid]');
+        if(c)ouvrirProfil(c.dataset.pid);
+      });
+      _sec._dispoDelegated=true;
+    }
   } catch(e){ console.error('[DispoNow]',e); }
 }
 
