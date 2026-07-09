@@ -3763,14 +3763,13 @@ function renderProviders() {
 
       
       <div class="pc2-top">
-        <div class="pc2-avatar-col" style="display:flex;flex-direction:column;align-items:center;">
+        <div class="pc2-avatar-col">
           <div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;">
             ${p.photo_url
               ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${p.nom}"/>`
               : p.ini}
           </div>
           <div class="pc2-online-badge"></div>
-          ${p.matricule ? `<div style="text-align:center;margin-top:6px;"><div style="font-size:8px;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;font-weight:500;">Matricule</div><div style="font-size:11px;color:#E8650A;font-weight:700;letter-spacing:.5px;white-space:nowrap;">${p.matricule}</div></div>` : ''}
         </div>
         <div class="pc2-info" style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px;">
@@ -3782,7 +3781,7 @@ function renderProviders() {
               <button class="btn-pfav" onclick="event.stopPropagation();toggleFav('${p.id}')" style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px 4px;line-height:1;">${isFav?'<i class="fa-solid fa-heart" style="color:#E85D04;"></i>':'<i class="fa-regular fa-heart" style="color:#bbb;"></i>'}</button>
             </div>
           </div>
-          
+
           <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">
             <div class="pc2-metier" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
               ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom + ' · ' + p.metier : p.metier}
@@ -3791,7 +3790,7 @@ function renderProviders() {
               <i class="fa-solid fa-bullseye" style="font-size:9px;"></i> ${p.missions||0} mission${(p.missions||0)>1?'s':''}
             </div>
           </div>
-          
+          ${p.matricule ? `<div style="display:inline-flex;align-items:center;gap:5px;margin-top:3px;margin-bottom:2px;"><span style="font-size:10px;color:#9CA3AF;text-transform:uppercase;letter-spacing:1px;">N°</span><span style="font-size:12px;color:#E8650A;font-weight:700;letter-spacing:.5px;">${p.matricule}</span></div>` : ''}
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px;">
             <div style="font-size:12px;color:var(--gris);display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
               <i class="fa-solid fa-location-dot" style="color:var(--orange);font-size:11px;"></i>
