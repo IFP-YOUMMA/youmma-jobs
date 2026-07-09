@@ -8255,8 +8255,6 @@ window.addEventListener('load', async function() {
     const _rawHash = window.location.hash.replace('#verif=', '');
     const _mat = _rawHash.replace(/[^A-Z0-9\-]/gi, '').toUpperCase().trim();
     console.log('[VERIF] hash brut:', _rawHash, '| matricule nettoyé:', _mat);
-    document.body.style.background = '#f5f5f5';
-    navigate('verif');
     _verifLoad(_mat);
     return;
   }
@@ -8311,8 +8309,6 @@ window.addEventListener('hashchange', async function() {
     const _rawHash2 = window.location.hash.replace('#verif=', '');
     const _hcMat = _rawHash2.replace(/[^A-Z0-9\-]/gi, '').toUpperCase().trim();
     console.log('[VERIF] hash brut:', _rawHash2, '| matricule nettoyé:', _hcMat);
-    document.body.style.background = '#f5f5f5';
-    navigate('verif');
     _verifLoad(_hcMat);
     return;
   }
@@ -14064,20 +14060,37 @@ function _loadScript(url) {
 }
 
 function _verifRetour() {
-  document.body.style.background = '';
-  navigate('home');
+  document.getElementById('verif-overlay')?.remove();
+  window.location.hash = '';
 }
 
 async function _verifLoad(matricule) {
   console.log('[VERIF] hash détecté, matricule extrait :', matricule);
 
-  var el = document.getElementById('verifResult');
-  if (!el) { console.error('[VERIF] #verifResult introuvable'); return; }
+  // Supprimer tout overlay existant
+  var _oldOv = document.getElementById('verif-overlay');
+  if (_oldOv) _oldOv.remove();
 
-  // Spinner pendant la requête
-  el.innerHTML = '<div class="verif-card"><div id="verifSpinner"></div><div style="font-size:14px;color:#6B7280;font-weight:500;">Vérification de '+matricule+'…</div></div>';
+  // Overlay fullscreen indépendant du système de navigation
+  var overlay = document.createElement('div');
+  overlay.id = 'verif-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#f5f7fa;z-index:99999;overflow-y:auto;font-family:\'DM Sans\',system-ui,sans-serif;display:flex;align-items:flex-start;justify-content:center;padding:20px;box-sizing:border-box;';
+  document.body.appendChild(overlay);
 
-  var _retour = '<div style="text-align:center;"><button class="verif-btn-back" onclick="_verifRetour()">← Retour au site</button></div>';
+  var _retourCode = "document.getElementById('verif-overlay')?.remove();window.location.hash='';";
+  var _retour = '<div style="text-align:center;margin-top:16px;"><button onclick="'+_retourCode+'" style="background:#fff;border:1.5px solid #E5E7EB;color:#374151;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;padding:10px 28px;border-radius:40px;cursor:pointer;">← Retour au site</button></div>';
+
+  var _wrap = document.createElement('div');
+  _wrap.style.cssText = 'width:100%;max-width:420px;margin-top:40px;';
+  overlay.appendChild(_wrap);
+
+  // Spinner initial
+  _wrap.innerHTML =
+    '<div style="background:#fff;border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #E5E7EB;">'
+    + '<style>@keyframes _vSpin{to{transform:rotate(360deg)}}</style>'
+    + '<div style="width:44px;height:44px;border:4px solid #F3F4F6;border-top-color:#E8650A;border-radius:50%;animation:_vSpin 0.8s linear infinite;margin:0 auto 14px;"></div>'
+    + '<div style="font-size:14px;color:#6B7280;font-weight:500;">Vérification de '+matricule+'…</div>'
+    + '</div>';
 
   try {
     var _testAnon = await sb.from('providers').select('matricule, nom').limit(3);
@@ -14090,10 +14103,9 @@ async function _verifLoad(matricule) {
 
     console.log('[VERIF] Supabase data:', _res.data, '| error:', _res.error);
 
-    // Erreur Supabase → CAS 3 avec message
     if (_res.error) {
-      el.innerHTML =
-        '<div class="verif-card" style="border-color:#FCA5A5;">'
+      _wrap.innerHTML =
+        '<div style="background:#fff;border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #FCA5A5;">'
         + '<div style="font-size:48px;margin-bottom:12px;">❌</div>'
         + '<div style="font-size:18px;font-weight:800;color:#374151;margin-bottom:8px;">Erreur de vérification</div>'
         + '<div style="font-size:13px;color:#6B7280;">'+_res.error.message+'</div>'
@@ -14105,11 +14117,10 @@ async function _verifLoad(matricule) {
     var p = _res.data;
     console.log('[VERIF] Prestataire trouvé :', p ? p.statut : 'null');
 
-    // CAS 3 — matricule introuvable
     if (!p) {
       console.log('[VERIF] CAS 3 — introuvable');
-      el.innerHTML =
-        '<div class="verif-card">'
+      _wrap.innerHTML =
+        '<div style="background:#fff;border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #E5E7EB;">'
         + '<div style="font-family:\'Libre Baskerville\',serif;font-size:15px;font-weight:700;color:#1B2A4A;margin-bottom:16px;">YOUMMA<span style="color:#E8650A;">JOBS</span></div>'
         + '<div style="font-size:52px;line-height:1;margin-bottom:14px;">❌</div>'
         + '<div style="font-size:18px;font-weight:800;color:#374151;margin-bottom:10px;">Badge non reconnu</div>'
@@ -14123,7 +14134,6 @@ async function _verifLoad(matricule) {
     var isAmbass = p.badge_ambassadeur && p.badge_ambassadeur_fin && new Date(p.badge_ambassadeur_fin) > new Date();
 
     if (isValide) {
-      // CAS 1 — prestataire valide — page VERTE
       console.log('[VERIF] CAS 1 — valide :', p.prenom, p.nom);
       var _nom = ((p.prenom||'') + ' ' + (p.nom||'')).trim();
       var _ini = ((p.prenom||'?')[0] + (p.nom||'?')[0]).toUpperCase();
@@ -14131,8 +14141,9 @@ async function _verifLoad(matricule) {
         ? '<img src="'+p.photo_url+'" loading="lazy" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid #6EE7B7;box-shadow:0 4px 16px rgba(5,150,105,.22);margin:0 auto 14px;display:block;">'
         : '<div style="width:96px;height:96px;border-radius:50%;background:#D1FAE5;border:3px solid #6EE7B7;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:#059669;margin:0 auto 14px;">'+_ini+'</div>';
       var _pid = p.id;
-      el.innerHTML =
-        '<div class="verif-card" style="border-color:#6EE7B7;background:linear-gradient(160deg,#ECFDF5,#D1FAE5);">'
+      var _btnProfil = "document.getElementById('verif-overlay')?.remove();window.location.hash='';setTimeout(function(){if(typeof ouvrirProfil==='function')ouvrirProfil('"+_pid+"');},400);";
+      _wrap.innerHTML =
+        '<div style="background:linear-gradient(160deg,#ECFDF5,#D1FAE5);border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #6EE7B7;">'
         + '<div style="font-family:\'Libre Baskerville\',serif;font-size:15px;font-weight:700;color:#1B2A4A;margin-bottom:8px;">YOUMMA<span style="color:#E8650A;">JOBS</span></div>'
         + '<div style="font-size:52px;line-height:1;margin-bottom:6px;">✅</div>'
         + '<div style="font-size:11px;font-weight:800;color:#059669;letter-spacing:.06em;margin-bottom:18px;">PRESTATAIRE VÉRIFIÉ PAR YOUMMA JOBS</div>'
@@ -14142,14 +14153,13 @@ async function _verifLoad(matricule) {
         + '<div style="font-size:13px;color:#6B7280;margin-bottom:12px;">'+(p.commune||'Conakry')+'</div>'
         + '<div style="font-size:11px;font-weight:700;color:#6B7280;letter-spacing:.06em;background:#fff;border:1px solid #A7F3D0;padding:4px 14px;border-radius:20px;display:inline-block;margin-bottom:'+(isAmbass?'10':'16')+'px;">'+p.matricule+'</div>'
         + (isAmbass ? '<div style="display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,#F5C518,#E8650A);color:#fff;border-radius:20px;padding:6px 14px;font-size:11px;font-weight:800;margin:0 auto 16px;width:fit-content;">🏆 Artisan Ambassadeur YOUMMA JOBS</div>' : '')
-        + '<button class="verif-btn-primary" onclick="_verifRetour();setTimeout(function(){if(typeof ouvrirProfil===\'function\')ouvrirProfil(\''+_pid+'\');},400);">Voir le profil complet →</button>'
+        + '<button onclick="'+_btnProfil+'" style="display:block;width:100%;background:linear-gradient(135deg,#E8650A,#C74B00);color:#fff;border:none;border-radius:40px;padding:13px 20px;font-size:15px;font-weight:700;font-family:\'DM Sans\',sans-serif;cursor:pointer;margin-bottom:10px;">Voir le profil complet →</button>'
         + '</div>'
         + _retour;
     } else {
-      // CAS 2 — compte non valide — page ROUGE, aucune info personnelle
       console.log('[VERIF] CAS 2 — non valide, statut :', p.statut);
-      el.innerHTML =
-        '<div class="verif-card" style="border-color:#FCA5A5;background:linear-gradient(160deg,#FEF2F2,#FEE2E2);">'
+      _wrap.innerHTML =
+        '<div style="background:linear-gradient(160deg,#FEF2F2,#FEE2E2);border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #FCA5A5;">'
         + '<div style="font-family:\'Libre Baskerville\',serif;font-size:15px;font-weight:700;color:#1B2A4A;margin-bottom:10px;">YOUMMA<span style="color:#E8650A;">JOBS</span></div>'
         + '<div style="font-size:52px;line-height:1;margin-bottom:14px;">⚠️</div>'
         + '<div style="font-size:17px;font-weight:800;color:#7F1D1D;line-height:1.4;margin-bottom:10px;">Ce prestataire n\'est plus actif<br>sur YOUMMA JOBS</div>'
@@ -14159,9 +14169,9 @@ async function _verifLoad(matricule) {
     }
   } catch(e) {
     console.error('[VERIF] Exception :', e);
-    el.innerHTML =
-      '<div class="verif-card" style="border-color:#FCA5A5;">'
-      + '<div style="font-size:13px;color:#DC2626;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>Erreur inattendue : '+e.message+'</div>'
+    _wrap.innerHTML =
+      '<div style="background:#fff;border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #FCA5A5;">'
+      + '<div style="font-size:13px;color:#DC2626;">Erreur inattendue : '+e.message+'</div>'
       + '</div>' + _retour;
   }
 }
