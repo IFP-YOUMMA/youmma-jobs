@@ -14183,165 +14183,92 @@ async function _genererBadgePDF(p) {
   showToast('Génération du badge en cours…','info');
   try {
     await _loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');
+    await _loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
     await _loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
 
     var verif_url = 'https://yoummajobs.com/#verif=' + p.matricule;
     var nom = ((p.prenom||'') + ' ' + (p.nom||'')).trim() || p.nom || 'Prestataire';
+    var ini = ((p.prenom||'?')[0] + (p.nom||'?')[0]).toUpperCase();
+    var isAmbass = p.badge_ambassadeur && p.badge_ambassadeur_fin && new Date(p.badge_ambassadeur_fin) > new Date();
 
-    // QR code dans div caché
-    var qrDiv = document.createElement('div');
-    qrDiv.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:200px;height:200px;';
-    document.body.appendChild(qrDiv);
-    new QRCode(qrDiv, { text: verif_url, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.H });
-    await new Promise(function(r){ setTimeout(r, 600); });
-    var qrCanvas = qrDiv.querySelector('canvas');
+    // ── Badge HTML (rendu par html2canvas) ──
+    var _wrap = document.createElement('div');
+    _wrap.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
+    _wrap.innerHTML =
+      '<div id="_bdg_inner" style="width:340px;background:#fff;font-family:\'DM Sans\',sans-serif;border-radius:16px;overflow:hidden;">'
+      // Bandeau bleu
+      + '<div style="background:#1B2A4A;padding:20px 24px 16px;text-align:center;">'
+      +   '<div style="font-family:\'Libre Baskerville\',serif;font-size:22px;font-weight:700;line-height:1;">'
+      +     '<span style="color:#fff;">YOUMMA</span><span style="color:#E8650A;">JOBS</span>'
+      +   '</div>'
+      +   '<div style="font-family:\'DM Sans\',sans-serif;font-size:10px;font-weight:500;color:rgba(255,255,255,.65);letter-spacing:2px;text-transform:uppercase;margin-top:6px;">Prestataire Vérifié</div>'
+      + '</div>'
+      // Photo
+      + '<div style="display:flex;flex-direction:column;align-items:center;padding:20px 24px 0;">'
+      + (p.photo_url
+          ? '<img src="'+p.photo_url+'" crossorigin="anonymous" style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid #E8650A;box-shadow:0 4px 12px rgba(232,101,10,.25);" />'
+          : '<div style="width:88px;height:88px;border-radius:50%;background:#1B2A4A;display:flex;align-items:center;justify-content:center;font-family:\'Libre Baskerville\',serif;font-size:32px;font-weight:700;color:#fff;border:3px solid #E8650A;">'+ini+'</div>'
+        )
+      + '</div>'
+      // Nom + Métier + Commune
+      + '<div style="padding:12px 24px 0;text-align:center;">'
+      +   '<div style="font-family:\'Libre Baskerville\',serif;font-size:19px;font-weight:700;color:#1B2A4A;margin-bottom:4px;">'+nom+'</div>'
+      +   '<div style="font-family:\'DM Sans\',sans-serif;font-size:13px;color:#6B7280;font-weight:500;margin-bottom:3px;">'+(p.metier||'')+'</div>'
+      +   ((p.commune||p.ville) ? '<div style="font-family:\'DM Sans\',sans-serif;font-size:12px;color:#9CA3AF;">'+(p.commune||p.ville||'')+'</div>' : '')
+      + '</div>'
+      // Matricule
+      + '<div style="display:flex;justify-content:center;padding:12px 24px 0;">'
+      +   '<div style="background:#E8650A;border-radius:30px;padding:6px 22px;">'
+      +     '<span style="font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:1px;">'+p.matricule+'</span>'
+      +   '</div>'
+      + '</div>'
+      // Badge Ambassadeur
+      + (isAmbass ? '<div style="display:flex;justify-content:center;padding:8px 24px 0;"><div style="background:linear-gradient(135deg,#F5C518,#E8650A);border-radius:30px;padding:5px 16px;font-family:\'DM Sans\',sans-serif;font-size:11px;font-weight:800;color:#fff;">🏆 Artisan Ambassadeur YOUMMA JOBS</div></div>' : '')
+      // Séparateur
+      + '<div style="display:flex;align-items:center;gap:8px;padding:14px 24px 0;">'
+      +   '<div style="flex:1;height:1px;background:#E5E7EB;"></div>'
+      +   '<div style="font-family:\'DM Sans\',sans-serif;font-size:9px;color:#9CA3AF;text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap;">Badge officiel YOUMMA JOBS</div>'
+      +   '<div style="flex:1;height:1px;background:#E5E7EB;"></div>'
+      + '</div>'
+      // QR + texte sous QR
+      + '<div style="display:flex;flex-direction:column;align-items:center;padding:14px 24px 0;">'
+      +   '<div id="_bdg_qr" style="width:130px;height:130px;"></div>'
+      +   '<div style="font-family:\'DM Sans\',sans-serif;font-size:10px;color:#6B7280;margin-top:8px;text-align:center;">Scannez pour vérifier l\'authenticité de ce badge</div>'
+      + '</div>'
+      // Pied de page
+      + '<div style="background:#E8650A;padding:10px 24px;margin-top:16px;text-align:center;">'
+      +   '<div style="font-family:\'DM Sans\',sans-serif;font-size:11px;font-weight:700;color:#fff;margin-bottom:3px;">yoummajobs.com · Artisans vérifiés en Guinée</div>'
+      +   '<div style="font-family:\'DM Sans\',sans-serif;font-size:9px;color:rgba(255,235,210,.9);">Ce badge est infalsifiable — vérifiable en temps réel par scan QR</div>'
+      + '</div>'
+      + '</div>';
 
-    // Photo : fond blanc avant clip pour éviter coins noirs JPEG
-    var photoDataUrl = null;
-    if (p.photo_url) {
-      try {
-        var imgEl = new Image();
-        imgEl.crossOrigin = 'anonymous';
-        await new Promise(function(res) {
-          imgEl.onload = function() {
-            var cv = document.createElement('canvas');
-            cv.width = 200; cv.height = 200;
-            var ctx = cv.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, 200, 200);
-            ctx.beginPath(); ctx.arc(100,100,100,0,Math.PI*2); ctx.closePath(); ctx.clip();
-            ctx.drawImage(imgEl, 0, 0, 200, 200);
-            photoDataUrl = cv.toDataURL('image/jpeg', 0.85);
-            res();
-          };
-          imgEl.onerror = res;
-          imgEl.src = p.photo_url;
-        });
-      } catch(pe) { /* sans photo */ }
-    }
+    document.body.appendChild(_wrap);
 
+    // QR code dans le slot prévu
+    new QRCode(_wrap.querySelector('#_bdg_qr'), { text: verif_url, width: 130, height: 130, correctLevel: QRCode.CorrectLevel.H });
+
+    // Attendre QR + polices du site
+    await new Promise(function(r){ setTimeout(r, 800); });
+    await document.fonts.ready;
+
+    // Rendu HTML → canvas → PDF
+    var _canvas = await html2canvas(_wrap.querySelector('#_bdg_inner'), {
+      scale: 3,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: '#ffffff',
+      logging: false
+    });
+
+    var _imgData = _canvas.toDataURL('image/png');
     var { jsPDF } = window.jspdf;
-    var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [85, 155] });
-
-    // Fond blanc
-    doc.setFillColor(255, 255, 255);
-    doc.rect(0, 0, 85, 155, 'F');
-
-    // Bande haute bleue
-    doc.setFillColor(27, 42, 74);
-    doc.rect(0, 0, 85, 30, 'F');
-
-    // Logo bicolore "YOUMMA JOBS"
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    var _wY = doc.getTextWidth('YOUMMA ');
-    var _wJ = doc.getTextWidth('JOBS');
-    var _lx = (85 - _wY - _wJ) / 2;
-    doc.setTextColor(255, 255, 255);
-    doc.text('YOUMMA ', _lx, 13);
-    doc.setTextColor(232, 101, 10);
-    doc.text('JOBS', _lx + _wY, 13);
-
-    // Sous-titre
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
-    doc.setTextColor(180, 190, 210);
-    doc.text('PRESTATAIRE VÉRIFIÉ', 42.5, 22, { align: 'center' });
-
-    // Photo ou initiales
-    var photoY = 32;
-    var photoSize = 28;
-    var photoX = (85 - photoSize) / 2;
-    var photoCenter = photoY + photoSize / 2;
-    if (photoDataUrl) {
-      doc.setFillColor(255, 255, 255);
-      doc.circle(42.5, photoCenter, photoSize / 2 + 1, 'F');
-      doc.addImage(photoDataUrl, 'JPEG', photoX, photoY, photoSize, photoSize);
-      // Bordure orange
-      doc.setDrawColor(232, 101, 10);
-      doc.setLineWidth(0.8);
-      doc.circle(42.5, photoCenter, photoSize / 2 + 0.4, 'S');
-    } else {
-      var ini = ((p.prenom||'?')[0] + (p.nom||'?')[0]).toUpperCase();
-      doc.setFillColor(27, 42, 74);
-      doc.circle(42.5, photoCenter, photoSize / 2, 'F');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
-      doc.setTextColor(255, 255, 255);
-      doc.text(ini, 42.5, photoCenter + 5, { align: 'center' });
-    }
-
-    var photoBottom = photoY + photoSize;
-
-    // Nom
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.setTextColor(27, 42, 74);
-    doc.text(nom.substring(0, 28), 42.5, photoBottom + 9, { align: 'center' });
-
-    // Métier
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 120);
-    doc.text((p.metier||'').substring(0, 34), 42.5, photoBottom + 15, { align: 'center' });
-
-    // Ville
-    if (p.commune || p.ville) {
-      doc.setFontSize(7);
-      doc.setTextColor(150, 150, 160);
-      doc.text((p.commune||p.ville||'').substring(0, 34), 42.5, photoBottom + 20, { align: 'center' });
-    }
-
-    // Matricule (badge orange)
-    var matY = photoBottom + 24;
-    doc.setFillColor(232, 101, 10);
-    doc.roundedRect(20, matY, 45, 8.5, 2, 2, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(255, 255, 255);
-    doc.text(p.matricule, 42.5, matY + 5.8, { align: 'center' });
-
-    // Séparateur
-    var sepY = matY + 12;
-    doc.setDrawColor(210, 215, 225);
-    doc.setLineWidth(0.3);
-    doc.line(15, sepY, 70, sepY);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(6);
-    doc.setTextColor(160, 165, 180);
-    doc.text('Badge officiel YOUMMA JOBS', 42.5, sepY + 4, { align: 'center' });
-
-    // QR code
-    var qrY = sepY + 9;
-    var qrSize = 34;
-    var qrX = (85 - qrSize) / 2;
-    if (qrCanvas) {
-      var qrDataUrl = qrCanvas.toDataURL('image/png');
-      doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
-    }
-
-    // Textes sous QR
-    var qrBottom = qrY + qrSize;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(6.5);
-    doc.setTextColor(100, 105, 120);
-    doc.text("Scannez pour vérifier l'authenticité de ce badge", 42.5, qrBottom + 4, { align: 'center' });
-
-    // Pied de page orange
-    var footerY = qrBottom + 9;
-    doc.setFillColor(232, 101, 10);
-    doc.rect(0, footerY, 85, 155 - footerY, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6);
-    doc.setTextColor(255, 255, 255);
-    doc.text('yoummajobs.com · Artisans vérifiés en Guinée', 42.5, footerY + 5, { align: 'center' });
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(5.5);
-    doc.setTextColor(255, 220, 185);
-    doc.text('Ce badge est infalsifiable — vérifiable en temps réel par scan QR', 42.5, footerY + 10, { align: 'center' });
-
+    var _pdfW = 85;
+    var _pdfH = Math.round(_pdfW * _canvas.height / _canvas.width * 10) / 10;
+    var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [_pdfW, _pdfH] });
+    doc.addImage(_imgData, 'PNG', 0, 0, _pdfW, _pdfH);
     doc.save('badge_' + p.matricule + '.pdf');
-    document.body.removeChild(qrDiv);
+
+    document.body.removeChild(_wrap);
     showToast('Badge téléchargé !','success');
   } catch(e) {
     showToast('Erreur : '+e.message,'error');
