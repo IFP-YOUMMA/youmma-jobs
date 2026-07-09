@@ -2978,12 +2978,13 @@ if (typeof inscrirePrestataire === 'undefined') {
       return {success:false,message:'API SMS non disponible en local. Ouvrez www.yoummajobs.com pour tester. (code enregistré dans Supabase → verification_codes)'};
     }
     var _r=null,_d={};
-    try{_r=await fetch('/api/send-sms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:e164,code:_smsCode})});}
+    var _msg='Votre code de vérification YOUMMA JOBS : '+_smsCode+'. Valable 10 minutes.';
+    try{_r=await fetch('https://slawwbhlakilnviwzyrb.supabase.co/functions/v1/send-otp',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON_KEY},body:JSON.stringify({telephone:e164,message:_msg})});}
     catch(err){return {success:false,message:'Erreur réseau: '+err.message};}
     try{_d=await _r.json();}catch(_j){_d={};}
     console.log('[SMS] Statut:',_r.status,'| Réponse:',_d);
-    if(_r.ok)return {success:true};
-    var detail=_d.details?(' | Nimba: '+(typeof _d.details==='string'?_d.details:JSON.stringify(_d.details))):'';
+    if(_r.ok&&_d.ok!==false)return {success:true};
+    var detail=_d.detail?(' | Nimba: '+(typeof _d.detail==='string'?_d.detail:JSON.stringify(_d.detail))):'';
     return {success:false,message:(_d.error||'Erreur SMS '+_r.status)+detail};
   };
 
