@@ -3689,6 +3689,7 @@ function renderArtisans() {
           <div class="ac2-avatar" style="background:${p.bg};color:${p.color};">${p.ini}</div>
           <div class="ac2-online-ring"></div>
         </div>
+        ${p.matricule ? `<div style="text-align:center;margin-bottom:4px;"><div style="font-size:9px;color:#9CA3AF;text-transform:uppercase;letter-spacing:1.5px;font-weight:500;">Matricule</div><div style="font-size:13px;color:#E8650A;font-weight:700;letter-spacing:1px;">${p.matricule}</div></div>` : ''}
         <div class="ac2-name">${p.nom}</div>
         <div class="ac2-metier">${p.metier}</div>
         <div class="ac2-loc"><i class="fa-solid fa-location-dot"></i> ${p.ville}, Conakry</div>
@@ -3771,7 +3772,7 @@ function renderProviders() {
           <div class="pc2-online-badge"></div>
         </div>
         <div class="pc2-info" style="flex:1;min-width:0;">
-          
+          ${p.matricule ? `<div style="margin-bottom:4px;"><div style="font-size:9px;color:#9CA3AF;text-transform:uppercase;letter-spacing:1.5px;font-weight:500;">Matricule</div><div style="font-size:13px;color:#E8650A;font-weight:700;letter-spacing:1px;">${p.matricule}</div></div>` : ''}
           <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px;">
             <div class="pc2-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
               ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom_entreprise : p.nom}
@@ -3947,8 +3948,8 @@ function openModal(id) {
             : p.ini}
         </div>
         <div style="flex:1;min-width:0;">
+          ${p.matricule ? `<div style="margin-bottom:6px;"><div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.5px;font-weight:500;">Matricule</div><div style="font-size:15px;color:#E8650A;font-weight:700;letter-spacing:1px;">${p.matricule}</div></div>` : ''}
           <div style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:3px;">${p.nom}</div>
-          ${p.matricule ? `<div style="font-size:10px;color:rgba(255,255,255,.45);font-weight:600;letter-spacing:.07em;margin-bottom:2px;">${p.matricule}</div>` : ''}
           <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px;">${p.metier} · <i class="fa-solid fa-location-dot"></i> ${p.ville}</div>
           <div style="display:flex;gap:5px;flex-wrap:wrap;">${badgesHtml}</div>
           ${badgeAmbValide ? `
@@ -14186,128 +14187,157 @@ async function _genererBadgePDF(p) {
     var verif_url = 'https://yoummajobs.com/#verif=' + p.matricule;
     var nom = ((p.prenom||'') + ' ' + (p.nom||'')).trim() || p.nom || 'Prestataire';
 
-    // Générer QR code dans un div caché
+    // QR code dans div caché
     var qrDiv = document.createElement('div');
     qrDiv.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:200px;height:200px;';
     document.body.appendChild(qrDiv);
-    var qr = new QRCode(qrDiv, { text: verif_url, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.H });
-
-    // Attendre que le QR soit rendu
+    new QRCode(qrDiv, { text: verif_url, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.H });
     await new Promise(function(r){ setTimeout(r, 600); });
-
     var qrCanvas = qrDiv.querySelector('canvas');
 
-    // Charger la photo du prestataire
+    // Photo : fond blanc avant clip pour éviter coins noirs JPEG
     var photoDataUrl = null;
     if (p.photo_url) {
       try {
         var imgEl = new Image();
         imgEl.crossOrigin = 'anonymous';
-        await new Promise(function(res, rej) {
+        await new Promise(function(res) {
           imgEl.onload = function() {
             var cv = document.createElement('canvas');
             cv.width = 200; cv.height = 200;
             var ctx = cv.getContext('2d');
-            // Cercle clip
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, 200, 200);
             ctx.beginPath(); ctx.arc(100,100,100,0,Math.PI*2); ctx.closePath(); ctx.clip();
             ctx.drawImage(imgEl, 0, 0, 200, 200);
             photoDataUrl = cv.toDataURL('image/jpeg', 0.85);
             res();
           };
-          imgEl.onerror = res; // continuer sans photo
+          imgEl.onerror = res;
           imgEl.src = p.photo_url;
         });
       } catch(pe) { /* sans photo */ }
     }
 
-    // Créer le PDF (carte verticale 85×120mm = carte de visite)
     var { jsPDF } = window.jspdf;
-    var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [85, 130] });
+    var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [85, 155] });
 
     // Fond blanc
     doc.setFillColor(255, 255, 255);
-    doc.rect(0, 0, 85, 130, 'F');
+    doc.rect(0, 0, 85, 155, 'F');
 
     // Bande haute bleue
     doc.setFillColor(27, 42, 74);
-    doc.rect(0, 0, 85, 26, 'F');
+    doc.rect(0, 0, 85, 30, 'F');
 
-    // Nom de l'app
+    // Logo bicolore "YOUMMA JOBS"
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
+    doc.setFontSize(14);
+    var _wY = doc.getTextWidth('YOUMMA ');
+    var _wJ = doc.getTextWidth('JOBS');
+    var _lx = (85 - _wY - _wJ) / 2;
     doc.setTextColor(255, 255, 255);
-    doc.text('YOUMMA JOBS', 42.5, 11, { align: 'center' });
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
+    doc.text('YOUMMA ', _lx, 13);
     doc.setTextColor(232, 101, 10);
-    doc.text('PRESTATAIRE VÉRIFIÉ', 42.5, 18, { align: 'center' });
+    doc.text('JOBS', _lx + _wY, 13);
+
+    // Sous-titre
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(180, 190, 210);
+    doc.text('PRESTATAIRE VÉRIFIÉ', 42.5, 22, { align: 'center' });
 
     // Photo ou initiales
-    var photoY = 28;
-    var photoSize = 26;
+    var photoY = 32;
+    var photoSize = 28;
     var photoX = (85 - photoSize) / 2;
+    var photoCenter = photoY + photoSize / 2;
     if (photoDataUrl) {
-      // Cercle blanc derrière
       doc.setFillColor(255, 255, 255);
-      doc.circle(42.5, photoY + photoSize / 2, photoSize / 2 + 1, 'F');
+      doc.circle(42.5, photoCenter, photoSize / 2 + 1, 'F');
       doc.addImage(photoDataUrl, 'JPEG', photoX, photoY, photoSize, photoSize);
+      // Bordure orange
+      doc.setDrawColor(232, 101, 10);
+      doc.setLineWidth(0.8);
+      doc.circle(42.5, photoCenter, photoSize / 2 + 0.4, 'S');
     } else {
       var ini = ((p.prenom||'?')[0] + (p.nom||'?')[0]).toUpperCase();
       doc.setFillColor(27, 42, 74);
-      doc.circle(42.5, photoY + photoSize / 2, photoSize / 2, 'F');
+      doc.circle(42.5, photoCenter, photoSize / 2, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(16);
       doc.setTextColor(255, 255, 255);
-      doc.text(ini, 42.5, photoY + photoSize / 2 + 5, { align: 'center' });
+      doc.text(ini, 42.5, photoCenter + 5, { align: 'center' });
     }
+
+    var photoBottom = photoY + photoSize;
 
     // Nom
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
     doc.setTextColor(27, 42, 74);
-    doc.text(nom.substring(0, 28), 42.5, photoY + photoSize + 8, { align: 'center' });
+    doc.text(nom.substring(0, 28), 42.5, photoBottom + 9, { align: 'center' });
 
     // Métier
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(100, 100, 120);
-    doc.text((p.metier||'').substring(0, 34), 42.5, photoY + photoSize + 14, { align: 'center' });
+    doc.text((p.metier||'').substring(0, 34), 42.5, photoBottom + 15, { align: 'center' });
 
     // Ville
     if (p.commune || p.ville) {
       doc.setFontSize(7);
       doc.setTextColor(150, 150, 160);
-      doc.text((p.commune||p.ville||'').substring(0, 34), 42.5, photoY + photoSize + 19, { align: 'center' });
+      doc.text((p.commune||p.ville||'').substring(0, 34), 42.5, photoBottom + 20, { align: 'center' });
     }
 
-    // Matricule
+    // Matricule (badge orange)
+    var matY = photoBottom + 24;
     doc.setFillColor(232, 101, 10);
-    doc.roundedRect(20, photoY + photoSize + 22, 45, 8, 2, 2, 'F');
+    doc.roundedRect(20, matY, 45, 8.5, 2, 2, 'F');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
     doc.setTextColor(255, 255, 255);
-    doc.text(p.matricule, 42.5, photoY + photoSize + 27.5, { align: 'center' });
+    doc.text(p.matricule, 42.5, matY + 5.8, { align: 'center' });
+
+    // Séparateur
+    var sepY = matY + 12;
+    doc.setDrawColor(210, 215, 225);
+    doc.setLineWidth(0.3);
+    doc.line(15, sepY, 70, sepY);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6);
+    doc.setTextColor(160, 165, 180);
+    doc.text('Badge officiel YOUMMA JOBS', 42.5, sepY + 4, { align: 'center' });
 
     // QR code
+    var qrY = sepY + 9;
+    var qrSize = 34;
+    var qrX = (85 - qrSize) / 2;
     if (qrCanvas) {
       var qrDataUrl = qrCanvas.toDataURL('image/png');
-      var qrY = photoY + photoSize + 34;
-      var qrSize = 32;
-      var qrX = (85 - qrSize) / 2;
       doc.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(6);
-      doc.setTextColor(150, 150, 160);
-      doc.text('Scannez pour vérifier ce badge', 42.5, qrY + qrSize + 4, { align: 'center' });
     }
 
-    // Bande basse orange
+    // Textes sous QR
+    var qrBottom = qrY + qrSize;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(100, 105, 120);
+    doc.text("Scannez pour vérifier l'authenticité de ce badge", 42.5, qrBottom + 4, { align: 'center' });
+
+    // Pied de page orange
+    var footerY = qrBottom + 9;
     doc.setFillColor(232, 101, 10);
-    doc.rect(0, 122, 85, 8, 'F');
+    doc.rect(0, footerY, 85, 155 - footerY, 'F');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(5.5);
+    doc.setFontSize(6);
     doc.setTextColor(255, 255, 255);
-    doc.text('yoummajobs.com · Artisans vérifiés en Guinée', 42.5, 127, { align: 'center' });
+    doc.text('yoummajobs.com · Artisans vérifiés en Guinée', 42.5, footerY + 5, { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(5.5);
+    doc.setTextColor(255, 220, 185);
+    doc.text('Ce badge est infalsifiable — vérifiable en temps réel par scan QR', 42.5, footerY + 10, { align: 'center' });
 
     doc.save('badge_' + p.matricule + '.pdf');
     document.body.removeChild(qrDiv);
