@@ -5771,7 +5771,7 @@ async function chargerAvis() {
       <div class="admin-section-inner">
 
         
-        <div class="adm-stats-grid">
+        <div class="adm-stats-grid" style="margin-bottom:28px;">
           <div class="adm-stat-card total" onclick="showAdmin('en_attente')" style="cursor:pointer;">
             <div class="adm-stat-icon"><i class="fa-solid fa-users"></i></div>
             <div class="adm-stat-num" id="statTotal">—</div>
@@ -5805,7 +5805,7 @@ async function chargerAvis() {
         </div>
 
         <!-- Activité plateforme -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
           <div class="adm-table-wrap" style="padding:14px 16px;text-align:center;">
             <div style="font-size:20px;margin-bottom:6px;">📋</div>
             <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashMissionsTotal">—</div>
@@ -5833,26 +5833,11 @@ async function chargerAvis() {
         </div>
 
         <!-- Alertes prioritaires -->
-        <div id="dashAlertes" style="margin-bottom:20px;"></div>
+        <div id="dashAlertes" style="margin-bottom:28px;"></div>
 
-
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
-          <button onclick="showAdmin('en_attente')" style="background:#FFF7F0;border:1.5px solid #FDE8D8;border-radius:12px;padding:14px;text-align:left;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='#FDE8D8'" onmouseout="this.style.background='#FFF7F0'">
-            <i class="fa-solid fa-user-clock" style="color:#E85D04;font-size:18px;display:block;margin-bottom:8px;"></i>
-            <div style="font-size:13px;font-weight:700;color:#1A1A4E;">Valider les inscriptions</div>
-            <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Gérer les nouveaux prestataires</div>
-          </button>
-          <button onclick="showAdmin('rapports')" style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:14px;text-align:left;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='#BFDBFE'" onmouseout="this.style.background='#EFF6FF'">
-            <i class="fa-solid fa-chart-line" style="color:#2563EB;font-size:18px;display:block;margin-bottom:8px;"></i>
-            <div style="font-size:13px;font-weight:700;color:#1A1A4E;">Voir les rapports</div>
-            <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">Statistiques et analyses</div>
-          </button>
-        </div>
-
-        
-        <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;">
           <div class="adm-table-wrap">
-            <div style="padding:16px 18px;border-bottom:1px solid #F0F0F8;display:flex;align-items:center;justify-content:space-between;">
+            <div style="padding:18px 20px;border-bottom:1px solid #F0F0F8;display:flex;align-items:center;justify-content:space-between;">
               <div class="adm-section-title" style="font-size:14px;"><i class="fa-solid fa-clock-rotate-left" style="color:#E85D04;"></i> Inscriptions récentes</div>
               <button onclick="showAdmin('en_attente')" style="font-size:11.5px;color:#E85D04;background:none;border:none;cursor:pointer;font-weight:600;">Voir tout →</button>
             </div>
@@ -5860,9 +5845,9 @@ async function chargerAvis() {
               <div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>
             </div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            
-            <div class="adm-table-wrap" style="padding:16px 18px;">
+          <div style="display:flex;flex-direction:column;gap:0;">
+
+            <div class="adm-table-wrap" style="padding:18px 20px;">
               <div class="adm-section-title" style="font-size:13px;margin-bottom:14px;"><i class="fa-solid fa-circle-check" style="color:#16A34A;"></i> Statut du système</div>
               <div style="display:flex;flex-direction:column;gap:8px;" id="dashSystemStatus">
                 <div style="display:flex;align-items:center;justify-content:space-between;font-size:12.5px;">
@@ -5897,38 +5882,10 @@ async function chargerAvis() {
                 </div>
               </div>
             </div>
-            
-            <a href="https://wa.me/224XXXXXXXXX" target="_blank" style="background:linear-gradient(135deg,#25D366,#128C7E);border-radius:12px;padding:16px;text-decoration:none;display:flex;align-items:center;gap:12px;">
-              <i class="fa-brands fa-whatsapp" style="color:#fff;font-size:24px;flex-shrink:0;"></i>
-              <div>
-                <div style="color:#fff;font-size:13px;font-weight:700;">Support WhatsApp</div>
-                <div style="color:rgba(255,255,255,.7);font-size:11px;">Contacter les prestataires</div>
-              </div>
-            </a>
           </div>
         </div>
 
-        <!-- Graphique inscriptions + Répartition géographique -->
-        <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:16px;">
-          <div class="adm-table-wrap">
-            <div style="padding:14px 18px;border-bottom:1px solid #F0F0F8;display:flex;align-items:center;justify-content:space-between;">
-              <div class="adm-section-title" style="font-size:13px;">📈 Inscriptions — 7 derniers jours</div>
-            </div>
-            <div style="padding:16px 16px 8px;" id="dashChartWrap">
-              <div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>
-            </div>
-          </div>
-          <div class="adm-table-wrap">
-            <div style="padding:14px 18px;border-bottom:1px solid #F0F0F8;">
-              <div class="adm-section-title" style="font-size:13px;">🗺️ Répartition géographique</div>
-            </div>
-            <div style="padding:14px 16px;" id="dashGeoWrap">
-              <div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>
-            </div>
-          </div>
-        </div>
-
-        <div id="dashboardAll" style="margin-top:16px;"></div>
+        <div id="dashboardAll" style="margin-top:24px;"></div>
       </div>
     </div>
 
