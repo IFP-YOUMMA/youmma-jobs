@@ -220,18 +220,21 @@ body.admin-mode #page-admin.logged #adminSidebarEl{
 body.admin-mode #page-admin.logged #adminSidebarEl.open{
   transform:translateX(0)!important;
 }
-/* Contrôle d'accès par rôle */
-body.role-agent .super-admin-only,
-body.role-agent [data-super-only],
-body.role-agent #amenu-suspendu,
-body.role-agent #amenu-campagne,
-body.role-agent #amenu-carousel,
-body.role-agent #amenu-rapports,
-body.role-agent #amenu-equipe,
-body.role-agent .btn-suspendre,
-body.role-agent .btn-supprimer,
-body.role-agent .admin-revenus,
-body.role-agent .admin-abonnements-section{display:none!important;}
+/* Contrôle d'accès par rôle
+   body:not(.role-super_admin) = toute session sans le rôle super_admin explicite
+   Le panel admin étant caché au chargement, le flash initial est imperceptible */
+body:not(.role-super_admin) .super-admin-only,
+body:not(.role-super_admin) [data-super-only],
+body:not(.role-super_admin) #amenu-suspendu,
+body:not(.role-super_admin) #amenu-campagne,
+body:not(.role-super_admin) #amenu-carousel,
+body:not(.role-super_admin) #amenu-rapports,
+body:not(.role-super_admin) #amenu-equipe,
+body:not(.role-super_admin) .btn-suspendre,
+body:not(.role-super_admin) .btn-supprimer,
+body:not(.role-super_admin) .admin-revenus,
+body:not(.role-super_admin) .admin-abonnements-section,
+body:not(.role-super_admin) .admin-abonnements-btn{display:none!important;}
 body.admin-mode #page-admin.logged #adminWrap{
   margin-left:0!important;
   width:100%!important;
@@ -5773,7 +5776,7 @@ async function chargerAvis() {
           <div style="width:28px;height:28px;border-radius:8px;background:#E85D04;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">A</div>
           <div>
             <div style="font-size:12.5px;font-weight:700;color:#1A1A4E;" id="adminTopbarName">Admin</div>
-            <div style="font-size:10.5px;color:#9CA3AF;">Administrateur</div>
+            <div id="adminTopbarRole" style="font-size:10.5px;color:#9CA3AF;">Administrateur</div>
           </div>
         </div>
       </div>
@@ -5893,7 +5896,7 @@ async function chargerAvis() {
                     <span style="color:#374151;font-weight:600;" id="dashLastPayment">—</span>
                   </div>
                 </div>
-                <div class="super-admin-only admin-abonnements-section" style="margin-top:14px;padding-top:12px;border-top:1px solid #F0F0F8;">
+                <div class="super-admin-only admin-abonnements-section admin-abonnements-btn" style="margin-top:14px;padding-top:12px;border-top:1px solid #F0F0F8;">
                   <button onclick="_aboToggle()" id="dashAboToggleBtn" style="width:100%;padding:9px 14px;background:#1B2A4A;color:#fff;border:none;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
                     <span>💳 Gérer les abonnements</span><span id="dashAboToggleArrow" style="font-size:14px;">↓</span>
                   </button>
@@ -8348,8 +8351,20 @@ function _adminShowSection(name) {
 function _adminAppliquerRole(role) {
   const r = role || 'agent';
   window._adminRole = r;
-  document.body.classList.remove('role-super_admin', 'role-agent');
+  document.body.classList.remove('role-super_admin','role-agent','role-admin','role-moderator');
   document.body.classList.add('role-' + r);
+}
+
+function _adminTopbarSetRole(role) {
+  const el = document.getElementById('adminTopbarRole');
+  if (!el) return;
+  if (role === 'super_admin') {
+    el.style.cssText = 'font-size:10.5px;color:#9CA3AF;';
+    el.textContent = 'Administrateur';
+  } else {
+    el.style.cssText = 'font-size:10px;margin-top:2px;';
+    el.innerHTML = '<span style="background:#E5E7EB;color:#6B7280;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;letter-spacing:.3px;">Agent</span>';
+  }
 }
 
 // ─── Équipe admin ─────────────────────────────────────────────────────────────
@@ -9125,11 +9140,14 @@ async function loginAdmin() {
     localStorage.setItem('yj_admin_session', JSON.stringify({admin_id:data.id,token,nom:data.nom,role:data.role}));
     adminData = data;
     window._adminRole = data.role || 'agent';
+    document.body.classList.remove('role-super_admin','role-agent','role-admin','role-moderator');
+    document.body.classList.add('role-' + (data.role || 'agent'));
     _adminAppliquerRole(data.role);
     _showAdminPanel();
-    // Mettre à jour le nom admin dans la topbar
+    // Mettre à jour nom + badge rôle dans la topbar
     const adminName = document.getElementById('adminTopbarName');
     if (adminName && data.nom) adminName.textContent = data.nom;
+    _adminTopbarSetRole(data.role);
     if(typeof loadAll==='function') await loadAll();
     else if(typeof _adminLoadAll==='function') await _adminLoadAll();
     // Démarrer polling notifications
@@ -9145,7 +9163,19 @@ async function initAdmin() {
   if (!raw) return;
   try {
     const s = JSON.parse(raw);
-    if (s?.token) { adminData = s; window._adminRole = s.role || 'agent'; _adminAppliquerRole(s.role); navigate('admin'); _showAdminPanel(); await loadAll(); }
+    if (s?.token) {
+      adminData = s;
+      window._adminRole = s.role || 'agent';
+      document.body.classList.remove('role-super_admin','role-agent','role-admin','role-moderator');
+      document.body.classList.add('role-' + (s.role || 'agent'));
+      _adminAppliquerRole(s.role);
+      navigate('admin');
+      _showAdminPanel();
+      const adminName = document.getElementById('adminTopbarName');
+      if (adminName && s.nom) adminName.textContent = s.nom;
+      _adminTopbarSetRole(s.role);
+      await loadAll();
+    }
   } catch(e) {}
 }
 
@@ -9155,7 +9185,7 @@ function logoutAdmin() {
   adminData = null;
   // Nettoyer le rôle
   window._adminRole = null;
-  document.body.classList.remove('role-agent');
+  document.body.classList.remove('role-super_admin','role-agent','role-admin','role-moderator');
   document.body.classList.remove('admin-mode');
   // Réafficher le bouton flottant YOUMMA ÉQUIPES
   const _fe = document.getElementById('btnYoummaEquipes');
