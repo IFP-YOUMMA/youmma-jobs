@@ -239,6 +239,8 @@ body:not(.role-super_admin) .admin-abonnements-btn{display:none!important;}
 body:not(.role-super_admin) [data-super-only]{display:none!important;}
 /* Badge rôle dans la topbar */
 body.role-agent #adminRoleLabel::after{content:" (Agent)";font-size:11px;color:#9CA3AF;}
+/* Dashboard activité : 2 colonnes pour agent (SMS et Vues masqués) */
+body.role-agent .dash-activity-grid{grid-template-columns:repeat(2,1fr)!important;}
 body.admin-mode #page-admin.logged #adminWrap{
   margin-left:0!important;
   width:100%!important;
@@ -5743,6 +5745,7 @@ async function chargerAvis() {
     <div onclick="showAdmin('projets_clients')" id="amenu-projets_clients" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-clipboard-list" style="width:16px;flex-shrink:0;"></i> Projets clients<span id="adminPcBadge" style="display:none;margin-left:auto;background:#E53E3E;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center;line-height:1.4;animation:yjBadgePulse 2s ease-in-out infinite;"></span></div>
     <div onclick="showAdmin('ambassadeurs');chargerClassementAdmin();" id="amenu-ambassadeurs" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-trophy" style="width:16px;"></i> Ambassadeurs</div>
     <div onclick="showAdmin('rapports')" id="amenu-rapports" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-chart-line" style="width:16px;"></i> Rapports</div>
+    <div onclick="showAdmin('activite');_adminLoadActivite();" id="amenu-activite" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-chart-bar" style="width:16px;"></i> Activité équipe</div>
     <div onclick="showAdmin('notifications')" id="amenu-notifications" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:9px;">
       <i class="fa-solid fa-bell" style="width:16px;"></i> 
       <span>Notifications</span>
@@ -5790,7 +5793,9 @@ async function chargerAvis() {
     <div class="admin-section active" id="admin-dashboard">
       <div class="admin-section-inner">
 
-        
+        <div id="dashRoleHeader" style="margin-bottom:24px;"></div>
+        <div id="dashAgentUrgence" style="display:none;margin-bottom:20px;"></div>
+
         <div class="adm-stats-grid" style="margin-bottom:28px;">
           <div class="adm-stat-card total" onclick="showAdmin('en_attente')" style="cursor:pointer;">
             <div class="adm-stat-icon"><i class="fa-solid fa-users"></i></div>
@@ -5825,7 +5830,7 @@ async function chargerAvis() {
         </div>
 
         <!-- Activité plateforme -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
+        <div class="dash-activity-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
           <div class="adm-table-wrap" style="padding:14px 16px;text-align:center;">
             <div style="font-size:20px;margin-bottom:6px;">📋</div>
             <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashMissionsTotal">—</div>
@@ -5910,6 +5915,9 @@ async function chargerAvis() {
           </div>
         </div>
 
+        <div id="dashMonActivite" style="display:none;margin-top:24px;"></div>
+        <div id="dashSuperRapportAgents" style="display:none;margin-top:24px;" data-super-only="true"></div>
+
         <!-- Section abonnements (toggle) -->
         <div id="dashAboSection" style="display:none;margin-top:24px;">
           <div class="adm-table-wrap">
@@ -5939,6 +5947,27 @@ async function chargerAvis() {
     </div>
 
     <!-- ========= ÉQUIPE ADMIN ========= -->
+    <div class="admin-section" id="admin-activite">
+      <div class="admin-section-inner">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+          <h2 style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:#1B2A4A;margin:0;">📊 Activité équipe</h2>
+          <div style="display:flex;gap:8px;">
+            <button id="actFilt_semaine" onclick="_adminLoadActivite('semaine')" style="padding:6px 14px;background:#F3F4F6;color:#374151;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">Cette semaine</button>
+            <button id="actFilt_mois" onclick="_adminLoadActivite('mois')" style="padding:6px 14px;background:#1B2A4A;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">Ce mois</button>
+            <button id="actFilt_tout" onclick="_adminLoadActivite('tout')" style="padding:6px 14px;background:#F3F4F6;color:#374151;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">Tout</button>
+          </div>
+        </div>
+        <div class="adm-table-wrap" style="margin-bottom:20px;">
+          <div style="padding:14px 20px;border-bottom:1px solid #F0F0F8;font-size:13px;font-weight:700;color:#1B2A4A;">👥 Synthèse par agent</div>
+          <div id="activiteAgentsTable"><div style="text-align:center;padding:28px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div></div>
+        </div>
+        <div class="adm-table-wrap">
+          <div style="padding:14px 20px;border-bottom:1px solid #F0F0F8;font-size:13px;font-weight:700;color:#1B2A4A;">📋 Historique des actions</div>
+          <div id="activiteTimeline"><div style="text-align:center;padding:28px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div></div>
+        </div>
+      </div>
+    </div>
+
     <div class="admin-section" id="admin-equipe">
       <div class="admin-section-inner">
         <div class="adm-section-header">
@@ -8116,11 +8145,133 @@ async function _adminLoadDashboard() {
     var rev = ((sys[1].count || 0) * 50000).toLocaleString('fr-FR');
     setEl('dashRevMois', rev + ' GNF');
   } catch(e) {}
+
+  // ⑦ Header rôle
+  var prenomAdmin = ((adminData && adminData.nom) || 'Admin').split(' ')[0];
+  var dateJour = new Date().toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
+  var dateJourStr = dateJour.charAt(0).toUpperCase() + dateJour.slice(1);
+  var hdr = document.getElementById('dashRoleHeader');
+  if (hdr) {
+    if (window._adminRole === 'super_admin') {
+      hdr.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:16px 20px;background:linear-gradient(135deg,#1B2A4A,#2D3F6B);border-radius:14px;color:#fff;">'
+        + '<div><div style="font-family:\'Libre Baskerville\',serif;font-size:19px;font-weight:700;">Tableau de bord — YOUMMA JOBS</div>'
+        + '<div style="font-size:12px;opacity:.7;margin-top:3px;">' + dateJourStr + '</div></div>'
+        + '<span style="font-size:11px;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-weight:700;letter-spacing:.5px;">Super Admin</span>'
+        + '</div>';
+    } else {
+      hdr.innerHTML = '<div style="padding:16px 20px;background:linear-gradient(135deg,#1B2A4A,#2D3F6B);border-radius:14px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">'
+        + '<div><div style="font-family:\'Libre Baskerville\',serif;font-size:19px;font-weight:700;">Bonjour ' + prenomAdmin + ' 👋</div>'
+        + '<div style="font-size:12px;opacity:.7;margin-top:3px;">' + dateJourStr + '</div></div>'
+        + '<span style="font-size:11px;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-weight:700;letter-spacing:.5px;">Agent</span>'
+        + '</div>';
+    }
+  }
+
+  // ⑧ Contenu rôle-spécifique
+  if (window._adminRole !== 'super_admin') {
+    // Card urgence en attente
+    try {
+      var atRes = await sb.from('providers').select('id',{count:'exact',head:true}).eq('statut','en_attente');
+      var atCount = atRes.count || 0;
+      var urgEl = document.getElementById('dashAgentUrgence');
+      if (urgEl) {
+        if (atCount > 0) {
+          urgEl.innerHTML = '<div onclick="showAdmin(\'en_attente\')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#FFF7F0;border:2px solid #E8650A;border-radius:12px;cursor:pointer;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(232,101,10,.2)\'" onmouseout="this.style.boxShadow=\'\'">'
+            + '<div><div style="font-size:14.5px;font-weight:700;color:#1B2A4A;">⏳ ' + atCount + ' prestataire' + (atCount > 1 ? 's' : '') + ' en attente de validation</div>'
+            + '<div style="font-size:12px;color:#E8650A;margin-top:3px;font-weight:600;">Cliquer pour traiter →</div></div>'
+            + '<div style="font-size:32px;font-weight:800;color:#E8650A;font-family:\'Libre Baskerville\',serif;">' + atCount + '</div></div>';
+          urgEl.style.display = '';
+        } else {
+          urgEl.style.display = 'none';
+        }
+      }
+    } catch(e) {}
+
+    // Mon activité ce mois
+    var actEl = document.getElementById('dashMonActivite');
+    if (actEl) {
+      try {
+        var admin = adminData;
+        var {data:myActs} = await sb.from('admin_actions')
+          .select('action,created_at')
+          .eq('admin_id', admin && (admin.id || admin.admin_id))
+          .gte('created_at', moisDebut + 'T00:00:00')
+          .order('created_at', {ascending:false});
+        var acts = myActs || [];
+        var nbVal = acts.filter(function(a){return a.action==='valider';}).length;
+        var nbRej = acts.filter(function(a){return a.action==='rejeter';}).length;
+        var lastAct = acts[0];
+        var lastTxt = '—';
+        if (lastAct) {
+          var diffMs = Date.now() - new Date(lastAct.created_at).getTime();
+          var diffMins = Math.round(diffMs / 60000);
+          var diffHrs = Math.floor(diffMins / 60);
+          var whenStr = diffHrs > 0 ? 'il y a ' + diffHrs + 'h' + (diffMins % 60 > 0 ? (diffMins % 60) + 'min' : '') : 'il y a ' + diffMins + ' min';
+          var actLabels = {valider:'Validation',rejeter:'Rejet',suspendre:'Suspension',renouveler:'Renouvellement',supprimer:'Suppression'};
+          lastTxt = (actLabels[lastAct.action] || lastAct.action) + ' — ' + whenStr;
+        }
+        actEl.style.display = '';
+        actEl.innerHTML = '<div class="adm-table-wrap" style="padding:18px 20px;">'
+          + '<div style="font-size:13.5px;font-weight:700;color:#1B2A4A;margin-bottom:14px;">📋 Mon activité ce mois</div>'
+          + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">'
+          + '<div style="text-align:center;padding:14px;background:#ECFDF5;border-radius:10px;">'
+          + '<div style="font-size:26px;font-weight:700;color:#059669;font-family:\'Libre Baskerville\',serif;">' + nbVal + '</div>'
+          + '<div style="font-size:12px;color:#6B7280;margin-top:4px;">✅ Validations</div></div>'
+          + '<div style="text-align:center;padding:14px;background:#FEF2F2;border-radius:10px;">'
+          + '<div style="font-size:26px;font-weight:700;color:#DC2626;font-family:\'Libre Baskerville\',serif;">' + nbRej + '</div>'
+          + '<div style="font-size:12px;color:#6B7280;margin-top:4px;">❌ Rejets</div></div>'
+          + '<div style="text-align:center;padding:14px;background:#F9FAFB;border-radius:10px;">'
+          + '<div style="font-size:12px;color:#1B2A4A;font-weight:600;line-height:1.4;">📋 Dernière action</div>'
+          + '<div style="font-size:11px;color:#6B7280;margin-top:6px;">' + lastTxt + '</div></div>'
+          + '</div></div>';
+      } catch(e) { actEl.style.display = 'none'; }
+    }
+  } else {
+    // Rapport agents (super_admin) — top 3 d'aujourd'hui
+    var rapEl = document.getElementById('dashSuperRapportAgents');
+    if (rapEl) {
+      try {
+        var todayStr = new Date().toISOString().slice(0, 10);
+        var {data:todayActs} = await sb.from('admin_actions')
+          .select('admin_nom,action').gte('created_at', todayStr + 'T00:00:00');
+        var byAgent = {};
+        (todayActs || []).forEach(function(a) {
+          if (!byAgent[a.admin_nom]) byAgent[a.admin_nom] = {val:0, rej:0, sus:0, total:0};
+          byAgent[a.admin_nom].total++;
+          if (a.action === 'valider') byAgent[a.admin_nom].val++;
+          else if (a.action === 'rejeter') byAgent[a.admin_nom].rej++;
+          else if (a.action === 'suspendre') byAgent[a.admin_nom].sus++;
+        });
+        var agentEntries = Object.entries(byAgent).sort(function(a,b){return b[1].total-a[1].total;}).slice(0, 3);
+        if (agentEntries.length > 0) {
+          var rows = agentEntries.map(function(e) {
+            var n = e[0], s = e[1];
+            return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid #F3F4F6;">'
+              + '<span style="font-weight:600;color:#1B2A4A;font-size:13px;">' + n + '</span>'
+              + '<span style="display:flex;gap:14px;font-size:12.5px;">'
+              + '<span style="color:#059669;">✅ ' + s.val + '</span>'
+              + '<span style="color:#DC2626;">❌ ' + s.rej + '</span>'
+              + '<span style="color:#F59E0B;">⛔ ' + s.sus + '</span>'
+              + '</span></div>';
+          }).join('');
+          rapEl.style.display = '';
+          rapEl.innerHTML = '<div class="adm-table-wrap">'
+            + '<div style="padding:14px 20px;border-bottom:1px solid #F0F0F8;display:flex;align-items:center;justify-content:space-between;">'
+            + '<div style="font-size:13.5px;font-weight:700;color:#1B2A4A;">👥 Agents — actions du jour</div>'
+            + '<button onclick="showAdmin(\'activite\');_adminLoadActivite()" style="font-size:11.5px;color:#E8650A;background:none;border:none;cursor:pointer;font-weight:600;">Rapport complet →</button>'
+            + '</div>' + rows + '</div>';
+        } else {
+          rapEl.style.display = 'none';
+        }
+      } catch(e) { rapEl.style.display = 'none'; }
+    }
+  }
 }
 
 function _adminRenderAlertes(attente, expire7, sansAbo) {
   var el = document.getElementById('dashAlertes');
   if (!el) return;
+  var isSuperAdmin = (window._adminRole === 'super_admin');
   var items = [];
   if (attente > 0) {
     items.push('<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:#FFF7F0;border-left:4px solid #E8650A;border-radius:0 8px 8px 0;flex-wrap:wrap;">'
@@ -8128,13 +8279,13 @@ function _adminRenderAlertes(attente, expire7, sansAbo) {
       + '<button onclick="showAdmin(\'en_attente\')" style="padding:6px 14px;background:#E8650A;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Valider maintenant →</button>'
       + '</div>');
   }
-  if (expire7 > 0) {
+  if (isSuperAdmin && expire7 > 0) {
     items.push('<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:#FFFBEB;border-left:4px solid #F59E0B;border-radius:0 8px 8px 0;flex-wrap:wrap;">'
       + '<span style="font-size:13px;color:#1B2A4A;font-weight:600;">⚠️ <strong>' + expire7 + '</strong> abonnement' + (expire7 > 1 ? 's expirent' : ' expire') + ' dans 7 jours</span>'
       + '<button onclick="showAdmin(\'valide\')" style="padding:6px 14px;background:#F59E0B;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Voir la liste →</button>'
       + '</div>');
   }
-  if (sansAbo > 0) {
+  if (isSuperAdmin && sansAbo > 0) {
     items.push('<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:#F8F9FA;border-left:4px solid #6B7280;border-radius:0 8px 8px 0;flex-wrap:wrap;">'
       + '<span style="font-size:13px;color:#1B2A4A;font-weight:600;">💤 <strong>' + sansAbo + '</strong> prestataire' + (sansAbo > 1 ? 's validés' : ' validé') + ' sans abonnement actif</span>'
       + '<button onclick="showAdmin(\'campagne\');_campagneInit();setTimeout(function(){var cb=document.getElementById(\'cmpFiltSansAbo\');if(cb){cb.checked=true;_campagneUpdateCount();}},600);" style="padding:6px 14px;background:#6B7280;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Relancer par SMS →</button>'
@@ -8147,6 +8298,103 @@ function _adminRenderAlertes(attente, expire7, sansAbo) {
       + '</div>';
   } else {
     el.innerHTML = '<div style="display:flex;flex-direction:column;gap:0;border:1.5px solid #FDE8D8;border-radius:10px;overflow:hidden;">' + items.join('') + '</div>';
+  }
+}
+
+var _actFiltreActuel = 'mois';
+
+async function _adminLoadActivite(filtre) {
+  filtre = filtre || _actFiltreActuel;
+  _actFiltreActuel = filtre;
+  var c1 = document.getElementById('activiteAgentsTable');
+  var c2 = document.getElementById('activiteTimeline');
+  var loading = '<div style="text-align:center;padding:28px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>';
+  if (c1) c1.innerHTML = loading;
+  if (c2) c2.innerHTML = loading;
+
+  // Activer bouton filtre
+  ['semaine','mois','tout'].forEach(function(f) {
+    var btn = document.getElementById('actFilt_' + f);
+    if (btn) {
+      btn.style.background = f === filtre ? '#1B2A4A' : '#F3F4F6';
+      btn.style.color = f === filtre ? '#fff' : '#374151';
+    }
+  });
+
+  var debut = '';
+  var n = new Date();
+  if (filtre === 'semaine') debut = new Date(n.getTime() - 7 * 86400000).toISOString();
+  else if (filtre === 'mois') debut = n.toISOString().slice(0, 7) + '-01T00:00:00';
+
+  try {
+    var q = sb.from('admin_actions')
+      .select('admin_nom,action,cible_nom,cible_matricule,created_at')
+      .order('created_at', {ascending: false});
+    if (debut) q = q.gte('created_at', debut);
+    var {data:acts} = await q;
+
+    // Synthèse par agent
+    var byAgent = {};
+    (acts || []).forEach(function(a) {
+      if (!byAgent[a.admin_nom]) byAgent[a.admin_nom] = {val:0, rej:0, sus:0, total:0, last:null};
+      byAgent[a.admin_nom].total++;
+      if (a.action === 'valider') byAgent[a.admin_nom].val++;
+      else if (a.action === 'rejeter') byAgent[a.admin_nom].rej++;
+      else if (a.action === 'suspendre') byAgent[a.admin_nom].sus++;
+      if (!byAgent[a.admin_nom].last) byAgent[a.admin_nom].last = a.created_at;
+    });
+
+    if (c1) {
+      var agList = Object.entries(byAgent).sort(function(a,b){return b[1].total-a[1].total;});
+      if (agList.length === 0) {
+        c1.innerHTML = '<div style="text-align:center;padding:28px;color:#9CA3AF;font-size:13px;">Aucune action pour cette période.</div>';
+      } else {
+        var trows = agList.map(function(e) {
+          var nom = e[0], s = e[1];
+          var lastStr = s.last ? new Date(s.last).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}) + ' ' + new Date(s.last).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '—';
+          return '<tr style="border-bottom:1px solid #F3F4F6;">'
+            + '<td style="padding:10px 16px;font-weight:600;color:#1B2A4A;font-size:13.5px;">' + nom + '</td>'
+            + '<td style="padding:10px 16px;text-align:center;color:#059669;font-weight:700;font-size:14px;">' + s.val + '</td>'
+            + '<td style="padding:10px 16px;text-align:center;color:#DC2626;font-weight:700;font-size:14px;">' + s.rej + '</td>'
+            + '<td style="padding:10px 16px;text-align:center;color:#F59E0B;font-weight:700;font-size:14px;">' + s.sus + '</td>'
+            + '<td style="padding:10px 16px;font-size:11.5px;color:#9CA3AF;">' + lastStr + '</td>'
+            + '</tr>';
+        }).join('');
+        c1.innerHTML = '<table style="width:100%;border-collapse:collapse;">'
+          + '<thead><tr style="background:#F9FAFB;">'
+          + '<th style="padding:9px 16px;text-align:left;font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Agent</th>'
+          + '<th style="padding:9px 16px;text-align:center;font-size:11px;color:#059669;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">✅ Val.</th>'
+          + '<th style="padding:9px 16px;text-align:center;font-size:11px;color:#DC2626;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">❌ Rejets</th>'
+          + '<th style="padding:9px 16px;text-align:center;font-size:11px;color:#F59E0B;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">⛔ Susp.</th>'
+          + '<th style="padding:9px 16px;text-align:left;font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Dernière action</th>'
+          + '</tr></thead><tbody>' + trows + '</tbody></table>';
+      }
+    }
+
+    // Timeline
+    if (c2) {
+      if (!acts || acts.length === 0) {
+        c2.innerHTML = '<div style="text-align:center;padding:28px;color:#9CA3AF;font-size:13px;">Aucune action pour cette période.</div>';
+      } else {
+        var icons = {valider:'🟢', rejeter:'🔴', suspendre:'⛔', renouveler:'🔄', supprimer:'🗑️'};
+        var actLbls = {valider:'a validé', rejeter:'a rejeté', suspendre:'a suspendu', renouveler:'a renouvelé', supprimer:'a supprimé'};
+        var items = (acts || []).slice(0, 60).map(function(a) {
+          var d = new Date(a.created_at);
+          var dateStr = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}) + ' à ' + d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+          var cible = a.cible_nom ? a.cible_nom + (a.cible_matricule ? ' — ' + a.cible_matricule : '') : '';
+          return '<div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #F9FAFB;">'
+            + '<span style="font-size:14px;flex-shrink:0;">' + (icons[a.action] || '●') + '</span>'
+            + '<div style="flex:1;min-width:0;">'
+            + '<span style="font-size:13px;color:#1B2A4A;"><strong>' + a.admin_nom + '</strong> ' + (actLbls[a.action] || a.action)
+            + (cible ? ' <span style="color:#E8650A;">[' + cible + ']</span>' : '') + '</span>'
+            + '<span style="font-size:11px;color:#9CA3AF;margin-left:8px;">le ' + dateStr + '</span>'
+            + '</div></div>';
+        }).join('');
+        c2.innerHTML = '<div style="max-height:420px;overflow-y:auto;">' + items + '</div>';
+      }
+    }
+  } catch(e) {
+    if (c1) c1.innerHTML = '<div style="color:#DC2626;padding:20px;font-size:13px;">Erreur : ' + e.message + '</div>';
   }
 }
 
@@ -8332,6 +8580,7 @@ async function _aboRenouveler(id, nom, btn) {
       details:'Abonnement renouvelé manuellement par admin — expire le '+nouvelleFin.toLocaleDateString('fr-FR')
     });
     if(typeof showToast==='function') showToast('✅ Abonnement de '+nom+' renouvelé jusqu\'au '+nouvelleFin.toLocaleDateString('fr-FR'),'success');
+    _logAdminAction('renouveler', nom, '', 'Abonnement +30j → expire le '+nouvelleFin.toLocaleDateString('fr-FR'));
     var p=_aboData.find(function(x){return x.id===id;});
     if(p){p.abonnement_actif=true;p.abonnement_fin=nfStr;}
     _aboUpdateCompteurs(_aboData);
@@ -9252,12 +9501,13 @@ function showAdmin(name) {
     notifications: '<i class="fa-solid fa-bell" style="color:#E85D04;margin-right:6px;"></i>Notifications',
     campagne: '<i class="fa-solid fa-bullhorn" style="color:#E8650A;margin-right:6px;"></i>Campagne SMS',
     equipe: '<i class="fa-solid fa-users-gear" style="color:#E8650A;margin-right:6px;"></i>Équipe admin',
+    activite: '<i class="fa-solid fa-chart-bar" style="color:#E85D04;margin-right:6px;"></i>Activité équipe',
   };
   const tt = document.getElementById('adminTopbarTitle');
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','missions','projets_clients','ambassadeurs','rapports','notifications','equipe'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','missions','projets_clients','ambassadeurs','rapports','activite','notifications','equipe'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (!el) return;
     // Ne pas réafficher un élément restreint à l'agent
@@ -9272,6 +9522,7 @@ function showAdmin(name) {
   else if (name==='projets_clients') { _adminChargerProjets(); }
   else if (name==='campagne') { _campagneInit(); }
   else if (name==='equipe') { _adminLoadEquipe(); }
+  else if (name==='activite') { _adminLoadActivite(); }
   else if (name!=='dashboard') { if(typeof _adminLoadAll==='function') _adminLoadAll(); }
 }
 
@@ -9329,12 +9580,32 @@ function actionsHTML(p) {
   return `<div style="display:flex;flex-wrap:wrap;gap:3px;">${btns}</div>`;
 }
 
+async function _logAdminAction(action, cible_nom, cible_matricule, details) {
+  try {
+    const admin = adminData;
+    if (!admin) return;
+    await sb.from('admin_actions').insert({
+      admin_id: admin.id || admin.admin_id,
+      admin_nom: admin.nom || 'Admin',
+      action,
+      cible_nom: cible_nom || '',
+      cible_matricule: cible_matricule || '',
+      details: details || ''
+    });
+  } catch(e) { console.log('[logAdminAction]', e.message); }
+}
+
 async function _adminAction(type, id) {
   if (type !== 'supprimer') {
     const labels = {valider:'Valider ce prestataire ?',rejeter:'Rejeter ?',suspendre:'Suspendre ?'};
     if (!window.confirm(labels[type]||type)) return;
   }
   try {
+    // Récupérer infos prestataire pour log et confirmation (avant toute suppression)
+    const {data:pInfo} = await sb.from('providers').select('prenom,nom,matricule').eq('id',id).single();
+    const pNom = pInfo ? `${pInfo.prenom||''} ${pInfo.nom||''}`.trim() : '';
+    const pMat = pInfo?.matricule || '';
+
     if (type==='valider') {
       const essai_fin = new Date(Date.now()+14*24*60*60*1000).toISOString();
       const {error} = await sb.from('providers').update({statut:'valide',essai_actif:true,essai_fin}).eq('id',id);
@@ -9354,18 +9625,16 @@ async function _adminAction(type, id) {
     } else if (type==='suspendre') {
       await sb.from('providers').update({statut:'suspendu'}).eq('id',id);
     } else if (type==='supprimer') {
-      // Récupérer nom + matricule pour la confirmation
-      const {data:pData} = await sb.from('providers').select('prenom,nom,matricule').eq('id',id).single();
-      const fullName = `${pData?.prenom||''} ${pData?.nom||''}`.trim() || 'ce prestataire';
-      const mat = pData?.matricule || '—';
+      const fullName = pNom || 'ce prestataire';
+      const mat = pMat || '—';
       if (!window.confirm(`⚠️ SUPPRESSION DÉFINITIVE\n\nSupprimer définitivement ${fullName} (${mat}) ?\nSon matricule sera définitivement invalidé.\n\nCette action est irréversible.`)) return;
-      // Suppression cascadée des données liées
       await sb.from('devis').delete().eq('provider_id', id);
       await sb.from('provider_photos').delete().eq('provider_id', id);
       try { await sb.from('notifications').delete().eq('receiver_id', id); } catch(e) {}
       try { await sb.from('partages_log').delete().eq('provider_id', id); } catch(e) {}
       await sb.from('providers').delete().eq('id', id);
     }
+    _logAdminAction(type, pNom, pMat, '');
     showToast('Action effectuée avec succès');
     await loadAll();
   } catch(e) { showToast('Erreur: '+e.message); }
