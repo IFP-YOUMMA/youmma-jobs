@@ -241,6 +241,9 @@ body:not(.role-super_admin) [data-super-only]{display:none!important;}
 body.role-agent #adminRoleLabel::after{content:" (Agent)";font-size:11px;color:#9CA3AF;}
 /* Dashboard activité : 2 colonnes pour agent (SMS et Vues masqués) */
 body.role-agent .dash-activity-grid{grid-template-columns:repeat(2,1fr)!important;}
+/* Dashboard fond et ombre cards */
+#admin-dashboard .admin-section-inner{background:#F8F9FA;}
+.adm-table-wrap{box-shadow:0 1px 4px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04)!important;}
 body.admin-mode #page-admin.logged #adminWrap{
   margin-left:0!important;
   width:100%!important;
@@ -5829,6 +5832,9 @@ async function chargerAvis() {
           </div>
         </div>
 
+        <!-- Alertes prioritaires -->
+        <div id="dashAlertes" style="margin-bottom:28px;"></div>
+
         <!-- Présence & Activité (super_admin only) -->
         <div id="dashPresence" data-super-only="true" style="display:none;margin-bottom:28px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
@@ -5863,37 +5869,6 @@ async function chargerAvis() {
             <div id="dashPresenceChart" style="padding:14px 20px 10px;"><div style="text-align:center;padding:16px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i></div></div>
           </div>
         </div>
-
-        <!-- Activité plateforme -->
-        <div class="dash-activity-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
-          <div class="adm-table-wrap" style="padding:14px 16px;text-align:center;">
-            <div style="font-size:20px;margin-bottom:6px;">📋</div>
-            <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashMissionsTotal">—</div>
-            <div style="font-size:11.5px;color:#6B7280;margin-top:2px;">Projets clients</div>
-            <div id="dashMissionsToday" style="font-size:11px;color:#E8650A;margin-top:4px;font-weight:600;">—</div>
-          </div>
-          <div class="adm-table-wrap" style="padding:14px 16px;text-align:center;">
-            <div style="font-size:20px;margin-bottom:6px;">💬</div>
-            <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashDevisTotal">—</div>
-            <div style="font-size:11.5px;color:#6B7280;margin-top:2px;">Devis soumis</div>
-            <div id="dashDevisToday" style="font-size:11px;color:#E8650A;margin-top:4px;font-weight:600;">—</div>
-          </div>
-          <div class="adm-table-wrap" data-super-only="true" style="padding:14px 16px;text-align:center;">
-            <div style="font-size:20px;margin-bottom:6px;">📱</div>
-            <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashSmsCredits">—</div>
-            <div style="font-size:11.5px;color:#6B7280;margin-top:2px;">SMS restants</div>
-            <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">mise à jour manuelle</div>
-          </div>
-          <div class="adm-table-wrap" data-super-only="true" style="padding:14px 16px;text-align:center;">
-            <div style="font-size:20px;margin-bottom:6px;">👁</div>
-            <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashVuesProfils">—</div>
-            <div style="font-size:11.5px;color:#6B7280;margin-top:2px;">Vues profils</div>
-            <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">total cumulé</div>
-          </div>
-        </div>
-
-        <!-- Alertes prioritaires -->
-        <div id="dashAlertes" style="margin-bottom:28px;"></div>
 
         <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;">
           <div class="adm-table-wrap">
@@ -5952,6 +5927,34 @@ async function chargerAvis() {
 
         <div id="dashMonActivite" style="display:none;margin-top:24px;"></div>
         <div id="dashSuperRapportAgents" style="display:none;margin-top:24px;" data-super-only="true"></div>
+
+        <!-- Activité plateforme -->
+        <div class="dash-activity-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px;">
+          <div class="adm-table-wrap" style="padding:14px 16px;text-align:center;">
+            <div style="font-size:20px;margin-bottom:6px;">📋</div>
+            <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashMissionsTotal">—</div>
+            <div style="font-size:11.5px;color:#6B7280;margin-top:2px;">Projets clients</div>
+            <div id="dashMissionsToday" style="font-size:11px;color:#E8650A;margin-top:4px;font-weight:600;">—</div>
+          </div>
+          <div class="adm-table-wrap" style="padding:14px 16px;text-align:center;">
+            <div style="font-size:20px;margin-bottom:6px;">💬</div>
+            <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashDevisTotal">—</div>
+            <div style="font-size:11.5px;color:#6B7280;margin-top:2px;">Devis soumis</div>
+            <div id="dashDevisToday" style="font-size:11px;color:#E8650A;margin-top:4px;font-weight:600;">—</div>
+          </div>
+          <div class="adm-table-wrap" data-super-only="true" style="padding:14px 16px;text-align:center;">
+            <div style="font-size:20px;margin-bottom:6px;">📱</div>
+            <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashSmsCredits">—</div>
+            <div style="font-size:11.5px;color:#6B7280;margin-top:2px;">SMS restants</div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">mise à jour manuelle</div>
+          </div>
+          <div class="adm-table-wrap" data-super-only="true" style="padding:14px 16px;text-align:center;">
+            <div style="font-size:20px;margin-bottom:6px;">👁</div>
+            <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashVuesProfils">—</div>
+            <div style="font-size:11.5px;color:#6B7280;margin-top:2px;">Vues profils</div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">total cumulé</div>
+          </div>
+        </div>
 
         <!-- Section abonnements (toggle) -->
         <div id="dashAboSection" style="display:none;margin-top:24px;">
@@ -8170,16 +8173,20 @@ async function _adminLoadDashboard() {
     _adminRenderChart(r7.data || []);
   } catch(e) {}
 
-  // ⑥ Abonnements + revenus
-  try {
-    var sys = await Promise.all([
-      sb.from('providers').select('id',{count:'exact',head:true}).eq('abonnement_actif', true),
-      sb.from('providers').select('id',{count:'exact',head:true}).eq('abonnement_actif', true).gte('created_at', moisDebut),
-    ]);
-    setEl('dashAboActifs', sys[0].count || 0);
-    var rev = ((sys[1].count || 0) * 50000).toLocaleString('fr-FR');
-    setEl('dashRevMois', rev + ' GNF');
-  } catch(e) {}
+  // ⑥ Abonnements + revenus (super_admin only)
+  if (window._adminRole === 'super_admin') {
+    try {
+      var debutMoisDate = new Date(); debutMoisDate.setDate(1); debutMoisDate.setHours(0,0,0,0);
+      var debutMoisIso = debutMoisDate.toISOString();
+      var sys = await Promise.all([
+        sb.from('providers').select('id',{count:'exact',head:true}).eq('statut','valide').eq('abonnement_actif', true),
+        sb.from('providers').select('id',{count:'exact',head:true}).eq('statut','valide').eq('abonnement_actif', true).gte('abonnement_fin', debutMoisIso),
+      ]);
+      setEl('dashAboActifs', sys[0].count || 0);
+      var rev = ((sys[1].count || 0) * 50000).toLocaleString('fr-FR');
+      setEl('dashRevMois', rev + ' GNF');
+    } catch(e) {}
+  }
 
   // ⑦ Header rôle
   var prenomAdmin = ((adminData && adminData.nom) || 'Admin').split(' ')[0];
