@@ -5829,6 +5829,41 @@ async function chargerAvis() {
           </div>
         </div>
 
+        <!-- Présence & Activité (super_admin only) -->
+        <div id="dashPresence" data-super-only="true" style="display:none;margin-bottom:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:14px;font-weight:700;color:#1B2A4A;">👥 Présence &amp; Activité</span>
+              <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:#059669;font-weight:600;"><span style="display:inline-block;width:7px;height:7px;background:#059669;border-radius:50%;animation:yjBadgePulse 2s ease-in-out infinite;"></span> En direct</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span id="dashPresenceUpdated" style="font-size:11px;color:#9CA3AF;"></span>
+              <button onclick="_adminLoadPresence()" style="font-size:11.5px;color:#E8650A;background:none;border:none;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:4px;"><i class="fa-solid fa-rotate"></i> Actualiser</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;">
+            <div class="adm-table-wrap" id="dashPresCard1" style="padding:16px 18px;transition:border-top .3s;">
+              <div style="font-size:10.5px;color:#059669;font-weight:700;letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase;">🟢 Connectés aujourd'hui</div>
+              <div id="dashConnectes24h" style="font-family:'Libre Baskerville',serif;font-size:28px;font-weight:700;color:#1B2A4A;">—</div>
+              <div id="dashConnectes24hSub" style="font-size:11.5px;color:#6B7280;margin-top:5px;">sur — membres au total</div>
+            </div>
+            <div class="adm-table-wrap" style="padding:16px 18px;">
+              <div style="font-size:10.5px;color:#6366F1;font-weight:700;letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase;">📅 Cette semaine</div>
+              <div id="dashConnectes7j" style="font-family:'Libre Baskerville',serif;font-size:28px;font-weight:700;color:#1B2A4A;">—</div>
+              <div style="font-size:11.5px;color:#6B7280;margin-top:5px;">connexions uniques 7 jours</div>
+            </div>
+            <div class="adm-table-wrap" style="padding:16px 18px;">
+              <div style="font-size:10.5px;color:#E8650A;font-weight:700;letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase;">📈 Inscrits aujourd'hui</div>
+              <div id="dashInscrits24h" style="font-family:'Libre Baskerville',serif;font-size:28px;font-weight:700;color:#1B2A4A;">—</div>
+              <div style="font-size:11.5px;color:#6B7280;margin-top:5px;">nouveaux comptes 24h</div>
+            </div>
+          </div>
+          <div class="adm-table-wrap">
+            <div style="padding:14px 20px;border-bottom:1px solid #F0F0F8;font-size:13px;font-weight:700;color:#1B2A4A;">📈 Inscriptions — 30 derniers jours</div>
+            <div id="dashPresenceChart" style="padding:14px 20px 10px;"><div style="text-align:center;padding:16px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i></div></div>
+          </div>
+        </div>
+
         <!-- Activité plateforme -->
         <div class="dash-activity-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;">
           <div class="adm-table-wrap" style="padding:14px 16px;text-align:center;">
@@ -8265,6 +8300,8 @@ async function _adminLoadDashboard() {
         }
       } catch(e) { rapEl.style.display = 'none'; }
     }
+    // Métriques présence temps réel
+    _adminLoadPresence();
   }
 }
 
@@ -8302,6 +8339,85 @@ function _adminRenderAlertes(attente, expire7, sansAbo) {
 }
 
 var _actFiltreActuel = 'mois';
+var _presenceInterval = null;
+
+async function _adminLoadPresence() {
+  if (window._adminRole !== 'super_admin') return;
+  var el = document.getElementById('dashPresence');
+  if (!el) return;
+  el.style.display = '';
+
+  // Métriques vue_connexions_admin
+  try {
+    var {data:cv} = await sb.from('vue_connexions_admin').select('*').single();
+    if (cv) {
+      var setV = function(id, val) { var e = document.getElementById(id); if (e) e.textContent = (val !== null && val !== undefined) ? val : '—'; };
+      setV('dashConnectes24h', cv.connectes_24h || 0);
+      setV('dashConnectes7j', cv.connectes_7j || 0);
+      setV('dashInscrits24h', cv.inscrits_24h || 0);
+      var sub1 = document.getElementById('dashConnectes24hSub');
+      if (sub1) sub1.textContent = 'sur ' + (cv.total_users || '—') + ' membres au total';
+      // Indicateur vert si connectés > 0
+      var c1 = document.getElementById('dashPresCard1');
+      if (c1) c1.style.borderTop = (cv.connectes_24h > 0) ? '3px solid #059669' : '';
+    }
+  } catch(e) { console.log('[dashPresence vue]', e.message); }
+
+  // Horodatage
+  var updEl = document.getElementById('dashPresenceUpdated');
+  if (updEl) updEl.textContent = 'Mis à jour à ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+
+  // Graphique 30 jours (providers.created_at comme proxy d'activité)
+  try {
+    var debut30 = new Date(Date.now() - 30 * 86400000).toISOString();
+    var {data:rows30} = await sb.from('providers').select('created_at').gte('created_at', debut30).order('created_at', {ascending: true});
+    _adminRenderPresenceChart(rows30 || []);
+  } catch(e) { console.log('[dashPresence chart]', e.message); }
+
+  // Auto-refresh toutes les 60s (une seule instance)
+  if (!_presenceInterval) {
+    _presenceInterval = setInterval(function() {
+      if (window._adminRole === 'super_admin') { _adminLoadPresence(); }
+      else { clearInterval(_presenceInterval); _presenceInterval = null; }
+    }, 60000);
+  }
+}
+
+function _adminRenderPresenceChart(data) {
+  var el = document.getElementById('dashPresenceChart');
+  if (!el) return;
+  var now = new Date();
+  var days = [];
+  for (var i = 29; i >= 0; i--) {
+    var d = new Date(now.getTime() - i * 86400000);
+    days.push({key: d.toISOString().slice(0, 10), count: 0, isToday: i === 0});
+  }
+  (data || []).forEach(function(row) {
+    var dk = (row.created_at || '').slice(0, 10);
+    var found = days.find(function(x) { return x.key === dk; });
+    if (found) found.count++;
+  });
+  var max = Math.max.apply(null, days.map(function(d) { return d.count; })) || 1;
+  var barW = 14, gap = 3, padL = 8, padR = 8, svgH = 100;
+  var svgW = padL + days.length * (barW + gap) - gap + padR;
+  var bars = days.map(function(d, i) {
+    var barH = Math.max(3, Math.round(d.count / max * 65));
+    var x = padL + i * (barW + gap);
+    var y = 75 - barH;
+    var fill = d.isToday ? '#1B2A4A' : '#E8650A';
+    var opacity = d.isToday ? '1' : '.7';
+    return '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" rx="3" fill="' + fill + '" opacity="' + opacity + '">'
+      + '<title>' + d.key + ' : ' + d.count + ' inscription' + (d.count > 1 ? 's' : '') + '</title></rect>'
+      + (d.count > 0 && (d.isToday || d.count === max) ? '<text x="' + (x + barW / 2) + '" y="' + (y - 3) + '" text-anchor="middle" font-size="9" fill="' + fill + '" font-weight="700">' + d.count + '</text>' : '');
+  }).join('');
+  var xStart = padL + barW / 2;
+  var xMid = padL + 14 * (barW + gap) + barW / 2;
+  var xEnd = padL + 29 * (barW + gap) + barW / 2;
+  var labels = '<text x="' + xStart + '" y="92" text-anchor="middle" font-size="9" fill="#9CA3AF">J−30</text>'
+    + '<text x="' + xMid + '" y="92" text-anchor="middle" font-size="9" fill="#9CA3AF">J−15</text>'
+    + '<text x="' + xEnd + '" y="92" text-anchor="middle" font-size="9" fill="#1B2A4A" font-weight="700">Auj.</text>';
+  el.innerHTML = '<svg width="100%" viewBox="0 0 ' + svgW + ' ' + svgH + '" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible;">' + bars + labels + '</svg>';
+}
 
 async function _adminLoadActivite(filtre) {
   filtre = filtre || _actFiltreActuel;
@@ -9455,6 +9571,7 @@ async function initAdmin() {
 function logoutAdmin() {
   localStorage.removeItem('yj_admin_session');
   adminData = null;
+  if (_presenceInterval) { clearInterval(_presenceInterval); _presenceInterval = null; }
   // Nettoyer le rôle et remettre les éléments restreints visibles
   window._adminRole = null;
   document.body.classList.remove('role-super_admin','role-agent','role-admin','role-moderator');
