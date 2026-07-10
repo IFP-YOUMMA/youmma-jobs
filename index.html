@@ -8173,20 +8173,18 @@ async function _adminLoadDashboard() {
     _adminRenderChart(r7.data || []);
   } catch(e) {}
 
-  // ⑥ Abonnements + revenus (super_admin only)
-  if (window._adminRole === 'super_admin') {
-    try {
-      var debutMoisDate = new Date(); debutMoisDate.setDate(1); debutMoisDate.setHours(0,0,0,0);
-      var debutMoisIso = debutMoisDate.toISOString();
-      var sys = await Promise.all([
-        sb.from('providers').select('id',{count:'exact',head:true}).eq('statut','valide').eq('abonnement_actif', true),
-        sb.from('providers').select('id',{count:'exact',head:true}).eq('statut','valide').eq('abonnement_actif', true).gte('abonnement_fin', debutMoisIso),
-      ]);
-      setEl('dashAboActifs', sys[0].count || 0);
-      var rev = ((sys[1].count || 0) * 50000).toLocaleString('fr-FR');
-      setEl('dashRevMois', rev + ' GNF');
-    } catch(e) {}
-  }
+  // ⑥ Abonnements + revenus
+  try {
+    var debutMoisDate = new Date(); debutMoisDate.setDate(1); debutMoisDate.setHours(0,0,0,0);
+    var debutMoisIso = debutMoisDate.toISOString();
+    var sys = await Promise.all([
+      sb.from('providers').select('id',{count:'exact',head:true}).eq('statut','valide').eq('abonnement_actif', true),
+      sb.from('providers').select('id',{count:'exact',head:true}).eq('statut','valide').eq('abonnement_actif', true).gte('abonnement_fin', debutMoisIso),
+    ]);
+    setEl('dashAboActifs', sys[0].count || 0);
+    var rev = ((sys[1].count || 0) * 50000).toLocaleString('fr-FR');
+    setEl('dashRevMois', rev + ' GNF');
+  } catch(e) {}
 
   // ⑦ Header rôle
   var prenomAdmin = ((adminData && adminData.nom) || 'Admin').split(' ')[0];
@@ -8354,32 +8352,55 @@ async function _adminLoadPresence() {
   if (!el) return;
   el.style.display = '';
 
-  // Métriques vue_connexions_admin
+  var setV = function(id, val) { var e = document.getElementById(id); if (e) e.textContent = (val !== null && val !== undefined) ? val : '—'; };
+
+  // Métriques : vue_connexions_admin en priorité, fallback providers
+  var vueOk = false;
   try {
-    var {data:cv} = await sb.from('vue_connexions_admin').select('*').single();
-    if (cv) {
-      var setV = function(id, val) { var e = document.getElementById(id); if (e) e.textContent = (val !== null && val !== undefined) ? val : '—'; };
+    var {data:cv, error:cvErr} = await sb.from('vue_connexions_admin').select('*').single();
+    if (cv && !cvErr) {
       setV('dashConnectes24h', cv.connectes_24h || 0);
       setV('dashConnectes7j', cv.connectes_7j || 0);
       setV('dashInscrits24h', cv.inscrits_24h || 0);
       var sub1 = document.getElementById('dashConnectes24hSub');
       if (sub1) sub1.textContent = 'sur ' + (cv.total_users || '—') + ' membres au total';
-      // Indicateur vert si connectés > 0
       var c1 = document.getElementById('dashPresCard1');
       if (c1) c1.style.borderTop = (cv.connectes_24h > 0) ? '3px solid #059669' : '';
+      vueOk = true;
     }
-  } catch(e) { console.log('[dashPresence vue]', e.message); }
+  } catch(e) { /* vue absente — fallback ci-dessous */ }
+
+  if (!vueOk) {
+    // Fallback : métriques d'inscription depuis providers
+    try {
+      var h24 = new Date(Date.now() - 86400000).toISOString();
+      var j7  = new Date(Date.now() - 7 * 86400000).toISOString();
+      var fb = await Promise.all([
+        sb.from('providers').select('id', {count:'exact', head:true}),
+        sb.from('providers').select('id', {count:'exact', head:true}).gte('created_at', h24),
+        sb.from('providers').select('id', {count:'exact', head:true}).gte('created_at', j7),
+      ]);
+      var tot = fb[0].count || 0, nb24 = fb[1].count || 0, nb7 = fb[2].count || 0;
+      setV('dashConnectes24h', nb24);
+      setV('dashConnectes7j', nb7);
+      setV('dashInscrits24h', nb24);
+      var sub1b = document.getElementById('dashConnectes24hSub');
+      if (sub1b) sub1b.textContent = 'inscrits sur ' + tot + ' prestataires au total';
+      var c1b = document.getElementById('dashPresCard1');
+      if (c1b) c1b.style.borderTop = nb24 > 0 ? '3px solid #059669' : '';
+    } catch(e2) { console.log('[dashPresence fallback]', e2.message); }
+  }
 
   // Horodatage
   var updEl = document.getElementById('dashPresenceUpdated');
   if (updEl) updEl.textContent = 'Mis à jour à ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
 
-  // Graphique 30 jours (providers.created_at comme proxy d'activité)
+  // Graphique 30 jours
   try {
     var debut30 = new Date(Date.now() - 30 * 86400000).toISOString();
     var {data:rows30} = await sb.from('providers').select('created_at').gte('created_at', debut30).order('created_at', {ascending: true});
     _adminRenderPresenceChart(rows30 || []);
-  } catch(e) { console.log('[dashPresence chart]', e.message); }
+  } catch(e) { _adminRenderPresenceChart([]); }
 
   // Auto-refresh toutes les 60s (une seule instance)
   if (!_presenceInterval) {
