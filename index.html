@@ -221,7 +221,17 @@ body.admin-mode #page-admin.logged #adminSidebarEl.open{
   transform:translateX(0)!important;
 }
 /* Contrôle d'accès par rôle */
-body.role-agent .super-admin-only{display:none!important;}
+body.role-agent .super-admin-only,
+body.role-agent [data-super-only],
+body.role-agent #amenu-suspendu,
+body.role-agent #amenu-campagne,
+body.role-agent #amenu-carousel,
+body.role-agent #amenu-rapports,
+body.role-agent #amenu-equipe,
+body.role-agent .btn-suspendre,
+body.role-agent .btn-supprimer,
+body.role-agent .admin-revenus,
+body.role-agent .admin-abonnements-section{display:none!important;}
 body.admin-mode #page-admin.logged #adminWrap{
   margin-left:0!important;
   width:100%!important;
@@ -5869,7 +5879,7 @@ async function chargerAvis() {
                   <span style="color:#6B7280;">Dernière synchro</span>
                   <span style="color:#374151;font-weight:600;" id="dashLastSync">—</span>
                 </div>
-                <div class="super-admin-only" style="border-top:1px solid #F0F0F8;margin-top:8px;padding-top:8px;display:flex;flex-direction:column;gap:6px;">
+                <div class="super-admin-only admin-revenus" style="border-top:1px solid #F0F0F8;margin-top:8px;padding-top:8px;display:flex;flex-direction:column;gap:6px;">
                   <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
                     <span style="color:#6B7280;">Abonnements actifs</span>
                     <span style="color:#059669;font-weight:700;" id="dashAboActifs">—</span>
@@ -5883,7 +5893,7 @@ async function chargerAvis() {
                     <span style="color:#374151;font-weight:600;" id="dashLastPayment">—</span>
                   </div>
                 </div>
-                <div class="super-admin-only" style="margin-top:14px;padding-top:12px;border-top:1px solid #F0F0F8;">
+                <div class="super-admin-only admin-abonnements-section" style="margin-top:14px;padding-top:12px;border-top:1px solid #F0F0F8;">
                   <button onclick="_aboToggle()" id="dashAboToggleBtn" style="width:100%;padding:9px 14px;background:#1B2A4A;color:#fff;border:none;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
                     <span>💳 Gérer les abonnements</span><span id="dashAboToggleArrow" style="font-size:14px;">↓</span>
                   </button>
@@ -6546,8 +6556,8 @@ function renderTableHTML(statut, data) {
     const actionBtns = [
       p.statut !== 'valide'   ? `<button class="adm-btn valider"   onclick="event.stopPropagation();_adminAction('valider','${p.id}')"><i class="fa-solid fa-check"></i> Valider</button>` : '',
       p.statut !== 'rejete'   ? `<button class="adm-btn rejeter"   onclick="event.stopPropagation();_adminAction('rejeter','${p.id}')">Rejeter</button>` : '',
-      p.statut !== 'suspendu' ? `<button class="adm-btn suspendre super-admin-only" onclick="event.stopPropagation();_adminAction('suspendre','${p.id}')"><i class="fa-solid fa-ban"></i></button>` : '',
-      `<button class="adm-btn supprimer super-admin-only" onclick="event.stopPropagation();_adminAction('supprimer','${p.id}')"><i class="fa-solid fa-trash"></i></button>`
+      p.statut !== 'suspendu' ? `<button class="adm-btn suspendre super-admin-only btn-suspendre" onclick="event.stopPropagation();_adminAction('suspendre','${p.id}')"><i class="fa-solid fa-ban"></i></button>` : '',
+      `<button class="adm-btn supprimer super-admin-only btn-supprimer" onclick="event.stopPropagation();_adminAction('supprimer','${p.id}')"><i class="fa-solid fa-trash"></i></button>`
     ].filter(Boolean).join('');
 
     const docCol = `<div style="display:flex;flex-direction:column;gap:3px;">
@@ -7987,6 +7997,7 @@ async function _adminLogin() {
   const res=await connexionAdmin(tel,pwd);
   if(res.success){
     _adminData=res.admin;
+    window._adminRole = res.admin.role || 'agent';
     _adminAppliquerRole(res.admin.role);
     const loginWrap=document.querySelector('#page-admin .login-wrap');
     const adminWrap=document.querySelector('#page-admin .admin-wrap');
@@ -8335,12 +8346,10 @@ function _adminShowSection(name) {
 
 // ─── Rôle admin ──────────────────────────────────────────────────────────────
 function _adminAppliquerRole(role) {
-  window._adminRole = role || 'agent';
-  if (role === 'super_admin') {
-    document.body.classList.remove('role-agent');
-  } else {
-    document.body.classList.add('role-agent');
-  }
+  const r = role || 'agent';
+  window._adminRole = r;
+  document.body.classList.remove('role-super_admin', 'role-agent');
+  document.body.classList.add('role-' + r);
 }
 
 // ─── Équipe admin ─────────────────────────────────────────────────────────────
@@ -9115,6 +9124,7 @@ async function loginAdmin() {
     try { await sb.from('admin_sessions').insert({admin_id:data.id,token}); } catch(e){}
     localStorage.setItem('yj_admin_session', JSON.stringify({admin_id:data.id,token,nom:data.nom,role:data.role}));
     adminData = data;
+    window._adminRole = data.role || 'agent';
     _adminAppliquerRole(data.role);
     _showAdminPanel();
     // Mettre à jour le nom admin dans la topbar
@@ -9135,7 +9145,7 @@ async function initAdmin() {
   if (!raw) return;
   try {
     const s = JSON.parse(raw);
-    if (s?.token) { adminData = s; _adminAppliquerRole(s.role); navigate('admin'); _showAdminPanel(); await loadAll(); }
+    if (s?.token) { adminData = s; window._adminRole = s.role || 'agent'; _adminAppliquerRole(s.role); navigate('admin'); _showAdminPanel(); await loadAll(); }
   } catch(e) {}
 }
 
@@ -9254,8 +9264,8 @@ function actionsHTML(p) {
   let btns = '';
   if (p.statut!=='valide')   btns += b('rgba(22,163,74,.12)','#16A34A','Valider','valider');
   if (p.statut!=='rejete')   btns += b('rgba(239,68,68,.1)','#DC2626','Rejeter','rejeter');
-  if (p.statut!=='suspendu') btns += `<span class="super-admin-only">${b('rgba(245,158,11,.1)','#B45309','Suspendre','suspendre')}</span>`;
-  btns += `<span class="super-admin-only">${b('rgba(239,68,68,.08)','#DC2626','Supprimer','supprimer')}</span>`;
+  if (p.statut!=='suspendu') btns += `<span class="super-admin-only btn-suspendre">${b('rgba(245,158,11,.1)','#B45309','Suspendre','suspendre')}</span>`;
+  btns += `<span class="super-admin-only btn-supprimer">${b('rgba(239,68,68,.08)','#DC2626','Supprimer','supprimer')}</span>`;
   return `<div style="display:flex;flex-wrap:wrap;gap:3px;">${btns}</div>`;
 }
 
