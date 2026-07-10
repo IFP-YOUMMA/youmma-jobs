@@ -235,6 +235,10 @@ body:not(.role-super_admin) .btn-supprimer,
 body:not(.role-super_admin) .admin-revenus,
 body:not(.role-super_admin) .admin-abonnements-section,
 body:not(.role-super_admin) .admin-abonnements-btn{display:none!important;}
+/* Attribut data-super-only : masquage universel hors super_admin */
+body:not(.role-super_admin) [data-super-only]{display:none!important;}
+/* Badge rôle dans la topbar */
+body.role-agent #adminRoleLabel::after{content:" (Agent)";font-size:11px;color:#9CA3AF;}
 body.admin-mode #page-admin.logged #adminWrap{
   margin-left:0!important;
   width:100%!important;
@@ -5730,21 +5734,21 @@ async function chargerAvis() {
     <div onclick="showAdmin('en_attente')" id="amenu-en_attente" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-clock" style="width:16px;"></i> En attente</div>
     <div onclick="showAdmin('valide')" id="amenu-valide" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-circle-check" style="width:16px;"></i> Validés</div>
     <div onclick="showAdmin('rejete')" id="amenu-rejete" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-circle-xmark" style="width:16px;"></i> Rejetés</div>
-    <div onclick="showAdmin('suspendu')" id="amenu-suspendu" class="super-admin-only" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-ban" style="width:16px;"></i> Suspendus</div>
-    <div class="super-admin-only" style="border-top:1px solid rgba(255,255,255,.12);margin:6px 0 8px;"></div>
-    <div onclick="showAdmin('campagne');_campagneInit();" id="amenu-campagne" class="super-admin-only" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullhorn" style="width:16px;"></i> Campagne SMS</div>
+    <div onclick="showAdmin('suspendu')" id="amenu-suspendu" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-ban" style="width:16px;"></i> Suspendus</div>
+    <div class="super-admin-only" data-super-only="true" style="border-top:1px solid rgba(255,255,255,.12);margin:6px 0 8px;"></div>
+    <div onclick="showAdmin('campagne');_campagneInit();" id="amenu-campagne" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullhorn" style="width:16px;"></i> Campagne SMS</div>
     <div style="border-top:1px solid rgba(255,255,255,.12);margin:8px 0 6px;"></div>
-    <div onclick="showAdmin('carousel')" id="amenu-carousel" class="super-admin-only" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-photo-film" style="width:16px;"></i> Images à la une</div>
+    <div onclick="showAdmin('carousel')" id="amenu-carousel" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-photo-film" style="width:16px;"></i> Images à la une</div>
     <div onclick="showAdmin('missions')" id="amenu-missions" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullseye" style="width:16px;"></i> Missions</div>
     <div onclick="showAdmin('projets_clients')" id="amenu-projets_clients" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-clipboard-list" style="width:16px;flex-shrink:0;"></i> Projets clients<span id="adminPcBadge" style="display:none;margin-left:auto;background:#E53E3E;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center;line-height:1.4;animation:yjBadgePulse 2s ease-in-out infinite;"></span></div>
     <div onclick="showAdmin('ambassadeurs');chargerClassementAdmin();" id="amenu-ambassadeurs" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-trophy" style="width:16px;"></i> Ambassadeurs</div>
-    <div onclick="showAdmin('rapports')" id="amenu-rapports" class="super-admin-only" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-chart-line" style="width:16px;"></i> Rapports</div>
+    <div onclick="showAdmin('rapports')" id="amenu-rapports" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-chart-line" style="width:16px;"></i> Rapports</div>
     <div onclick="showAdmin('notifications')" id="amenu-notifications" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:9px;">
       <i class="fa-solid fa-bell" style="width:16px;"></i> 
       <span>Notifications</span>
       <span class="sidebar-notif-badge hidden" id="sidebarNotifBadge">0</span>
     </div>
-    <div onclick="showAdmin('equipe');_adminLoadEquipe();" id="amenu-equipe" class="super-admin-only" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-users-gear" style="width:16px;"></i> Équipe</div>
+    <div onclick="showAdmin('equipe');_adminLoadEquipe();" id="amenu-equipe" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-users-gear" style="width:16px;"></i> Équipe</div>
   </div>
   <div style="padding:8px;border-top:1px solid rgba(255,255,255,.08);margin-top:10px;">
     <div onclick="logoutAdmin()" style="padding:10px 12px;border-radius:8px;color:#FCA5A5;font-size:13px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.1);"><i class="fa-solid fa-right-from-bracket" style="width:16px;"></i> Déconnexion</div>
@@ -5776,7 +5780,7 @@ async function chargerAvis() {
           <div style="width:28px;height:28px;border-radius:8px;background:#E85D04;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;">A</div>
           <div>
             <div style="font-size:12.5px;font-weight:700;color:#1A1A4E;" id="adminTopbarName">Admin</div>
-            <div id="adminTopbarRole" style="font-size:10.5px;color:#9CA3AF;">Administrateur</div>
+            <div id="adminRoleLabel" style="font-size:10.5px;color:#9CA3AF;">Administrateur</div>
           </div>
         </div>
       </div>
@@ -6559,8 +6563,8 @@ function renderTableHTML(statut, data) {
     const actionBtns = [
       p.statut !== 'valide'   ? `<button class="adm-btn valider"   onclick="event.stopPropagation();_adminAction('valider','${p.id}')"><i class="fa-solid fa-check"></i> Valider</button>` : '',
       p.statut !== 'rejete'   ? `<button class="adm-btn rejeter"   onclick="event.stopPropagation();_adminAction('rejeter','${p.id}')">Rejeter</button>` : '',
-      p.statut !== 'suspendu' ? `<button class="adm-btn suspendre super-admin-only btn-suspendre" onclick="event.stopPropagation();_adminAction('suspendre','${p.id}')"><i class="fa-solid fa-ban"></i></button>` : '',
-      `<button class="adm-btn supprimer super-admin-only btn-supprimer" onclick="event.stopPropagation();_adminAction('supprimer','${p.id}')"><i class="fa-solid fa-trash"></i></button>`
+      p.statut !== 'suspendu' ? `<button class="adm-btn suspendre super-admin-only btn-suspendre" data-super-only="true" onclick="event.stopPropagation();_adminAction('suspendre','${p.id}')"><i class="fa-solid fa-ban"></i></button>` : '',
+      `<button class="adm-btn supprimer super-admin-only btn-supprimer" data-super-only="true" onclick="event.stopPropagation();_adminAction('supprimer','${p.id}')"><i class="fa-solid fa-trash"></i></button>`
     ].filter(Boolean).join('');
 
     const docCol = `<div style="display:flex;flex-direction:column;gap:3px;">
@@ -8356,7 +8360,7 @@ function _adminAppliquerRole(role) {
 }
 
 function _adminTopbarSetRole(role) {
-  const el = document.getElementById('adminTopbarRole');
+  const el = document.getElementById('adminRoleLabel');
   if (!el) return;
   if (role === 'super_admin') {
     el.style.cssText = 'font-size:10.5px;color:#9CA3AF;';
@@ -9294,8 +9298,8 @@ function actionsHTML(p) {
   let btns = '';
   if (p.statut!=='valide')   btns += b('rgba(22,163,74,.12)','#16A34A','Valider','valider');
   if (p.statut!=='rejete')   btns += b('rgba(239,68,68,.1)','#DC2626','Rejeter','rejeter');
-  if (p.statut!=='suspendu') btns += `<span class="super-admin-only btn-suspendre">${b('rgba(245,158,11,.1)','#B45309','Suspendre','suspendre')}</span>`;
-  btns += `<span class="super-admin-only btn-supprimer">${b('rgba(239,68,68,.08)','#DC2626','Supprimer','supprimer')}</span>`;
+  if (p.statut!=='suspendu') btns += `<span class="super-admin-only btn-suspendre" data-super-only="true">${b('rgba(245,158,11,.1)','#B45309','Suspendre','suspendre')}</span>`;
+  btns += `<span class="super-admin-only btn-supprimer" data-super-only="true">${b('rgba(239,68,68,.08)','#DC2626','Supprimer','supprimer')}</span>`;
   return `<div style="display:flex;flex-wrap:wrap;gap:3px;">${btns}</div>`;
 }
 
