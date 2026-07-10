@@ -6391,19 +6391,6 @@ async function chargerAvis() {
 
 // ── LOGIN ──
 
-function logoutAdmin() {
-  localStorage.removeItem('yj_admin_session');
-  adminData = null;
-  document.body.classList.remove('admin-mode');
-  const pa = document.getElementById('page-admin');
-  if (pa) { pa.classList.remove('logged'); pa.classList.remove('active'); pa.style.cssText = ''; }
-  const lw = document.getElementById('loginWrap');
-  if (lw) lw.removeAttribute('style');
-  const aw = document.getElementById('adminWrap');
-  if (aw) { aw.classList.remove('visible'); aw.removeAttribute('style'); }
-  navigate('home');
-}
-
 // ── SECTIONS ──
 function showSection(name) {
   // Cacher toutes les sections
@@ -9152,23 +9139,29 @@ async function initAdmin() {
   } catch(e) {}
 }
 
-// ── ADMIN LOGOUT ALIAS ──
+// ── ADMIN LOGOUT ──
 function logoutAdmin() {
   localStorage.removeItem('yj_admin_session');
   adminData = null;
+  // Nettoyer le rôle
+  window._adminRole = null;
+  document.body.classList.remove('role-agent');
+  document.body.classList.remove('admin-mode');
   // Réafficher le bouton flottant YOUMMA ÉQUIPES
   const _fe = document.getElementById('btnYoummaEquipes');
   if (_fe) _fe.style.removeProperty('display');
   // Détruire l'overlay admin
   const overlay = document.getElementById('_adminOverlay');
   if (overlay) overlay.style.display = 'none';
-  // Remettre sidebar dans adminWrap
+  // Remettre sidebar dans adminWrap et masquer
   const aw2 = document.getElementById('adminWrap');
   const adminSbFinal = document.getElementById('adminSidebarEl');
   if (aw2 && adminSbFinal) aw2.insertBefore(adminSbFinal, aw2.firstChild);
   if (adminSbFinal) { adminSbFinal.removeAttribute('style'); adminSbFinal.style.display = 'none'; }
-  if (aw) { aw.classList.remove('visible'); aw.removeAttribute('style'); }
-  // Réafficher login
+  if (aw2) { aw2.classList.remove('visible'); aw2.removeAttribute('style'); }
+  // Réafficher login / masquer panel admin
+  const pa = document.getElementById('page-admin');
+  if (pa) { pa.classList.remove('logged'); pa.classList.remove('active'); pa.style.cssText = ''; }
   const lw = document.getElementById('loginWrap');
   if (lw) { lw.removeAttribute('style'); }
   // Restaurer scroll
