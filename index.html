@@ -5880,7 +5880,36 @@ async function chargerAvis() {
                     <span style="color:#374151;font-weight:600;" id="dashLastPayment">—</span>
                   </div>
                 </div>
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid #F0F0F8;">
+                  <button onclick="_aboToggle()" id="dashAboToggleBtn" style="width:100%;padding:9px 14px;background:#1B2A4A;color:#fff;border:none;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                    <span>💳 Gérer les abonnements</span><span id="dashAboToggleArrow" style="font-size:14px;">↓</span>
+                  </button>
+                </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section abonnements (toggle) -->
+        <div id="dashAboSection" style="display:none;margin-top:24px;">
+          <div class="adm-table-wrap">
+            <div style="padding:16px 20px;border-bottom:1px solid #F0F0F8;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+              <div class="adm-section-title" style="font-size:14px;">💳 Gestion des abonnements</div>
+              <button onclick="_aboLoad()" style="font-size:11.5px;color:#E8650A;background:none;border:none;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:5px;"><i class="fa-solid fa-rotate"></i> Actualiser</button>
+            </div>
+            <div style="display:flex;gap:20px;padding:12px 20px;background:#F8F9FA;border-bottom:1px solid #F0F0F8;flex-wrap:wrap;align-items:center;">
+              <span style="font-size:13px;font-weight:600;" id="aboCntActifs" style="color:#059669;">—</span>
+              <span style="font-size:13px;font-weight:600;" id="aboCntSemaine" style="color:#9CA3AF;">—</span>
+              <span style="font-size:13px;font-weight:600;" id="aboCntExpires" style="color:#9CA3AF;">—</span>
+            </div>
+            <div style="display:flex;gap:6px;padding:10px 20px;border-bottom:1px solid #F0F0F8;flex-wrap:wrap;">
+              <button onclick="_aboFiltrer('tous')" id="aboFiltTous" style="padding:5px 14px;background:#1B2A4A;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">Tous</button>
+              <button onclick="_aboFiltrer('expire')" id="aboFiltExpire" style="padding:5px 14px;background:#F3F4F6;color:#374151;border:none;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;">🔴 Expirés</button>
+              <button onclick="_aboFiltrer('semaine')" id="aboFiltSemaine" style="padding:5px 14px;background:#F3F4F6;color:#374151;border:none;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;">🟠 Cette semaine</button>
+              <button onclick="_aboFiltrer('actif')" id="aboFiltActif" style="padding:5px 14px;background:#F3F4F6;color:#374151;border:none;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;">🟢 Actifs</button>
+            </div>
+            <div id="dashAboTable" style="overflow-x:auto;">
+              <div style="text-align:center;padding:32px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>
             </div>
           </div>
         </div>
@@ -8115,6 +8144,145 @@ function _adminRenderChart(data) {
       + '<text x="' + (x + barW / 2) + '" y="96" text-anchor="middle" font-size="9" fill="#9CA3AF">' + d.label + '</text>';
   }).join('');
   el.innerHTML = '<svg width="100%" viewBox="0 0 ' + svgW + ' ' + svgH + '" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible;">' + bars + '</svg>';
+}
+
+// ── GESTION ABONNEMENTS ──
+var _aboData = [];
+var _aboFiltre = 'tous';
+
+function _aboToggle() {
+  var sec = document.getElementById('dashAboSection');
+  var arrow = document.getElementById('dashAboToggleArrow');
+  if (!sec) return;
+  var hidden = sec.style.display === 'none';
+  sec.style.display = hidden ? 'block' : 'none';
+  if (arrow) arrow.textContent = hidden ? '↑' : '↓';
+  if (hidden && !_aboData.length) _aboLoad();
+}
+
+async function _aboLoad() {
+  var el = document.getElementById('dashAboTable');
+  if (el) el.innerHTML = '<div style="text-align:center;padding:32px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>';
+  try {
+    var res = await sb.from('providers')
+      .select('id,prenom,nom,matricule,telephone,metier,commune,photo_url,abonnement_actif,abonnement_fin,essai_actif,essai_fin')
+      .eq('statut','valide')
+      .order('abonnement_fin',{ascending:true,nullsFirst:true});
+    _aboData = res.data || [];
+    _aboUpdateCompteurs(_aboData);
+    _aboFiltrer(_aboFiltre);
+  } catch(e) {
+    if (el) el.innerHTML = '<div style="color:#DC2626;font-size:13px;padding:20px;">Erreur : '+e.message+'</div>';
+  }
+}
+
+function _aboStatut(p) {
+  var now = new Date();
+  if (p.essai_actif && p.essai_fin && new Date(p.essai_fin) > now)
+    return {label:'Essai gratuit', badge:'🔵', color:'#2563EB', priority:3, fin:new Date(p.essai_fin)};
+  var fin = p.abonnement_fin ? new Date(p.abonnement_fin) : null;
+  if (!p.abonnement_actif || !fin || fin <= now)
+    return {label:'Expiré', badge:'🔴', color:'#DC2626', priority:0, fin:fin};
+  var jours = Math.ceil((fin - now) / 86400000);
+  if (jours <= 7)  return {label:'Expire dans '+jours+' j', badge:'🟠', color:'#E8650A', priority:1, fin:fin};
+  if (jours <= 30) return {label:'Expire dans '+jours+' j', badge:'🟡', color:'#F59E0B', priority:2, fin:fin};
+  return {label:'Actif — expire le '+fin.toLocaleDateString('fr-FR'), badge:'🟢', color:'#059669', priority:4, fin:fin};
+}
+
+function _aboUpdateCompteurs(data) {
+  var actifs=0, semaine=0, expires=0;
+  data.forEach(function(p){
+    var pr=_aboStatut(p).priority;
+    if(pr===0) expires++;
+    else if(pr===1) semaine++;
+    else if(pr>=2) actifs++;
+  });
+  var s=function(id,txt,color){var e=document.getElementById(id);if(e){e.textContent=txt;e.style.color=color;}};
+  s('aboCntActifs', actifs+' abonnement'+(actifs>1?'s':'')+' actif'+(actifs>1?'s':''), '#059669');
+  s('aboCntSemaine', semaine+' expire'+(semaine>1?'nt':'')+' cette semaine', semaine>0?'#E8650A':'#9CA3AF');
+  s('aboCntExpires', expires+' expiré'+(expires>1?'s':''), expires>0?'#DC2626':'#9CA3AF');
+}
+
+function _aboFiltrer(filtre) {
+  _aboFiltre = filtre;
+  var btns={tous:'aboFiltTous',expire:'aboFiltExpire',semaine:'aboFiltSemaine',actif:'aboFiltActif'};
+  Object.keys(btns).forEach(function(k){
+    var e=document.getElementById(btns[k]);
+    if(e){e.style.background=k===filtre?'#1B2A4A':'#F3F4F6';e.style.color=k===filtre?'#fff':'#374151';}
+  });
+  var filtered=_aboData.filter(function(p){
+    var pr=_aboStatut(p).priority;
+    if(filtre==='tous') return true;
+    if(filtre==='expire') return pr===0;
+    if(filtre==='semaine') return pr===1;
+    if(filtre==='actif') return pr>=2;
+    return true;
+  });
+  filtered.sort(function(a,b){return _aboStatut(a).priority-_aboStatut(b).priority;});
+  _aboRenderTable(filtered);
+}
+
+function _aboRenderTable(data) {
+  var el=document.getElementById('dashAboTable'); if(!el) return;
+  if(!data.length){el.innerHTML='<div style="text-align:center;padding:32px;color:#9CA3AF;font-size:13px;">Aucun prestataire dans cette catégorie</div>';return;}
+  var rows=data.map(function(p){
+    var s=_aboStatut(p);
+    var ini=((p.prenom||'?')[0]+(p.nom||'?')[0]).toUpperCase();
+    var nom=((p.prenom||'')+' '+(p.nom||'')).trim();
+    var avatar=p.photo_url
+      ?'<img src="'+p.photo_url+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #E8650A;" alt=""/>'
+      :'<div style="width:34px;height:34px;border-radius:50%;background:#F3F4F6;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1B2A4A;flex-shrink:0;">'+ini+'</div>';
+    var wa=p.telephone?'https://wa.me/'+p.telephone.replace(/\D/g,''):'#';
+    var finStr=s.fin?s.fin.toLocaleDateString('fr-FR'):'—';
+    var idSafe=p.id.replace(/'/g,'');
+    var nomSafe=nom.replace(/'/g,"&#39;");
+    return '<tr style="border-bottom:1px solid #F7F8FC;">'
+      +'<td style="padding:10px 12px;"><div style="display:flex;align-items:center;gap:8px;">'+avatar+'<div><div style="font-size:13px;font-weight:600;color:#1B2A4A;">'+nom+'</div><div style="font-size:11px;color:#E8650A;font-weight:700;">'+(p.matricule||'—')+'</div></div></div></td>'
+      +'<td style="padding:10px 12px;font-size:12px;color:#374151;"><div>'+(p.metier||'—')+'</div><div style="color:#9CA3AF;">'+(p.commune||'—')+'</div></td>'
+      +'<td style="padding:10px 12px;"><a href="'+wa+'" target="_blank" style="font-size:12px;color:#25D366;font-weight:600;text-decoration:none;white-space:nowrap;">📱 '+(p.telephone||'—')+'</a></td>'
+      +'<td style="padding:10px 12px;white-space:nowrap;"><span style="font-size:12px;font-weight:700;color:'+s.color+';">'+s.badge+' '+s.label+'</span></td>'
+      +'<td style="padding:10px 12px;font-size:12px;color:#6B7280;white-space:nowrap;">'+finStr+'</td>'
+      +'<td style="padding:10px 12px;"><button onclick="_aboRenouveler(\''+idSafe+'\',\''+nomSafe+'\',this)" style="padding:6px 12px;background:#E8650A;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🔄 +30j</button></td>'
+      +'</tr>';
+  }).join('');
+  el.innerHTML='<table style="width:100%;border-collapse:collapse;min-width:600px;">'
+    +'<thead><tr style="border-bottom:2px solid #E5E7EB;background:#F8F9FA;">'
+    +'<th style="padding:8px 12px;text-align:left;font-size:11px;color:#9CA3AF;font-weight:700;">Prestataire</th>'
+    +'<th style="padding:8px 12px;text-align:left;font-size:11px;color:#9CA3AF;font-weight:700;">Métier</th>'
+    +'<th style="padding:8px 12px;text-align:left;font-size:11px;color:#9CA3AF;font-weight:700;">Téléphone</th>'
+    +'<th style="padding:8px 12px;text-align:left;font-size:11px;color:#9CA3AF;font-weight:700;">Statut abonnement</th>'
+    +'<th style="padding:8px 12px;text-align:left;font-size:11px;color:#9CA3AF;font-weight:700;">Expiration</th>'
+    +'<th style="padding:8px 12px;"></th>'
+    +'</tr></thead>'
+    +'<tbody>'+rows+'</tbody></table>';
+}
+
+async function _aboRenouveler(id, nom, btn) {
+  if(!confirm('Renouveler l\'abonnement de '+nom+' pour 30 jours supplémentaires ?')) return;
+  if(btn){btn.disabled=true;btn.textContent='...';}
+  try {
+    var cur=await sb.from('providers').select('abonnement_fin').eq('id',id).single();
+    var now=new Date();
+    var curFin=cur.data?.abonnement_fin?new Date(cur.data.abonnement_fin):now;
+    var base=curFin>now?curFin:now;
+    var nouvelleFin=new Date(base.getTime()+30*24*3600000);
+    var nfStr=nouvelleFin.toISOString();
+    var res=await sb.from('providers').update({abonnement_actif:true,abonnement_fin:nfStr}).eq('id',id);
+    if(res.error) throw new Error(res.error.message);
+    await sb.from('prestataire_historique').insert({
+      provider_id:id,evenement:'abonnement',
+      details:'Abonnement renouvelé manuellement par admin — expire le '+nouvelleFin.toLocaleDateString('fr-FR')
+    });
+    if(typeof showToast==='function') showToast('✅ Abonnement de '+nom+' renouvelé jusqu\'au '+nouvelleFin.toLocaleDateString('fr-FR'),'success');
+    var p=_aboData.find(function(x){return x.id===id;});
+    if(p){p.abonnement_actif=true;p.abonnement_fin=nfStr;}
+    _aboUpdateCompteurs(_aboData);
+    _aboFiltrer(_aboFiltre);
+  } catch(e) {
+    if(typeof showToast==='function') showToast('Erreur : '+e.message,'error');
+  } finally {
+    if(btn){btn.disabled=false;btn.textContent='🔄 +30j';}
+  }
 }
 
 function _adminShowSection(name) {
