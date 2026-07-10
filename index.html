@@ -687,6 +687,15 @@ body.admin-mode #page-admin.logged #adminWrap{
   .hero-actions .btn-hero-main,.hero-actions .btn-hero-outline{font-size:13px!important;padding:11px!important;}
 }
 
+/* ── Nouvelle barre de recherche mobile-first ── */
+.search-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:1rem;display:flex;flex-direction:column;gap:10px;max-width:480px;margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,.07);}
+.search-card .sc-field{display:flex;align-items:center;gap:10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:0 12px;height:48px;}
+.search-card .sc-field i{font-size:16px;color:#9ca3af;flex-shrink:0;}
+.search-card .sc-field input{border:none;background:transparent;font-size:15px;color:#111827;width:100%;outline:none;font-family:'DM Sans',sans-serif;}
+.search-card .sc-field input::placeholder{color:#9ca3af;}
+.search-card .sc-btn{background:#E8521A;color:#fff;border:none;border-radius:10px;height:48px;font-size:15px;font-weight:600;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'DM Sans',sans-serif;transition:background .2s;}
+.search-card .sc-btn:hover{background:#d14516;}
+
 </style>
 
 
@@ -1696,76 +1705,19 @@ async function verifierSession() {
   </div>
 </section>
 
-<div class="search-section">
-  <div class="search-container">
-    <div class="search-box">
-      <div class="search-box-label"><i class="fa-solid fa-magnifying-glass"></i> Rechercher</div>
-      <div class="search-divider"></div>
-      <div class="search-field">
-        <span class="search-field-icon"></span>
-        <input type="text" id="searchInput" placeholder="Métier, artisan, service..." oninput="filterProviders()"/>
-      </div>
-      <div class="search-divider"></div>
-      <div class="search-field" style="gap:6px;">
-        <span class="search-field-icon"><i class="fa-solid fa-location-dot"></i></span>
-        <select id="villeFilter" onchange="filterProviders()" style="flex:1;min-width:0;">
-          <option value="">Toutes les villes</option>
-          <optgroup label="— Communes de Conakry —">
-            <option value="Kaloum">Kaloum</option>
-            <option value="Dixinn">Dixinn</option>
-            <option value="Matam">Matam</option>
-            <option value="Ratoma">Ratoma</option>
-            <option value="Matoto">Matoto</option>
-            <option value="Lambanyi">Lambanyi</option>
-            <option value="Kipé">Kipé</option>
-          </optgroup>
-          <optgroup label="— Villes de Guinée —">
-            <option value="Kindia">Kindia</option>
-            <option value="Kankan">Kankan</option>
-            <option value="Labé">Labé</option>
-            <option value="Mamou">Mamou</option>
-            <option value="Boké">Boké</option>
-            <option value="Faranah">Faranah</option>
-            <option value="Nzérékoré">Nzérékoré</option>
-            <option value="Siguiri">Siguiri</option>
-            <option value="Guéckédou">Guéckédou</option>
-          </optgroup>
-        </select>
-        <button id="btnGeoLocate" onclick="geoLocateUser()" title="Trouver les prestataires près de moi" style="flex-shrink:0;padding:5px 10px;border:1.5px solid var(--bordure);border-radius:8px;background:#fff;color:var(--gris);font-size:11.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;">
-          <i class="fa-solid fa-location-dot"></i> Me localiser
-        </button>
-      </div>
-      <div class="search-divider"></div>
-      <div class="search-field">
-        <span class="search-field-icon">📂</span>
-        <select id="catFilter" onchange="filterProviders()">
-          <option value="">Toutes catégories</option>
-        </select>
-      </div>
-      <div class="search-divider"></div>
-      <div class="search-field">
-        <span class="search-field-icon">🟢</span>
-        <select id="dispoFilter" onchange="filterProviders()">
-          <option value="">Disponibilité</option>
-          <option value="maintenant">Disponible maintenant</option>
-          <option value="semaine">Disponible cette semaine</option>
-          <option value="all">Toutes disponibilités</option>
-        </select>
-      </div>
-      <div class="search-divider"></div>
-      <div class="search-field" style="min-width:100px;">
-        <span class="search-field-icon"><i class="fa-solid fa-star" style="color:#F5C842;"></i></span>
-        <select id="noteFilter" onchange="filterProviders()">
-          <option value="0">Toutes notes</option>
-          <option value="4">4+ étoiles</option>
-          <option value="4.5">4.5+ étoiles</option>
-          <option value="5">5 étoiles</option>
-        </select>
-      </div>
-      <button class="btn-search" onclick="filterProviders();document.getElementById('prestataires').scrollIntoView({behavior:'smooth'})">
-        <i class="fa-solid fa-magnifying-glass"></i> Rechercher
-      </button>
+<div style="padding:24px 20px 8px;">
+  <div class="search-card">
+    <div class="sc-field">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" placeholder="Métier, artisan, service…" oninput="filterProviders()"/>
     </div>
+    <div class="sc-field">
+      <i class="fa-solid fa-location-dot"></i>
+      <input type="text" id="locationInput" placeholder="Commune, quartier…" oninput="filterProviders()"/>
+    </div>
+    <button id="searchBtn" class="sc-btn" onclick="filterProviders();document.getElementById('prestataires').scrollIntoView({behavior:'smooth'})">
+      <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+    </button>
   </div>
 </div>
 
