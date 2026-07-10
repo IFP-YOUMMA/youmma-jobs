@@ -5816,7 +5816,7 @@ async function chargerAvis() {
             <div class="adm-stat-label">Rejetés</div>
             <div id="statRejetesTrend" style="font-size:11px;margin-top:3px;color:#9CA3AF;">—</div>
           </div>
-          <div class="adm-stat-card suspendu" onclick="showAdmin('suspendu')" style="cursor:pointer;">
+          <div class="adm-stat-card suspendu" data-super-only="true" onclick="showAdmin('suspendu')" style="cursor:pointer;">
             <div class="adm-stat-icon"><i class="fa-solid fa-ban"></i></div>
             <div class="adm-stat-num" id="statSuspendu">—</div>
             <div class="adm-stat-label">Suspendus</div>
@@ -5838,13 +5838,13 @@ async function chargerAvis() {
             <div style="font-size:11.5px;color:#6B7280;margin-top:2px;">Devis soumis</div>
             <div id="dashDevisToday" style="font-size:11px;color:#E8650A;margin-top:4px;font-weight:600;">—</div>
           </div>
-          <div class="adm-table-wrap" style="padding:14px 16px;text-align:center;">
+          <div class="adm-table-wrap" data-super-only="true" style="padding:14px 16px;text-align:center;">
             <div style="font-size:20px;margin-bottom:6px;">📱</div>
             <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashSmsCredits">—</div>
             <div style="font-size:11.5px;color:#6B7280;margin-top:2px;">SMS restants</div>
             <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">mise à jour manuelle</div>
           </div>
-          <div class="adm-table-wrap" style="padding:14px 16px;text-align:center;">
+          <div class="adm-table-wrap" data-super-only="true" style="padding:14px 16px;text-align:center;">
             <div style="font-size:20px;margin-bottom:6px;">👁</div>
             <div style="font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:#1B2A4A;" id="dashVuesProfils">—</div>
             <div style="font-size:11.5px;color:#6B7280;margin-top:2px;">Vues profils</div>
