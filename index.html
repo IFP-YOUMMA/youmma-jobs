@@ -696,6 +696,18 @@ body.admin-mode #page-admin.logged #adminWrap{
 .search-card .sc-btn{background:#E8521A;color:#fff;border:none;border-radius:10px;height:48px;font-size:15px;font-weight:600;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'DM Sans',sans-serif;transition:background .2s;}
 .search-card .sc-btn:hover{background:#d14516;}
 
+/* ── Hero KPIs — icônes compactes ── */
+.hero-kpis .kpi-num{font-size:36px!important;line-height:1.1!important;}
+.hero-kpis .kpi-label{font-size:12px!important;font-weight:600!important;opacity:1!important;white-space:normal!important;}
+.hero-kpis .kpi>div:last-child{font-size:11px!important;color:rgba(255,255,255,.45)!important;}
+@media(max-width:480px){
+  .hero-kpis{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:8px!important;padding:0.5rem 0!important;}
+  .hero-kpis .kpi{padding:6px 4px!important;border-right:none!important;background:none!important;}
+  .hero-kpis .kpi-num{font-size:28px!important;}
+  .hero-kpis .kpi-label{font-size:11px!important;}
+  .hero-kpis .kpi>div:last-child{font-size:10px!important;}
+}
+
 </style>
 
 
