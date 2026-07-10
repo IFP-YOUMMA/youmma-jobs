@@ -8353,10 +8353,29 @@ function _adminShowSection(name) {
 
 // ─── Rôle admin ──────────────────────────────────────────────────────────────
 function _adminAppliquerRole(role) {
-  const r = role || 'agent';
-  window._adminRole = r;
+  const estSuperAdmin = (role === 'super_admin');
+  window._adminRole = role || null;
+
+  // Classes body
   document.body.classList.remove('role-super_admin','role-agent','role-admin','role-moderator');
-  document.body.classList.add('role-' + r);
+  if (role) document.body.classList.add('role-' + role);
+
+  // DOM direct : masquer/afficher tous les éléments [data-super-only]
+  document.querySelectorAll('[data-super-only]').forEach(el => {
+    el.style.display = estSuperAdmin ? '' : 'none';
+  });
+
+  // Masquage par texte dans la sidebar (filet de sécurité)
+  document.querySelectorAll('#adminSidebarEl div[onclick]').forEach(el => {
+    const txt = el.textContent || '';
+    if (txt.includes('Campagne SMS') ||
+        txt.includes('Images à la une') ||
+        txt.includes('Rapports') ||
+        txt.includes('Équipe') ||
+        txt.includes('Suspendus')) {
+      el.style.display = estSuperAdmin ? '' : 'none';
+    }
+  });
 }
 
 function _adminTopbarSetRole(role) {
@@ -9187,9 +9206,10 @@ async function initAdmin() {
 function logoutAdmin() {
   localStorage.removeItem('yj_admin_session');
   adminData = null;
-  // Nettoyer le rôle
+  // Nettoyer le rôle et remettre les éléments restreints visibles
   window._adminRole = null;
   document.body.classList.remove('role-super_admin','role-agent','role-admin','role-moderator');
+  document.querySelectorAll('[data-super-only]').forEach(el => { el.style.display = ''; });
   document.body.classList.remove('admin-mode');
   // Réafficher le bouton flottant YOUMMA ÉQUIPES
   const _fe = document.getElementById('btnYoummaEquipes');
@@ -9239,7 +9259,13 @@ function showAdmin(name) {
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
   ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','missions','projets_clients','ambassadeurs','rapports','notifications','equipe'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
-    if (el) el.style.cssText = s===name ? ACTIVE : NORMAL;
+    if (!el) return;
+    // Ne pas réafficher un élément restreint à l'agent
+    if (el.hasAttribute('data-super-only') && window._adminRole !== 'super_admin') {
+      el.style.display = 'none';
+      return;
+    }
+    el.style.cssText = s===name ? ACTIVE : NORMAL;
   });
   if (name==='carousel') { if(typeof _carouselLoadAdmin==='function') _carouselLoadAdmin(); }
   else if (name==='missions') { renderAdminMissions(); }
