@@ -244,6 +244,14 @@ body.role-agent .dash-activity-grid{grid-template-columns:repeat(2,1fr)!importan
 /* Dashboard fond et ombre cards */
 #admin-dashboard .admin-section-inner{background:#F8F9FA;}
 .adm-table-wrap{box-shadow:0 1px 4px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04)!important;}
+/* Dashboard agent — fond et pastilles légères */
+body.role-agent #admin-dashboard .admin-section-inner{background:#f4f5f7!important;}
+body.role-agent .adm-table-wrap{background:#fff!important;border-radius:12px!important;border:1px solid #e5e7eb!important;box-shadow:none!important;}
+body.role-agent .adm-stat-card{background:#fff!important;border-radius:12px!important;border:1px solid #e5e7eb!important;}
+body.role-agent .adm-stat-card.total .adm-stat-icon{background:#ede9fe!important;color:#6366f1!important;}
+body.role-agent .adm-stat-card.attente .adm-stat-icon{background:#fef3c7!important;color:#f59e0b!important;}
+body.role-agent .adm-stat-card.valide .adm-stat-icon{background:#d1fae5!important;color:#10b981!important;}
+body.role-agent .adm-stat-card.rejete .adm-stat-icon{background:#fee2e2!important;color:#ef4444!important;}
 body.admin-mode #page-admin.logged #adminWrap{
   margin-left:0!important;
   width:100%!important;
@@ -8085,16 +8093,24 @@ async function _adminLoadDashboard() {
         + '<span style="font-size:11px;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-weight:700;letter-spacing:.5px;">Super Admin</span>'
         + '</div>';
     } else {
-      hdr.innerHTML = '<div style="padding:16px 20px;background:linear-gradient(135deg,#1B2A4A,#2D3F6B);border-radius:14px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">'
-        + '<div><div style="font-family:\'Libre Baskerville\',serif;font-size:19px;font-weight:700;">Bonjour ' + prenomAdmin + ' 👋</div>'
-        + '<div style="font-size:12px;opacity:.7;margin-top:3px;">' + dateJourStr + '</div></div>'
-        + '<span style="font-size:11px;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-weight:700;letter-spacing:.5px;">Agent</span>'
+      var nomAgent = (adminData && adminData.nom) || 'Agent';
+      var iniAgent = (function(n) { var p = n.trim().split(' '); return ((p[0]||'A')[0] + (p[1] ? p[1][0] : '')).toUpperCase(); })(nomAgent);
+      var heureConn = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+      hdr.innerHTML = '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">'
+        + '<div style="display:flex;align-items:center;gap:12px;">'
+        + '<div style="width:40px;height:40px;border-radius:50%;background:#E8521A;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0;">' + iniAgent + '</div>'
+        + '<div><div style="font-size:15px;font-weight:600;color:#111827;">' + nomAgent + '</div>'
+        + '<div style="font-size:12px;color:#6b7280;">Agent · Connecté depuis ' + heureConn + ' · ' + dateJourStr + '</div></div>'
+        + '</div>'
+        + '<div id="agentDerniereAction" style="font-size:12px;color:#6b7280;">Dernière action : —</div>'
         + '</div>';
     }
   }
 
   // ⑧ Contenu rôle-spécifique
   if (window._adminRole !== 'super_admin') {
+    var agentId = adminData && (adminData.id || adminData.admin_id);
+
     // Card urgence en attente
     try {
       var atRes = await sb.from('providers').select('id',{count:'exact',head:true}).eq('statut','en_attente');
@@ -8113,43 +8129,76 @@ async function _adminLoadDashboard() {
       }
     } catch(e) {}
 
-    // Mon activité ce mois
+    // Tendances KPIs "aujourd'hui" pour l'agent (écrase les tendances hebdo)
+    try {
+      var todayTs = new Date(); todayTs.setHours(0,0,0,0);
+      var todayIso = todayTs.toISOString();
+      var todayTrends = await Promise.all([
+        sb.from('providers').select('id',{count:'exact',head:true}).gte('created_at', todayIso),
+        sb.from('providers').select('id',{count:'exact',head:true}).gte('created_at', todayIso).eq('statut','en_attente'),
+        sb.from('providers').select('id',{count:'exact',head:true}).gte('created_at', todayIso).eq('statut','valide'),
+        sb.from('providers').select('id',{count:'exact',head:true}).gte('created_at', todayIso).eq('statut','rejete'),
+      ]);
+      var tIds = ['statTotalTrend','statAttenteTrend','statValidesTrend','statRejetesTrend'];
+      todayTrends.forEach(function(r, i) {
+        var el = document.getElementById(tIds[i]);
+        if (!el) return;
+        var n = r.count || 0;
+        el.textContent = n > 0 ? '+' + n + " aujourd'hui" : "0 aujourd'hui";
+        el.style.color = n > 0 ? '#16A34A' : '#9CA3AF';
+      });
+    } catch(e) {}
+
+    // Dernière action agent → mise à jour du bandeau
+    try {
+      var {data:lastActs} = await sb.from('admin_actions')
+        .select('action,created_at')
+        .eq('admin_id', agentId)
+        .order('created_at', {ascending:false})
+        .limit(1);
+      var daEl = document.getElementById('agentDerniereAction');
+      if (daEl && lastActs && lastActs.length) {
+        var la = lastActs[0];
+        var laLbls = {valider:'Validation',rejeter:'Rejet',suspendre:'Suspension',renouveler:'Renouvellement',supprimer:'Suppression'};
+        var laHeure = new Date(la.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+        var laDate = new Date(la.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
+        daEl.textContent = 'Dernière action : ' + (laLbls[la.action] || la.action) + ' — ' + laDate + ' à ' + laHeure;
+      }
+    } catch(e) {}
+
+    // Mes actions du jour
     var actEl = document.getElementById('dashMonActivite');
     if (actEl) {
       try {
-        var admin = adminData;
-        var {data:myActs} = await sb.from('admin_actions')
-          .select('action,created_at')
-          .eq('admin_id', admin && (admin.id || admin.admin_id))
-          .gte('created_at', moisDebut + 'T00:00:00')
+        var todayStart2 = new Date(); todayStart2.setHours(0,0,0,0);
+        var {data:todayActs} = await sb.from('admin_actions')
+          .select('action,cible_nom,created_at')
+          .eq('admin_id', agentId)
+          .gte('created_at', todayStart2.toISOString())
           .order('created_at', {ascending:false});
-        var acts = myActs || [];
-        var nbVal = acts.filter(function(a){return a.action==='valider';}).length;
-        var nbRej = acts.filter(function(a){return a.action==='rejeter';}).length;
-        var lastAct = acts[0];
-        var lastTxt = '—';
-        if (lastAct) {
-          var diffMs = Date.now() - new Date(lastAct.created_at).getTime();
-          var diffMins = Math.round(diffMs / 60000);
-          var diffHrs = Math.floor(diffMins / 60);
-          var whenStr = diffHrs > 0 ? 'il y a ' + diffHrs + 'h' + (diffMins % 60 > 0 ? (diffMins % 60) + 'min' : '') : 'il y a ' + diffMins + ' min';
-          var actLabels = {valider:'Validation',rejeter:'Rejet',suspendre:'Suspension',renouveler:'Renouvellement',supprimer:'Suppression'};
-          lastTxt = (actLabels[lastAct.action] || lastAct.action) + ' — ' + whenStr;
-        }
+        var acts = todayActs || [];
+        var actionCfgA = {
+          valider:   {icon:'✓', color:'#10b981', label:'a validé'},
+          rejeter:   {icon:'✗', color:'#ef4444', label:'a rejeté'},
+          suspendre: {icon:'⊘', color:'#f59e0b', label:'a suspendu'},
+          renouveler:{icon:'↻', color:'#6366f1', label:'a renouvelé'},
+          supprimer: {icon:'⊠', color:'#9ca3af', label:'a supprimé'}
+        };
+        var lignes = acts.length === 0
+          ? '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;">Aucune action aujourd\'hui.</div>'
+          : acts.map(function(a) {
+              var cfg = actionCfgA[a.action] || {icon:'•', color:'#9ca3af', label:a.action};
+              var h = new Date(a.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+              return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f3f4f6;font-size:13px;">'
+                + '<span style="color:' + cfg.color + ';font-weight:700;font-size:15px;flex-shrink:0;">' + cfg.icon + '</span>'
+                + '<span style="flex:1;color:#374151;">' + cfg.label + (a.cible_nom ? ' <strong>' + a.cible_nom + '</strong>' : '') + '</span>'
+                + '<span style="color:#6b7280;font-size:11px;white-space:nowrap;">' + h + '</span>'
+                + '</div>';
+            }).join('');
         actEl.style.display = '';
-        actEl.innerHTML = '<div class="adm-table-wrap" style="padding:18px 20px;">'
-          + '<div style="font-size:13.5px;font-weight:700;color:#1B2A4A;margin-bottom:14px;">📋 Mon activité ce mois</div>'
-          + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">'
-          + '<div style="text-align:center;padding:14px;background:#ECFDF5;border-radius:10px;">'
-          + '<div style="font-size:26px;font-weight:700;color:#059669;font-family:\'Libre Baskerville\',serif;">' + nbVal + '</div>'
-          + '<div style="font-size:12px;color:#6B7280;margin-top:4px;">✅ Validations</div></div>'
-          + '<div style="text-align:center;padding:14px;background:#FEF2F2;border-radius:10px;">'
-          + '<div style="font-size:26px;font-weight:700;color:#DC2626;font-family:\'Libre Baskerville\',serif;">' + nbRej + '</div>'
-          + '<div style="font-size:12px;color:#6B7280;margin-top:4px;">❌ Rejets</div></div>'
-          + '<div style="text-align:center;padding:14px;background:#F9FAFB;border-radius:10px;">'
-          + '<div style="font-size:12px;color:#1B2A4A;font-weight:600;line-height:1.4;">📋 Dernière action</div>'
-          + '<div style="font-size:11px;color:#6B7280;margin-top:6px;">' + lastTxt + '</div></div>'
-          + '</div></div>';
+        actEl.innerHTML = '<div class="adm-table-wrap" style="padding:16px 20px;">'
+          + '<div style="font-size:13.5px;font-weight:700;color:#1B2A4A;margin-bottom:12px;">📋 Mes actions du jour <span style="font-size:12px;color:#6b7280;font-weight:400;">(' + acts.length + ')</span></div>'
+          + lignes + '</div>';
       } catch(e) { actEl.style.display = 'none'; }
     }
   } else {
