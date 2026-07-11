@@ -3684,27 +3684,27 @@ function renderProviders() {
     const dispoClass = isOccupe ? 'led-red' : 'led-green';
     const joursInscrit = Math.floor((new Date() - new Date(p.created_at)) / (1000*60*60*24));
     const badgeAnciennete = joursInscrit <= 7
-      ? '<span style="font-size:10px;padding:2px 7px;color:#3730a3;white-space:nowrap;">✦ Nouveau</span>'
+      ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#3730a3;white-space:nowrap;">✦ Nouveau</span>'
       : joursInscrit <= 90
-      ? '<span style="font-size:10px;padding:2px 7px;color:#065f46;white-space:nowrap;">⬆ Actif</span>'
+      ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#065f46;white-space:nowrap;">⬆ Actif</span>'
       : joursInscrit <= 365
-      ? '<span style="font-size:10px;padding:2px 7px;color:#92400e;white-space:nowrap;">★ Confirmé</span>'
-      : '<span style="font-size:10px;padding:2px 7px;color:#1e40af;white-space:nowrap;">◆ Expert</span>';
-    const _sep = '<span style="width:1px;height:12px;background:#d1d5db;flex-shrink:0;display:inline-block;"></span>';
+      ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#92400e;white-space:nowrap;">★ Confirmé</span>'
+      : '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#1e40af;white-space:nowrap;">◆ Expert</span>';
+    const _sep = '<span style="width:1px;height:11px;background:#e5e7eb;flex-shrink:0;display:inline-block;"></span>';
     const badgePills = [
-      isExpress ? '<span style="font-size:10px;padding:2px 7px;color:#E85D04;display:flex;align-items:center;gap:2px;white-space:nowrap;">⚡ Express</span>'
-        : isOccupe ? '<span style="font-size:10px;padding:2px 7px;color:#dc2626;display:flex;align-items:center;gap:2px;white-space:nowrap;">✗ Occupé</span>'
-        : '<span style="font-size:10px;padding:2px 7px;color:#065f46;display:flex;align-items:center;gap:2px;white-space:nowrap;">✓ Disponible</span>',
-      p.badge_verifie ? '<span style="font-size:10px;padding:2px 7px;color:#1e40af;display:flex;align-items:center;gap:2px;white-space:nowrap;">✓ Vérifié</span>' : null,
+      isExpress ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#E85D04;display:flex;align-items:center;gap:2px;white-space:nowrap;">⚡ Express</span>'
+        : isOccupe ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#dc2626;display:flex;align-items:center;gap:2px;white-space:nowrap;">✗ Occupé</span>'
+        : '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#059669;display:flex;align-items:center;gap:2px;white-space:nowrap;">✓ Disponible</span>',
+      p.badge_verifie ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#2563eb;display:flex;align-items:center;gap:2px;white-space:nowrap;">✓ Vérifié</span>' : null,
       badgeAnciennete,
-      (p.badge_ambassadeur && p.badge_ambassadeur_fin && new Date(p.badge_ambassadeur_fin) > new Date()) ? '<span style="font-size:10px;padding:2px 7px;color:#92400e;white-space:nowrap;">Ambassadeur</span>' : null,
+      (p.badge_ambassadeur && p.badge_ambassadeur_fin && new Date(p.badge_ambassadeur_fin) > new Date()) ? '<span style="font-size:10px;font-weight:600;padding:4px 10px;color:#d97706;white-space:nowrap;">Ambassadeur</span>' : null,
     ].filter(Boolean).join(_sep);
 
     return `
-    <div class="pc2-card fade-in" style="overflow:hidden;" onclick="openModal('${p.id}')">
+    <div class="pc2-card fade-in" style="overflow:hidden;border-radius:20px;border:1px solid #e8ecf0;box-shadow:0 2px 12px rgba(0,0,0,0.06);" onclick="openModal('${p.id}')">
 
-      
-      <div class="pc2-top" style="background:#1B2A6B;border-radius:12px 12px 0 0;">
+
+      <div class="pc2-top" style="background:#1B2A6B;border-radius:20px 20px 0 0;">
         <div class="pc2-avatar-col">
           <div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;">
             ${p.photo_url
@@ -3715,7 +3715,7 @@ function renderProviders() {
         </div>
         <div class="pc2-info" style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px;">
-            <div class="pc2-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;">
+            <div class="pc2-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font-size:16px;font-weight:700;">
               ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom_entreprise : p.nom}
             </div>
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
@@ -3724,58 +3724,56 @@ function renderProviders() {
           </div>
 
           <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">
-            <div class="pc2-metier" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f97316;">
+            <div class="pc2-metier" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f97316;font-size:12px;font-weight:600;">
               ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom + ' · ' + p.metier : p.metier}
             </div>
-            <div style="flex-shrink:0;font-size:11px;font-weight:600;color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.12);padding:2px 7px;border-radius:20px;white-space:nowrap;border:1px solid rgba(255,255,255,0.15);">
-              <i class="fa-solid fa-bullseye" style="font-size:9px;"></i> ${p.missions||0} mission${(p.missions||0)>1?'s':''}
-            </div>
+            ${(p.missions||0) > 0 ? `<div style="flex-shrink:0;font-size:11px;font-weight:600;color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.12);padding:2px 7px;border-radius:20px;white-space:nowrap;border:1px solid rgba(255,255,255,0.15);"><i class="fa-solid fa-bullseye" style="font-size:9px;"></i> ${p.missions} mission${p.missions>1?'s':''}</div>` : ''}
           </div>
-          ${p.matricule && p.matricule !== 'YMJ-000000' ? `<div style="display:inline-flex;align-items:center;gap:6px;margin-top:3px;margin-bottom:2px;"><span style="font-size:10px;color:rgba(255,255,255,0.6);font-weight:500;">Membre vérifié</span><span style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.35);flex-shrink:0;display:inline-block;"></span><span style="font-size:10px;color:#f97316;font-weight:700;letter-spacing:.5px;">N° ${p.matricule}</span></div>` : ''}
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px;">
-            <div style="font-size:12px;color:#a5b4fc;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+            <div style="font-size:11px;color:#a5b4fc;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
               <i class="fa-solid fa-location-dot" style="color:#a5b4fc;font-size:11px;"></i>
               <span>${p.commune && p.commune !== p.ville ? p.commune + ', ' + (p.ville||'Conakry') : (p.ville||'Conakry')}</span>
               ${p._distance != null ? `<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.12);padding:1px 7px;border-radius:20px;white-space:nowrap;border:1px solid rgba(255,255,255,0.15);"><i class="fa-solid fa-bullseye" style="font-size:9px;"></i> ${p._distance < 1 ? Math.round(p._distance*1000)+'m' : p._distance.toFixed(1)+'km'}</span>` : ''}
             </div>
             <div style="display:flex;align-items:center;gap:3px;">
-              ${stars5}<span style="font-size:12px;font-weight:700;color:#fff;margin-left:3px;">${p.note}</span>
+              ${stars5}<span style="font-size:12px;font-weight:600;color:#fbbf24;margin-left:3px;">${p.note}</span>
             </div>
           </div>
           
         </div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:3px 8px;margin-bottom:12px;overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:0 4px;margin-bottom:12px;overflow:hidden;">
         <div style="display:flex;align-items:center;gap:0;">${badgePills}</div>
         <button class="btn-pfav" onclick="event.stopPropagation();toggleFav('${p.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px 5px;line-height:1;flex-shrink:0;">${isFav?'<i class="fa-solid fa-heart" style="color:#E85D04;"></i>':'<i class="fa-regular fa-heart" style="color:#9ca3af;"></i>'}</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;">
-        <div style="text-align:center;padding:8px 4px;background:#f9fafb;border-radius:10px;border:1px solid #f3f4f6;">
-          <div style="font-size:15px;font-weight:700;color:#111;">${p.missions||0}</div>
-          <div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.04em;">Missions</div>
+        <div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">
+          <div style="font-size:18px;font-weight:700;color:#111;">${(p.missions||0) > 0 ? p.missions : '—'}</div>
+          <div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Missions</div>
         </div>
-        <div style="text-align:center;padding:8px 4px;background:#f9fafb;border-radius:10px;border:1px solid #f3f4f6;">
-          <div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${[1,2,3,4,5].map(i=>`<span style="color:${i<=Math.round(p.note||0)?'#f59e0b':'#e5e7eb'};font-size:11px;">★</span>`).join('')}</div>
-          <div style="font-size:12px;font-weight:700;color:#111;">${p.note?Number(p.note).toFixed(1):'—'}</div>
+        <div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">
+          <div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${[1,2,3,4,5].map(i=>`<span style="color:${(p.nb_avis||0)>0 && i<=Math.round(p.note||0)?'#f59e0b':'#e5e7eb'};font-size:11px;">★</span>`).join('')}</div>
+          <div style="font-size:18px;font-weight:700;color:#111;">${(p.nb_avis||0) > 0 ? Number(p.note).toFixed(1) : '—'}</div>
         </div>
-        <div style="text-align:center;padding:8px 4px;background:#f9fafb;border-radius:10px;border:1px solid #f3f4f6;">
-          <div style="font-size:15px;font-weight:700;color:#111;">${p.experience||'—'}</div>
-          <div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.04em;">Expérience</div>
+        <div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">
+          <div style="font-size:18px;font-weight:700;color:#111;">${p.experience || '—'}</div>
+          <div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Expérience</div>
         </div>
       </div>
 
+      ${p.matricule && p.matricule !== 'YMJ-000000' ? `<div style="text-align:center;font-size:11px;color:#6b7280;padding:6px 0;margin-bottom:8px;border-top:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;">Membre vérifié · N° <span style="color:#1B2A6B;font-weight:700;letter-spacing:0.05em;">${p.matricule}</span></div>` : ''}
       <div style="display:grid;grid-template-columns:1fr 1fr${p.latitude?` 1fr`:''};gap:6px;margin:10px 0 8px;">
-        <button onclick="event.stopPropagation();openWA('${p.wa}','${p.nom}')" style="display:flex;align-items:center;justify-content:center;gap:5px;height:40px;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:#22c55e;color:#fff;font-family:'DM Sans',sans-serif;">
+        <button onclick="event.stopPropagation();openWA('${p.wa}','${p.nom}')" style="display:flex;align-items:center;justify-content:center;gap:5px;height:42px;border-radius:12px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:#22c55e;color:#fff;font-family:'DM Sans',sans-serif;">
           <i class="fa-brands fa-whatsapp" style="font-size:13px;"></i> WhatsApp
         </button>
-        <button onclick="event.stopPropagation();window.open('tel:${p.tel}')" style="display:flex;align-items:center;justify-content:center;gap:5px;height:40px;border-radius:10px;font-size:13px;font-weight:600;border:1.5px solid #fbd5c5;cursor:pointer;background:#fff4f0;color:#E8521A;font-family:'DM Sans',sans-serif;">
+        <button onclick="event.stopPropagation();window.open('tel:${p.tel}')" style="display:flex;align-items:center;justify-content:center;gap:5px;height:42px;border-radius:12px;font-size:13px;font-weight:700;border:1.5px solid #fbd5c5;cursor:pointer;background:#fff4f0;color:#E8521A;font-family:'DM Sans',sans-serif;">
           <i class="fa-solid fa-phone" style="font-size:11px;"></i> Appeler
         </button>
         ${p.latitude?`<button onclick="event.stopPropagation();window.open('https://www.google.com/maps?q=${p.latitude},${p.longitude}')" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 4px;border-radius:10px;font-size:12px;font-weight:700;border:1.5px solid #4285F4;cursor:pointer;background:#fff;color:#4285F4;"><i class="fa-solid fa-location-dot" style="font-size:11px;"></i> Localiser</button>`:''}
       </div>
 
       
-      <button onclick="event.stopPropagation();openModal('${p.id}')" style="width:100%;height:42px;border-radius:10px;background:#1B2A6B;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+      <button onclick="event.stopPropagation();openModal('${p.id}')" style="width:100%;height:44px;border-radius:12px;background:#1B2A6B;color:#fff;border:none;cursor:pointer;font-size:14px;font-weight:700;letter-spacing:0.01em;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
         <i class="fa-solid fa-user"></i> Voir le profil complet
       </button>
     </div>`;
