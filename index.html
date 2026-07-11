@@ -3714,15 +3714,10 @@ function renderProviders() {
 
       <div class="pc2-top" style="background:#1B2A6B;border-radius:20px 20px 0 0;padding:18px 16px;gap:14px;">
         <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-          <div class="pc2-avatar-col">
-            <div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;width:62px;height:62px;">
-              ${p.photo_url
-                ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${p.nom}"/>`
-                : p.ini}
-            </div>
-            <div class="pc2-online-badge"></div>
-          </div>
-          ${p.matricule && p.matricule !== 'YMJ-000000' ? `<div style="font-size:9px;color:#a5b4fc;text-align:center;margin-top:4px;letter-spacing:0.04em;font-weight:500;">${p.matricule}</div>` : ''}
+          ${p.photo_url
+            ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:62px;height:62px;border-radius:12px;object-fit:cover;border:2px solid #E8521A;" alt="${p.nom}"/>`
+            : `<div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;width:62px;height:62px;border-radius:12px;border:2px solid #E8521A;">${p.ini}</div>`}
+          ${p.matricule && p.matricule !== 'YMJ-000000' ? `<div style="font-size:8px;color:#a5b4fc;text-align:center;margin-top:4px;letter-spacing:0.05em;font-weight:600;background:rgba(255,255,255,0.08);border-radius:4px;padding:1px 4px;">${p.matricule}</div>` : ''}
         </div>
         <div class="pc2-info" style="flex:1;min-width:0;">
           <div style="margin-bottom:2px;">
