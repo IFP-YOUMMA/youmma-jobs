@@ -3682,15 +3682,22 @@ function renderProviders() {
     const isOccupe  = p.dispo === 'Occupé';
     const isExpress = p.dispo === 'express';
     const dispoClass = isOccupe ? 'led-red' : 'led-green';
-    const isNew = new Date() - new Date(p.created_at) < 7*24*60*60*1000;
+    const joursInscrit = Math.floor((new Date() - new Date(p.created_at)) / (1000*60*60*24));
+    const badgeAnciennete = joursInscrit <= 7
+      ? '<span style="font-size:10px;padding:2px 7px;color:#3730a3;white-space:nowrap;">✦ Nouveau</span>'
+      : joursInscrit <= 90
+      ? '<span style="font-size:10px;padding:2px 7px;color:#065f46;white-space:nowrap;">⬆ Actif</span>'
+      : joursInscrit <= 365
+      ? '<span style="font-size:10px;padding:2px 7px;color:#92400e;white-space:nowrap;">★ Confirmé</span>'
+      : '<span style="font-size:10px;padding:2px 7px;color:#1e40af;white-space:nowrap;">◆ Expert</span>';
     const _sep = '<span style="width:1px;height:12px;background:#d1d5db;flex-shrink:0;display:inline-block;"></span>';
     const badgePills = [
       isExpress ? '<span style="font-size:10px;padding:2px 7px;color:#E85D04;display:flex;align-items:center;gap:2px;white-space:nowrap;">⚡ Express</span>'
         : isOccupe ? '<span style="font-size:10px;padding:2px 7px;color:#dc2626;display:flex;align-items:center;gap:2px;white-space:nowrap;">✗ Occupé</span>'
         : '<span style="font-size:10px;padding:2px 7px;color:#065f46;display:flex;align-items:center;gap:2px;white-space:nowrap;">✓ Disponible</span>',
       p.badge_verifie ? '<span style="font-size:10px;padding:2px 7px;color:#1e40af;display:flex;align-items:center;gap:2px;white-space:nowrap;">✓ Vérifié</span>' : null,
+      badgeAnciennete,
       (p.badge_ambassadeur && p.badge_ambassadeur_fin && new Date(p.badge_ambassadeur_fin) > new Date()) ? '<span style="font-size:10px;padding:2px 7px;color:#92400e;white-space:nowrap;">Ambassadeur</span>' : null,
-      isNew ? '<span style="font-size:10px;padding:2px 7px;color:#3730a3;white-space:nowrap;">✦ Nouveau</span>' : null,
     ].filter(Boolean).join(_sep);
 
     return `
