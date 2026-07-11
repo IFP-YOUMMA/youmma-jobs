@@ -3699,6 +3699,10 @@ function renderProviders() {
       badgeAnciennete,
       (p.badge_ambassadeur && p.badge_ambassadeur_fin && new Date(p.badge_ambassadeur_fin) > new Date()) ? '<span style="font-size:10px;font-weight:600;padding:4px 10px;color:#d97706;white-space:nowrap;">Ambassadeur</span>' : null,
     ].filter(Boolean).join(_sep);
+    const _note = parseFloat(p.note) || 0;
+    const noteDisplay = _note > 0
+      ? `<div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${[1,2,3,4,5].map(i=>`<span style="color:${i<=Math.round(_note)?'#f59e0b':'#e5e7eb'};font-size:11px;">★</span>`).join('')}</div><div style="font-size:18px;font-weight:700;color:#111;">${_note.toFixed(1)}</div>`
+      : '<div style="display:flex;justify-content:center;gap:1px;margin-bottom:3px;"><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span></div><div style="font-size:11px;font-weight:500;color:#9ca3af;margin-top:2px;">Pas encore noté</div>';
 
     return `
     <div class="pc2-card fade-in" style="overflow:hidden;border-radius:20px;border:1px solid #e8ecf0;box-shadow:0 2px 12px rgba(0,0,0,0.06);" onclick="openModal('${p.id}')">
@@ -3752,8 +3756,7 @@ function renderProviders() {
           <div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Missions</div>
         </div>
         <div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">
-          <div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${[1,2,3,4,5].map(i=>`<span style="color:${(p.nb_avis||0)>0 && i<=Math.round(p.note||0)?'#f59e0b':'#e5e7eb'};font-size:11px;">★</span>`).join('')}</div>
-          <div style="font-size:18px;font-weight:700;color:#111;">${(p.nb_avis||0) > 0 ? Number(p.note).toFixed(1) : '—'}</div>
+          ${noteDisplay}
         </div>
         <div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">
           <div style="font-size:18px;font-weight:700;color:#111;">${p.experience || '—'}</div>
@@ -3761,7 +3764,7 @@ function renderProviders() {
         </div>
       </div>
 
-      ${p.matricule && p.matricule !== 'YMJ-000000' ? `<div style="text-align:center;font-size:11px;color:#6b7280;padding:6px 0;margin-bottom:8px;border-top:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;">Membre vérifié · N° <span style="color:#1B2A6B;font-weight:700;letter-spacing:0.05em;">${p.matricule}</span></div>` : ''}
+      ${p.matricule && p.matricule !== 'YMJ-000000' ? `<div style="text-align:center;font-size:11px;color:#6b7280;padding:7px 0;margin-bottom:8px;border-top:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;">Membre vérifié · N° <span style="color:#1B2A6B;font-weight:700;letter-spacing:0.05em;">${p.matricule}</span></div>` : ''}
       <div style="display:grid;grid-template-columns:1fr 1fr${p.latitude?` 1fr`:''};gap:6px;margin:10px 0 8px;">
         <button onclick="event.stopPropagation();openWA('${p.wa}','${p.nom}')" style="display:flex;align-items:center;justify-content:center;gap:5px;height:42px;border-radius:12px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:#22c55e;color:#fff;font-family:'DM Sans',sans-serif;">
           <i class="fa-brands fa-whatsapp" style="font-size:13px;"></i> WhatsApp
