@@ -3717,7 +3717,7 @@ function renderProviders() {
           ${p.photo_url
             ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:62px;height:62px;border-radius:12px;object-fit:cover;border:2px solid #E8521A;" alt="${p.nom}"/>`
             : `<div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;width:62px;height:62px;border-radius:12px;border:2px solid #E8521A;">${p.ini}</div>`}
-          ${p.matricule ? `<div style="font-size:8px;color:#a5b4fc;text-align:center;margin-top:4px;letter-spacing:0.05em;font-weight:600;background:rgba(255,255,255,0.1);border-radius:4px;padding:1px 5px;">${p.matricule}</div>` : ''}
+          ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="font-size:8px;color:#a5b4fc;text-align:center;margin-top:4px;letter-spacing:0.05em;font-weight:600;background:rgba(255,255,255,0.1);border-radius:4px;padding:1px 5px;">${p.matricule}</div>` : ''}
         </div>
         <div class="pc2-info" style="flex:1;min-width:0;">
           <div style="margin-bottom:2px;">
