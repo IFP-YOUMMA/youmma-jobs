@@ -1,4 +1,4 @@
-// @ts-nocheck
+﻿// @ts-nocheck
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -96,11 +96,16 @@ serve(async (req: Request) => {
       return { ...p, score }
     }).sort((a, b) => b.score - a.score)
 
-    // 4. Message SMS — max 160 chars
+    // 4. Message SMS — max 160 chars GSM-7 (sans accents → évite basculement UCS-2 à 70 chars)
+    const sansAccents    = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '')
     const communeDisplay = commune.charAt(0).toUpperCase() + commune.slice(1)
     const catDisplay     = categorie.length > 25 ? categorie.substring(0, 25) : categorie
     const titreDisplay   = titreRaw.length  > 35 ? titreRaw.substring(0, 35)  : titreRaw
-    const smsMsg = `YOUMMA JOBS: Nouveau projet ${catDisplay} a ${communeDisplay}: ${titreDisplay}. Devis sur yoummajobs.com`
+    const catShort       = sansAccents(categorie.length > 20 ? categorie.substring(0, 20) : categorie)
+    const commShort      = sansAccents(commune.length   > 15 ? commune.substring(0, 15)   : commune)
+    const lien           = `https://yoummajobs.com/#projet=${mission_id}`
+    // Pire cas : 28 + 20 + 3 + 15 + 11 + 31 + 36 = 144 chars <= 160 ✓
+    const smsMsg = `YOUMMA JOBS: Nouveau projet ${catShort} a ${commShort}. Ecoutez: ${lien}`
 
     // 5. SMS — 10 premiers de la liste scorée
     const ciblesSMS = scored.slice(0, 10)

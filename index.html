@@ -9463,6 +9463,16 @@ window.addEventListener('load', async function() {
     if (typeof _realNavigate==='function') _realNavigate('home');
     setTimeout(function() { if (typeof window.ouvrirDevisProjet==='function') window.ouvrirDevisProjet(_dpId); }, 400);
   }
+  else if (hash.startsWith('projet=')) {
+    const _pjId = hash.replace('projet=','').trim();
+    document.body.classList.add('on-home');
+    const _pjMc = document.getElementById('mainContent');
+    const _pjMn = document.getElementById('mainNav');
+    if (_pjMc) _pjMc.style.cssText = 'display:block!important;';
+    if (_pjMn) _pjMn.style.cssText = '';
+    if (typeof _realNavigate==='function') _realNavigate('home');
+    setTimeout(function() { if (typeof window.ouvrirProjetDetail==='function') window.ouvrirProjetDetail(_pjId); }, 400);
+  }
   else {
     // Afficher home directement sans dépendre des wrappers navigate
     document.body.classList.add('on-home');
@@ -9516,6 +9526,15 @@ window.addEventListener('hashchange', async function() {
     const _hcMc = document.getElementById('mainContent'); const _hcMn = document.getElementById('mainNav');
     if (_hcMc) _hcMc.style.cssText = 'display:block!important;'; if (_hcMn) _hcMn.style.cssText = '';
     setTimeout(function() { if (typeof window.ouvrirDevisProjet==='function') window.ouvrirDevisProjet(_hcId); }, 200);
+    return;
+  }
+  if (hash.startsWith('projet=')) {
+    const _pjhId = hash.replace('projet=','').trim();
+    document.body.classList.add('on-home'); document.body.classList.remove('on-admin','admin-mode','on-dashboard');
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); p.style.display=''; });
+    const _pjhMc = document.getElementById('mainContent'); const _pjhMn = document.getElementById('mainNav');
+    if (_pjhMc) _pjhMc.style.cssText = 'display:block!important;'; if (_pjhMn) _pjhMn.style.cssText = '';
+    setTimeout(function() { if (typeof window.ouvrirProjetDetail==='function') window.ouvrirProjetDetail(_pjhId); }, 200);
     return;
   }
 
@@ -13697,7 +13716,7 @@ async function retirerBadgeAmb(providerId, nomPrest) {
   chargerClassementAdmin();
 }
 
-function loginSubmitHandler(){var tel=document.getElementById("telephone")?.value;var pin=["lpin1","lpin2","lpin3","lpin4"].map(function(id){return document.getElementById(id)?.value||"";}).join("");var errBox=document.getElementById("errorBox");var btn=document.getElementById("loginSubmitBtn");if(errBox)errBox.style.display="none";if(!tel||tel.trim().length<8){if(errBox){errBox.textContent="Entrez un numero valide";errBox.style.display="block";}return;}if(pin.length<4){if(errBox){errBox.textContent="Entrez votre code PIN 4 chiffres";errBox.style.display="block";}return;}if(btn)btn.disabled=true;(async function(){try{var res=await connexionPrestataire(tel.trim(),pin);if(res.success){var pid=res.provider&&res.provider.id;if(pid){document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");p.style.display="";});document.getElementById("page-login").style.cssText="display:none!important";document.body.classList.add("on-dashboard");document.body.classList.remove("on-home","on-admin");var pd=document.getElementById("page-dashboard");if(pd){pd.classList.add("active");pd.style.cssText="display:block!important";window.scrollTo(0,0);}if(typeof chargerDashboard==="function")await chargerDashboard(pid);}}else{if(errBox){errBox.textContent=res.message||"Telephone ou PIN incorrect";errBox.style.display="block";}}}catch(e){if(errBox){errBox.textContent="Erreur: "+e.message;errBox.style.display="block";}}if(btn)btn.disabled=false;})();}
+function loginSubmitHandler(){var tel=document.getElementById("telephone")?.value;var pin=["lpin1","lpin2","lpin3","lpin4"].map(function(id){return document.getElementById(id)?.value||"";}).join("");var errBox=document.getElementById("errorBox");var btn=document.getElementById("loginSubmitBtn");if(errBox)errBox.style.display="none";if(!tel||tel.trim().length<8){if(errBox){errBox.textContent="Entrez un numero valide";errBox.style.display="block";}return;}if(pin.length<4){if(errBox){errBox.textContent="Entrez votre code PIN 4 chiffres";errBox.style.display="block";}return;}if(btn)btn.disabled=true;(async function(){try{var res=await connexionPrestataire(tel.trim(),pin);if(res.success){var pid=res.provider&&res.provider.id;if(pid){document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");p.style.display="";});document.getElementById("page-login").style.cssText="display:none!important";document.body.classList.add("on-dashboard");document.body.classList.remove("on-home","on-admin");var pd=document.getElementById("page-dashboard");if(pd){pd.classList.add("active");pd.style.cssText="display:block!important";window.scrollTo(0,0);}if(typeof chargerDashboard==="function")await chargerDashboard(pid);var _rPj=sessionStorage.getItem('_retourProjetId');if(_rPj){sessionStorage.removeItem('_retourProjetId');setTimeout(function(){if(typeof window.ouvrirProjetDetail==='function')window.ouvrirProjetDetail(_rPj);},700);}}}else{if(errBox){errBox.textContent=res.message||"Telephone ou PIN incorrect";errBox.style.display="block";}}}catch(e){if(errBox){errBox.textContent="Erreur: "+e.message;errBox.style.display="block";}}if(btn)btn.disabled=false;})();}
 window.loginSubmitHandler=loginSubmitHandler;
 </script>
 
@@ -14498,6 +14517,7 @@ window.ouvrirPublierProjet = function() {
     +'</div>'
     +'<div style="padding:22px 26px;max-height:62vh;overflow-y:auto;display:flex;flex-direction:column;gap:13px;">'
       +_grp('Titre du projet *','<input id="ppTitre" type="text" placeholder="Ex : Réparation fuite d\'eau cuisine" style="'+_inpS+'">')
+      +_grp('Catégorie *','<select id="ppCategorie" style="'+_inpS+'"><option value="">Choisir une catégorie…</option></select>')
       +'<div>'
         +_lbl('Comment décrivez-vous votre besoin ?')
         +'<div id="ppChoix"></div>'
@@ -14513,7 +14533,7 @@ window.ouvrirPublierProjet = function() {
     +'</div>'
     +'</div>';
   _ppAudioBlob = null;
-  setTimeout(function() { _creerChoixSaisie('ppChoix', 'ppDesc', 'Décrivez votre projet : quoi, où, quand...', function(b) { _ppAudioBlob = b; }); }, 0);
+  setTimeout(function() { _creerChoixSaisie('ppChoix', 'ppDesc', 'Décrivez votre projet : quoi, où, quand...', function(b) { _ppAudioBlob = b; }); if (typeof renderCategoriesSelect==='function') renderCategoriesSelect('ppCategorie'); }, 0);
 };
 
 window.fermerProjetPub = function() {
@@ -14522,8 +14542,9 @@ window.fermerProjetPub = function() {
 };
 
 window._soumettreProjet = async function() {
-  var titre  = (document.getElementById('ppTitre')||{value:''}).value.trim();
-  var desc   = (document.getElementById('ppDesc')||{value:''}).value.trim();
+  var titre    = (document.getElementById('ppTitre')||{value:''}).value.trim();
+  var categorie= (document.getElementById('ppCategorie')||{value:''}).value.trim();
+  var desc     = (document.getElementById('ppDesc')||{value:''}).value.trim();
   var commune= (document.getElementById('ppCommune')||{value:''}).value.trim();
   var budget = (document.getElementById('ppBudget')||{value:''}).value.trim();
   var nom    = (document.getElementById('ppNom')||{value:''}).value.trim();
@@ -14536,7 +14557,8 @@ window._soumettreProjet = async function() {
   };
 
   // Validation champ par champ avec messages précis
-  if (!titre) { affErr('Veuillez renseigner le titre du projet.'); return; }
+  if (!titre)    { affErr('Veuillez renseigner le titre du projet.'); return; }
+  if (!categorie){ affErr('Veuillez choisir une catégorie pour votre projet.'); return; }
   if (!desc && !_ppAudioBlob)  { affErr('Décrivez votre besoin : tapez du texte ou enregistrez un message vocal.'); return; }
   if (!nom)   { affErr('Veuillez indiquer votre nom.'); return; }
   if (!tel)   { affErr('Veuillez indiquer votre numéro de téléphone.'); return; }
@@ -14585,7 +14607,7 @@ window._soumettreProjet = async function() {
     var montant = budget ? parseInt(budget, 10) : null;
     var mode_saisie = (desc && audioUrl) ? 'mixte' : audioUrl ? 'vocal' : 'texte';
     var payload = {
-      titre: titre, categorie: null, description: desc || null,
+      titre: titre, categorie: categorie || null, description: desc || null,
       commune: commune||null, montant: montant,
       client_nom: nom, client_telephone: tel, statut: 'ouvert',
       mode_saisie: mode_saisie, audio_url: audioUrl || null
@@ -15112,6 +15134,227 @@ window.ouvrirDevisProjet = async function(missionId) {
     var b = document.getElementById('dpBody');
     if (b) b.innerHTML = '<div style="text-align:center;padding:32px;color:#DC2626;font-size:13px;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>Erreur : '+e.message+'</div>';
     console.error('[devis-projet]', e.message);
+  }
+};
+
+// ══════════════════════════════════════════════════════════════
+// PAGE PUBLIQUE — DÉTAIL PROJET (prestataire depuis SMS)
+// ══════════════════════════════════════════════════════════════
+
+window.fermerProjetDetail = function() {
+  var m = document.getElementById('projetDetailModal');
+  if (m) m.style.display = 'none';
+  if (history.pushState) history.pushState('', document.title, window.location.pathname + window.location.search);
+};
+
+window.ouvrirProjetDetail = async function(missionId) {
+  if (!missionId) return;
+  var modal = _makeModal('projetDetailModal');
+  modal.onclick = function(e) { if (e.target === modal) window.fermerProjetDetail(); };
+
+  // ── État de chargement ──
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:16px;width:100%;max-width:640px;margin:0 auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.22);">'
+      +'<div style="background:#1B2A6B;padding:18px 18px 20px;">'
+        +'<div style="color:rgba(255,255,255,.6);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">YOUMMA JOBS · Nouveau projet</div>'
+        +'<div style="color:#fff;font-size:21px;font-weight:800;line-height:1.3;">Chargement…</div>'
+      +'</div>'
+      +'<div style="padding:28px 20px;text-align:center;"><i class="fa-solid fa-spinner fa-spin" style="font-size:26px;color:#E8521A;"></i></div>'
+    +'</div>';
+
+  try {
+    // ── 1. Mission — SANS client_telephone, SANS audio_url (sécurité) ──
+    var mRes = await sb.from('missions')
+      .select('id,titre,description,commune,categorie,created_at,client_nom')
+      .eq('id', missionId).single();
+    if (mRes.error) throw new Error('Projet introuvable');
+    var m = mRes.data;
+
+    // ── 2. Session et statut abonnement ──
+    var session = getSession();
+    var isConnected = !!(session && session.provider_id);
+    var canAccess = false;
+    var providerSnap = null;
+
+    if (isConnected) {
+      var pRes = await sb.from('providers')
+        .select('id,prenom,nom,abonnement_actif,abonnement_fin,created_at')
+        .eq('id', session.provider_id).single();
+      if (!pRes.error && pRes.data) {
+        providerSnap = pRes.data;
+        var _now = new Date();
+        var _jours = Math.max(0, 3 - Math.floor((_now - new Date(providerSnap.created_at)) / 86400000));
+        var _aAbo  = providerSnap.abonnement_actif === true && providerSnap.abonnement_fin && new Date(providerSnap.abonnement_fin) > _now;
+        canAccess = _aAbo || _jours > 0;
+      }
+    }
+
+    // ── 3. audio_url chargé UNIQUEMENT si accès autorisé ──
+    var audioUrl = null;
+    if (canAccess) {
+      var aRes = await sb.from('missions').select('audio_url').eq('id', missionId).single();
+      if (!aRes.error && aRes.data) audioUrl = aRes.data.audio_url || null;
+    }
+
+    // ── 4. Données d'affichage ──
+    var titre   = (m.titre || '').trim() || 'Projet sans titre';
+    var desc    = (m.description || '').trim();
+    var cat     = (m.categorie || '').trim();
+    var commune = (m.commune   || '').trim();
+
+    // Prénom + initiale du nom — jamais le téléphone
+    var clientNom = (m.client_nom || '').trim();
+    var clientParts = clientNom ? clientNom.split(/\s+/) : [];
+    var clientAffiche = clientParts.length >= 2
+      ? clientParts[0] + ' ' + clientParts[1].charAt(0).toUpperCase() + '.'
+      : clientParts[0] || 'Client';
+
+    // Ancienneté
+    var diffS = Math.floor((Date.now() - new Date(m.created_at).getTime()) / 1000);
+    var ago = diffS < 60     ? 'il y a quelques secondes'
+            : diffS < 3600   ? 'il y a ' + Math.floor(diffS/60)   + ' min'
+            : diffS < 86400  ? 'il y a ' + Math.floor(diffS/3600) + ' h'
+            : 'il y a '      + Math.floor(diffS/86400)             + ' j';
+
+    // ── 5. Blocs conditionnels ──
+
+    // Badges header
+    var catBadge  = cat    ? '<span style="display:inline-block;background:#E8521A;color:#fff;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap;margin-right:6px;">'+cat+'</span>' : '';
+    var lieuBadge = commune? '<span style="display:inline-block;background:rgba(255,255,255,.18);color:#fff;font-size:11px;font-weight:600;padding:3px 12px;border-radius:20px;white-space:nowrap;">📍 '+commune+'</span>' : '';
+
+    // Bloc description
+    var descBloc = desc
+      ? '<div style="background:#F9FAFB;border-radius:12px;padding:14px 16px;margin-bottom:14px;">'
+          +'<div style="font-size:10.5px;font-weight:700;color:#9CA3AF;letter-spacing:.07em;text-transform:uppercase;margin-bottom:7px;">Description</div>'
+          +'<div style="font-size:13.5px;color:#374151;line-height:1.65;white-space:pre-wrap;">'+desc+'</div>'
+        +'</div>'
+      : '';
+
+    // Bloc vocal (3 états)
+    var vocalBloc = '';
+    if (!isConnected) {
+      // Non connecté : le bloc vocal n'est pas rendu du tout
+      vocalBloc = '';
+    } else if (!canAccess) {
+      // Expiré : lecteur verrouillé
+      vocalBloc =
+        '<div style="background:#F1EFE8;border-radius:14px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;gap:14px;">'
+          +'<div style="width:48px;height:48px;border-radius:50%;background:#B4B2A9;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'
+            +'<i class="fa-solid fa-lock" style="font-size:18px;color:#fff;"></i>'
+          +'</div>'
+          +'<div>'
+            +'<div style="font-size:13px;font-weight:700;color:#6B6966;">Vocal réservé aux abonnés</div>'
+            +'<div style="font-size:11.5px;color:#9C9A94;margin-top:3px;">Abonnez-vous pour écouter ce message</div>'
+          +'</div>'
+        +'</div>';
+    } else if (audioUrl) {
+      // Accès complet : lecteur mauve
+      vocalBloc =
+        '<div style="background:#EEEDFE;border-radius:14px;padding:14px 16px;margin-bottom:14px;">'
+          +'<div style="font-size:12.5px;font-weight:700;color:#534AB7;margin-bottom:10px;display:flex;align-items:center;gap:8px;">'
+            +'<span style="width:28px;height:28px;background:#534AB7;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">'
+              +'<i class="fa-solid fa-play" style="font-size:11px;color:#fff;margin-left:2px;"></i>'
+            +'</span>'
+            +'Message vocal du client'
+          +'</div>'
+          +'<audio controls preload="none" src="'+audioUrl+'" style="width:100%;height:40px;border-radius:10px;"></audio>'
+        +'</div>';
+    }
+
+    // Bandeau expiration
+    var bandeauExpire = '';
+    if (isConnected && !canAccess) {
+      bandeauExpire =
+        '<div style="background:#FCEBEB;border-radius:14px;padding:16px 18px;margin-bottom:14px;">'
+          +'<div style="font-size:14px;font-weight:800;color:#791F1F;margin-bottom:6px;">Votre abonnement a expiré</div>'
+          +'<div style="font-size:13px;color:#A32D2D;line-height:1.55;margin-bottom:14px;">Réabonnez-vous pour écouter les projets et envoyer vos devis. Un client vous attend peut-être.</div>'
+          +'<button id="pdRenewBtn" style="width:100%;padding:14px;background:#1D9E75;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;">'
+            +'<i class="fa-solid fa-rotate"></i>Renouveler — 50 000 GNF/mois'
+          +'</button>'
+          +'<div style="text-align:center;font-size:11px;color:#A32D2D;margin-top:8px;">Paiement mobile via ChapChap</div>'
+        +'</div>';
+    }
+
+    // CTA principal (devis ou connexion)
+    var ctaBloc = '';
+    if (!isConnected) {
+      ctaBloc =
+        '<div style="background:#F9FAFB;border:1.5px solid #E5E7EB;border-radius:14px;padding:20px 18px;margin-bottom:4px;text-align:center;">'
+          +'<div style="font-size:34px;margin-bottom:12px;">🔒</div>'
+          +'<div style="font-size:15px;font-weight:800;color:#1A1A4E;margin-bottom:6px;">Connexion requise</div>'
+          +'<div style="font-size:13px;color:#6B7280;line-height:1.55;margin-bottom:16px;">Connectez-vous pour écouter le message du client et envoyer votre devis.</div>'
+          +'<button id="pdConnexionBtn" style="width:100%;padding:14px;background:#1B2A6B;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:48px;font-family:inherit;">🔑 Se connecter</button>'
+        +'</div>';
+    } else if (canAccess) {
+      ctaBloc =
+        '<button id="pdDevisBtn" style="width:100%;padding:16px;background:#E8521A;border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;touch-action:manipulation;min-height:52px;box-shadow:0 4px 16px rgba(232,82,26,.35);font-family:inherit;">✍️ Faire mon devis</button>'
+        +'<div style="text-align:center;font-size:11.5px;color:#9CA3AF;margin-top:10px;">Le client compare les devis et appelle celui qu\'il choisit</div>';
+    }
+
+    // ── 6. Rendu final ──
+    var wrap = modal.querySelector('div');
+    wrap.innerHTML =
+      // Header navy
+      '<div style="background:#1B2A6B;padding:18px 18px 20px;">'
+        +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">'
+          +'<div style="flex:1;">'
+            +'<div style="color:rgba(255,255,255,.6);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">YOUMMA JOBS · Nouveau projet</div>'
+            +'<div style="color:#fff;font-size:20px;font-weight:800;line-height:1.3;margin-bottom:12px;">'+titre+'</div>'
+            +((catBadge||lieuBadge) ? '<div style="display:flex;flex-wrap:wrap;gap:6px;">'+catBadge+lieuBadge+'</div>' : '')
+          +'</div>'
+          +'<button onclick="window.fermerProjetDetail()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;font-family:inherit;">×</button>'
+        +'</div>'
+      +'</div>'
+      // Corps
+      +'<div style="padding:18px 18px 28px;display:flex;flex-direction:column;">'
+        +vocalBloc
+        +descBloc
+        +'<div style="font-size:12px;color:#9CA3AF;margin-bottom:16px;">'+clientAffiche+' · '+ago+'</div>'
+        +bandeauExpire
+        +ctaBloc
+      +'</div>';
+
+    // ── 7. Binders ──
+    var btnDevis = document.getElementById('pdDevisBtn');
+    if (btnDevis) {
+      btnDevis.onclick = function() {
+        window.fermerProjetDetail();
+        window.ouvrirDevis(missionId, titre, audioUrl || '');
+      };
+    }
+
+    var btnConn = document.getElementById('pdConnexionBtn');
+    if (btnConn) {
+      btnConn.onclick = function() {
+        sessionStorage.setItem('_retourProjetId', missionId);
+        window.fermerProjetDetail();
+        document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); p.style.display=''; });
+        var mc = document.getElementById('mainContent');
+        if (mc) mc.style.cssText = 'display:none!important';
+        var pl = document.getElementById('page-login');
+        if (pl) { pl.classList.add('active'); pl.style.cssText = 'display:block!important'; window.scrollTo(0,0); }
+      };
+    }
+
+    var btnRenew = document.getElementById('pdRenewBtn');
+    if (btnRenew && providerSnap) {
+      btnRenew.onclick = function() {
+        window._dashProviderId = providerSnap.id;
+        window.providerData    = providerSnap;
+        if (typeof lancerPaiementAbonnement==='function') lancerPaiementAbonnement();
+      };
+    }
+
+  } catch(e) {
+    var wrap = modal.querySelector('div');
+    if (wrap) wrap.innerHTML =
+      '<div style="padding:32px 20px;text-align:center;color:#DC2626;font-size:13px;">'
+        +'<div style="font-size:40px;margin-bottom:14px;">⚠️</div>'
+        +'<div style="font-weight:700;margin-bottom:8px;">Projet introuvable</div>'
+        +'<div style="font-size:12px;color:#9CA3AF;">'+e.message+'</div>'
+        +'<button onclick="window.fermerProjetDetail()" style="margin-top:18px;padding:11px 24px;background:#1B2A6B;border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Fermer</button>'
+      +'</div>';
+    console.error('[projet-detail]', e.message);
   }
 };
 
