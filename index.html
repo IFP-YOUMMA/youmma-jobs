@@ -3724,7 +3724,7 @@ function renderProviders() {
               <i class="fa-solid fa-bullseye" style="font-size:9px;"></i> ${p.missions||0} mission${(p.missions||0)>1?'s':''}
             </div>
           </div>
-          ${p.matricule && p.matricule !== 'YMJ-000000' ? `<div style="display:inline-flex;align-items:center;gap:5px;margin-top:3px;margin-bottom:2px;"><span style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;">N°</span><span style="font-size:12px;color:#f97316;font-weight:700;letter-spacing:.5px;">${p.matricule}</span></div>` : ''}
+          ${p.matricule && p.matricule !== 'YMJ-000000' ? `<div style="display:inline-flex;align-items:center;gap:6px;margin-top:3px;margin-bottom:2px;"><span style="font-size:10px;color:rgba(255,255,255,0.6);font-weight:500;">Membre vérifié</span><span style="width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.35);flex-shrink:0;display:inline-block;"></span><span style="font-size:10px;color:#f97316;font-weight:700;letter-spacing:.5px;">N° ${p.matricule}</span></div>` : ''}
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px;">
             <div style="font-size:12px;color:#a5b4fc;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
               <i class="fa-solid fa-location-dot" style="color:#a5b4fc;font-size:11px;"></i>
