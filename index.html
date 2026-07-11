@@ -3744,7 +3744,7 @@ function renderProviders() {
             <span style="font-size:11px;color:var(--gris);display:flex;align-items:center;gap:4px;"><i class="fa-solid fa-id-card"></i> Pièce d'identité</span>
             <span style="font-size:10.5px;font-weight:700;color:${p.badge_verifie?'#16A34A':'#9CA3AF'};">${p.badge_verifie?'✅ Vérifiée':'⏳ En attente'}</span>
           </div>
-          ${p.badge_ambassadeur && p.badge_ambassadeur_fin && new Date(p.badge_ambassadeur_fin) > new Date() ? `<div style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#F5C518,#E85D04);color:#fff;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:800;letter-spacing:.03em;box-shadow:0 2px 8px rgba(232,93,4,.35);margin-top:4px;">🏆 Ambassadeur YOUMMA</div>` : ''}
+          ${(p.badge_ambassadeur && p.badge_ambassadeur_fin && new Date(p.badge_ambassadeur_fin) > new Date()) || (new Date() - new Date(p.created_at) < 7*24*60*60*1000) ? `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;">${p.badge_ambassadeur && p.badge_ambassadeur_fin && new Date(p.badge_ambassadeur_fin) > new Date() ? '<span style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#F5C518,#E85D04);color:#fff;border-radius:20px;padding:4px 10px;font-size:10px;font-weight:800;letter-spacing:.03em;box-shadow:0 2px 8px rgba(232,93,4,.35);">🏆 Ambassadeur YOUMMA</span>' : ''}${new Date() - new Date(p.created_at) < 7*24*60*60*1000 ? '<span style="font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500;background:#fce7f3;color:#9d174d;border:1px solid #f9a8d4;">✦ Nouveau</span>' : ''}</div>` : ''}
         </div>
       </div>
 
