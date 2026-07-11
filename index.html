@@ -3703,14 +3703,18 @@ function renderProviders() {
     const noteDisplay = _note > 0
       ? `<div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${[1,2,3,4,5].map(i=>`<span style="color:${i<=Math.round(_note)?'#f59e0b':'#e5e7eb'};font-size:11px;">★</span>`).join('')}</div><div style="font-size:18px;font-weight:700;color:#111;">${_note.toFixed(1)}</div>`
       : '<div style="display:flex;justify-content:center;gap:1px;margin-bottom:3px;"><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span></div><div style="font-size:11px;font-weight:500;color:#9ca3af;margin-top:2px;">Pas encore noté</div>';
+    console.log('[DEBUG matricule]', p.id, p.matricule);
+    const matriculeHtml = (p.matricule && p.matricule !== 'YMJ-000000')
+      ? `<div style="text-align:center;font-size:11px;color:#6b7280;padding:7px 0;margin:0 0 8px 0;border-top:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;">Membre vérifié · N°&nbsp;<span style="color:#1B2A6B;font-weight:700;letter-spacing:0.05em;">${p.matricule}</span></div>`
+      : '';
 
     return `
     <div class="pc2-card fade-in" style="overflow:hidden;border-radius:20px;border:1px solid #e8ecf0;box-shadow:0 2px 12px rgba(0,0,0,0.06);" onclick="openModal('${p.id}')">
 
 
-      <div class="pc2-top" style="background:#1B2A6B;border-radius:20px 20px 0 0;">
+      <div class="pc2-top" style="background:#1B2A6B;border-radius:20px 20px 0 0;padding:18px 16px;gap:14px;">
         <div class="pc2-avatar-col">
-          <div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;">
+          <div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;width:62px;height:62px;">
             ${p.photo_url
               ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${p.nom}"/>`
               : p.ini}
@@ -3719,7 +3723,7 @@ function renderProviders() {
         </div>
         <div class="pc2-info" style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:2px;">
-            <div class="pc2-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font-size:16px;font-weight:700;">
+            <div class="pc2-name" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font-size:17px;font-weight:700;">
               ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom_entreprise : p.nom}
             </div>
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
@@ -3764,7 +3768,7 @@ function renderProviders() {
         </div>
       </div>
 
-      ${p.matricule && p.matricule !== 'YMJ-000000' ? `<div style="text-align:center;font-size:11px;color:#6b7280;padding:7px 0;margin-bottom:8px;border-top:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;">Membre vérifié · N° <span style="color:#1B2A6B;font-weight:700;letter-spacing:0.05em;">${p.matricule}</span></div>` : ''}
+      ${matriculeHtml}
       <div style="display:grid;grid-template-columns:1fr 1fr${p.latitude?` 1fr`:''};gap:6px;margin:10px 0 8px;">
         <button onclick="event.stopPropagation();openWA('${p.wa}','${p.nom}')" style="display:flex;align-items:center;justify-content:center;gap:5px;height:42px;border-radius:12px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:#22c55e;color:#fff;font-family:'DM Sans',sans-serif;">
           <i class="fa-brands fa-whatsapp" style="font-size:13px;"></i> WhatsApp
