@@ -12,6 +12,36 @@ serve(async () => {
   const dans3jours = new Date()
   dans3jours.setDate(dans3jours.getDate() + 3)
 
+  // ── Rappel J2 : prestataires sans abonnement créés il y a ~2 jours ──
+  const il_y_a_2_jours = new Date(); il_y_a_2_jours.setDate(il_y_a_2_jours.getDate() - 2)
+  const il_y_a_3_jours = new Date(); il_y_a_3_jours.setDate(il_y_a_3_jours.getDate() - 3)
+  const { data: rappelJ2 } = await supabase
+    .from('providers')
+    .select('telephone, prenom, nom')
+    .eq('statut', 'valide')
+    .eq('abonnement_actif', false)
+    .gte('created_at', il_y_a_3_jours.toISOString())
+    .lte('created_at', il_y_a_2_jours.toISOString())
+
+  let rappelsJ2Envoyes = 0
+  for (const p of rappelJ2 || []) {
+    try {
+      await fetch('https://yoummajobs.com/api/send-reminder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telephone: p.telephone,
+          prenom: p.prenom,
+          message: `Bonjour ${p.prenom}, votre profil YOUMMA JOBS expire demain ! Abonnez-vous pour 50 000 GNF/mois et restez visible. Contactez-nous sur WhatsApp : +224 612 52 52 10`
+        })
+      })
+      rappelsJ2Envoyes++
+      console.log('[sms-rappel] Rappel J2 envoyé à', p.prenom)
+    } catch (e) {
+      console.error('[sms-rappel] Erreur rappel J2 pour', p.prenom, ':', e.message)
+    }
+  }
+
   // ── Rappel 3 jours avant expiration ──
   const { data: expireBientot } = await supabase
     .from('providers')
@@ -71,6 +101,7 @@ serve(async () => {
   return new Response(
     JSON.stringify({
       ok: true,
+      rappels_j2_envoyes: rappelsJ2Envoyes,
       rappels_envoyes: rappelsEnvoyes,
       expires_traites: expiresTraites,
       timestamp: maintenant.toISOString()

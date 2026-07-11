@@ -3669,7 +3669,12 @@ function renderProviders() {
     return;
   }
 
-  grid.innerHTML = toShow.map((p, i) => {
+  grid.innerHTML = toShow.filter(p => {
+    const _jours = Math.floor((new Date() - new Date(p.created_at)) / (1000*60*60*24));
+    const _periodeTerminee = !isNaN(_jours) && _jours >= 3;
+    const _aAbo = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
+    return !(_periodeTerminee && !_aAbo);
+  }).map((p, i) => {
     const isFav = favorites.includes(p.id);
     const stars5 = Array.from({length:5},(_,j)=>`<span style="color:${j<Math.floor(p.note)?'#D4A017':'#D1D5DB'};font-size:11px;">★</span>`).join('');
     const isEntreprise = p.type_compte === 'entreprise';
@@ -4447,6 +4452,7 @@ document.addEventListener('keydown', e => {
           <button onclick="showSection('abonnement')" style="width:100%;padding:16px;background:linear-gradient(135deg,#E85D04,#C74B00);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:56px;font-family:'DM Sans',sans-serif;">Renouveler maintenant →</button>
         </div>
         <div id="dashStatutAlert" style="display:none;margin-top:9px;padding:11px 14px;border-radius:12px;font-size:13.5px;font-weight:600;"></div>
+        <div id="dashBandeauEssai" style="display:none;margin-top:10px;"></div>
         <div id="dashBadgeDlBtn" style="display:none;margin-top:12px;"></div>
       </div>
 
@@ -6868,7 +6874,7 @@ async function getProviders({ categorie='', recherche='', limite=20, offset=0 }=
   // Colonnes de base garanties dans le schéma providers
   const COLS_BASE = 'id,nom,prenom,matricule,metier,categorie,ville,commune,quartier,photo_url,note_moyenne,nb_vues,telephone,skills,description,statut,disponibilite,doc_cni_statut,doc_diplome_statut,created_at';
   // Colonnes optionnelles (peuvent manquer selon version du schéma) — tentée séparément
-  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,latitude,longitude,tarif,experience,type_compte,nom_entreprise,badge_ambassadeur,badge_ambassadeur_fin';
+  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,latitude,longitude,tarif,experience,type_compte,nom_entreprise,badge_ambassadeur,badge_ambassadeur_fin,abonnement_actif,abonnement_fin';
 
   try {
     let query = sb.from('providers')
@@ -7458,6 +7464,9 @@ async function loadProvidersFromSupabase() {
       type_compte: p.type_compte || 'particulier',
       nom_entreprise: p.nom_entreprise || null,
       matricule: p.matricule || null,
+      created_at: p.created_at || null,
+      abonnement_actif: p.abonnement_actif || false,
+      abonnement_fin: p.abonnement_fin || null,
     }));
     // Cacher le spinner dans tous les cas
     const loader = document.getElementById('providersLoader');
@@ -7718,6 +7727,27 @@ function _dashUpdateUI() {
     else if (p.statut==='suspendu') { statAlert.style.display='block'; statAlert.style.background='#FEF2F2'; statAlert.style.color='#DC2626'; statAlert.textContent='🚫 Votre profil est suspendu. Contactez le support.'; }
     else statAlert.style.display='none';
   }
+
+  // ── Bandeau essai / abonnement ──
+  const _bandeauEl = document.getElementById('dashBandeauEssai');
+  if (_bandeauEl && p.statut === 'valide') {
+    const _dateV = new Date(p.created_at);
+    const _joursV = Math.floor((new Date() - _dateV) / (1000*60*60*24));
+    const _periodeTerminee = !isNaN(_joursV) && _joursV >= 3;
+    const _aAbo = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
+    const _doitPayer = _periodeTerminee && !_aAbo;
+    if (_doitPayer) {
+      _bandeauEl.style.display = 'block';
+      _bandeauEl.innerHTML = `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:13px;font-weight:600;color:#991b1b;">⚠️ Votre profil est masqué</div><div style="font-size:12px;color:#b91c1c;margin-top:2px;">Votre période gratuite est terminée.<br>Abonnez-vous pour redevenir visible des clients.</div></div><button onclick="afficherModalAbonnement()" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">S'abonner maintenant</button></div>`;
+    } else if (!_periodeTerminee && !_aAbo) {
+      const _restants = 3 - _joursV;
+      _bandeauEl.style.display = 'block';
+      _bandeauEl.innerHTML = `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:13px;font-weight:600;color:#065f46;">🎉 Période gratuite en cours</div><div style="font-size:12px;color:#047857;margin-top:2px;">Il vous reste <strong>${_restants} jour(s)</strong> gratuit(s) — Abonnez-vous pour rester visible !</div></div><button onclick="afficherModalAbonnement()" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">S'abonner</button></div>`;
+    } else {
+      _bandeauEl.style.display = 'none';
+    }
+  }
+
   set('chipName', nomComplet);
   set('chipJob', p.metier||'—');
   _dashUpdateDispoBtn(p.disponibilite);
@@ -15270,6 +15300,43 @@ window._verifRetour = _verifRetour;
 window._genererBadgePDF = _genererBadgePDF;
 
 })(); // IIFE end
+</script>
+
+<!-- ══ MODAL ABONNEMENT ══ -->
+<script>
+function afficherModalAbonnement() {
+  var _existing = document.getElementById('_modalAbonnement');
+  if (_existing) _existing.remove();
+  var _m = document.createElement('div');
+  _m.id = '_modalAbonnement';
+  _m.innerHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:#fff;border-radius:20px;padding:2rem;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+      <div style="font-size:32px;margin-bottom:8px;">🏆</div>
+      <h2 style="font-size:18px;font-weight:700;color:#1B2A6B;margin-bottom:4px;">Abonnement YOUMMA JOBS</h2>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:20px;">Restez visible et recevez des clients chaque jour</p>
+      <div style="background:#f9fafb;border-radius:12px;padding:16px;margin-bottom:20px;">
+        <div style="font-size:28px;font-weight:700;color:#1B2A6B;">50 000 GNF</div>
+        <div style="font-size:12px;color:#6b7280;">par mois</div>
+        <div style="margin-top:10px;font-size:12px;color:#374151;text-align:left;">✅ Profil visible dans l'annuaire<br>✅ Réception de demandes clients<br>✅ Badge Membre actif<br>✅ Support YOUMMA JOBS</div>
+      </div>
+      <p style="font-size:12px;color:#6b7280;margin-bottom:12px;">Envoyez <strong>50 000 GNF</strong> au numéro ci-dessous puis contactez-nous pour activer :</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px;">
+          <div style="font-size:11px;color:#9a3412;font-weight:600;margin-bottom:4px;">🟠 Orange Money</div>
+          <div style="font-size:13px;font-weight:700;color:#c2410c;">+224 612 52 52 10</div>
+        </div>
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px;">
+          <div style="font-size:11px;color:#92400e;font-weight:600;margin-bottom:4px;">🟡 MTN Money</div>
+          <div style="font-size:13px;font-weight:700;color:#b45309;">+224 612 52 52 10</div>
+        </div>
+      </div>
+      <button onclick="window.open('https://wa.me/22461252510?text=Bonjour%2C%20je%20veux%20activer%20mon%20abonnement%20YOUMMA%20JOBS%20-%2050000%20GNF','_blank')" style="background:#22c55e;color:#fff;border:none;border-radius:12px;height:44px;width:100%;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;font-family:'DM Sans',sans-serif;">📲 Confirmer via WhatsApp</button>
+      <button onclick="document.getElementById('_modalAbonnement').remove()" style="background:#f3f4f6;color:#374151;border:none;border-radius:12px;height:40px;width:100%;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">Fermer</button>
+    </div>
+  </div>`;
+  document.body.appendChild(_m);
+}
+window.afficherModalAbonnement = afficherModalAbonnement;
 </script>
 
 <!-- ══ SERVICE WORKER REGISTRATION ══ -->
