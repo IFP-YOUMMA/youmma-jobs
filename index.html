@@ -3703,7 +3703,7 @@ function renderProviders() {
     const noteDisplay = _note > 0
       ? `<div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${[1,2,3,4,5].map(i=>`<span style="color:${i<=Math.round(_note)?'#f59e0b':'#e5e7eb'};font-size:11px;">★</span>`).join('')}</div><div style="font-size:18px;font-weight:700;color:#111;">${_note.toFixed(1)}</div>`
       : '<div style="display:flex;justify-content:center;gap:1px;margin-bottom:3px;"><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span></div><div style="font-size:11px;font-weight:500;color:#9ca3af;margin-top:2px;">Pas encore noté</div>';
-    console.log('[DEBUG matricule]', p.id, p.matricule);
+    console.log('DEBUG matricule:', p.matricule, 'created_at:', p.created_at, 'id:', p.id);
     const matriculeHtml = (p.matricule && p.matricule !== 'YMJ-000000')
       ? `<div style="text-align:center;font-size:11px;color:#6b7280;padding:7px 0;margin:0 0 8px 0;border-top:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;">Membre vérifié · N°&nbsp;<span style="color:#1B2A6B;font-weight:700;letter-spacing:0.05em;">${p.matricule}</span></div>`
       : '';
@@ -3717,7 +3717,7 @@ function renderProviders() {
           ${p.photo_url
             ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:62px;height:62px;border-radius:12px;object-fit:cover;border:2px solid #E8521A;" alt="${p.nom}"/>`
             : `<div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;width:62px;height:62px;border-radius:12px;border:2px solid #E8521A;">${p.ini}</div>`}
-          ${p.matricule && p.matricule !== 'YMJ-000000' ? `<div style="font-size:8px;color:#a5b4fc;text-align:center;margin-top:4px;letter-spacing:0.05em;font-weight:600;background:rgba(255,255,255,0.08);border-radius:4px;padding:1px 4px;">${p.matricule}</div>` : ''}
+          ${p.matricule ? `<div style="font-size:8px;color:#a5b4fc;text-align:center;margin-top:4px;letter-spacing:0.05em;font-weight:600;background:rgba(255,255,255,0.1);border-radius:4px;padding:1px 5px;">${p.matricule}</div>` : ''}
         </div>
         <div class="pc2-info" style="flex:1;min-width:0;">
           <div style="margin-bottom:2px;">
