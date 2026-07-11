@@ -5872,10 +5872,13 @@ async function chargerAvis() {
       <div class="admin-section-inner">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
           <h2 style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:#1B2A4A;margin:0;">📊 Activité équipe</h2>
-          <div style="display:flex;gap:8px;">
-            <button id="actFilt_semaine" onclick="_adminLoadActivite('semaine')" style="padding:6px 14px;background:#F3F4F6;color:#374151;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">Cette semaine</button>
-            <button id="actFilt_mois" onclick="_adminLoadActivite('mois')" style="padding:6px 14px;background:#1B2A4A;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">Ce mois</button>
-            <button id="actFilt_tout" onclick="_adminLoadActivite('tout')" style="padding:6px 14px;background:#F3F4F6;color:#374151;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">Tout</button>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span id="lastUpdateEquipe" style="font-size:11px;color:#6b7280;"></span>
+            <div style="display:flex;gap:8px;">
+              <button id="actFilt_semaine" onclick="_adminLoadActivite('semaine')" style="padding:6px 14px;background:#F3F4F6;color:#374151;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">Cette semaine</button>
+              <button id="actFilt_mois" onclick="_adminLoadActivite('mois')" style="padding:6px 14px;background:#1B2A4A;color:#fff;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">Ce mois</button>
+              <button id="actFilt_tout" onclick="_adminLoadActivite('tout')" style="padding:6px 14px;background:#F3F4F6;color:#374151;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;">Tout</button>
+            </div>
           </div>
         </div>
         <div class="adm-table-wrap" style="margin-bottom:20px;">
@@ -8227,6 +8230,7 @@ function _adminRenderAlertes(attente, expire7, sansAbo) {
 }
 
 var _actFiltreActuel = 'mois';
+var _activiteInterval = null;
 var _presenceInterval = null;
 
 async function _adminLoadPresence() {
@@ -8339,89 +8343,135 @@ async function _adminLoadActivite(filtre) {
   if (c1) c1.innerHTML = loading;
   if (c2) c2.innerHTML = loading;
 
-  // Activer bouton filtre
+  // Boutons filtre
   ['semaine','mois','tout'].forEach(function(f) {
     var btn = document.getElementById('actFilt_' + f);
-    if (btn) {
-      btn.style.background = f === filtre ? '#1B2A4A' : '#F3F4F6';
-      btn.style.color = f === filtre ? '#fff' : '#374151';
-    }
+    if (btn) { btn.style.background = f === filtre ? '#1B2A4A' : '#F3F4F6'; btn.style.color = f === filtre ? '#fff' : '#374151'; }
   });
 
+  // Calcul date début — "semaine" = lundi de la semaine en cours
   var debut = '';
   var n = new Date();
-  if (filtre === 'semaine') debut = new Date(n.getTime() - 7 * 86400000).toISOString();
-  else if (filtre === 'mois') debut = n.toISOString().slice(0, 7) + '-01T00:00:00';
+  if (filtre === 'semaine') {
+    var day = n.getDay();
+    var diffLundi = (day === 0) ? 6 : day - 1;
+    var lundi = new Date(n); lundi.setDate(n.getDate() - diffLundi); lundi.setHours(0, 0, 0, 0);
+    debut = lundi.toISOString();
+  } else if (filtre === 'mois') {
+    debut = n.toISOString().slice(0, 7) + '-01T00:00:00';
+  }
 
   try {
+    // Requête actions
     var q = sb.from('admin_actions')
-      .select('admin_nom,action,cible_nom,cible_matricule,created_at')
-      .order('created_at', {ascending: false});
+      .select('admin_id,admin_nom,action,cible_nom,cible_matricule,created_at')
+      .order('created_at', {ascending: false})
+      .limit(50);
     if (debut) q = q.gte('created_at', debut);
-    var {data:acts} = await q;
+    var {data: acts} = await q;
 
-    // Synthèse par agent
+    // Récupération rôles depuis admin_users
+    var rolesById = {}, rolesByNom = {};
+    try {
+      var {data: admins} = await sb.from('admin_users').select('id,nom,role');
+      (admins || []).forEach(function(a) { if (a.id) rolesById[a.id] = a.role; if (a.nom) rolesByNom[a.nom] = a.role; });
+    } catch(_) {}
+
+    // Helpers
+    function _ini(nom) { var p = (nom || '?').trim().split(' '); return ((p[0]||'?')[0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
+    function _aColor(nom) { var h = 0; for (var i = 0; i < nom.length; i++) h = nom.charCodeAt(i) + ((h << 5) - h); return ['#6366f1','#10b981','#f59e0b','#8b5cf6','#06b6d4','#ec4899','#ef4444'][Math.abs(h) % 7]; }
+    function _roleLabel(r) { return r === 'super_admin' ? 'Super Admin' : r === 'agent' ? 'Agent' : (r || 'Admin'); }
+
+    // ── ① SYNTHÈSE PAR AGENT ────────────────────────────────────────────
     var byAgent = {};
     (acts || []).forEach(function(a) {
-      if (!byAgent[a.admin_nom]) byAgent[a.admin_nom] = {val:0, rej:0, sus:0, total:0, last:null};
-      byAgent[a.admin_nom].total++;
-      if (a.action === 'valider') byAgent[a.admin_nom].val++;
-      else if (a.action === 'rejeter') byAgent[a.admin_nom].rej++;
-      else if (a.action === 'suspendre') byAgent[a.admin_nom].sus++;
-      if (!byAgent[a.admin_nom].last) byAgent[a.admin_nom].last = a.created_at;
+      var k = a.admin_nom;
+      if (!byAgent[k]) byAgent[k] = {id: a.admin_id, val: 0, rej: 0, sus: 0, autres: 0, total: 0};
+      byAgent[k].total++;
+      if (a.action === 'valider') byAgent[k].val++;
+      else if (a.action === 'rejeter') byAgent[k].rej++;
+      else if (a.action === 'suspendre') byAgent[k].sus++;
+      else byAgent[k].autres++;
     });
 
     if (c1) {
-      var agList = Object.entries(byAgent).sort(function(a,b){return b[1].total-a[1].total;});
-      if (agList.length === 0) {
+      var agList = Object.entries(byAgent).sort(function(a, b) { return b[1].total - a[1].total; });
+      if (!agList.length) {
         c1.innerHTML = '<div style="text-align:center;padding:28px;color:#9CA3AF;font-size:13px;">Aucune action pour cette période.</div>';
       } else {
-        var trows = agList.map(function(e) {
+        c1.innerHTML = '<div style="padding:12px;">' + agList.map(function(e) {
           var nom = e[0], s = e[1];
-          var lastStr = s.last ? new Date(s.last).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}) + ' ' + new Date(s.last).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '—';
-          return '<tr style="border-bottom:1px solid #F3F4F6;">'
-            + '<td style="padding:10px 16px;font-weight:600;color:#1B2A4A;font-size:13.5px;">' + nom + '</td>'
-            + '<td style="padding:10px 16px;text-align:center;color:#059669;font-weight:700;font-size:14px;">' + s.val + '</td>'
-            + '<td style="padding:10px 16px;text-align:center;color:#DC2626;font-weight:700;font-size:14px;">' + s.rej + '</td>'
-            + '<td style="padding:10px 16px;text-align:center;color:#F59E0B;font-weight:700;font-size:14px;">' + s.sus + '</td>'
-            + '<td style="padding:10px 16px;font-size:11.5px;color:#9CA3AF;">' + lastStr + '</td>'
-            + '</tr>';
-        }).join('');
-        c1.innerHTML = '<table style="width:100%;border-collapse:collapse;">'
-          + '<thead><tr style="background:#F9FAFB;">'
-          + '<th style="padding:9px 16px;text-align:left;font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Agent</th>'
-          + '<th style="padding:9px 16px;text-align:center;font-size:11px;color:#059669;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">✅ Val.</th>'
-          + '<th style="padding:9px 16px;text-align:center;font-size:11px;color:#DC2626;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">❌ Rejets</th>'
-          + '<th style="padding:9px 16px;text-align:center;font-size:11px;color:#F59E0B;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">⛔ Susp.</th>'
-          + '<th style="padding:9px 16px;text-align:left;font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Dernière action</th>'
-          + '</tr></thead><tbody>' + trows + '</tbody></table>';
+          var role = rolesById[s.id] || rolesByNom[nom] || 'agent';
+          var col = _aColor(nom);
+          return '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">'
+            + '<div style="width:36px;height:36px;border-radius:50%;background:' + col + ';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">' + _ini(nom) + '</div>'
+            + '<div style="flex:1;min-width:0;">'
+            + '<div style="font-weight:600;font-size:13.5px;color:#1B2A4A;">' + nom + '</div>'
+            + '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;">'
+            + '<span style="background:#d1fae5;color:#065f46;font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600;">✓ ' + s.val + ' val.</span>'
+            + '<span style="background:#fee2e2;color:#991b1b;font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600;">✗ ' + s.rej + ' rejets</span>'
+            + '<span style="background:#fef3c7;color:#92400e;font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600;">⊘ ' + s.sus + ' susp.</span>'
+            + '<span style="background:#f3f4f6;color:#374151;font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600;">• ' + s.autres + ' autres</span>'
+            + '</div></div>'
+            + '<div style="text-align:right;flex-shrink:0;">'
+            + '<div style="font-size:11px;color:#6b7280;margin-bottom:4px;">' + _roleLabel(role) + '</div>'
+            + '<span style="background:#ede9fe;color:#6366f1;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;">' + s.total + ' actions</span>'
+            + '</div></div>';
+        }).join('') + '</div>';
       }
     }
 
-    // Timeline
+    // ── ② HISTORIQUE DES ACTIONS ────────────────────────────────────────
     if (c2) {
-      if (!acts || acts.length === 0) {
+      if (!acts || !acts.length) {
         c2.innerHTML = '<div style="text-align:center;padding:28px;color:#9CA3AF;font-size:13px;">Aucune action pour cette période.</div>';
       } else {
-        var icons = {valider:'🟢', rejeter:'🔴', suspendre:'⛔', renouveler:'🔄', supprimer:'🗑️'};
+        var actionCfg = {
+          valider:   {icon: '✓', color: '#10b981'},
+          rejeter:   {icon: '✗', color: '#ef4444'},
+          suspendre: {icon: '⊘', color: '#f59e0b'},
+          renouveler:{icon: '↻', color: '#6366f1'},
+          supprimer: {icon: '⊠', color: '#9ca3af'}
+        };
         var actLbls = {valider:'a validé', rejeter:'a rejeté', suspendre:'a suspendu', renouveler:'a renouvelé', supprimer:'a supprimé'};
-        var items = (acts || []).slice(0, 60).map(function(a) {
+        var items = acts.map(function(a) {
           var d = new Date(a.created_at);
-          var dateStr = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}) + ' à ' + d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-          var cible = a.cible_nom ? a.cible_nom + (a.cible_matricule ? ' — ' + a.cible_matricule : '') : '';
-          return '<div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #F9FAFB;">'
-            + '<span style="font-size:14px;flex-shrink:0;">' + (icons[a.action] || '●') + '</span>'
-            + '<div style="flex:1;min-width:0;">'
-            + '<span style="font-size:13px;color:#1B2A4A;"><strong>' + a.admin_nom + '</strong> ' + (actLbls[a.action] || a.action)
-            + (cible ? ' <span style="color:#E8650A;">[' + cible + ']</span>' : '') + '</span>'
-            + '<span style="font-size:11px;color:#9CA3AF;margin-left:8px;">le ' + dateStr + '</span>'
-            + '</div></div>';
+          var heureStr = d.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+          var dateStr  = d.toLocaleDateString('fr-FR', {day: '2-digit', month: '2-digit'});
+          var cfg = actionCfg[a.action] || {icon: '•', color: '#9ca3af'};
+          var col = _aColor(a.admin_nom || '?');
+          var cible = a.cible_nom || '';
+          return '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #f3f4f6;font-size:13px;">'
+            + '<div style="width:28px;height:28px;border-radius:50%;background:' + col + ';color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;">' + _ini(a.admin_nom || '?') + '</div>'
+            + '<div style="flex:1;min-width:0;overflow:hidden;">'
+            + '<strong style="color:#1B2A4A;">' + (a.admin_nom || '—') + '</strong>'
+            + ' <span style="color:#9ca3af;">→</span> '
+            + '<span style="color:' + cfg.color + ';font-weight:700;">' + cfg.icon + '</span> '
+            + '<span style="color:#374151;">' + (actLbls[a.action] || a.action) + '</span>'
+            + (cible ? ' <span style="color:#E8650A;">' + cible + '</span>' : '')
+            + '</div>'
+            + '<span style="color:#6b7280;font-size:11px;margin-left:auto;white-space:nowrap;">' + dateStr + ' ' + heureStr + '</span>'
+            + '</div>';
         }).join('');
         c2.innerHTML = '<div style="max-height:420px;overflow-y:auto;">' + items + '</div>';
       }
     }
+
+    // Timestamp mise à jour
+    var lu = document.getElementById('lastUpdateEquipe');
+    if (lu) lu.textContent = 'Mis à jour à ' + new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+
   } catch(e) {
     if (c1) c1.innerHTML = '<div style="color:#DC2626;padding:20px;font-size:13px;">Erreur : ' + e.message + '</div>';
+  }
+
+  // Auto-refresh toutes les 60s (une seule instance)
+  if (!_activiteInterval) {
+    _activiteInterval = setInterval(function() {
+      var sec = document.getElementById('admin-activite');
+      if (sec && sec.classList.contains('active')) _adminLoadActivite();
+      else { clearInterval(_activiteInterval); _activiteInterval = null; }
+    }, 60000);
   }
 }
 
