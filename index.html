@@ -3713,7 +3713,6 @@ function renderProviders() {
             </div>
             <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
               ${typeCompteBadge}
-              <button class="btn-pfav" onclick="event.stopPropagation();toggleFav('${p.id}')" style="background:none;border:none;cursor:pointer;font-size:17px;padding:2px 4px;line-height:1;">${isFav?'<i class="fa-solid fa-heart" style="color:#E85D04;"></i>':'<i class="fa-regular fa-heart" style="color:#bbb;"></i>'}</button>
             </div>
           </div>
 
@@ -3725,7 +3724,7 @@ function renderProviders() {
               <i class="fa-solid fa-bullseye" style="font-size:9px;"></i> ${p.missions||0} mission${(p.missions||0)>1?'s':''}
             </div>
           </div>
-          ${p.matricule ? `<div style="display:inline-flex;align-items:center;gap:5px;margin-top:3px;margin-bottom:2px;"><span style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;">N°</span><span style="font-size:12px;color:#f97316;font-weight:700;letter-spacing:.5px;">${p.matricule}</span></div>` : ''}
+          ${p.matricule && p.matricule !== 'YMJ-000000' ? `<div style="display:inline-flex;align-items:center;gap:5px;margin-top:3px;margin-bottom:2px;"><span style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;">N°</span><span style="font-size:12px;color:#f97316;font-weight:700;letter-spacing:.5px;">${p.matricule}</span></div>` : ''}
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px;">
             <div style="font-size:12px;color:#a5b4fc;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
               <i class="fa-solid fa-location-dot" style="color:#a5b4fc;font-size:11px;"></i>
@@ -3739,9 +3738,25 @@ function renderProviders() {
           
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:0;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:3px 8px;margin-bottom:12px;overflow:hidden;">${badgePills}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:3px 8px;margin-bottom:12px;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:0;">${badgePills}</div>
+        <button class="btn-pfav" onclick="event.stopPropagation();toggleFav('${p.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px 5px;line-height:1;flex-shrink:0;">${isFav?'<i class="fa-solid fa-heart" style="color:#E85D04;"></i>':'<i class="fa-regular fa-heart" style="color:#9ca3af;"></i>'}</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;">
+        <div style="text-align:center;padding:8px 4px;background:#f9fafb;border-radius:10px;border:1px solid #f3f4f6;">
+          <div style="font-size:15px;font-weight:700;color:#111;">${p.missions||0}</div>
+          <div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.04em;">Missions</div>
+        </div>
+        <div style="text-align:center;padding:8px 4px;background:#f9fafb;border-radius:10px;border:1px solid #f3f4f6;">
+          <div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${[1,2,3,4,5].map(i=>`<span style="color:${i<=Math.round(p.note||0)?'#f59e0b':'#e5e7eb'};font-size:11px;">★</span>`).join('')}</div>
+          <div style="font-size:12px;font-weight:700;color:#111;">${p.note?Number(p.note).toFixed(1):'—'}</div>
+        </div>
+        <div style="text-align:center;padding:8px 4px;background:#f9fafb;border-radius:10px;border:1px solid #f3f4f6;">
+          <div style="font-size:15px;font-weight:700;color:#111;">${p.experience||'—'}</div>
+          <div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.04em;">Expérience</div>
+        </div>
+      </div>
 
-      
       <div style="display:grid;grid-template-columns:1fr 1fr${p.latitude?` 1fr`:''};gap:6px;margin:10px 0 8px;">
         <button onclick="event.stopPropagation();openWA('${p.wa}','${p.nom}')" style="display:flex;align-items:center;justify-content:center;gap:5px;height:40px;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:#22c55e;color:#fff;font-family:'DM Sans',sans-serif;">
           <i class="fa-brands fa-whatsapp" style="font-size:13px;"></i> WhatsApp
