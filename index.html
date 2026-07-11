@@ -367,7 +367,22 @@ body.admin-mode #page-admin.logged #adminWrap{
 
 @media(max-width:480px){.hide-mobile{display:none!important;}}
 
-@media(max-width:768px){}
+@media(max-width:768px){
+/* A) Renouveler maintenant */
+#dashAboRenewBtn button{height:48px!important;font-size:14px!important;border-radius:12px!important;min-height:unset!important;}
+/* B) Bandeau essai → colonne + bouton pleine largeur */
+#dashBandeauEssai>div{flex-direction:column!important;gap:8px!important;}
+#dashBandeauEssai button{width:100%!important;}
+/* C) Grille raccourcis 2×2 */
+#dashQuickGrid{gap:10px!important;}
+#dashQuickGrid>div{min-height:80px!important;}
+#dashQuickGrid>div>div[style*="font-size:32px"]{font-size:24px!important;}
+#dashQuickGrid>div>div[style*="font-size:15px"],#dashDispoCardTitle{font-size:12px!important;}
+/* E) Espacement général */
+#section-dashboard .section{padding:12px!important;}
+/* Padding bottom : compenser la barre mobile fixe */
+#page-dashboard .content{padding-bottom:70px!important;}
+}
 
 @media(max-width:768px){
 .hero-kpis{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;gap:0!important;padding-top:20px!important;border-top:1px solid rgba(255,255,255,.1)!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important;}
@@ -1663,7 +1678,8 @@ async function verifierSession() {
       <p class="hero-subtitle">Trouvez rapidement le bon artisan pour tous vos projets — électriciens, plombiers, maçons, soudeurs, menuisiers, mécaniciens et bien plus.</p>
       
       
-      <div id="expWrap" style="position:relative;border-radius:20px;overflow:hidden;margin-bottom:28px;height:280px;box-shadow:0 8px 32px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.3);">
+      <style>#expWrap{height:200px;}@media(min-width:768px){#expWrap{height:300px;}}</style>
+      <div id="expWrap" style="position:relative;border-radius:16px;overflow:hidden;margin-bottom:28px;height:200px;border:3px solid #E8521A;box-shadow:0 0 0 1px #E8521A,0 4px 20px rgba(232,82,26,0.3);">
         <!-- Slides -->
         <div id="expSlides" style="position:absolute;inset:0;">
           <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1A0A4E,#2D2D6B);opacity:1;"></div>
@@ -1672,7 +1688,7 @@ async function verifierSession() {
         <div style="position:absolute;inset:0;background:rgba(5,5,20,.28);z-index:1;pointer-events:none;"></div>
         <!-- Overlay bas : gradient + infos artisan/image -->
         <div style="position:absolute;bottom:0;left:0;right:0;z-index:2;background:linear-gradient(transparent,rgba(5,5,20,.88));padding:36px 16px 38px;pointer-events:none;">
-          <div id="expTitreOverlay" style="color:#fff;font-size:13px;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.7);max-width:65%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+          <div id="expTitreOverlay" style="color:#fff;font-size:14px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,0.6);white-space:normal;overflow:visible;width:100%;padding:0 12px 12px;"></div>
           <div id="expArtisanOverlay" style="display:none;pointer-events:auto;">
             <div id="expArtisanInner" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
               <div id="expArtisanAvatar" style="width:46px;height:46px;border-radius:50%;overflow:hidden;border:2.5px solid #E85D04;flex-shrink:0;background:#1A1A4E;display:flex;align-items:center;justify-content:center;"></div>
@@ -2066,7 +2082,7 @@ async function verifierSession() {
     <div class="faq-grid">
       <div class="faq-list">
         <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">YOUMMA JOBS est-il gratuit pour les clients ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>Oui, totalement gratuit ! Les clients peuvent rechercher, consulter tous les profils et contacter directement les artisans sans payer quoi que ce soit. Aucune commission, aucun frais caché.</p></div></div>
-        <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">Comment devenir artisan / prestataire sur YOUMMA JOBS ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>Cliquez sur "Devenir artisan", remplissez le formulaire avec vos informations, photos et compétences. Notre équipe valide votre profil en moins de 24h. Vous bénéficiez ensuite de 14 jours d'essai gratuit.</p></div></div>
+        <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">Comment devenir artisan / prestataire sur YOUMMA JOBS ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>Cliquez sur "Devenir artisan", remplissez le formulaire avec vos informations, photos et compétences. Notre équipe valide votre profil en moins de 24h. Vous bénéficiez ensuite de 3 jours d'essai gratuit.</p></div></div>
         <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">Comment fonctionne le paiement de l'abonnement ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>L'abonnement est de 50 000 GNF par mois. Payez via Orange Money, MTN MoMo ou Wave au +224 612 52 52 10, puis envoyez-nous la confirmation sur WhatsApp pour recevoir votre code d'activation.</p></div></div>
         <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">Comment les artisans sont-ils vérifiés ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>Notre équipe vérifie manuellement chaque profil avant publication : identité, compétences déclarées et références. Chaque artisan approuvé reçoit le badge "<i class="fa-solid fa-check"></i> Vérifié YOUMMA JOBS".</p></div></div>
         <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">Que signifie le badge " Express" ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>Le badge Express indique que l'artisan est disponible pour des interventions rapides, généralement dans la journée. Idéal pour les urgences — pannes électriques, fuites d'eau, dépannages rapides.</p></div></div>
@@ -2149,7 +2165,7 @@ async function verifierSession() {
       <div class="inscr-badge-icon"><i class="fa-solid fa-bullseye"></i></div>
       <div>
         <div class="inscr-badge-title">Profil vérifié en moins de 24h</div>
-        <div class="inscr-badge-sub">14 jours d'essai gratuit · Abonnement 50 000 GNF/mois</div>
+        <div class="inscr-badge-sub">3 jours d'essai gratuit · Abonnement 50 000 GNF/mois</div>
       </div>
     </div>
     <div class="inscr-section">👤 Informations personnelles</div>
@@ -2428,7 +2444,7 @@ if (typeof connexionPrestataire === 'undefined') {
   <div style="background:linear-gradient(135deg,#E85D04,#C74B00);border-radius:12px;padding:12px 16px;display:flex;gap:10px;align-items:center;margin-bottom:20px;">
     <span style="font-size:22px;"><i class="fa-solid fa-bullseye"></i></span>
     <div>
-      <div style="font-size:12.5px;font-weight:700;color:#fff;">14 jours d'essai gratuit après validation</div>
+      <div style="font-size:12.5px;font-weight:700;color:#fff;">3 jours d'essai gratuit après validation</div>
       <div style="font-size:11px;color:rgba(255,255,255,.8);">Abonnement 50 000 GNF/mois — Orange Money, MTN MoMo, Wave</div>
     </div>
   </div>
@@ -4473,7 +4489,7 @@ document.addEventListener('keydown', e => {
       </div>
 
       <!-- ═══ GRILLE 2×2 ═══ -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+      <div id="dashQuickGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
         <div id="dashDispoCard" onclick="_dashToggleDispo()"
           style="background:#fff;border-radius:18px;padding:18px 12px;border:2px solid #86EFAC;cursor:pointer;min-height:110px;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;transition:border-color .2s;">
           <div id="dashDispoCardDot" style="width:18px;height:18px;border-radius:50%;background:#22C55E;display:inline-block;animation:pulse-green 1.5s infinite;"></div>
@@ -5330,10 +5346,14 @@ async function chargerDocuments(pid) {
   }
 }
 function showSection(name) {
-  // Cacher toutes les sections
-  document.querySelectorAll('#page-dashboard .section').forEach(s => s.classList.remove('active'));
+  console.log('[showSection] onglet cliqué:', name);
+  // Cacher toutes les sections — forcer display:none explicitement (fix mobile)
+  document.querySelectorAll('#page-dashboard .section').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
   const target = document.getElementById('section-' + name);
-  if (target) target.classList.add('active');
+  if (target) { target.classList.add('active'); target.style.display = 'block'; }
   // Mettre à jour les nav-items actifs
   document.querySelectorAll('#page-dashboard .nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('#page-dashboard .nav-item').forEach(n => {
@@ -6402,10 +6422,14 @@ async function chargerAvis() {
 
 // ── SECTIONS ──
 function showSection(name) {
-  // Cacher toutes les sections
-  document.querySelectorAll('#page-dashboard .section').forEach(s => s.classList.remove('active'));
+  console.log('[showSection] onglet cliqué:', name);
+  // Cacher toutes les sections — forcer display:none explicitement (fix mobile)
+  document.querySelectorAll('#page-dashboard .section').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
   const target = document.getElementById('section-' + name);
-  if (target) target.classList.add('active');
+  if (target) { target.classList.add('active'); target.style.display = 'block'; }
   // Mettre à jour les nav-items actifs
   document.querySelectorAll('#page-dashboard .nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('#page-dashboard .nav-item').forEach(n => {
@@ -7340,7 +7364,13 @@ window.addEventListener('popstate', (e) => {
     if (pid) { navigate('dashboard'); await chargerDashboard(pid); return; }
     navigate('login');
   } else {
-    // Charger prestataires depuis Supabase
+    // Session active → restaurer le dashboard sans attendre le hash
+    if (pid) {
+      navigate('dashboard');
+      await chargerDashboard(pid);
+      return;
+    }
+    // Sinon charger le site public
     navigate('home');
     await loadProvidersFromSupabase();
     renderCategoriesGrid('catsGrid');
@@ -7731,20 +7761,18 @@ function _dashUpdateUI() {
   // ── Bandeau essai / abonnement ──
   const _bandeauEl = document.getElementById('dashBandeauEssai');
   if (_bandeauEl && p.statut === 'valide') {
-    const _dateV = new Date(p.created_at);
-    const _joursV = Math.floor((new Date() - _dateV) / (1000*60*60*24));
-    const _periodeTerminee = !isNaN(_joursV) && _joursV >= 3;
-    const _aAbo = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
-    const _doitPayer = _periodeTerminee && !_aAbo;
-    if (_doitPayer) {
-      _bandeauEl.style.display = 'block';
-      _bandeauEl.innerHTML = `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:13px;font-weight:600;color:#991b1b;">⚠️ Votre profil est masqué</div><div style="font-size:12px;color:#b91c1c;margin-top:2px;">Votre période gratuite est terminée.<br>Abonnez-vous pour redevenir visible des clients.</div></div><button onclick="showSection('abonnement')" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">S'abonner maintenant</button></div>`;
-    } else if (!_periodeTerminee && !_aAbo) {
-      const _restants = 3 - _joursV;
-      _bandeauEl.style.display = 'block';
-      _bandeauEl.innerHTML = `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div><div style="font-size:13px;font-weight:600;color:#065f46;">🎉 Période gratuite en cours</div><div style="font-size:12px;color:#047857;margin-top:2px;">Il vous reste <strong>${_restants} jour(s)</strong> gratuit(s) — Abonnez-vous pour rester visible !</div></div><button onclick="showSection('abonnement')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">S'abonner</button></div>`;
+    const _dateRef = new Date(p.validated_at || p.created_at);
+    const _joursDepuis = Math.floor((new Date() - _dateRef) / (1000*60*60*24));
+    const _joursRestants = Math.max(0, 3 - _joursDepuis);
+    const _essaiActif = _joursRestants > 0;
+    const _abonne = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
+    _bandeauEl.style.display = 'block';
+    if (_abonne) {
+      _bandeauEl.innerHTML = `<div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;"><span style="font-size:18px;flex-shrink:0;">✅</span><div style="font-size:13px;font-weight:600;color:#1e40af;">Abonnement actif</div></div>`;
+    } else if (_essaiActif) {
+      _bandeauEl.innerHTML = `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div style="font-size:13px;font-weight:600;color:#065f46;">🎉 Période gratuite — ${_joursRestants} jour(s) restant(s)</div><button onclick="showSection('abonnement')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">S'abonner</button></div>`;
     } else {
-      _bandeauEl.style.display = 'none';
+      _bandeauEl.innerHTML = `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:12px 16px;"><div style="font-size:13px;font-weight:600;color:#991b1b;margin-bottom:8px;">⚠️ Période expirée — Abonnez-vous pour rester visible</div><button onclick="showSection('abonnement')" style="width:100%;background:#dc2626;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">S'abonner maintenant</button></div>`;
     }
   }
 
@@ -7844,18 +7872,22 @@ function _dashUpdateAbonnement(p) {
     if(j) j.textContent=jours>0?jours+' jours':'Expiré';
     if(pr) pr.style.width=pct+'%';
   });
-  // Badge abonnement simplifié
+  // Badge abonnement simplifié — calcul par date (3j depuis création/validation)
   const aboSimpleText  = document.getElementById('dashAboSimpleText');
   const aboSimpleBadge = document.getElementById('dashAboSimpleBadge');
   const aboRenewBtn    = document.getElementById('dashAboRenewBtn');
+  const _dateRef2 = new Date(p.validated_at || p.created_at);
+  const _joursEcoules = Math.floor((new Date() - _dateRef2) / (1000*60*60*24));
+  const joursRestants = Math.max(0, 3 - _joursEcoules);
+  const _abonneActif = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
   if (aboSimpleText && aboSimpleBadge) {
-    if (actif && isEssai) {
-      aboSimpleBadge.style.background = '#FEF3C7'; aboSimpleBadge.style.color = '#92400E';
-      aboSimpleText.textContent = '🕐 Essai gratuit — ' + jours + ' jours restants';
-      if (aboRenewBtn) aboRenewBtn.style.display = 'block';
-    } else if (actif) {
+    if (_abonneActif) {
       aboSimpleBadge.style.background = '#F0FDF4'; aboSimpleBadge.style.color = '#166534';
       aboSimpleText.textContent = '✅ Compte actif — ' + jours + ' jours restants';
+      if (aboRenewBtn) aboRenewBtn.style.display = 'none';
+    } else if (joursRestants > 0) {
+      aboSimpleBadge.style.background = '#FEF3C7'; aboSimpleBadge.style.color = '#92400E';
+      aboSimpleText.textContent = '🕐 Essai gratuit — ' + joursRestants + ' jour(s) restant(s)';
       if (aboRenewBtn) aboRenewBtn.style.display = 'none';
     } else {
       aboSimpleBadge.style.background = '#FEF2F2'; aboSimpleBadge.style.color = '#DC2626';
@@ -13799,7 +13831,7 @@ window.loginSubmitHandler=loginSubmitHandler;
 
       <h2 style="font-family:'Libre Baskerville',serif;font-size:16px;color:#1A1A4E;margin:28px 0 10px;">6. Abonnement et paiement</h2>
       <div style="background:#F0FDF4;border:1px solid #A7F3D0;border-radius:12px;padding:16px 20px;margin-bottom:16px;">
-        <p style="font-size:13.5px;color:#065F46;line-height:1.8;margin:0;"><strong>Essai gratuit :</strong> tout nouveau prestataire bénéficie d'une période d'essai gratuite de <strong>14 jours</strong> à compter de la validation de son compte. Pendant cette période, son profil est visible et aucun paiement n'est requis.</p>
+        <p style="font-size:13.5px;color:#065F46;line-height:1.8;margin:0;"><strong>Essai gratuit :</strong> tout nouveau prestataire bénéficie d'une période d'essai gratuite de <strong>3 jours</strong> à compter de la validation de son compte. Pendant cette période, son profil est visible et aucun paiement n'est requis.</p>
       </div>
       <p style="font-size:14px;color:#4B5563;line-height:1.8;margin:0 0 12px;">À l'issue de la période d'essai, la visibilité du profil est conditionnée au maintien d'un <strong>abonnement mensuel de 50 000 GNF/mois</strong>. En cas de non-renouvellement, le profil est masqué des résultats de recherche mais les données du compte sont conservées pendant 90 jours.</p>
       <p style="font-size:14px;color:#4B5563;line-height:1.8;margin:0 0 12px;"><strong>Moyens de paiement acceptés :</strong> Orange Money, MTN MoMo, Wave. Les paiements sont effectués directement auprès de notre équipe via WhatsApp au numéro indiqué dans le tableau de bord.</p>
@@ -14110,7 +14142,7 @@ function ouvrirPageLegale(type) {
     cgu: {
       titre: "Conditions d'utilisation — YOUMMA JOBS",
       html: H+'Article 1 — Objet</h3><p>YOUMMA JOBS est une plateforme de mise en relation entre artisans, prestataires de services et clients en République de Guinée.</p>'+
-            H+'Article 2 — Inscription artisan</h3><p>L\'inscription est gratuite avec une période d\'essai de <strong>14 jours</strong>. Après l\'essai, un abonnement de <strong>50 000 GNF par mois</strong> est requis pour rester visible sur la plateforme.</p>'+
+            H+'Article 2 — Inscription artisan</h3><p>L\'inscription est gratuite avec une période d\'essai de <strong>3 jours</strong>. Après l\'essai, un abonnement de <strong>50 000 GNF par mois</strong> est requis pour rester visible sur la plateforme.</p>'+
             H+'Article 3 — Obligations des artisans</h3><p>L\'artisan s\'engage à fournir des informations exactes, à respecter ses engagements envers les clients et à maintenir un comportement professionnel.</p>'+
             H+'Article 4 — Utilisation client</h3><p>Les clients utilisent la plateforme <strong>gratuitement</strong> pour rechercher et contacter des artisans.</p>'+
             H+'Article 5 — Responsabilité</h3><p>YOUMMA JOBS est une plateforme intermédiaire. Elle ne peut être tenue responsable des litiges entre artisans et clients. Tout litige sera réglé à l\'amiable.</p>'+
@@ -14512,22 +14544,57 @@ window._soumettreProjet = async function() {
   if (errEl) errEl.style.display = 'none';
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Publication en cours...'; }
 
-  // ── 1. INSERT dans missions — try/catch dédié ──
+  // ── 1. Upload vocal EN AMONT (bloquant) — audio_url sera inclus dans l'INSERT ──
+  var audioUrl = null;
+  var blobPris = _ppAudioBlob;
+  if (blobPris) {
+    if (btn) btn.textContent = '⏳ Envoi du vocal...';
+    try {
+      var ext  = blobPris.type.includes('mp4') ? 'mp4' : 'webm';
+      var path = 'projets/' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
+      console.log('[projet-upload] démarrage — path:', path, 'type:', blobPris.type, 'size:', blobPris.size);
+      var up = await sb.storage.from('vocaux').upload(path, blobPris, { contentType: blobPris.type });
+      if (up.error) {
+        console.error('[projet-upload] ÉCHEC upload — message:', up.error.message, '| statusCode:', up.error.statusCode);
+        if (!desc) {
+          affErr('L\'envoi du vocal a échoué. Réessayez ou décrivez votre projet par écrit.');
+          if (btn) { btn.disabled = false; btn.textContent = '🚀 Publier mon projet'; }
+          return;
+        }
+        // texte présent → dégradation gracieuse : on continue sans audio
+      } else {
+        var pu = sb.storage.from('vocaux').getPublicUrl(path);
+        audioUrl = pu.data && pu.data.publicUrl;
+        console.log('[projet-upload] OK — audioUrl:', audioUrl || '(vide!)');
+      }
+    } catch(e) {
+      console.error('[projet-upload] exception:', e.message);
+      if (!desc) {
+        affErr('L\'envoi du vocal a échoué. Réessayez ou décrivez votre projet par écrit.');
+        if (btn) { btn.disabled = false; btn.textContent = '🚀 Publier mon projet'; }
+        return;
+      }
+    }
+    if (btn) btn.textContent = '⏳ Publication en cours...';
+  }
+  _ppAudioBlob = null;
+
+  // ── 2. INSERT dans missions avec audio_url déjà connu ──
   var missionId = null;
   try {
     var montant = budget ? parseInt(budget, 10) : null;
-    var mode_saisie = (desc && _ppAudioBlob) ? 'mixte' : _ppAudioBlob ? 'vocal' : 'texte';
+    var mode_saisie = (desc && audioUrl) ? 'mixte' : audioUrl ? 'vocal' : 'texte';
     var payload = {
       titre: titre, categorie: null, description: desc || null,
       commune: commune||null, montant: montant,
       client_nom: nom, client_telephone: tel, statut: 'ouvert',
-      mode_saisie: mode_saisie
+      mode_saisie: mode_saisie, audio_url: audioUrl || null
     };
     var res = await sb.from('missions').insert(payload).select('id').single();
     // Fallback 1 : colonnes optionnelles absentes (categorie/commune/client_telephone)
     // → payload minimal qui inclut TOUJOURS titre (NOT NULL) + description + client_nom
     if (res.error && (res.error.code === '42703' || (res.error.message||'').includes('column'))) {
-      var minimal = { titre: titre, description: desc || null, client_nom: nom, statut: payload.statut, mode_saisie: mode_saisie };
+      var minimal = { titre: titre, description: desc || null, client_nom: nom, statut: payload.statut, mode_saisie: mode_saisie, audio_url: audioUrl || null };
       if (montant) minimal.montant = montant;
       res = await sb.from('missions').insert(minimal).select('id').single();
       // Sous-fallback : statut invalide dans le payload minimal aussi
@@ -14549,7 +14616,7 @@ window._soumettreProjet = async function() {
     return;
   }
 
-  // ── 2. Succès INSERT — fermer et confirmer IMMÉDIATEMENT ──
+  // ── 3. Succès INSERT — fermer et confirmer IMMÉDIATEMENT ──
   window.fermerProjetPub();
   var _lienD = 'https://yoummajobs.com/#devis-projet=' + missionId;
   var _sucModal = _makeModal('projetSuccesModal');
@@ -14566,24 +14633,6 @@ window._soumettreProjet = async function() {
       +'</div>'
       +'<button onclick="document.getElementById(\'projetSuccesModal\').style.display=\'none\'" style="width:100%;padding:12px;background:#1A1A4E;color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;">OK, fermer</button>'
     +'</div>';
-
-  // ── 3. Upload vocal en arrière-plan ──
-  (function(blob, mid) {
-    if (!blob || !mid) return;
-    (async function() {
-      try {
-        var ext = blob.type.includes('mp4') ? 'mp4' : 'webm';
-        var path = 'projets/' + Date.now() + '_' + Math.random().toString(36).slice(2,8) + '.' + ext;
-        var up = await sb.storage.from('vocaux').upload(path, blob, { contentType: blob.type });
-        if (!up.error) {
-          var pu = sb.storage.from('vocaux').getPublicUrl(path);
-          var audioUrl = pu.data && pu.data.publicUrl;
-          if (audioUrl) await sb.from('missions').update({ audio_url: audioUrl }).eq('id', mid);
-        } else console.error('[vocal-projet] upload:', up.error.message);
-      } catch(e) { console.error('[vocal-projet]', e.message); }
-    })();
-  })(_ppAudioBlob, missionId);
-  _ppAudioBlob = null;
 
   // ── 4. Alerter les prestataires — fire-and-forget, jamais visible au client ──
   if (missionId) {
