@@ -7165,11 +7165,11 @@ function abonnementActif(p) {
 function getJoursRestants(p) {
   if (!p) return 0;
   const now = new Date();
-  let fin = null;
-  if (p.essai_actif && p.essai_fin) fin = new Date(p.essai_fin);
-  if (p.abonnement_actif && p.abonnement_fin) { const af=new Date(p.abonnement_fin); if(!fin||af>fin) fin=af; }
-  if (!fin) return 0;
-  return Math.max(0,Math.ceil((fin-now)/(1000*60*60*24)));
+  const aboOk = p.abonnement_actif && p.abonnement_fin && new Date(p.abonnement_fin) > now;
+  const essaiOk = p.essai_actif && p.essai_fin && new Date(p.essai_fin) > now;
+  if (aboOk) return Math.max(0, Math.ceil((new Date(p.abonnement_fin)-now)/(1000*60*60*24)));
+  if (essaiOk) return Math.min(3, Math.max(0, Math.ceil((new Date(p.essai_fin)-now)/(1000*60*60*24))));
+  return 0;
 }
 async function getAvis(providerId) {
   try {
@@ -7717,6 +7717,8 @@ async function chargerDashboard(pid) {
   setTimeout(() => { if(typeof _notifStartPolling==='function') _notifStartPolling('provider'); }, 1500);
   // Charger infos partage & badge ambassadeur
   chargerInfosPartage(pid);
+  // Fix Bug 1 : s'assurer que la section Accueil est visible (inline display:none laissé par un précédent showSection)
+  showSection('dashboard');
 }
 
 function _dashUpdateDispoBtn(state) {
@@ -7809,11 +7811,9 @@ function _dashUpdateUI() {
   // ── Bandeau essai / abonnement ──
   const _bandeauEl = document.getElementById('dashBandeauEssai');
   if (_bandeauEl && p.statut === 'valide') {
-    const _dateRef = new Date(p.validated_at || p.created_at);
-    const _joursDepuis = Math.floor((new Date() - _dateRef) / (1000*60*60*24));
-    const _joursRestants = Math.max(0, 3 - _joursDepuis);
-    const _essaiActif = _joursRestants > 0;
     const _abonne = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
+    const _essaiActif = p.essai_actif && p.essai_fin && new Date(p.essai_fin) > new Date();
+    const _joursRestants = _essaiActif ? Math.min(3, Math.max(0, Math.ceil((new Date(p.essai_fin) - new Date()) / (1000*60*60*24)))) : 0;
     _bandeauEl.style.display = 'block';
     if (_abonne) {
       _bandeauEl.innerHTML = `<div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;"><span style="font-size:18px;flex-shrink:0;">✅</span><div style="font-size:13px;font-weight:600;color:#1e40af;">Abonnement actif</div></div>`;
@@ -7924,16 +7924,15 @@ function _dashUpdateAbonnement(p) {
   const aboSimpleText  = document.getElementById('dashAboSimpleText');
   const aboSimpleBadge = document.getElementById('dashAboSimpleBadge');
   const aboRenewBtn    = document.getElementById('dashAboRenewBtn');
-  const _dateRef2 = new Date(p.validated_at || p.created_at);
-  const _joursEcoules = Math.floor((new Date() - _dateRef2) / (1000*60*60*24));
-  const joursRestants = Math.max(0, 3 - _joursEcoules);
   const _abonneActif = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
+  const _essaiActifNow = p.essai_actif && p.essai_fin && new Date(p.essai_fin) > new Date();
+  const joursRestants = _essaiActifNow ? Math.min(3, Math.max(0, Math.ceil((new Date(p.essai_fin) - new Date()) / (1000*60*60*24)))) : 0;
   if (aboSimpleText && aboSimpleBadge) {
     if (_abonneActif) {
       aboSimpleBadge.style.background = '#F0FDF4'; aboSimpleBadge.style.color = '#166534';
       aboSimpleText.textContent = '✅ Compte actif — ' + jours + ' jours restants';
       if (aboRenewBtn) aboRenewBtn.style.display = 'none';
-    } else if (joursRestants > 0) {
+    } else if (_essaiActifNow) {
       aboSimpleBadge.style.background = '#FEF3C7'; aboSimpleBadge.style.color = '#92400E';
       aboSimpleText.textContent = '🕐 Essai gratuit — ' + joursRestants + ' jour(s) restant(s)';
       if (aboRenewBtn) aboRenewBtn.style.display = 'none';
