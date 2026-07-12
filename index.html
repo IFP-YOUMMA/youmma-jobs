@@ -129,6 +129,9 @@ var allProviders = {};
 .hamburger{display:flex!important;}
 .nav-logo{font-size:17px!important;}
 }
+#navMobileAuth{display:none}
+@media(max-width:1024px){#navMobileAuth{display:flex!important;align-items:center;gap:5px;}}
+@media(max-width:359px){#navMobileAuth .nav-mob-auth-label{display:none!important;}#navMobileAuth{min-width:34px!important;padding:0 9px!important;justify-content:center!important;}}
 
 /* ── HERO MOBILE ── */
 @media(max-width:768px){
@@ -954,7 +957,8 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
   #navHamburger{display:flex!important}
   /* Logo : pas de retour à la ligne */
   .nav-logo{min-width:0!important;flex-shrink:1!important;overflow:hidden!important}
-  .nav-logo-text{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:calc(100vw - 80px)!important}
+  .nav-logo-text{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;max-width:calc(100vw - 190px)!important}
+@media(max-width:359px){.nav-logo-text{max-width:calc(100vw - 130px)!important}}
 
   /* ── HERO — clip les décorations absolues ── */
   .hero,[class*="hero"]{overflow:hidden!important}
@@ -1556,11 +1560,16 @@ async function verifierSession() {
 <nav id="mainNav">
   <div class="nav-inner" style="display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 4%;max-width:1400px;margin:0 auto;width:100%;box-sizing:border-box;">
     
-    <!-- Logo -->
+    <!-- Logo + bouton auth mobile -->
+    <div style="display:flex;align-items:center;flex-shrink:0;">
     <a href="#accueil" class="nav-logo" style="display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0;">
       <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAEUElEQVR42u2Xy29UdRTHP7/fvXce93Y6D/ugU4FigSkolZSFBtKghIaFQfwDdCeJO5eaEJaauDNx4UKMkRATxZUmRk2MC1SIkfAIoNWQQlugQOfZaed5f8fFtCgGY2eYGhZzkptJ7r1z7ifnnN/39/0pEREe4dA84tEB7AB2ADuAaxx2s394oKwrUPe9IxgjaK1QSj0UoGrPTiKIEXxRKMCy/oIyRlBK0Srnqiq4Uo0TX03y/S8zuI7G+D5+pUKhpAl5HgNRRSzogwhih+ntTbB7Zy+p4cS9qrZSTXt19WnE9O0iZ3+9SzxskS8s4bgxDqbKHHC/Y6h8CXcxi6Ao6DiTmRE+Oz9GOJnitVdG6eoKtwTZ1AwGHE236yAibB9Zz9EtP5CaOQ4zcxhf4ysLgAEMSedHno9/zTfZlzj69jxvvj5Of39305BNLhLFYqnGti0DvDt0kp5zx1iSCNqJorTcWyhVQIxC5u5woOt9+uN53nlP8daR/QSDTiOTWgOZEb+O7opzZPMZei5+yJJ+DDvgoDEoMY1hEEEhaGWwgkEWl8LsLHzKuP0Tx09eQmuFiFkbHSzWLCaGa2y79gGlagBb+VCrQL3agKtXwNTBrzXu1Ws42qecrXEo8AXXL//G3fQiWmtWqx1NtdgOhdkbv4rUhsAbRsp5VCgCSsPCbehPwewFiPSBl4BbVyA2iCxk0SGL0fw5Tp/bzYv7PYwxWJZuTwVXxiURc9mUOYWyPHRyBIVAdB1q8ClkKY9oDVv3Qs8mCEWRrXshsQHVswEGdrI1OM3sTKb9q3hloL2A4NXSmPkcKn0TcUIwcwG8OET7UelpsB1EOxAMou6kkWgvlBeQW2miXZsoF4vLOVV7dVABllIYx0Xd+BmxvUYFAXI3UJYN1Roko6igDbdLqLgLfg60QZkiptaPjjj/yNoOwOVcIdcl6wywztZgB8D498+A5YAVQCUiSLYKrgtaIRaILdzJJ4l0u/++pz/sDG5c5/GHuwscC2OWZWVZWhABu+Ea5Pe5xu/UXZjNIDczqEyFS/khto/0NdXiVQE2tAtG1weZiu2mnNiBVS2CfkAD5vJQqsFCGap1pFjHyc2TY4Rpexu7dvQh0tjb26qDIkIooBkbHeLz7sME4h5+pYz8HXKlbVqBpRHLwVSXsB9Pcix7kImJUQIBi2b806oBtVYYI4w/GcXfvI8ve98gnAhhV/L4BgwWRi1faPy6IVDNER7s46PFV+navofn9my454zWzA8aAY3h429nqU6e4lD5BH2F81ApNh4CWBrC3dxwx/hk4QViI89w+OWnMYam4Fo2rCINbTxzJcvps9eJZi6ysXyZmD+PCKTp4areQs5NsW98mGfHki37wZYdtRFBKwUIkzMlpm4uUiiUQAwRL8gTgx6poe77DO//bvn/68Migggtw7XtTCIijfFbSaUUWvHQB6Y2Hpo6B/cOYAewA9gBXKv4EwW01J5x+MQNAAAAAElFTkSuQmCC" alt="YOUMMA JOBS" style="width:36px;height:36px;object-fit:contain;border-radius:8px;flex-shrink:0;"/>
       <span style="font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:#fff;white-space:nowrap;" class="nav-logo-text">YOUMMA <span style="color:#E85D04;">JOBS</span></span>
     </a>
+      <button id="navMobileAuth" onclick="window._navMobileAuthClick()" style="display:none;align-items:center;gap:5px;margin-left:8px;height:34px;padding:0 11px;background:transparent;border:1.5px solid rgba(255,255,255,.3);border-radius:50px;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">
+        <i class="fa-solid fa-lock" style="font-size:11px;"></i><span class="nav-mob-auth-label">Connexion</span>
+      </button>
+    </div>
 
     <!-- Liens desktop (cachés sur mobile) -->
     <ul class="nav-links" style="display:flex;align-items:center;gap:4px;list-style:none;margin:0;padding:0;">
@@ -3505,6 +3514,41 @@ function resetGpsLocate() {
   if (btn) { btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> Me localiser'; btn.style.borderColor=''; btn.style.color=''; btn.disabled = false; }
 }
 
+// ── BOUTON AUTH MOBILE NAV ──
+window._navMobileAuthClick = function() {
+  var s = typeof getSession === 'function' ? getSession() : null;
+  if (s) {
+    if (typeof _realNavigate === 'function') _realNavigate('dashboard');
+    else if (typeof navigate === 'function') navigate('dashboard');
+  } else {
+    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');p.style.display='';});
+    var mc=document.getElementById('mainContent'),mn=document.getElementById('mainNav');
+    document.body.classList.remove('on-home','on-dashboard','on-admin');
+    if(mc)mc.style.cssText='display:none!important';
+    if(mn)mn.style.cssText='display:none!important';
+    var pl=document.getElementById('page-login');
+    if(pl){pl.classList.add('active');pl.style.cssText='display:block!important';window.scrollTo(0,0);}
+  }
+};
+function _updateNavMobileAuth() {
+  var btn = document.getElementById('navMobileAuth'); if (!btn) return;
+  var lbl = btn.querySelector('.nav-mob-auth-label');
+  var ico = btn.querySelector('i');
+  var s = typeof getSession === 'function' ? getSession() : null;
+  if (s) {
+    var prenom = (s.prenom || s.nom || 'Mon espace').split(' ')[0];
+    if (lbl) lbl.textContent = prenom;
+    if (ico) ico.className = 'fa-solid fa-gauge';
+    btn.style.borderColor = 'rgba(232,93,4,.5)';
+    btn.style.background  = 'rgba(232,93,4,.12)';
+  } else {
+    if (lbl) lbl.textContent = 'Connexion';
+    if (ico) ico.className = 'fa-solid fa-lock';
+    btn.style.borderColor = 'rgba(255,255,255,.3)';
+    btn.style.background  = 'transparent';
+  }
+}
+
 // ── INIT ──
 document.addEventListener('DOMContentLoaded', () => {
   // Année dynamique dans les footers
@@ -3517,6 +3561,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCounters();
   observeFadeIn();
   initNavScroll();
+  _updateNavMobileAuth();
   setTimeout(() => showNotif('🇬🇳 Bienvenue', 'sur YOUMMA JOBS — La plateforme N°1 des artisans en Guinée !', '#E6FBF3'), 1500);
 });
 
@@ -9299,6 +9344,7 @@ function navigate(page) {
     if (mn) mn.style.cssText = '';
     if (_mbn) _mbn.style.display = 'none';
     window.scrollTo(0,0);
+    if (typeof _updateNavMobileAuth === 'function') _updateNavMobileAuth();
     if (typeof _expInit === 'function') setTimeout(_expInit, 50);
     if (typeof _heroLoadMissionsCount === 'function') setTimeout(_heroLoadMissionsCount, 200);
   } else if (page === 'admin') {
