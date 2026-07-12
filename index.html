@@ -3603,8 +3603,18 @@ function renderArtisans() {
     })
     .slice(0, 6);
 
+  // Fonction partagée étoiles dynamiques (demi-étoile si décimale [0.25–0.75[)
+  if (!window._renderStars) window._renderStars = function(note,size,fc,ec) {
+    var n=parseFloat(note)||0,f=Math.floor(n),dec=n-f;
+    var fn=f+(dec>=0.75?1:0),half=dec>=0.25&&dec<0.75;
+    var C1=fc||'#D4A017',C0=ec||'#D1D5DB',sz=size||12,s='';
+    for(var i=0;i<fn;i++) s+='<span style="color:'+C1+';font-size:'+sz+'px;">★</span>';
+    if(half) s+='<span style="position:relative;display:inline-block;font-size:'+sz+'px;line-height:1;"><span style="color:'+C0+';">★</span><span style="position:absolute;left:0;top:0;width:50%;overflow:hidden;color:'+C1+';">★</span></span>';
+    for(var i=fn+(half?1:0);i<5;i++) s+='<span style="color:'+C0+';font-size:'+sz+'px;">★</span>';
+    return s;
+  };
   document.getElementById('artisansGrid').innerHTML = artisans.map((p,i) => {
-    const stars5 = Array.from({length:5},(_,j)=>`<span style="color:${j<Math.floor(p.note)?'#D4A017':'#D1D5DB'};font-size:12px;">★</span>`).join('');
+    const stars5 = window._renderStars(p.note, 12);
     const badgeRow = [
       p.type_compte === 'youmma_equipe' ? `<span style="background:linear-gradient(135deg,#1A1A4E,#E85D04);color:#fff;border-radius:20px;padding:3px 10px;font-size:9.5px;font-weight:800;display:inline-flex;align-items:center;gap:4px;">⭐ YOUMMA CERTIFIÉ</span>` : '',
       p.badge_express ? `<span class="badge-express"> Express</span>` : '',
@@ -3692,7 +3702,7 @@ function renderProviders() {
     return !(_periodeTerminee && !_aAbo);
   }).map((p, i) => {
     const isFav = favorites.includes(p.id);
-    const stars5 = Array.from({length:5},(_,j)=>`<span style="color:${j<Math.floor(p.note)?'#D4A017':'#D1D5DB'};font-size:11px;">★</span>`).join('');
+    const stars5 = window._renderStars(p.note, 11);
     const isEntreprise = p.type_compte === 'entreprise';
     const isYoummaEquipe = p.type_compte === 'youmma_equipe';
     const typeCompteBadge = isYoummaEquipe
@@ -3728,8 +3738,8 @@ function renderProviders() {
     ].filter(Boolean).join(_sep);
     const _note = parseFloat(p.note) || 0;
     const noteDisplay = _note > 0
-      ? `<div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${[1,2,3,4,5].map(i=>`<span style="color:${i<=Math.round(_note)?'#f59e0b':'#e5e7eb'};font-size:11px;">★</span>`).join('')}</div><div style="font-size:18px;font-weight:700;color:#111;">${_note.toFixed(1)}</div>`
-      : '<div style="display:flex;justify-content:center;gap:1px;margin-bottom:3px;"><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span></div><div style="font-size:11px;font-weight:500;color:#9ca3af;margin-top:2px;">Pas encore noté</div>';
+      ? `<div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${window._renderStars(_note,11,'#f59e0b','#e5e7eb')}</div><div style="font-size:18px;font-weight:700;color:#111;">${_note.toFixed(1)}</div>`
+      : `<div style="display:flex;justify-content:center;gap:1px;margin-bottom:3px;">${window._renderStars(0,11,'#f59e0b','#e5e7eb')}</div><div style="font-size:11px;font-weight:500;color:#9ca3af;margin-top:2px;">Pas encore noté</div>`;
     console.log('DEBUG matricule:', p.matricule, 'created_at:', p.created_at, 'id:', p.id);
     const matriculeHtml = (p.matricule && p.matricule !== 'YMJ-000000')
       ? `<div style="text-align:center;font-size:11px;color:#6b7280;padding:7px 0;margin:0 0 8px 0;border-top:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;">Membre vérifié · N°&nbsp;<span style="color:#1B2A6B;font-weight:700;letter-spacing:0.05em;">${p.matricule}</span></div>`
@@ -3857,7 +3867,7 @@ function openModal(id) {
   const p = PRESTATAIRES.find(x => x.id == id || x.id === id);
   if (!p) { console.warn('openModal: prestataire non trouvé', id); return; }
 
-  const stars5Full = Array.from({length:5},(_,j)=>`<span style="color:${j<Math.floor(p.note)?'#D4A017':'#CBD5E1'};font-size:16px;">★</span>`).join('');
+  const stars5Full = window._renderStars(p.note, 16, '#D4A017', '#CBD5E1');
   const badgeAmbFin = p.badge_ambassadeur_fin ? new Date(p.badge_ambassadeur_fin) : null;
   const badgeAmbValide = p.badge_ambassadeur && badgeAmbFin && badgeAmbFin > new Date();
   const badgesHtml = [
