@@ -3592,6 +3592,7 @@ function ouvrirProfil(id) {
   });
 }
 
+window._renderStars=function(note,size,fc,ec){var n=parseFloat(note)||0,f=Math.floor(n),dec=n-f;var fn=f+(dec>=0.75?1:0),half=dec>=0.25&&dec<0.75;var C1=fc||'#D4A017',C0=ec||'#D1D5DB',sz=size||12,s='';for(var i=0;i<fn;i++)s+='<span style="color:'+C1+';font-size:'+sz+'px;">★</span>';if(half)s+='<span style="display:inline-block;font-size:'+sz+'px;line-height:1;background:linear-gradient(90deg,'+C1+' 50%,'+C0+' 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">★</span>';for(var i=fn+(half?1:0);i<5;i++)s+='<span style="color:'+C0+';font-size:'+sz+'px;">★</span>';return s;};
 function renderArtisans() {
   if (!document.getElementById('artisansGrid')) return; // section supprimée
   const artisans = PRESTATAIRES
@@ -3603,7 +3604,6 @@ function renderArtisans() {
     })
     .slice(0, 6);
 
-  if(!window._renderStars)window._renderStars=function(note,size,fc,ec){var n=parseFloat(note)||0,f=Math.floor(n),dec=n-f;var fn=f+(dec>=0.75?1:0),half=dec>=0.25&&dec<0.75;var C1=fc||'#D4A017',C0=ec||'#D1D5DB',sz=size||12,s='';for(var i=0;i<fn;i++)s+='<span style="color:'+C1+';font-size:'+sz+'px;">★</span>';if(half)s+='<span style="display:inline-block;font-size:'+sz+'px;line-height:1;background:linear-gradient(90deg,'+C1+' 50%,'+C0+' 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">★</span>';for(var i=fn+(half?1:0);i<5;i++)s+='<span style="color:'+C0+';font-size:'+sz+'px;">★</span>';return s;};
   document.getElementById('artisansGrid').innerHTML = artisans.map((p,i) => {
     const stars5 = window._renderStars(p.note, 12);
     const badgeRow = [
@@ -5193,22 +5193,17 @@ async function _provRapports() {
   if (listEl) listEl.innerHTML = '<div style="color:#9CA3AF;font-size:13px;text-align:center;padding:16px;">Chargement…</div>';
 
   try {
-    const [missRes, revRes] = await Promise.all([
-      sb.from('missions').select('id,description,montant,date_mission,statut,client_nom,created_at').eq('prestataire_id', pid).order('created_at', {ascending:false}),
-      sb.from('reviews').select('note,created_at').eq('provider_id', pid).eq('valide', true)
-    ]);
+    const missRes = await sb.from('missions').select('id,description,montant,date_mission,statut,client_nom,created_at').eq('prestataire_id', pid).order('created_at', {ascending:false});
 
     const missions = missRes.data || [];
-    const reviews  = revRes.data  || [];
 
     // KPIs
     const totalMissions = missions.length;
     const totalGagne = missions
       .filter(m => m.statut === 'valide')
       .reduce((s, m) => s + (parseFloat(m.montant) || 0), 0);
-    const noteMoy = reviews.length
-      ? (reviews.reduce((s, r) => s + (r.note || 0), 0) / reviews.length).toFixed(1)
-      : '—';
+    const _rawNote = parseFloat((_dashData || providerData || {}).note_moyenne);
+    const noteMoy = _rawNote > 0 ? _rawNote.toFixed(1) : '—';
     const nbVues = (_dashData || providerData || {}).nb_vues || 0;
 
     set('rptTotalMissions', totalMissions);
@@ -7127,8 +7122,10 @@ function getJoursRestants(p) {
   return Math.max(0,Math.ceil((fin-now)/(1000*60*60*24)));
 }
 async function getAvis(providerId) {
-  const { data } = await sb.from('reviews').select('id,note,commentaire,client_nom,created_at').eq('provider_id',providerId).eq('valide',true).order('created_at',{ascending:false});
-  return data||[];
+  try {
+    const { data } = await sb.from('reviews').select('id,note,commentaire,client_nom,created_at').eq('provider_id',providerId).eq('valide',true).order('created_at',{ascending:false});
+    return data||[];
+  } catch(e) { return []; }
 }
 
 async function validerProvider(id) {
