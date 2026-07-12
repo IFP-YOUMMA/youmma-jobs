@@ -1567,7 +1567,7 @@ async function verifierSession() {
       <span style="font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:#fff;white-space:nowrap;" class="nav-logo-text">YOUMMA <span style="color:#E85D04;">JOBS</span></span>
     </a>
       <button id="navMobileAuth" onclick="window._navMobileAuthClick()" style="display:none;align-items:center;gap:5px;margin-left:8px;height:34px;padding:0 11px;background:transparent;border:1.5px solid rgba(255,255,255,.3);border-radius:50px;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">
-        <i class="fa-solid fa-lock" style="font-size:11px;"></i><span class="nav-mob-auth-label">Connexion</span>
+        <i class="fa-solid fa-lock" style="font-size:11px;"></i><span class="nav-mob-dot" style="display:none;width:8px;height:8px;min-width:8px;border-radius:50%;background:#16A34A;flex-shrink:0;box-shadow:0 0 0 2px rgba(22,163,74,.25);"></span><span class="nav-mob-auth-label">Connexion</span>
       </button>
     </div>
 
@@ -3534,16 +3534,21 @@ function _updateNavMobileAuth() {
   var btn = document.getElementById('navMobileAuth'); if (!btn) return;
   var lbl = btn.querySelector('.nav-mob-auth-label');
   var ico = btn.querySelector('i');
+  var dot = btn.querySelector('.nav-mob-dot');
   var s = typeof getSession === 'function' ? getSession() : null;
   if (s) {
     var prenom = (s.prenom || s.nom || 'Mon espace').split(' ')[0];
     if (lbl) lbl.textContent = prenom;
-    if (ico) ico.className = 'fa-solid fa-gauge';
+    if (ico) ico.style.display = 'none';
+    if (dot) dot.style.display = 'block';
+    btn.title = 'Connecté';
     btn.style.borderColor = 'rgba(232,93,4,.5)';
     btn.style.background  = 'rgba(232,93,4,.12)';
   } else {
     if (lbl) lbl.textContent = 'Connexion';
-    if (ico) ico.className = 'fa-solid fa-lock';
+    if (ico) { ico.className = 'fa-solid fa-lock'; ico.style.display = ''; }
+    if (dot) dot.style.display = 'none';
+    btn.title = '';
     btn.style.borderColor = 'rgba(255,255,255,.3)';
     btn.style.background  = 'transparent';
   }
