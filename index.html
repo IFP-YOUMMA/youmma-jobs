@@ -2270,6 +2270,169 @@ async function verifierSession() {
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE "CONSTRUIRE AVEC YOUMMA JOBS" (#construire)
+     Affichée/masquée par showPageConstruire() / hidePageConstruire()
+     — réutilise la navbar et le footer réels du site (pas de copie).
+     ═══════════════════════════════════════════════════════════ -->
+<section id="page-construire" style="display:none;">
+
+  <!-- ── 1. HERO ── -->
+  <div style="background:linear-gradient(135deg,#0D0D2E 0%,var(--bleu) 55%,#0D0D2E 100%);padding:96px 5% 72px;text-align:center;">
+    <div style="max-width:740px;margin:0 auto;">
+      <div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;">
+        <span style="width:24px;height:2px;background:var(--or);border-radius:2px;"></span>
+        <span style="font-size:11.5px;font-weight:700;color:var(--or);letter-spacing:.12em;text-transform:uppercase;">🏗️ Construire avec YOUMMA JOBS</span>
+      </div>
+      <h1 style="font-family:'Libre Baskerville',serif;font-size:clamp(28px,4.5vw,46px);font-weight:700;line-height:1.2;color:#fff;margin-bottom:10px;">Construisez avec YOUMMA JOBS</h1>
+      <p style="font-size:14.5px;font-weight:600;color:var(--or);letter-spacing:.01em;margin-bottom:22px;">Build your project in Guinea, from anywhere in the world</p>
+      <p style="font-size:15.5px;color:rgba(255,255,255,.72);line-height:1.75;max-width:560px;margin:0 auto 34px;">Vous avez un projet de construction en Guinée ? YOUMMA JOBS vous accompagne de A à Z : artisans vérifiés, suivi de chantier, registre matériaux transparent.</p>
+      <button onclick="document.getElementById('pcFormSection')?.scrollIntoView({behavior:'smooth',block:'start'})" style="background:var(--orange);color:#fff;border:none;padding:15px 34px;border-radius:50px;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 8px 24px rgba(232,93,4,.35);">Démarrer mon projet →</button>
+    </div>
+  </div>
+
+  <!-- ── 2. 3 FORMULES ── -->
+  <div style="padding:72px 5%;background:#fff;">
+    <div style="max-width:1100px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:44px;">
+        <h2 class="section-title" style="text-align:center;">Choisissez votre <span class="hl">formule</span></h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;align-items:stretch;">
+
+        <div style="background:#fff;border:1.5px solid var(--bordure);border-radius:var(--radius-xl);padding:30px 26px;">
+          <div style="font-size:30px;margin-bottom:14px;">💬</div>
+          <div style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:var(--texte);margin-bottom:10px;">Assistance</div>
+          <p style="font-size:13.5px;color:var(--gris);line-height:1.7;margin-bottom:20px;">On vous met en relation avec les bons artisans vérifiés. Vous gérez votre chantier, on vous guide.</p>
+          <span style="display:inline-block;font-size:12px;font-weight:700;color:var(--bleu);background:var(--bleu-light);padding:5px 14px;border-radius:20px;">Sur devis</span>
+        </div>
+
+        <div style="background:var(--bleu);border:1.5px solid var(--bleu);border-radius:var(--radius-xl);padding:34px 26px;position:relative;box-shadow:0 16px 40px rgba(26,26,78,.25);transform:translateY(-6px);">
+          <span style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--or);color:#1A1A4E;font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:5px 16px;border-radius:20px;white-space:nowrap;">★ Populaire</span>
+          <div style="font-size:30px;margin-bottom:14px;">👁️</div>
+          <div style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:#fff;margin-bottom:10px;">Suivi de Chantier</div>
+          <p style="font-size:13.5px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:20px;">Un superviseur YOUMMA suit votre chantier sur le terrain. Rapports journaliers, photos, alertes.</p>
+          <span style="display:inline-block;font-size:12px;font-weight:700;color:#1A1A4E;background:var(--or);padding:5px 14px;border-radius:20px;">Sur devis</span>
+        </div>
+
+        <div style="background:#fff;border:1.5px solid var(--bordure);border-radius:var(--radius-xl);padding:30px 26px;">
+          <div style="font-size:30px;margin-bottom:14px;">🏗️</div>
+          <div style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:var(--texte);margin-bottom:10px;">Gestion Complète</div>
+          <p style="font-size:13.5px;color:var(--gris);line-height:1.7;margin-bottom:20px;">On gère tout à votre place : artisans, matériaux, registre, rapports. Vous validez à distance.</p>
+          <span style="display:inline-block;font-size:12px;font-weight:700;color:var(--bleu);background:var(--bleu-light);padding:5px 14px;border-radius:20px;">Sur devis</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. TIMELINE 7 ÉTAPES ── -->
+  <div style="padding:72px 5%;background:var(--fond);">
+    <div style="max-width:680px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:8px;">
+        <h2 class="section-title" style="text-align:center;">Comment ça <span class="hl">marche</span> ?</h2>
+        <p style="font-size:13.5px;font-weight:600;color:var(--gris);letter-spacing:.02em;margin-bottom:40px;">How it works</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0;">
+
+        <div style="display:flex;gap:18px;padding-bottom:28px;">
+          <div style="flex-shrink:0;width:38px;height:38px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:14px;">1</div>
+          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">📋 Vous nous contactez</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">Remplissez le formulaire, on vous rappelle sous 24h</div></div>
+        </div>
+        <div style="display:flex;gap:18px;padding-bottom:28px;">
+          <div style="flex-shrink:0;width:38px;height:38px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:14px;">2</div>
+          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">🗣️ Consultation gratuite</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">On discute de votre projet et on choisit la formule</div></div>
+        </div>
+        <div style="display:flex;gap:18px;padding-bottom:28px;">
+          <div style="flex-shrink:0;width:38px;height:38px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:14px;">3</div>
+          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">📄 Devis et contrat</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">Devis transparent, contrat numérique signé par SMS</div></div>
+        </div>
+        <div style="display:flex;gap:18px;padding-bottom:28px;">
+          <div style="flex-shrink:0;width:38px;height:38px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:14px;">4</div>
+          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">👷 Sélection des artisans</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">On choisit les meilleurs artisans vérifiés pour votre projet</div></div>
+        </div>
+        <div style="display:flex;gap:18px;padding-bottom:28px;">
+          <div style="flex-shrink:0;width:38px;height:38px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:14px;">5</div>
+          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">🏗️ Démarrage du chantier</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">Votre superviseur YOUMMA ouvre le registre matériaux</div></div>
+        </div>
+        <div style="display:flex;gap:18px;padding-bottom:28px;">
+          <div style="flex-shrink:0;width:38px;height:38px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:14px;">6</div>
+          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">📊 Rapports journaliers</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">Vous validez chaque jour ce qui sort, ce qui est utilisé, votre solde</div></div>
+        </div>
+        <div style="display:flex;gap:18px;">
+          <div style="flex-shrink:0;width:38px;height:38px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:14px;">7</div>
+          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">✅ Réception et clôture</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">Rapport final signé par toutes les parties</div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. DIASPORA ── -->
+  <div style="padding:72px 5%;background:var(--bleu-50);">
+    <div style="max-width:920px;margin:0 auto;text-align:center;">
+      <h2 class="section-title" style="text-align:center;">Vous êtes à <span class="hl">l'étranger</span> ?</h2>
+      <p style="font-size:13.5px;font-weight:600;color:var(--gris);letter-spacing:.02em;margin-bottom:20px;">Managing your construction project from abroad</p>
+      <p style="font-size:15px;color:var(--gris);line-height:1.8;max-width:640px;margin:0 auto 40px;">Pas besoin d'être sur place. Notre registre numérique vous permet de suivre chaque sortie de matériaux, chaque dépense, chaque journée de chantier — depuis votre téléphone, où que vous soyez dans le monde.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;">
+        <div style="background:#fff;border-radius:var(--radius-lg);padding:24px 18px;border:1.5px solid var(--bordure);">
+          <div style="font-size:26px;margin-bottom:10px;">📱</div>
+          <div style="font-size:13.5px;font-weight:700;color:var(--texte);">Suivi en temps réel</div>
+        </div>
+        <div style="background:#fff;border-radius:var(--radius-lg);padding:24px 18px;border:1.5px solid var(--bordure);">
+          <div style="font-size:26px;margin-bottom:10px;">💰</div>
+          <div style="font-size:13.5px;font-weight:700;color:var(--texte);">Registre matériaux transparent</div>
+        </div>
+        <div style="background:#fff;border-radius:var(--radius-lg);padding:24px 18px;border:1.5px solid var(--bordure);">
+          <div style="font-size:26px;margin-bottom:10px;">✅</div>
+          <div style="font-size:13.5px;font-weight:700;color:var(--texte);">Validation à distance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. FORMULAIRE LEADS ── -->
+  <div id="pcFormSection" style="padding:72px 5%;background:#fff;">
+    <div style="max-width:520px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:8px;">
+        <h2 class="section-title" style="text-align:center;">Démarrer mon <span class="hl">projet</span></h2>
+        <p style="font-size:13.5px;font-weight:600;color:var(--gris);letter-spacing:.02em;">Tell us about your project</p>
+      </div>
+      <p style="font-size:14px;color:var(--gris);text-align:center;line-height:1.7;margin-bottom:28px;">Laissez-nous vos coordonnées, on vous rappelle sous 24h.</p>
+      <div class="contact-form-box">
+        <div class="form-group">
+          <label>Nom complet</label>
+          <input type="text" id="pcNom" placeholder="Mamadou Diallo" required/>
+        </div>
+        <div class="form-group">
+          <label>Téléphone</label>
+          <input type="tel" id="pcTelephone" placeholder="224XXXXXXXXX" required/>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea id="pcMessage" placeholder="Décrivez votre projet..."></textarea>
+        </div>
+        <button class="btn-submit" id="pcSubmitBtn" onclick="envoyerLeadConstruire()">Envoyer ma demande</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. FAQ ── -->
+  <div style="padding:72px 5%;background:var(--fond);">
+    <div style="max-width:760px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:36px;">
+        <h2 class="section-title" style="text-align:center;">Questions <span class="hl">fréquentes</span></h2>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">Puis-je gérer mon chantier depuis l'étranger ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>Oui. Notre plateforme est conçue pour ça. Vous validez les rapports journaliers et le rapport final depuis votre téléphone, où que vous soyez.</p></div></div>
+        <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">Comment fonctionne le registre matériaux ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>Chaque sortie de matériaux chez le fournisseur est enregistrée, validée par le fournisseur, déclarée par le superviseur, puis validée par vous. Vous voyez en temps réel ce qui est sorti, utilisé, et votre solde restant.</p></div></div>
+        <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">YOUMMA JOBS touche-t-il l'argent des matériaux ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>Non. Les versements se font directement entre vous et votre fournisseur. YOUMMA JOBS est témoin et garant de la transparence, pas intermédiaire financier.</p></div></div>
+        <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">Comment sont sélectionnés les artisans ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>Tous les artisans YOUMMA JOBS sont vérifiés, notés par leurs clients, et ont un badge matricule. Vous pouvez consulter leur profil avant de les choisir.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-top">
@@ -9415,6 +9578,68 @@ function navigate(page) {
 }
 window._realNavigate = navigate;
 
+/* ── PAGE "CONSTRUIRE AVEC YOUMMA JOBS" (#construire) ── */
+// Réutilise la navbar/footer réels : on cache les sections de la home au
+// lieu de dupliquer leur markup, puis on les restaure via hidePageConstruire().
+const _PC_HOMEPAGE_SECTIONS = ['accueil','disponibles-maintenant','prestataires','features','devenir','temoignages','tarifs','faq','contact'];
+
+function showPageConstruire() {
+  if (typeof _realNavigate === 'function') _realNavigate('home');
+  else if (typeof navigate === 'function') navigate('home');
+  _PC_HOMEPAGE_SECTIONS.forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  // Barre de recherche home (entre #accueil et #disponibles-maintenant) : pas
+  // de section/id propre, ciblée via sa classe pour ne pas toucher le HTML existant.
+  const searchBar = document.querySelector('.search-card');
+  if (searchBar && searchBar.parentElement) searchBar.parentElement.style.display = 'none';
+  const pc = document.getElementById('page-construire');
+  if (pc) pc.style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function hidePageConstruire() {
+  const pc = document.getElementById('page-construire');
+  if (pc) pc.style.display = 'none';
+  _PC_HOMEPAGE_SECTIONS.forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = '';
+  });
+  const searchBar = document.querySelector('.search-card');
+  if (searchBar && searchBar.parentElement) searchBar.parentElement.style.display = '';
+}
+
+async function envoyerLeadConstruire() {
+  const nom = document.getElementById('pcNom')?.value.trim();
+  const telephone = document.getElementById('pcTelephone')?.value.trim();
+  const message = document.getElementById('pcMessage')?.value.trim();
+  const btn = document.getElementById('pcSubmitBtn');
+
+  if (!nom) { showToast('Indiquez votre nom complet', 'error'); return; }
+  if (!/^224\d{9}$/.test(telephone || '')) { showToast('Téléphone au format 224XXXXXXXXX', 'error'); return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi...'; }
+  try {
+    const { error } = await sb.from('leads_construction').insert({
+      nom: nom,
+      telephone: telephone,
+      description: message || null,
+      statut_lead: 'nouveau'
+    });
+    if (error) throw error;
+    showToast('✅ Demande envoyée ! On vous rappelle sous 24h.', 'success');
+    document.getElementById('pcNom').value = '';
+    document.getElementById('pcTelephone').value = '';
+    document.getElementById('pcMessage').value = '';
+  } catch (e) {
+    console.error('[construire] envoyerLeadConstruire:', e.message);
+    showToast('❌ Erreur, réessayez ou appelez-nous directement.', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Envoyer ma demande'; }
+  }
+}
+
 /* ── BADGE COMPTEUR PROJETS HERO ── */
 (function() {
   var _heroCountTimer = null;
@@ -9498,6 +9723,7 @@ window.addEventListener('resize', function() {
 
 window.addEventListener('load', async function() {
   const hash = location.hash.replace('#','').toLowerCase().trim();
+  if (typeof hidePageConstruire === 'function') hidePageConstruire();
   if (hash.startsWith('verif=')) {
     const _rawHash = window.location.hash.replace('#verif=', '');
     const _mat = _rawHash.replace(/[^A-Z0-9\-]/gi, '').toUpperCase().trim();
@@ -9518,6 +9744,7 @@ window.addEventListener('load', async function() {
   } else if (hash === 'inscription') { navigate('inscription'); }
   else if (hash === 'login') { navigate('login'); }
   else if (hash === 'nouveautes') { openSoonHub(); }
+  else if (hash === 'construire') { showPageConstruire(); }
   else if (typeof SOON_MODULES !== 'undefined' && SOON_MODULES[hash]) {
     openSoonPage(hash);
   }
@@ -9560,7 +9787,8 @@ window.addEventListener('load', async function() {
 });
 window.addEventListener('hashchange', async function() {
   const hash = location.hash.replace('#','').toLowerCase().trim();
-  
+  if (typeof hidePageConstruire === 'function') hidePageConstruire();
+
   // #verif= intercepté en priorité absolue (page publique, aucune auth requise)
   if (hash.startsWith('verif=')) {
     const _rawHash2 = window.location.hash.replace('#verif=', '');
@@ -9586,6 +9814,7 @@ window.addEventListener('hashchange', async function() {
   if (hash === 'inscription') { if(typeof _realNavigate==='function') _realNavigate('inscription'); return; }
   if (hash === 'login') { if(typeof _realNavigate==='function') _realNavigate('login'); return; }
   if (hash === 'nouveautes') { if(typeof openSoonHub==='function') openSoonHub(); return; }
+  if (hash === 'construire') { if(typeof showPageConstruire==='function') showPageConstruire(); return; }
   if (typeof SOON_MODULES !== 'undefined' && SOON_MODULES[hash]) { if(typeof openSoonPage==='function') openSoonPage(hash); return; }
   if (hash.startsWith('devis-projet=')) {
     const _hcId = hash.replace('devis-projet=','').trim();
