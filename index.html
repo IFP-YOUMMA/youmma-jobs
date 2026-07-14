@@ -5395,6 +5395,15 @@ async function chargerDocuments(pid) {
 }
 function showSection(name) {
   console.log('[showSection] onglet cliqué:', name);
+  // Fermer le tiroir latéral mobile s'il est ouvert (sinon il reste au-dessus
+  // de la section qui vient d'être affichée, qui paraît alors blanche/vide)
+  const _mobSidebar = document.querySelector('#page-dashboard .sidebar');
+  if (_mobSidebar && _mobSidebar.classList.contains('open')) {
+    _mobSidebar.classList.remove('open');
+    _mobSidebar.style.transform = 'translateX(-100%)';
+  }
+  const _mobSidebarOverlay = document.getElementById('dashSidebarOverlay');
+  if (_mobSidebarOverlay) _mobSidebarOverlay.remove();
   // Cacher toutes les sections — forcer display:none explicitement (fix mobile)
   document.querySelectorAll('#page-dashboard .section').forEach(s => {
     s.classList.remove('active');
@@ -5681,7 +5690,7 @@ async function chargerAvis() {
 </script>
 
 <!-- Mobile bottom navigation bar (dashboard) -->
-<nav id="mobileBottomNav" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9998;background:#1A1A4E;border-top:1px solid rgba(255,255,255,.1);padding:6px 0 env(safe-area-inset-bottom,6px);box-shadow:0 -4px 20px rgba(0,0,0,.3);">
+<nav id="mobileBottomNav" style="display:none;position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;z-index:9998;background:#1A1A4E;border-top:1px solid rgba(255,255,255,.1);padding:6px 0 env(safe-area-inset-bottom,6px);box-shadow:0 -4px 20px rgba(0,0,0,.3);">
   <div style="display:flex;align-items:center;justify-content:space-around;max-width:600px;margin:0 auto;">
     <button onclick="showSection('dashboard')" id="mbnDashboard" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;transition:color .2s;">
       <i class="fa-solid fa-house" style="font-size:18px;"></i><span>Accueil</span>
@@ -6471,6 +6480,15 @@ async function chargerAvis() {
 // ── SECTIONS ──
 function showSection(name) {
   console.log('[showSection] onglet cliqué:', name);
+  // Fermer le tiroir latéral mobile s'il est ouvert (sinon il reste au-dessus
+  // de la section qui vient d'être affichée, qui paraît alors blanche/vide)
+  const _mobSidebar = document.querySelector('#page-dashboard .sidebar');
+  if (_mobSidebar && _mobSidebar.classList.contains('open')) {
+    _mobSidebar.classList.remove('open');
+    _mobSidebar.style.transform = 'translateX(-100%)';
+  }
+  const _mobSidebarOverlay = document.getElementById('dashSidebarOverlay');
+  if (_mobSidebarOverlay) _mobSidebarOverlay.remove();
   // Cacher toutes les sections — forcer display:none explicitement (fix mobile)
   document.querySelectorAll('#page-dashboard .section').forEach(s => {
     s.classList.remove('active');
