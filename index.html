@@ -2278,23 +2278,14 @@ async function verifierSession() {
 <section id="page-construire" style="display:none;">
 
 <style>
-/* ── Styles scopés page Construire (carrousel/hover/timeline — impossibles en pur inline) ── */
+/* ── Styles scopés page Construire (carrousel + cartes fournisseurs — impossibles en pur inline) ── */
 #page-construire .pc-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease;background-size:cover;background-position:center;}
 #page-construire .pc-slide.active{opacity:1;}
 #page-construire .pc-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.4);border:none;cursor:pointer;padding:0;transition:.25s;}
 #page-construire .pc-dot.active{background:#fff;width:24px;border-radius:6px;}
-#page-construire .pc-card-hover{transition:transform .25s ease,box-shadow .25s ease;}
-#page-construire .pc-card-hover:hover{transform:translateY(-8px);box-shadow:0 20px 44px rgba(0,0,0,.14);}
-#page-construire .pc-formule-hover{transition:transform .25s ease,box-shadow .25s ease;}
-#page-construire .pc-formule-hover:hover{transform:translateY(-10px);box-shadow:0 24px 50px rgba(0,0,0,.16);}
-#page-construire .pc-timeline-item{display:flex;gap:22px;align-items:flex-start;}
-@media(min-width:900px){
-  #page-construire .pc-timeline{position:relative;}
-  #page-construire .pc-timeline::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--bordure);transform:translateX(-50%);}
-  #page-construire .pc-timeline-item{width:calc(50% - 30px);}
-  #page-construire .pc-timeline-item:nth-child(odd){margin-right:auto;}
-  #page-construire .pc-timeline-item:nth-child(even){margin-left:auto;flex-direction:row-reverse;text-align:right;}
-}
+/* Cartes fournisseurs : même comportement hover que .pc2-card (cartes prestataires) sans coupler les styles */
+#page-construire .pc-fournisseur-card{background:#fff;border-radius:20px;border:1.5px solid var(--bordure);cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.06);transition:transform .22s cubic-bezier(.4,0,.2,1),box-shadow .22s cubic-bezier(.4,0,.2,1);}
+#page-construire .pc-fournisseur-card:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(26,26,78,.13),0 4px 12px rgba(232,93,4,.08);}
 </style>
 
   <!-- ── 1. HERO CARROUSEL ── -->
@@ -2349,279 +2340,104 @@ async function verifierSession() {
     </div>
   </div>
 
-  <!-- ── 2. CHIFFRES DE CONFIANCE ── -->
-  <div style="background:#0D0D2E;padding:44px 5%;">
-    <div style="max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:24px;text-align:center;">
-      <div>
-        <div style="font-size:26px;margin-bottom:6px;">🏗️</div>
-        <div class="pc-counter" data-target="50" data-suffix="+" style="font-family:'Libre Baskerville',serif;font-size:clamp(24px,3vw,34px);font-weight:700;color:#fff;">0</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:4px;">Chantiers supervisés</div>
+  <!-- ── 1. MOT DU DIRECTEUR ── -->
+  <div style="padding:60px 5%;background:#FAFAF8;">
+    <div style="max-width:800px;margin:0 auto;text-align:center;">
+      <div style="display:flex;justify-content:center;margin-bottom:22px;">
+        <div style="width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,var(--bleu),var(--bleu-mid));display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:25px;font-weight:700;color:#fff;box-shadow:0 10px 26px rgba(26,26,78,.2);">DG</div>
       </div>
-      <div>
-        <div style="font-size:26px;margin-bottom:6px;">👷</div>
-        <div class="pc-counter" data-target="200" data-suffix="+" style="font-family:'Libre Baskerville',serif;font-size:clamp(24px,3vw,34px);font-weight:700;color:#fff;">0</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:4px;">Artisans certifiés</div>
-      </div>
-      <div>
-        <div style="font-size:26px;margin-bottom:6px;">✅</div>
-        <div class="pc-counter" data-target="100" data-suffix="%" style="font-family:'Libre Baskerville',serif;font-size:clamp(24px,3vw,34px);font-weight:700;color:#fff;">0</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:4px;">Registre transparent</div>
-      </div>
-      <div>
-        <div style="font-size:26px;margin-bottom:6px;">🇬🇳</div>
-        <div style="font-family:'Libre Baskerville',serif;font-size:clamp(24px,3vw,34px);font-weight:700;color:#fff;">Conakry</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.55);margin-top:4px;">&amp; diaspora mondiale</div>
+      <p style="font-size:14.5px;font-weight:700;color:var(--bleu);margin-bottom:20px;">Bienvenue dans l'espace Construire de YOUMMA JOBS.</p>
+      <p style="font-family:'Libre Baskerville',serif;font-size:clamp(15px,1.6vw,18px);font-style:italic;color:var(--texte);line-height:1.75;margin-bottom:22px;">"Nous avons créé ce service pour résoudre un problème que nous avons vécu nous-mêmes : confier la construction de sa maison à distance, sans pouvoir contrôler ce qui se passe vraiment sur le chantier. Ici, chaque franc dépensé est tracé, chaque sortie de matériaux est validée, chaque journée de chantier est documentée. Vous restez maître de votre projet, où que vous soyez dans le monde."</p>
+      <div style="font-size:13px;font-weight:700;color:var(--bleu);margin-bottom:26px;">La Direction Générale — YOUMMA JOBS</div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;">
+        <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#166534;background:#F0FDF4;border:1px solid #BBF7D0;padding:6px 14px;border-radius:20px;">✅ Artisans vérifiés</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--bleu);background:var(--bleu-light);border:1px solid #C7D2FE;padding:6px 14px;border-radius:20px;">🔒 Registre infalsifiable</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--orange);background:var(--orange-light);border:1px solid #FDE1C7;padding:6px 14px;border-radius:20px;">🌍 Diaspora friendly</span>
       </div>
     </div>
   </div>
 
-  <!-- ── 3. MOT DU DIRECTEUR GÉNÉRAL ── -->
-  <div style="padding:76px 5%;background:#FAF9F6;">
-    <div style="max-width:960px;margin:0 auto;display:grid;grid-template-columns:200px 1fr;gap:44px;align-items:center;">
-      <div style="display:flex;justify-content:center;">
-        <div style="width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,var(--bleu),var(--bleu-mid));display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:44px;font-weight:700;color:#fff;box-shadow:0 12px 32px rgba(26,26,78,.2);flex-shrink:0;">DG</div>
-      </div>
-      <div>
-        <div style="font-family:'Libre Baskerville',serif;font-size:40px;color:var(--orange);line-height:.5;margin-bottom:14px;">"</div>
-        <p style="font-family:'Libre Baskerville',serif;font-size:clamp(16px,1.8vw,20px);font-style:italic;color:var(--texte);line-height:1.75;margin-bottom:20px;">Nous avons créé YOUMMA JOBS pour résoudre un problème que nous avons vécu nous-mêmes : confier la construction de sa maison à distance, sans pouvoir contrôler ce qui se passe vraiment sur le chantier. Aujourd'hui, notre registre numérique vous donne une visibilité totale — chaque sac de ciment, chaque versement, chaque journée de travail est enregistré, validé et accessible depuis votre téléphone.</p>
-        <div style="font-size:13.5px;font-weight:700;color:var(--bleu);">La Direction Générale</div>
-        <div style="font-size:12px;color:var(--gris);">YOUMMA JOBS</div>
+  <!-- ── 2. AVANTAGES COMPACTS ── -->
+  <div style="padding:52px 5%;background:#fff;">
+    <div style="max-width:1000px;margin:0 auto;">
+      <h2 class="section-title" style="text-align:center;margin-bottom:28px;">Pourquoi nous faire <span class="hl">confiance</span> ?</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;">
+        <div style="display:flex;align-items:flex-start;gap:12px;border:1.5px solid var(--bordure);border-radius:12px;padding:16px;">
+          <div style="font-size:32px;flex-shrink:0;line-height:1;">🔒</div>
+          <div><div style="font-size:13.5px;font-weight:700;color:var(--texte);margin-bottom:2px;">Registre infalsifiable</div><div style="font-size:12px;color:var(--gris);line-height:1.5;">Validé par 3 parties indépendantes</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;border:1.5px solid var(--bordure);border-radius:12px;padding:16px;">
+          <div style="font-size:32px;flex-shrink:0;line-height:1;">📱</div>
+          <div><div style="font-size:13.5px;font-weight:700;color:var(--texte);margin-bottom:2px;">Suivi à distance</div><div style="font-size:12px;color:var(--gris);line-height:1.5;">Rapports journaliers sur votre téléphone</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;border:1.5px solid var(--bordure);border-radius:12px;padding:16px;">
+          <div style="font-size:32px;flex-shrink:0;line-height:1;">👷</div>
+          <div><div style="font-size:13.5px;font-weight:700;color:var(--texte);margin-bottom:2px;">Artisans certifiés</div><div style="font-size:12px;color:var(--gris);line-height:1.5;">Vérifiés, notés, badge matricule</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;border:1.5px solid var(--bordure);border-radius:12px;padding:16px;">
+          <div style="font-size:32px;flex-shrink:0;line-height:1;">💰</div>
+          <div><div style="font-size:13.5px;font-weight:700;color:var(--texte);margin-bottom:2px;">Zéro intermédiaire</div><div style="font-size:12px;color:var(--gris);line-height:1.5;">Vous versez directement au fournisseur</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;border:1.5px solid var(--bordure);border-radius:12px;padding:16px;">
+          <div style="font-size:32px;flex-shrink:0;line-height:1;">📄</div>
+          <div><div style="font-size:13.5px;font-weight:700;color:var(--texte);margin-bottom:2px;">Contrat par SMS</div><div style="font-size:12px;color:var(--gris);line-height:1.5;">Signature numérique, facture consolidée</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;border:1.5px solid var(--bordure);border-radius:12px;padding:16px;">
+          <div style="font-size:32px;flex-shrink:0;line-height:1;">🏆</div>
+          <div><div style="font-size:13.5px;font-weight:700;color:var(--texte);margin-bottom:2px;">Équipe dédiée</div><div style="font-size:12px;color:var(--gris);line-height:1.5;">Un superviseur YOUMMA sur votre chantier</div></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ── 4. QUI SOMMES-NOUS ── -->
-  <div style="padding:76px 5%;background:#fff;">
+  <!-- ── 3. GUIDE PDF (bandeau compact) ── -->
+  <div style="padding:22px 5%;background:linear-gradient(135deg,var(--orange),var(--or-dark));">
+    <div style="max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px;text-align:center;">
+      <div style="font-size:13.5px;font-weight:700;color:#fff;">📥 Téléchargez notre guide complet — Tout savoir sur nos services</div>
+      <button id="pcPdfBtn" onclick="genererGuidePDF()" style="background:#fff;color:var(--orange);border:none;padding:10px 22px;border-radius:50px;font-weight:800;font-size:12.5px;cursor:pointer;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.15);">Télécharger le guide (PDF)</button>
+    </div>
+  </div>
+
+  <!-- ── 4. FOURNISSEURS PARTENAIRES (cœur de la page) ── -->
+  <div style="padding:60px 5%;background:var(--fond);">
     <div style="max-width:1100px;margin:0 auto;">
-      <div style="text-align:center;margin-bottom:48px;">
-        <h2 class="section-title" style="text-align:center;">Qui sommes-<span class="hl">nous</span> ?</h2>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:32px;text-align:center;">
-        <div>
-          <div style="font-size:38px;margin-bottom:14px;">🏢</div>
-          <div style="font-family:'Libre Baskerville',serif;font-size:17px;font-weight:700;color:var(--texte);margin-bottom:10px;">YOUMMA GROUP</div>
-          <p style="font-size:13.5px;color:var(--gris);line-height:1.7;">Groupe guinéen fondé à Conakry, actif dans la formation professionnelle et les services numériques.</p>
-        </div>
-        <div>
-          <div style="font-size:38px;margin-bottom:14px;">🔧</div>
-          <div style="font-family:'Libre Baskerville',serif;font-size:17px;font-weight:700;color:var(--texte);margin-bottom:10px;">YOUMMA JOBS</div>
-          <p style="font-size:13.5px;color:var(--gris);line-height:1.7;">La plateforme de mise en relation artisans-clients, avec système de vérification et registre chantier numérique.</p>
-        </div>
-        <div>
-          <div style="font-size:38px;margin-bottom:14px;">🌍</div>
-          <div style="font-family:'Libre Baskerville',serif;font-size:17px;font-weight:700;color:var(--texte);margin-bottom:10px;">YOUMMA DIASPORA</div>
-          <p style="font-size:13.5px;color:var(--gris);line-height:1.7;">Service dédié aux Guinéens de l'étranger souhaitant construire ou investir en Guinée.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 5. POURQUOI NOUS CONFIER VOTRE CHANTIER ── -->
-  <div style="padding:76px 5%;background:var(--fond);">
-    <div style="max-width:1100px;margin:0 auto;">
-      <div style="text-align:center;margin-bottom:44px;">
-        <h2 class="section-title" style="text-align:center;">Pourquoi <span class="hl">YOUMMA JOBS</span> ?</h2>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
-        <div class="pc-card-hover" style="background:#fff;border:1.5px solid var(--bordure);border-radius:var(--radius-lg);padding:26px;">
-          <div style="font-size:26px;margin-bottom:12px;">🔒</div>
-          <div style="font-size:14.5px;font-weight:700;color:var(--texte);margin-bottom:8px;">Registre matériaux infalsifiable</div>
-          <p style="font-size:13px;color:var(--gris);line-height:1.65;">Chaque sortie validée par 3 parties : superviseur, fournisseur, client.</p>
-        </div>
-        <div class="pc-card-hover" style="background:#fff;border:1.5px solid var(--bordure);border-radius:var(--radius-lg);padding:26px;">
-          <div style="font-size:26px;margin-bottom:12px;">📱</div>
-          <div style="font-size:14.5px;font-weight:700;color:var(--texte);margin-bottom:8px;">Suivi depuis l'étranger</div>
-          <p style="font-size:13px;color:var(--gris);line-height:1.65;">Rapports journaliers accessibles sur votre téléphone, où que vous soyez.</p>
-        </div>
-        <div class="pc-card-hover" style="background:#fff;border:1.5px solid var(--bordure);border-radius:var(--radius-lg);padding:26px;">
-          <div style="font-size:26px;margin-bottom:12px;">👷</div>
-          <div style="font-size:14.5px;font-weight:700;color:var(--texte);margin-bottom:8px;">Artisans vérifiés et notés</div>
-          <p style="font-size:13px;color:var(--gris);line-height:1.65;">Badge matricule, photos de réalisations, avis clients vérifiés.</p>
-        </div>
-        <div class="pc-card-hover" style="background:#fff;border:1.5px solid var(--bordure);border-radius:var(--radius-lg);padding:26px;">
-          <div style="font-size:26px;margin-bottom:12px;">💰</div>
-          <div style="font-size:14.5px;font-weight:700;color:var(--texte);margin-bottom:8px;">Zéro intermédiaire financier</div>
-          <p style="font-size:13px;color:var(--gris);line-height:1.65;">Vous versez directement au fournisseur. YOUMMA est témoin, pas intermédiaire.</p>
-        </div>
-        <div class="pc-card-hover" style="background:#fff;border:1.5px solid var(--bordure);border-radius:var(--radius-lg);padding:26px;">
-          <div style="font-size:26px;margin-bottom:12px;">📄</div>
-          <div style="font-size:14.5px;font-weight:700;color:var(--texte);margin-bottom:8px;">Contrat numérique</div>
-          <p style="font-size:13px;color:var(--gris);line-height:1.65;">Signé par SMS. Facture finale consolidée en clôture de chantier.</p>
-        </div>
-        <div class="pc-card-hover" style="background:#fff;border:1.5px solid var(--bordure);border-radius:var(--radius-lg);padding:26px;">
-          <div style="font-size:26px;margin-bottom:12px;">🏆</div>
-          <div style="font-size:14.5px;font-weight:700;color:var(--texte);margin-bottom:8px;">Garantie satisfaction</div>
-          <p style="font-size:13px;color:var(--gris);line-height:1.65;">Si un problème survient, notre équipe intervient et tranche.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 6. NOS FORMULES (premium) ── -->
-  <div style="padding:76px 5%;background:#fff;">
-    <div style="max-width:1100px;margin:0 auto;">
-      <div style="text-align:center;margin-bottom:48px;">
-        <h2 class="section-title" style="text-align:center;">Choisissez votre <span class="hl">formule</span></h2>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;align-items:stretch;">
-
-        <div class="pc-formule-hover" style="background:#fff;border:1.5px solid var(--bordure);border-radius:var(--radius-xl);padding:34px 28px;box-shadow:0 4px 20px rgba(0,0,0,.05);display:flex;flex-direction:column;">
-          <div style="font-size:36px;margin-bottom:16px;">💬</div>
-          <div style="font-family:'Libre Baskerville',serif;font-size:19px;font-weight:700;color:var(--texte);margin-bottom:8px;">Assistance</div>
-          <div style="font-size:15px;font-weight:800;color:var(--bleu);margin-bottom:16px;">À partir de 500 000 GNF</div>
-          <p style="font-size:13.5px;color:var(--gris);line-height:1.75;margin-bottom:22px;flex:1;">Mise en relation, sélection artisans, devis comparatifs.</p>
-          <button onclick="document.getElementById('pcFormSection')?.scrollIntoView({behavior:'smooth',block:'start'})" style="width:100%;padding:13px;background:#fff;border:1.5px solid var(--bleu);color:var(--bleu);border-radius:var(--radius-md);font-weight:700;font-size:13.5px;cursor:pointer;">Choisir Assistance</button>
-        </div>
-
-        <div class="pc-formule-hover" style="background:linear-gradient(160deg,var(--bleu),#0D0D2E);border-radius:var(--radius-xl);padding:38px 28px;position:relative;box-shadow:0 20px 48px rgba(26,26,78,.3);display:flex;flex-direction:column;">
-          <span style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--or);color:#1A1A4E;font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:5px 16px;border-radius:20px;white-space:nowrap;">★ Populaire</span>
-          <div style="font-size:36px;margin-bottom:16px;">📊</div>
-          <div style="font-family:'Libre Baskerville',serif;font-size:19px;font-weight:700;color:#fff;margin-bottom:8px;">Suivi de Chantier</div>
-          <div style="font-size:15px;font-weight:800;color:var(--or);margin-bottom:16px;">À partir de 1 500 000 GNF</div>
-          <p style="font-size:13.5px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:22px;flex:1;">Superviseur terrain, rapports journaliers, registre matériaux.</p>
-          <button onclick="document.getElementById('pcFormSection')?.scrollIntoView({behavior:'smooth',block:'start'})" style="width:100%;padding:13px;background:var(--orange);border:none;color:#fff;border-radius:var(--radius-md);font-weight:700;font-size:13.5px;cursor:pointer;">Choisir Suivi</button>
-        </div>
-
-        <div class="pc-formule-hover" style="background:#fff;border:1.5px solid var(--bordure);border-radius:var(--radius-xl);padding:34px 28px;box-shadow:0 4px 20px rgba(0,0,0,.05);display:flex;flex-direction:column;">
-          <div style="font-size:36px;margin-bottom:16px;">🏗️</div>
-          <div style="font-family:'Libre Baskerville',serif;font-size:19px;font-weight:700;color:var(--texte);margin-bottom:8px;">Gestion Complète</div>
-          <div style="font-size:15px;font-weight:800;color:var(--bleu);margin-bottom:16px;">Sur devis</div>
-          <p style="font-size:13.5px;color:var(--gris);line-height:1.75;margin-bottom:22px;flex:1;">Tout inclus : artisans, matériaux, supervision, rapports.</p>
-          <button onclick="document.getElementById('pcFormSection')?.scrollIntoView({behavior:'smooth',block:'start'})" style="width:100%;padding:13px;background:#fff;border:1.5px solid var(--bleu);color:var(--bleu);border-radius:var(--radius-md);font-weight:700;font-size:13.5px;cursor:pointer;">Demander un devis</button>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 7. GUIDE PDF ── -->
-  <div style="padding:64px 5%;background:linear-gradient(135deg,var(--orange),var(--or-dark));text-align:center;">
-    <div style="max-width:600px;margin:0 auto;">
-      <h2 style="font-family:'Libre Baskerville',serif;font-size:clamp(22px,3vw,30px);font-weight:700;color:#fff;margin-bottom:12px;">Téléchargez notre guide complet</h2>
-      <p style="font-size:14.5px;color:rgba(255,255,255,.9);line-height:1.7;margin-bottom:28px;">Tout ce que vous devez savoir avant de commencer votre projet de construction avec YOUMMA JOBS — 20 pages, gratuit.</p>
-      <button id="pcPdfBtn" onclick="genererGuidePDF()" style="background:#fff;color:var(--orange);border:none;padding:15px 32px;border-radius:50px;font-weight:800;font-size:14.5px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.18);">📥 Télécharger le guide gratuit (PDF)</button>
-    </div>
-  </div>
-
-  <!-- ── 8. FOURNISSEURS PARTENAIRES ── -->
-  <div style="padding:76px 5%;background:#fff;">
-    <div style="max-width:1100px;margin:0 auto;">
-      <div style="text-align:center;margin-bottom:44px;">
+      <div style="text-align:center;margin-bottom:36px;">
         <h2 class="section-title" style="text-align:center;">Nos fournisseurs <span class="hl">partenaires</span></h2>
-        <p class="section-desc" style="margin:0 auto;text-align:center;">Des partenaires de confiance, sélectionnés et vérifiés par YOUMMA JOBS pour la qualité et la fiabilité de leurs matériaux.</p>
+        <p class="section-desc" style="margin:0 auto;text-align:center;">Cliquez sur un fournisseur pour voir son catalogue complet.</p>
       </div>
-      <div id="pcFournisseursGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;">
+      <div id="pcFournisseursGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:20px;">
         <div style="text-align:center;padding:30px;color:var(--gris);font-size:13px;grid-column:1/-1;">Chargement…</div>
       </div>
     </div>
   </div>
 
-  <!-- ── 9. TIMELINE 7 ÉTAPES (redesign) ── -->
-  <div style="padding:76px 5%;background:var(--fond);">
-    <div style="max-width:820px;margin:0 auto;">
-      <div style="text-align:center;margin-bottom:8px;">
-        <h2 class="section-title" style="text-align:center;">Comment ça <span class="hl">marche</span> ?</h2>
-        <p style="font-size:13.5px;font-weight:600;color:var(--gris);letter-spacing:.02em;margin-bottom:48px;">How it works</p>
+  <!-- ── 5. FORMULAIRE LEADS ── -->
+  <div id="pcFormSection" style="padding:64px 5%;background:#0D0D2E;">
+    <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:var(--radius-xl);padding:38px 32px;">
+      <div style="text-align:center;margin-bottom:22px;">
+        <h2 class="section-title" style="text-align:center;margin-bottom:6px;">Démarrer votre <span class="hl">projet</span></h2>
+        <p style="font-size:13px;font-weight:700;color:var(--or-dark);">Réponse sous 24h</p>
       </div>
-      <div class="pc-timeline" style="display:flex;flex-direction:column;gap:32px;">
-
-        <div class="pc-timeline-item">
-          <div style="flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;">1</div>
-          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">📋 Vous nous contactez</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">Remplissez le formulaire, on vous rappelle sous 24h</div></div>
-        </div>
-        <div class="pc-timeline-item">
-          <div style="flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;">2</div>
-          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">🗣️ Consultation gratuite</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">On discute de votre projet et on choisit la formule</div></div>
-        </div>
-        <div class="pc-timeline-item">
-          <div style="flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;">3</div>
-          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">📄 Devis et contrat</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">Devis transparent, contrat numérique signé par SMS</div></div>
-        </div>
-        <div class="pc-timeline-item">
-          <div style="flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;">4</div>
-          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">👷 Sélection des artisans</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">On choisit les meilleurs artisans vérifiés pour votre projet</div></div>
-        </div>
-        <div class="pc-timeline-item">
-          <div style="flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;">5</div>
-          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">🏗️ Démarrage du chantier</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">Votre superviseur YOUMMA ouvre le registre matériaux</div></div>
-        </div>
-        <div class="pc-timeline-item">
-          <div style="flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;">6</div>
-          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">📊 Rapports journaliers</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">Vous validez chaque jour ce qui sort, ce qui est utilisé, votre solde</div></div>
-        </div>
-        <div class="pc-timeline-item">
-          <div style="flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;">7</div>
-          <div><div style="font-size:15px;font-weight:700;color:var(--texte);margin-bottom:4px;">✅ Réception et clôture</div><div style="font-size:13.5px;color:var(--gris);line-height:1.65;">Rapport final signé par toutes les parties</div></div>
-        </div>
-
+      <div class="form-group">
+        <label>Nom complet</label>
+        <input type="text" id="pcNom" placeholder="Mamadou Diallo" required/>
       </div>
+      <div class="form-group">
+        <label>Téléphone</label>
+        <input type="tel" id="pcTelephone" placeholder="224XXXXXXXXX" required/>
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea id="pcMessage" placeholder="Décrivez votre projet..."></textarea>
+      </div>
+      <button class="btn-submit" id="pcSubmitBtn" onclick="envoyerLeadConstruire()">Envoyer →</button>
     </div>
   </div>
 
-  <!-- ── 10. TÉMOIGNAGES ── -->
-  <div style="padding:76px 5%;background:#fff;">
-    <div style="max-width:1100px;margin:0 auto;">
-      <div style="text-align:center;margin-bottom:44px;">
-        <h2 class="section-title" style="text-align:center;">Ils nous ont fait <span class="hl">confiance</span></h2>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;">
-        <div style="background:var(--fond);border-radius:var(--radius-lg);padding:26px;">
-          <div style="color:var(--or);font-size:14px;margin-bottom:12px;">⭐⭐⭐⭐⭐</div>
-          <p style="font-size:13.5px;color:var(--texte);line-height:1.7;font-style:italic;margin-bottom:18px;">"Grâce à YOUMMA JOBS, j'ai pu suivre la construction de ma maison depuis Paris. Chaque dépense était visible en temps réel."</p>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:36px;height:36px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">MD</div>
-            <div><div style="font-size:12.5px;font-weight:700;color:var(--texte);">Mamadou D.</div><div style="font-size:11px;color:var(--gris);">Diaspora France</div></div>
-          </div>
-        </div>
-        <div style="background:var(--fond);border-radius:var(--radius-lg);padding:26px;">
-          <div style="color:var(--or);font-size:14px;margin-bottom:12px;">⭐⭐⭐⭐⭐</div>
-          <p style="font-size:13.5px;color:var(--texte);line-height:1.7;font-style:italic;margin-bottom:18px;">"Le registre matériaux m'a évité les malversations habituelles des chantiers. Je recommande à 100%."</p>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:36px;height:36px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">FK</div>
-            <div><div style="font-size:12.5px;font-weight:700;color:var(--texte);">Fatoumata K.</div><div style="font-size:11px;color:var(--gris);">Conakry</div></div>
-          </div>
-        </div>
-        <div style="background:var(--fond);border-radius:var(--radius-lg);padding:26px;">
-          <div style="color:var(--or);font-size:14px;margin-bottom:12px;">⭐⭐⭐⭐⭐</div>
-          <p style="font-size:13.5px;color:var(--texte);line-height:1.7;font-style:italic;margin-bottom:18px;">"L'équipe YOUMMA a sélectionné les meilleurs maçons pour ma villa. Travail impeccable, délais respectés."</p>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div style="width:36px;height:36px;border-radius:50%;background:var(--violet);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">IS</div>
-            <div><div style="font-size:12.5px;font-weight:700;color:var(--texte);">Ibrahim S.</div><div style="font-size:11px;color:var(--gris);">Diaspora Belgique</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 11. FORMULAIRE LEADS (premium) ── -->
-  <div id="pcFormSection" style="padding:80px 5%;background:linear-gradient(135deg,#0D0D2E,var(--bleu));">
-    <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:var(--radius-xl);padding:44px 36px;box-shadow:0 30px 70px rgba(0,0,0,.35);">
-      <div style="text-align:center;margin-bottom:8px;">
-        <h2 class="section-title" style="text-align:center;">Démarrez votre projet <span class="hl">aujourd'hui</span></h2>
-        <p style="font-size:13.5px;font-weight:700;color:var(--or-dark);letter-spacing:.01em;">Notre équipe vous rappelle sous 24h</p>
-      </div>
-      <div style="margin-top:24px;">
-        <div class="form-group">
-          <label>Nom complet</label>
-          <input type="text" id="pcNom" placeholder="Mamadou Diallo" required/>
-        </div>
-        <div class="form-group">
-          <label>Téléphone</label>
-          <input type="tel" id="pcTelephone" placeholder="224XXXXXXXXX" required/>
-        </div>
-        <div class="form-group">
-          <label>Message / description du projet</label>
-          <textarea id="pcMessage" placeholder="Décrivez votre projet..."></textarea>
-        </div>
-        <button class="btn-submit" id="pcSubmitBtn" onclick="envoyerLeadConstruire()">Envoyer ma demande →</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 12. FAQ ── -->
-  <div style="padding:76px 5%;background:#fff;">
+  <!-- ── 6. FAQ ── -->
+  <div style="padding:64px 5%;background:#fff;">
     <div style="max-width:760px;margin:0 auto;">
-      <div style="text-align:center;margin-bottom:36px;">
+      <div style="text-align:center;margin-bottom:32px;">
         <h2 class="section-title" style="text-align:center;">Questions <span class="hl">fréquentes</span></h2>
       </div>
       <div style="display:flex;flex-direction:column;gap:12px;">
@@ -2630,6 +2446,17 @@ async function verifierSession() {
         <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">YOUMMA JOBS touche-t-il l'argent des matériaux ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>Non. Les versements se font directement entre vous et votre fournisseur. YOUMMA JOBS est témoin et garant de la transparence, pas intermédiaire financier.</p></div></div>
         <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-question"><span class="faq-q-text">Comment sont sélectionnés les artisans ?</span><span class="faq-icon">+</span></div><div class="faq-answer"><p>Tous les artisans YOUMMA JOBS sont vérifiés, notés par leurs clients, et ont un badge matricule. Vous pouvez consulter leur profil avant de les choisir.</p></div></div>
       </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL CATALOGUE FOURNISSEUR (mêmes classes .modal-overlay/.modal que le site, id dédié pour ne pas interférer avec le modal profil prestataire) ── -->
+  <div class="modal-overlay" id="pcCatalogueOverlay" onclick="_pcFermerCatalogueModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title" id="pcCatalogueModalTitle">Fournisseur</div>
+        <button class="modal-close" onclick="_pcFermerCatalogueModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="pcCatalogueModalBody"></div>
     </div>
   </div>
 
@@ -9875,29 +9702,38 @@ function _pcCountersInit() {
   counters.forEach(function(c) { _pcCountersObserver.observe(c); });
 }
 
+// ── Formatage GNF ──
+function formatGNF(n) {
+  return n.toLocaleString('fr-FR') + ' GNF';
+}
+
+function _pcInitiales(nom) {
+  return (nom || '').split(/\s+/).slice(0, 2).map(function(w) { return w[0] || ''; }).join('').toUpperCase();
+}
+
 // ── Fournisseurs partenaires : chargement Supabase avec repli statique ──
+// Les fournisseurs de repli portent un id 'fallback-N' (pas un vrai UUID
+// Supabase) : _pcChargerCatalogue() le détecte et n'interroge pas la base
+// pour ceux-là, il n'y a rien à catalogeur derrière un exemple statique.
 const _PC_FOURNISSEURS_FALLBACK = [
-  { nom_entreprise: 'Conakry Matériaux SARL', specialite: 'Quincaillerie générale', adresse: 'Ratoma, Conakry', telephone: '224622000000' },
-  { nom_entreprise: 'Ciments & Fers Guinée', specialite: 'Ciment, fer à béton', adresse: 'Kaloum, Conakry', telephone: '224628000000' },
-  { nom_entreprise: 'Bois & Menuiserie Elite', specialite: 'Bois, contreplaqué', adresse: 'Matam, Conakry', telephone: '224655000000' }
+  { id: 'fallback-1', nom_entreprise: 'Conakry Matériaux SARL', specialite: 'Quincaillerie générale', adresse: 'Ratoma, Conakry', telephone: '224622000000', description: null },
+  { id: 'fallback-2', nom_entreprise: 'Ciments & Fers Guinée', specialite: 'Ciment, fer à béton', adresse: 'Kaloum, Conakry', telephone: '224628000000', description: null },
+  { id: 'fallback-3', nom_entreprise: 'Bois & Menuiserie Elite', specialite: 'Bois, contreplaqué', adresse: 'Matam, Conakry', telephone: '224655000000', description: null }
 ];
+let _pcFournisseursData = [];
 
 function _pcFournisseurCardHTML(f) {
   const nom = f.nom_entreprise || 'Fournisseur';
-  const ini = nom.split(/\s+/).slice(0, 2).map(function(w) { return w[0] || ''; }).join('').toUpperCase();
-  const tel = f.telephone || '';
+  const ini = _pcInitiales(nom);
   const zone = f.adresse || '';
   const spec = f.specialite || '';
-  return '<div style="background:var(--fond);border-radius:var(--radius-lg);padding:24px;border:1.5px solid var(--bordure);">'
-    + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">'
-    +   '<div style="width:46px;height:46px;border-radius:50%;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;">' + ini + '</div>'
-    +   '<div style="min-width:0;"><div style="font-size:14px;font-weight:700;color:var(--texte);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + nom + '</div>'
-    +     (spec ? '<span style="display:inline-block;margin-top:3px;font-size:10.5px;font-weight:700;color:var(--orange);background:var(--orange-light);padding:2px 9px;border-radius:20px;">' + spec + '</span>' : '')
-    +   '</div>'
-    + '</div>'
-    + (zone ? '<div style="font-size:12.5px;color:var(--gris);margin-bottom:6px;">📍 ' + zone + '</div>' : '')
-    + (tel ? '<div style="font-size:12.5px;color:var(--gris);margin-bottom:10px;">📞 ' + tel + '</div>' : '')
-    + '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#16A34A;background:#F0FDF4;padding:4px 11px;border-radius:20px;">✅ Vérifié YOUMMA JOBS</span>'
+  return '<div class="pc-fournisseur-card" onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="padding:22px;">'
+    + '<div style="width:52px;height:52px;border-radius:14px;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-bottom:14px;">' + ini + '</div>'
+    + '<div style="font-size:16px;font-weight:700;color:var(--texte);margin-bottom:8px;">' + nom + '</div>'
+    + (spec ? '<div style="margin-bottom:10px;"><span style="display:inline-block;font-size:11px;font-weight:700;color:var(--orange);background:var(--orange-light);padding:3px 10px;border-radius:20px;">' + spec + '</span></div>' : '')
+    + (zone ? '<div style="font-size:12.5px;color:var(--gris);margin-bottom:12px;">📍 ' + zone + '</div>' : '')
+    + '<div style="margin-bottom:16px;"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#16A34A;background:#F0FDF4;padding:4px 11px;border-radius:20px;">✅ Vérifié YOUMMA JOBS</span></div>'
+    + '<button onclick="event.stopPropagation();_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="width:100%;padding:11px;background:var(--bleu);border:none;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;cursor:pointer;">Voir le catalogue →</button>'
     + '</div>';
 }
 
@@ -9907,15 +9743,108 @@ async function _pcChargerFournisseurs() {
   let list = _PC_FOURNISSEURS_FALLBACK;
   try {
     const { data, error } = await sb.from('fournisseurs_materiaux')
-      .select('id, nom_entreprise, telephone, adresse, specialite, actif')
+      .select('*')
       .eq('actif', true)
-      .limit(6);
+      .order('nom_entreprise');
     if (!error && data && data.length > 0) list = data;
   } catch (e) {
     console.warn('[construire] fournisseurs_materiaux indisponible, repli statique:', e.message);
   }
+  _pcFournisseursData = list;
   grid.innerHTML = list.map(_pcFournisseurCardHTML).join('');
   grid.dataset.loaded = '1';
+}
+
+// ── Modal catalogue fournisseur : réutilise les classes .modal-overlay/.modal/
+// .modal-header/.modal-body du site (même style visuel) mais avec son propre
+// id (#pcCatalogueOverlay) pour rester indépendant du modal de profil
+// prestataire existant (openModal/closeModal, tableau PRESTATAIRES) — on ne
+// touche à aucun de ces éléments.
+function _pcOuvrirFournisseurModal(id) {
+  const f = _pcFournisseursData.find(function(x) { return String(x.id) === String(id); });
+  if (!f) return;
+  const ini = _pcInitiales(f.nom_entreprise);
+  const titleEl = document.getElementById('pcCatalogueModalTitle');
+  if (titleEl) titleEl.textContent = f.nom_entreprise || 'Fournisseur';
+
+  const body = document.getElementById('pcCatalogueModalBody');
+  if (body) {
+    body.innerHTML =
+      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">'
+      +   '<div style="width:64px;height:64px;border-radius:16px;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;">' + ini + '</div>'
+      +   '<div>'
+      +     '<div style="font-size:17px;font-weight:700;color:var(--texte);">' + (f.nom_entreprise || '') + '</div>'
+      +     (f.specialite ? '<span style="display:inline-block;margin-top:4px;font-size:11px;font-weight:700;color:var(--orange);background:var(--orange-light);padding:3px 10px;border-radius:20px;">' + f.specialite + '</span>' : '')
+      +   '</div>'
+      + '</div>'
+      + '<div style="margin-bottom:14px;"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#16A34A;background:#F0FDF4;padding:3px 10px;border-radius:20px;">✅ Vérifié YOUMMA JOBS</span></div>'
+      + (f.adresse ? '<div style="font-size:13.5px;color:var(--texte);margin-bottom:8px;">📍 ' + f.adresse + '</div>' : '')
+      + (f.telephone ? '<div style="font-size:13.5px;color:var(--texte);margin-bottom:8px;">📞 ' + f.telephone + '</div>' : '')
+      + (f.description ? '<div style="font-size:13px;color:var(--gris);line-height:1.6;margin-bottom:10px;">📝 ' + f.description + '</div>' : '')
+      + '<div style="border-top:1.5px solid var(--bordure);margin-top:14px;padding-top:18px;">'
+      +   '<div style="font-size:14.5px;font-weight:700;color:var(--texte);margin-bottom:14px;">Catalogue de produits</div>'
+      +   '<div id="pcCatalogueList"><div style="text-align:center;padding:20px;color:var(--gris);font-size:13px;">Chargement…</div></div>'
+      + '</div>';
+  }
+
+  const overlay = document.getElementById('pcCatalogueOverlay');
+  if (overlay) overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  _pcChargerCatalogue(f.id);
+}
+
+function _pcFermerCatalogueModal() {
+  const overlay = document.getElementById('pcCatalogueOverlay');
+  if (overlay) overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function _pcCatalogueMessageIndisponible(telephone) {
+  const telWa = telephone ? String(telephone).replace(/\D/g, '') : '';
+  return '<div style="text-align:center;padding:16px 10px 6px;">'
+    + '<div style="font-size:13.5px;color:var(--gris);line-height:1.6;margin-bottom:16px;">Catalogue en cours de mise à jour.<br>Contactez directement ce fournisseur.</div>'
+    + (telWa ? '<a href="https://wa.me/' + telWa + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:11px 22px;border-radius:50px;text-decoration:none;font-weight:700;font-size:13px;"><i class="fa-brands fa-whatsapp"></i> Contacter sur WhatsApp</a>' : '')
+    + '</div>';
+}
+
+async function _pcChargerCatalogue(fournisseurId) {
+  const list = document.getElementById('pcCatalogueList');
+  if (!list) return;
+  const f = _pcFournisseursData.find(function(x) { return String(x.id) === String(fournisseurId); });
+
+  // Fournisseurs de repli statiques : pas de vrai id Supabase, inutile d'interroger la base.
+  if (String(fournisseurId).indexOf('fallback-') === 0) {
+    list.innerHTML = _pcCatalogueMessageIndisponible(f && f.telephone);
+    return;
+  }
+
+  try {
+    const { data, error } = await sb.from('catalogue_materiaux')
+      .select('*')
+      .eq('fournisseur_id', fournisseurId)
+      .eq('disponible', true)
+      .order('nom_produit');
+    if (error || !data || data.length === 0) {
+      list.innerHTML = _pcCatalogueMessageIndisponible(f && f.telephone);
+      return;
+    }
+    list.innerHTML = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">'
+      + data.map(function(p) {
+          return '<div style="border:1.5px solid var(--bordure);border-radius:12px;overflow:hidden;">'
+            + (p.photo_url
+                ? '<img src="' + p.photo_url + '" loading="lazy" alt="' + (p.nom_produit || '') + '" style="width:100%;height:90px;object-fit:cover;display:block;"/>'
+                : '<div style="width:100%;height:90px;background:var(--fond);"></div>')
+            + '<div style="padding:10px;">'
+            +   '<div style="font-size:12.5px;font-weight:700;color:var(--texte);margin-bottom:4px;">' + (p.nom_produit || '') + '</div>'
+            +   '<div style="font-size:12px;font-weight:700;color:var(--orange);">' + (p.prix_unitaire != null ? formatGNF(p.prix_unitaire) : '—') + (p.unite ? ' <span style="font-weight:600;color:var(--gris);">/ ' + p.unite + '</span>' : '') + '</div>'
+            + '</div>'
+            + '</div>';
+        }).join('')
+      + '</div>';
+  } catch (e) {
+    console.warn('[construire] catalogue_materiaux indisponible:', e.message);
+    list.innerHTML = _pcCatalogueMessageIndisponible(f && f.telephone);
+  }
 }
 
 // ── Guide PDF (texte, généré côté client — jsPDF chargé à la demande) ──
