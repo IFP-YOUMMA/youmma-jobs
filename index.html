@@ -2634,6 +2634,757 @@ if (typeof connexionPrestataire === 'undefined') {
 
 </div>
 
+<div class="page" id="page-espace">
+<div style="background:linear-gradient(135deg,#1A1A4E 0%,#0D0D2E 100%);min-height:100vh;padding:40px 20px;display:flex;align-items:flex-start;justify-content:center;">
+
+  <!-- Étape 1 : téléphone -->
+  <div id="espaceEtapeTel" style="background:#fff;border-radius:24px;padding:36px 32px;width:100%;max-width:440px;box-shadow:0 32px 80px rgba(0,0,0,.3);">
+    <button onclick="goHome()" style="background:none;border:none;color:#9CA3AF;font-size:12.5px;cursor:pointer;padding:0;margin-bottom:16px;"><i class="fa-solid fa-arrow-left" style="font-size:10px;"></i> Accueil</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;justify-content:center;">
+      <img src="data:image/png;base64,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" alt="YJ" style="width:44px;height:44px;object-fit:contain;border-radius:10px;"/>
+      <div style="font-family:'Libre Baskerville',serif;font-weight:700;font-size:16px;color:#1A1A4E;">YOUMMA <span style="color:#E85D04;">JOBS</span></div>
+    </div>
+    <h1 style="font-family:'Libre Baskerville',serif;font-size:20px;font-weight:700;color:#1A1A4E;text-align:center;margin-bottom:6px;">Accès espace professionnel</h1>
+    <p style="font-size:13px;color:#6B7280;text-align:center;margin-bottom:22px;">Fournisseurs · Clients · Superviseurs</p>
+    <div id="espaceErreurTel" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 14px;font-size:13px;color:#DC2626;margin-bottom:16px;"></div>
+    <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:7px;">Numéro de téléphone</label>
+    <input id="espaceTelephone" type="tel" placeholder="224XXXXXXXXX" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid #E5E7EB;border-radius:11px;font-size:14px;outline:none;margin-bottom:20px;" onkeydown="if(event.key==='Enter')_espaceEnvoyerCode()"/>
+    <button id="espaceBtnEnvoyer" onclick="_espaceEnvoyerCode()" style="width:100%;padding:14px;background:linear-gradient(135deg,#E85D04,#C74B00);border:none;border-radius:12px;color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(232,93,4,.35);">Recevoir mon code</button>
+  </div>
+
+  <!-- Étape 2 : code OTP -->
+  <div id="espaceEtapeOtp" style="display:none;background:#fff;border-radius:24px;padding:36px 32px;width:100%;max-width:440px;box-shadow:0 32px 80px rgba(0,0,0,.3);">
+    <h1 style="font-family:'Libre Baskerville',serif;font-size:20px;font-weight:700;color:#1A1A4E;text-align:center;margin-bottom:6px;">Vérification</h1>
+    <p style="font-size:13px;color:#6B7280;text-align:center;margin-bottom:20px;">Code envoyé au <strong id="espaceOtpTelAffiche"></strong></p>
+    <div id="espaceErreurOtp" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 14px;font-size:13px;color:#DC2626;margin-bottom:16px;text-align:center;"></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px;">
+      <input id="espaceOtp1" type="password" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:10px;font-size:20px;font-weight:700;outline:none;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,1);if(this.value)document.getElementById('espaceOtp2').focus()"/>
+      <input id="espaceOtp2" type="password" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:10px;font-size:20px;font-weight:700;outline:none;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,1);if(this.value)document.getElementById('espaceOtp3').focus()"/>
+      <input id="espaceOtp3" type="password" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:10px;font-size:20px;font-weight:700;outline:none;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,1);if(this.value)document.getElementById('espaceOtp4').focus()"/>
+      <input id="espaceOtp4" type="password" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:10px;font-size:20px;font-weight:700;outline:none;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,1);if(this.value)document.getElementById('espaceOtp5').focus()"/>
+      <input id="espaceOtp5" type="password" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:10px;font-size:20px;font-weight:700;outline:none;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,1);if(this.value)document.getElementById('espaceOtp6').focus()"/>
+      <input id="espaceOtp6" type="password" inputmode="numeric" maxlength="1" style="width:44px;height:52px;text-align:center;border:2px solid #E5E7EB;border-radius:10px;font-size:20px;font-weight:700;outline:none;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,1);if(this.value)document.getElementById('espaceBtnValider').click()"/>
+    </div>
+    <div id="espaceOtpCountdown" style="text-align:center;font-size:12px;color:#9CA3AF;margin-bottom:20px;"></div>
+    <button id="espaceBtnValider" onclick="_espaceValiderCode()" style="width:100%;padding:14px;background:linear-gradient(135deg,#E85D04,#C74B00);border:none;border-radius:12px;color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(232,93,4,.35);margin-bottom:14px;">Valider le code</button>
+    <div style="display:flex;justify-content:space-between;">
+      <button onclick="_espaceRetourTel()" style="background:none;border:none;color:#9CA3AF;font-size:12.5px;cursor:pointer;padding:0;">‹ Modifier le numéro</button>
+      <button id="espaceBtnRenvoyer" onclick="_espaceRenvoyerCode()" style="background:none;border:none;color:#E85D04;font-size:12.5px;font-weight:700;cursor:pointer;padding:0;">Renvoyer le code</button>
+    </div>
+  </div>
+
+  <!-- Tableau de bord FOURNISSEUR -->
+  <div id="espaceDashFournisseur" style="display:none;width:100%;max-width:920px;">
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div style="font-size:17px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceFourNom"></div>
+        <div style="font-size:12.5px;color:#E8650A;font-weight:700;">Fournisseur YOUMMA JOBS</div>
+      </div>
+      <button onclick="_espaceDeconnexion()" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">Déconnexion</button>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+      <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;"><i class="fa-solid fa-building" style="color:#059669;margin-right:6px;"></i>Mes chantiers et soldes</div>
+      <div id="espaceFourChantiers" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+      <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;"><i class="fa-solid fa-clock" style="color:#D97706;margin-right:6px;"></i>Transactions en attente de validation</div>
+      <div id="espaceFourEnAttente" style="display:flex;flex-direction:column;gap:10px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+      <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;"><i class="fa-solid fa-list-check" style="color:#E85D04;margin-right:6px;"></i>Historique complet</div>
+      <div class="adm-table-wrap">
+        <table class="adm-table" style="width:100%;border-collapse:collapse;">
+          <thead><tr style="background:#F4F6FB;border-bottom:2px solid #E5E7EB;">
+            <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Date</th>
+            <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Chantier</th>
+            <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Type</th>
+            <th style="padding:10px 12px;text-align:right;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Montant</th>
+            <th style="padding:10px 12px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Statut</th>
+          </tr></thead>
+          <tbody id="espaceFourHistorique"><tr><td colspan="5" style="text-align:center;padding:20px;color:#9CA3AF;">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau de bord SUPERVISEUR -->
+  <div id="espaceDashSuperviseur" style="display:none;width:100%;max-width:920px;">
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div style="font-size:17px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceSupNom"></div>
+        <div style="font-size:12.5px;color:#7C3AED;font-weight:700;">Superviseur YOUMMA JOBS</div>
+      </div>
+      <button onclick="_espaceDeconnexion()" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">Déconnexion</button>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+      <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;"><i class="fa-solid fa-building" style="color:#059669;margin-right:6px;"></i>Mes chantiers</div>
+      <div id="espaceSupChantiers" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
+
+    <div id="espaceSupGestionZone" style="display:none;">
+      <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;"><i class="fa-solid fa-truck-fast" style="color:#E8650A;margin-right:6px;"></i>Demander une sortie de matériaux — <span id="espaceSupChantierNom" style="color:#7C3AED;"></span></div>
+        <div style="display:flex;flex-direction:column;gap:12px;max-width:480px;">
+          <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Fournisseur *</label>
+            <select id="espaceSupFournisseur" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;background:#fff;"><option value="">— Sélectionner —</option></select>
+          </div>
+          <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Matériau *</label>
+            <input id="espaceSupMateriau" type="text" placeholder="Ciment, fer à béton..." style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;"/>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;"><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Quantité *</label>
+              <input id="espaceSupQuantite" type="number" min="1" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;"/></div>
+            <div style="flex:1;"><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Unité *</label>
+              <input id="espaceSupUnite" type="text" placeholder="sac, tonne..." style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;"/></div>
+          </div>
+          <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Montant estimé (GNF) *</label>
+            <input id="espaceSupMontant" type="number" min="1" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;"/>
+          </div>
+          <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Description</label>
+            <textarea id="espaceSupDescription" rows="2" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;"></textarea>
+          </div>
+          <div id="espaceSupErreur" style="display:none;color:#DC2626;font-size:13px;"></div>
+          <button id="espaceSupBtnDemande" onclick="_espaceSauvegarderDemandeSortie()" style="background:#7C3AED;color:#fff;border:none;border-radius:8px;padding:11px;font-size:13.5px;font-weight:700;cursor:pointer;">Envoyer la demande</button>
+        </div>
+      </div>
+
+      <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+        <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;"><i class="fa-solid fa-list-check" style="color:#E85D04;margin-right:6px;"></i>Transactions du chantier</div>
+        <div class="adm-table-wrap">
+          <table class="adm-table" style="width:100%;border-collapse:collapse;">
+            <thead><tr style="background:#F4F6FB;border-bottom:2px solid #E5E7EB;">
+              <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Date</th>
+              <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Fournisseur</th>
+              <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Acteur</th>
+              <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Type</th>
+              <th style="padding:10px 12px;text-align:right;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Montant</th>
+              <th style="padding:10px 12px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Statut</th>
+            </tr></thead>
+            <tbody id="espaceSupTransactions"><tr><td colspan="6" style="text-align:center;padding:20px;color:#9CA3AF;">—</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau de bord CLIENT (lecture seule) -->
+  <div id="espaceDashClient" style="display:none;width:100%;max-width:920px;">
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div>
+        <div style="font-size:17px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceCliNom"></div>
+        <div style="font-size:12.5px;color:#2563EB;font-weight:700;">Espace client YOUMMA JOBS</div>
+      </div>
+      <button onclick="_espaceDeconnexion()" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">Déconnexion</button>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+      <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;"><i class="fa-solid fa-building" style="color:#059669;margin-right:6px;"></i>Mes chantiers</div>
+      <div id="espaceCliChantiers" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+      <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;"><i class="fa-solid fa-money-bill-wave" style="color:#2563EB;margin-right:6px;"></i>Mes versements</div>
+      <div class="adm-table-wrap">
+        <table class="adm-table" style="width:100%;border-collapse:collapse;">
+          <thead><tr style="background:#F4F6FB;border-bottom:2px solid #E5E7EB;">
+            <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Date</th>
+            <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Fournisseur</th>
+            <th style="padding:10px 12px;text-align:right;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Montant</th>
+            <th style="padding:10px 12px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Statut</th>
+          </tr></thead>
+          <tbody id="espaceCliVersements"><tr><td colspan="4" style="text-align:center;padding:20px;color:#9CA3AF;">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+      <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;"><i class="fa-solid fa-truck-fast" style="color:#E8650A;margin-right:6px;"></i>Sorties validées</div>
+      <div class="adm-table-wrap">
+        <table class="adm-table" style="width:100%;border-collapse:collapse;">
+          <thead><tr style="background:#F4F6FB;border-bottom:2px solid #E5E7EB;">
+            <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Date</th>
+            <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Matériau</th>
+            <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Fournisseur</th>
+            <th style="padding:10px 12px;text-align:right;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Montant</th>
+          </tr></thead>
+          <tbody id="espaceCliSorties"><tr><td colspan="4" style="text-align:center;padding:20px;color:#9CA3AF;">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;">
+      <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:14px;"><i class="fa-solid fa-scale-balanced" style="color:#7C3AED;margin-right:6px;"></i>Solde par fournisseur</div>
+      <div id="espaceCliSoldes" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// ESPACE PROFESSIONNEL (#espace) — connexion OTP SMS unique pour
+// clients / fournisseurs_materiaux / superviseurs, détection de rôle
+// par numéro de téléphone, tableau de bord dédié par rôle.
+// Réutilise l'infrastructure OTP existante telle quelle : table
+// verification_codes (phone/code/expires_at/used) + edge function
+// send-otp via window._smsSend(telephoneE164) (déjà définie plus haut
+// dans le fichier pour la vérification téléphone à l'inscription,
+// code à 6 chiffres). Aucune nouvelle infra SMS créée.
+// ⚠️ Les providers n'utilisent PAS l'OTP (PIN hashé) — ce module est
+// entièrement nouveau, il ne "copie" pas un flux de connexion provider
+// qui n'existe pas.
+// ══════════════════════════════════════════════════════════════
+
+let _espaceContexte = null;  // { role, id, nom, telephone, telephoneE164 } — avant validation OTP
+let _espaceSession = null;   // { role, id, nom, telephone } — après validation OTP, en mémoire seulement
+let _espaceChantierSelectionne = null; // superviseur : chantier en cours de gestion
+
+function _espaceAfficherErreur(elId, msg) {
+  const el = document.getElementById(elId);
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+function _espaceCacherErreur(elId) {
+  const el = document.getElementById(elId);
+  if (el) { el.style.display = 'none'; el.textContent = ''; }
+}
+
+// Point d'entrée de la page (appelé par le routing hash). Si une session
+// est déjà active en mémoire (navigation interne, pas de rechargement),
+// on ré-affiche directement le tableau de bord plutôt que de repartir du
+// formulaire de connexion.
+function _espaceInit() {
+  if (_espaceSession) { _espaceAfficherTableauBord(); return; }
+  document.getElementById('espaceEtapeTel').style.display = 'block';
+  document.getElementById('espaceEtapeOtp').style.display = 'none';
+  ['espaceDashFournisseur', 'espaceDashSuperviseur', 'espaceDashClient'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  _espaceCacherErreur('espaceErreurTel');
+  const tel = document.getElementById('espaceTelephone'); if (tel) tel.value = '';
+}
+
+function _espaceRetourTel() {
+  document.getElementById('espaceEtapeOtp').style.display = 'none';
+  document.getElementById('espaceEtapeTel').style.display = 'block';
+  _espaceContexte = null;
+}
+
+// Étape 1 : recherche le téléphone dans clients → fournisseurs_materiaux →
+// superviseurs (dans cet ordre, premier trouvé gagne), puis envoie l'OTP
+// via l'infra existante.
+async function _espaceEnvoyerCode() {
+  const telephone = document.getElementById('espaceTelephone').value.trim();
+  _espaceCacherErreur('espaceErreurTel');
+
+  if (!_rcTelephoneValide(telephone)) { _espaceAfficherErreur('espaceErreurTel', 'Téléphone au format 224XXXXXXXXX.'); return; }
+
+  const btn = document.getElementById('espaceBtnEnvoyer');
+  btn.disabled = true; btn.textContent = 'Recherche...';
+  try {
+    let role = null, entite = null;
+
+    const { data: client } = await sb.from('clients').select('id,nom,prenom').eq('telephone', telephone).maybeSingle();
+    if (client) { role = 'client'; entite = client; }
+
+    if (!role) {
+      const { data: fournisseur } = await sb.from('fournisseurs_materiaux').select('id,nom_entreprise').eq('telephone', telephone).maybeSingle();
+      if (fournisseur) { role = 'fournisseur'; entite = fournisseur; }
+    }
+
+    if (!role) {
+      const { data: superviseur } = await sb.from('superviseurs').select('id,nom,prenom').eq('telephone', telephone).maybeSingle();
+      if (superviseur) { role = 'superviseur'; entite = superviseur; }
+    }
+
+    if (!role) {
+      _espaceAfficherErreur('espaceErreurTel', 'Ce numéro n\'est pas enregistré. Contactez YOUMMA JOBS pour créer votre compte.');
+      return;
+    }
+
+    const nom = role === 'fournisseur'
+      ? entite.nom_entreprise
+      : ((entite.prenom ? entite.prenom + ' ' : '') + entite.nom);
+
+    const telephoneE164 = '+' + telephone;
+    const envoi = await window._smsSend(telephoneE164);
+    if (!envoi.success) { _espaceAfficherErreur('espaceErreurTel', envoi.message || "Erreur lors de l'envoi du code."); return; }
+
+    _espaceContexte = { role, id: entite.id, nom, telephone, telephoneE164 };
+    document.getElementById('espaceOtpTelAffiche').textContent = telephone;
+    ['espaceOtp1','espaceOtp2','espaceOtp3','espaceOtp4','espaceOtp5','espaceOtp6'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    _espaceCacherErreur('espaceErreurOtp');
+    document.getElementById('espaceEtapeTel').style.display = 'none';
+    document.getElementById('espaceEtapeOtp').style.display = 'block';
+    document.getElementById('espaceOtp1')?.focus();
+  } catch (e) {
+    _espaceAfficherErreur('espaceErreurTel', 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Recevoir mon code';
+  }
+}
+
+async function _espaceRenvoyerCode() {
+  if (!_espaceContexte) return;
+  const btn = document.getElementById('espaceBtnRenvoyer');
+  btn.disabled = true; btn.textContent = 'Envoi...';
+  try {
+    const envoi = await window._smsSend(_espaceContexte.telephoneE164);
+    if (!envoi.success) { _espaceAfficherErreur('espaceErreurOtp', envoi.message || 'Erreur lors du renvoi.'); }
+    else { _espaceAfficherErreur('espaceErreurOtp', 'Nouveau code envoyé.'); }
+  } catch (e) {
+    _espaceAfficherErreur('espaceErreurOtp', 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Renvoyer le code';
+  }
+}
+
+// Étape 2 : même logique de vérification que verifySmsCode() (inscription) —
+// verification_codes filtré par phone/code/used=false/expires_at>=now,
+// puis marqué used=true.
+async function _espaceValiderCode() {
+  if (!_espaceContexte) { _espaceRetourTel(); return; }
+  const ids = ['espaceOtp1','espaceOtp2','espaceOtp3','espaceOtp4','espaceOtp5','espaceOtp6'];
+  const entered = ids.map(id => (document.getElementById(id) || {}).value || '').join('');
+  _espaceCacherErreur('espaceErreurOtp');
+  if (entered.length < 6) { _espaceAfficherErreur('espaceErreurOtp', 'Entrez le code complet à 6 chiffres.'); return; }
+
+  const btn = document.getElementById('espaceBtnValider');
+  btn.disabled = true; btn.textContent = 'Vérification...';
+  try {
+    const now = new Date().toISOString();
+    const { data, error } = await sb.from('verification_codes').select('id')
+      .eq('phone', _espaceContexte.telephoneE164).eq('code', entered).eq('used', false)
+      .gte('expires_at', now).order('created_at', { ascending: false }).limit(1);
+    if (error || !data || !data.length) {
+      _espaceAfficherErreur('espaceErreurOtp', 'Code incorrect ou expiré.');
+      return;
+    }
+    await sb.from('verification_codes').update({ used: true }).eq('id', data[0].id);
+
+    _espaceSession = { role: _espaceContexte.role, id: _espaceContexte.id, nom: _espaceContexte.nom, telephone: _espaceContexte.telephone };
+    _espaceContexte = null;
+    document.getElementById('espaceEtapeOtp').style.display = 'none';
+    _espaceAfficherTableauBord();
+  } catch (e) {
+    _espaceAfficherErreur('espaceErreurOtp', 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Valider le code';
+  }
+}
+
+function _espaceDeconnexion() {
+  _espaceSession = null;
+  _espaceContexte = null;
+  _espaceChantierSelectionne = null;
+  _espaceInit();
+}
+
+function _espaceAfficherTableauBord() {
+  ['espaceDashFournisseur', 'espaceDashSuperviseur', 'espaceDashClient'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  if (!_espaceSession) { _espaceInit(); return; }
+  if (_espaceSession.role === 'fournisseur') {
+    document.getElementById('espaceDashFournisseur').style.display = 'block';
+    document.getElementById('espaceFourNom').textContent = _espaceSession.nom;
+    _espaceChargerFournisseur();
+  } else if (_espaceSession.role === 'superviseur') {
+    document.getElementById('espaceDashSuperviseur').style.display = 'block';
+    document.getElementById('espaceSupNom').textContent = _espaceSession.nom;
+    _espaceChargerSuperviseur();
+  } else if (_espaceSession.role === 'client') {
+    document.getElementById('espaceDashClient').style.display = 'block';
+    document.getElementById('espaceCliNom').textContent = _espaceSession.nom;
+    _espaceChargerClient();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// TABLEAU DE BORD FOURNISSEUR
+// ─────────────────────────────────────────────────────────────────────────
+let _espaceFourTransactionsCache = [];
+
+async function _espaceChargerFournisseur() {
+  const zoneComptes = document.getElementById('espaceFourChantiers');
+  const zoneAttente = document.getElementById('espaceFourEnAttente');
+  const corpsHisto = document.getElementById('espaceFourHistorique');
+
+  try {
+    const { data: comptes, error } = await sb.from('comptes_materiaux')
+      .select('id,solde_gnf,solde_reserve,chantiers(id,nom,statut)')
+      .eq('fournisseur_id', _espaceSession.id);
+    if (error) throw error;
+
+    if (!comptes || !comptes.length) {
+      zoneComptes.innerHTML = '<div style="color:#9CA3AF;font-size:13px;">Aucun chantier assigné pour le moment.</div>';
+      zoneAttente.innerHTML = '<div style="color:#9CA3AF;font-size:13px;">Aucune transaction.</div>';
+      corpsHisto.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#9CA3AF;">Aucune transaction</td></tr>';
+      return;
+    }
+
+    zoneComptes.innerHTML = comptes.map(c => {
+      const sc = _rcStatutChantierConfig(c.chantiers?.statut);
+      return `<div style="border:1.5px solid #F0F0F8;border-radius:12px;padding:14px;">
+        <div style="font-size:13px;font-weight:700;color:#1A1A4E;margin-bottom:6px;">${c.chantiers?.nom || '—'}</div>
+        <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
+        <div style="font-size:18px;font-weight:800;color:#1A1A4E;margin-top:10px;">${Number(c.solde_gnf || 0).toLocaleString('fr-FR')} GNF</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-bottom:10px;">Réservé : ${Number(c.solde_reserve || 0).toLocaleString('fr-FR')} GNF</div>
+        <button onclick="_espaceBasculerHistoriqueCompte('${c.id}')" style="width:100%;background:#EFF6FF;color:#2563EB;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Voir les transactions</button>
+        <div id="espaceFourHistoCompte-${c.id}" style="display:none;margin-top:10px;max-height:220px;overflow-y:auto;"></div>
+      </div>`;
+    }).join('');
+
+    const compteIds = comptes.map(c => c.id);
+    const { data: transactions, error: errT } = await sb.from('registre_transactions')
+      .select('*, chantiers(nom)')
+      .in('compte_id', compteIds)
+      .order('created_at', { ascending: false });
+    if (errT) throw errT;
+    _espaceFourTransactionsCache = transactions || [];
+
+    const referencees = new Set(_espaceFourTransactionsCache.map(t => t.reference_transaction_id).filter(Boolean));
+    const enAttente = _espaceFourTransactionsCache.filter(t => t.type_operation === 'sortie_demandee' && !referencees.has(t.id));
+
+    zoneAttente.innerHTML = enAttente.length ? enAttente.map(t => {
+      const date = new Date(t.created_at).toLocaleString('fr-FR');
+      return `<div style="border:1.5px solid #FED7AA;background:#FFFBEB;border-radius:10px;padding:12px 14px;">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${t.chantiers?.nom || '—'} — ${t.materiau || ''} (${t.quantite || ''} ${t.unite || ''})</div>
+            <div style="font-size:11.5px;color:#9CA3AF;">${date}</div>
+          </div>
+          <div style="font-size:15px;font-weight:800;color:#1A1A4E;">${Number(t.montant_gnf).toLocaleString('fr-FR')} GNF</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button onclick="_espaceTraiterSortie('${t.id}','valider')" style="flex:1;background:#059669;color:#fff;border:none;border-radius:8px;padding:9px;font-size:12.5px;font-weight:700;cursor:pointer;">Valider la sortie</button>
+          <button onclick="_espaceTraiterSortie('${t.id}','rejeter')" style="flex:1;background:#FEF2F2;color:#DC2626;border:1.5px solid #FECACA;border-radius:8px;padding:9px;font-size:12.5px;font-weight:700;cursor:pointer;">Rejeter</button>
+        </div>
+      </div>`;
+    }).join('') : '<div style="color:#9CA3AF;font-size:13px;">Aucune transaction en attente.</div>';
+
+    corpsHisto.innerHTML = _espaceFourTransactionsCache.length ? _espaceFourTransactionsCache.map(t => {
+      const sc = _rcStatutConfig(t.type_operation);
+      const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const typeLabel = String(t.type_operation).startsWith('versement') ? '💰 Versement' : '📦 Sortie';
+      return `<tr style="border-bottom:1px solid #F7F8FC;">
+        <td style="padding:10px 12px;font-size:12px;color:#6B7280;white-space:nowrap;">${date}</td>
+        <td style="padding:10px 12px;font-size:12.5px;font-weight:700;color:#1A1A4E;">${t.chantiers?.nom || '—'}</td>
+        <td style="padding:10px 12px;font-size:12px;color:#374151;">${typeLabel}</td>
+        <td style="padding:10px 12px;text-align:right;font-size:12.5px;font-weight:700;color:#1A1A4E;">${Number(t.montant_gnf).toLocaleString('fr-FR')} GNF</td>
+        <td style="padding:10px 12px;text-align:center;"><span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:700;">${sc.label}</span></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="5" style="text-align:center;padding:20px;color:#9CA3AF;">Aucune transaction</td></tr>';
+  } catch (e) {
+    zoneComptes.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+function _espaceBasculerHistoriqueCompte(compteId) {
+  const zone = document.getElementById('espaceFourHistoCompte-' + compteId);
+  if (!zone) return;
+  if (zone.style.display === 'block') { zone.style.display = 'none'; return; }
+  zone.style.display = 'block';
+  const lignes = _espaceFourTransactionsCache.filter(t => t.compte_id === compteId);
+  if (!lignes.length) { zone.innerHTML = '<div style="font-size:12px;color:#9CA3AF;padding:8px 0;">Aucune transaction sur ce compte.</div>'; return; }
+  zone.innerHTML = lignes.map(t => {
+    const sc = _rcStatutConfig(t.type_operation);
+    const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #F7F8FC;font-size:11.5px;">
+      <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:2px 8px;font-weight:700;">${sc.label}</span>
+      <span style="color:#6B7280;">${date}</span>
+      <span style="font-weight:700;color:#1A1A4E;">${Number(t.montant_gnf).toLocaleString('fr-FR')} GNF</span>
+    </div>`;
+  }).join('');
+}
+
+// Valider/Rejeter une sortie demandée — append-only : insert seul, jamais
+// d'UPDATE. fournisseur_id = le fournisseur connecté (acteur imposé par
+// chk_registre_acteur_coherent pour sortie_confirmee/sortie_rejetee). Motif
+// de rejet optionnel stocké dans description de CET événement (pas celle
+// de la demande d'origine, qui reste inchangée — append-only oblige).
+async function _espaceTraiterSortie(transactionId, decision) {
+  let motif = null;
+  if (decision === 'rejeter') {
+    if (!window.confirm('Rejeter cette demande de sortie ?')) return;
+    motif = window.prompt('Motif du rejet (optionnel) :') || null;
+  }
+  try {
+    const { data: origine, error: errOrig } = await sb.from('registre_transactions').select('*').eq('id', transactionId).single();
+    if (errOrig) throw errOrig;
+    if (origine.type_operation !== 'sortie_demandee') { if (typeof showToast === 'function') showToast("Cette transaction n'est plus en attente.", 'error'); return; }
+
+    const payload = {
+      chantier_id: origine.chantier_id,
+      compte_id: origine.compte_id,
+      type_operation: decision === 'valider' ? 'sortie_confirmee' : 'sortie_rejetee',
+      montant_gnf: origine.montant_gnf,
+      materiau: origine.materiau,
+      quantite: origine.quantite,
+      unite: origine.unite,
+      reference_transaction_id: origine.id,
+      fournisseur_id: _espaceSession.id,
+      description: motif
+    };
+    const { error } = await sb.from('registre_transactions').insert(payload);
+    if (error) {
+      const msg = (error.message || '').toLowerCase();
+      const propre = msg.includes('solde disponible insuffisant') ? 'Solde disponible insuffisant.' : ('Erreur : ' + error.message);
+      if (typeof showToast === 'function') showToast(propre, 'error'); else window.alert(propre);
+      return;
+    }
+    if (typeof showToast === 'function') showToast(decision === 'valider' ? '✅ Sortie validée' : '✅ Sortie rejetée', 'success');
+    _espaceChargerFournisseur();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error'); else window.alert('Erreur : ' + e.message);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// TABLEAU DE BORD SUPERVISEUR
+// ─────────────────────────────────────────────────────────────────────────
+let _espaceSupComptesChantier = [];
+
+async function _espaceChargerSuperviseur() {
+  const zone = document.getElementById('espaceSupChantiers');
+  try {
+    const { data: chantiers, error } = await sb.from('chantiers')
+      .select('id,nom,statut,date_debut,clients(nom,prenom),comptes_materiaux(solde_gnf)')
+      .eq('superviseur_id', _espaceSession.id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    if (!chantiers || !chantiers.length) {
+      zone.innerHTML = '<div style="color:#9CA3AF;font-size:13px;">Aucun chantier assigné pour le moment.</div>';
+      return;
+    }
+
+    zone.innerHTML = chantiers.map(c => {
+      const sc = _rcStatutChantierConfig(c.statut);
+      const client = c.clients ? ((c.clients.prenom ? c.clients.prenom + ' ' : '') + c.clients.nom) : '—';
+      const soldeTotal = (c.comptes_materiaux || []).reduce((s, cm) => s + Number(cm.solde_gnf || 0), 0);
+      const dateDebut = c.date_debut ? new Date(c.date_debut).toLocaleDateString('fr-FR') : '—';
+      return `<div style="border:1.5px solid #F0F0F8;border-radius:12px;padding:14px;">
+        <div style="font-size:13px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">${c.nom}</div>
+        <div style="font-size:11.5px;color:#6B7280;margin-bottom:8px;">Client : ${client} · Début : ${dateDebut}</div>
+        <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
+        <div style="font-size:16px;font-weight:800;color:#1A1A4E;margin-top:10px;">${soldeTotal.toLocaleString('fr-FR')} GNF</div>
+        <div style="font-size:10.5px;color:#9CA3AF;margin-bottom:10px;">Solde total du chantier</div>
+        <button onclick="_espaceGererChantier('${c.id}','${String(c.nom).replace(/'/g, "\\'")}')" style="width:100%;background:#F5F3FF;color:#7C3AED;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Gérer</button>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    zone.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+async function _espaceGererChantier(chantierId, chantierNom) {
+  _espaceChantierSelectionne = chantierId;
+  document.getElementById('espaceSupGestionZone').style.display = 'block';
+  document.getElementById('espaceSupChantierNom').textContent = chantierNom;
+  _espaceCacherErreur('espaceSupErreur');
+  ['espaceSupMateriau','espaceSupQuantite','espaceSupUnite','espaceSupMontant','espaceSupDescription'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+
+  const selFournisseur = document.getElementById('espaceSupFournisseur');
+  selFournisseur.innerHTML = '<option value="">Chargement...</option>';
+  const corpsTrans = document.getElementById('espaceSupTransactions');
+  corpsTrans.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#9CA3AF;">Chargement...</td></tr>';
+
+  try {
+    const { data: comptes, error } = await sb.from('comptes_materiaux').select('id,fournisseurs_materiaux(nom_entreprise)').eq('chantier_id', chantierId);
+    if (error) throw error;
+    _espaceSupComptesChantier = comptes || [];
+    selFournisseur.innerHTML = _espaceSupComptesChantier.length
+      ? _espaceSupComptesChantier.map(c => `<option value="${c.id}">${c.fournisseurs_materiaux?.nom_entreprise || '—'}</option>`).join('')
+      : '<option value="">— Aucun fournisseur assigné à ce chantier —</option>';
+  } catch (e) { selFournisseur.innerHTML = '<option value="">Erreur de chargement</option>'; }
+
+  try {
+    const { data: transactions, error } = await sb.from('registre_transactions')
+      .select('*, comptes_materiaux(fournisseurs_materiaux(nom_entreprise))')
+      .eq('chantier_id', chantierId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    if (!transactions || !transactions.length) {
+      corpsTrans.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#9CA3AF;">Aucune transaction</td></tr>';
+    } else {
+      corpsTrans.innerHTML = transactions.map(t => {
+        const sc = _rcStatutConfig(t.type_operation);
+        const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const typeLabel = String(t.type_operation).startsWith('versement') ? '💰 Versement' : '📦 Sortie';
+        const acteur = t.client_id ? 'Client' : t.superviseur_id ? 'Superviseur' : t.fournisseur_id ? 'Fournisseur' : '—';
+        const fournisseur = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || '—';
+        return `<tr style="border-bottom:1px solid #F7F8FC;">
+          <td style="padding:10px 12px;font-size:12px;color:#6B7280;white-space:nowrap;">${date}</td>
+          <td style="padding:10px 12px;font-size:12px;color:#374151;">${fournisseur}</td>
+          <td style="padding:10px 12px;font-size:12px;color:#374151;">${acteur}</td>
+          <td style="padding:10px 12px;font-size:12px;color:#374151;">${typeLabel}</td>
+          <td style="padding:10px 12px;text-align:right;font-size:12.5px;font-weight:700;color:#1A1A4E;">${Number(t.montant_gnf).toLocaleString('fr-FR')} GNF</td>
+          <td style="padding:10px 12px;text-align:center;"><span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:700;">${sc.label}</span></td>
+        </tr>`;
+      }).join('');
+    }
+  } catch (e) {
+    corpsTrans.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#DC2626;">Erreur : ' + e.message + '</td></tr>';
+  }
+}
+
+// Demande de sortie — insert seul (append-only). superviseur_id = acteur
+// imposé par chk_registre_acteur_coherent pour sortie_demandee. Le trigger
+// fn_gerer_solde_registre (BEFORE INSERT) bloque si solde disponible
+// insuffisant — on se contente d'afficher son message proprement.
+async function _espaceSauvegarderDemandeSortie() {
+  const compteId = document.getElementById('espaceSupFournisseur').value;
+  const materiau = document.getElementById('espaceSupMateriau').value.trim();
+  const quantite = parseInt(document.getElementById('espaceSupQuantite').value, 10);
+  const unite = document.getElementById('espaceSupUnite').value.trim();
+  const montant = parseInt(document.getElementById('espaceSupMontant').value, 10);
+  const description = document.getElementById('espaceSupDescription').value.trim();
+  _espaceCacherErreur('espaceSupErreur');
+
+  if (!compteId) { _espaceAfficherErreur('espaceSupErreur', 'Le fournisseur est obligatoire.'); return; }
+  if (!materiau) { _espaceAfficherErreur('espaceSupErreur', 'Le matériau est obligatoire.'); return; }
+  if (!quantite || quantite <= 0) { _espaceAfficherErreur('espaceSupErreur', 'La quantité doit être un nombre positif.'); return; }
+  if (!unite) { _espaceAfficherErreur('espaceSupErreur', "L'unité est obligatoire."); return; }
+  if (!montant || montant <= 0) { _espaceAfficherErreur('espaceSupErreur', 'Le montant estimé doit être un nombre positif.'); return; }
+
+  const btn = document.getElementById('espaceSupBtnDemande');
+  btn.disabled = true; btn.textContent = 'Envoi...';
+  try {
+    const { error } = await sb.from('registre_transactions').insert({
+      chantier_id: _espaceChantierSelectionne,
+      compte_id: compteId,
+      type_operation: 'sortie_demandee',
+      montant_gnf: montant,
+      materiau, quantite, unite,
+      description: description || null,
+      superviseur_id: _espaceSession.id
+    });
+    if (error) {
+      const msg = (error.message || '').toLowerCase();
+      const propre = msg.includes('solde disponible insuffisant') ? 'Solde disponible insuffisant sur ce compte pour cette demande.' : ('Erreur : ' + error.message);
+      _espaceAfficherErreur('espaceSupErreur', propre);
+      return;
+    }
+    if (typeof showToast === 'function') showToast('✅ Demande de sortie envoyée', 'success');
+    ['espaceSupMateriau','espaceSupQuantite','espaceSupUnite','espaceSupMontant','espaceSupDescription'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    _espaceGererChantier(_espaceChantierSelectionne, document.getElementById('espaceSupChantierNom').textContent);
+  } catch (e) {
+    _espaceAfficherErreur('espaceSupErreur', 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Envoyer la demande';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// TABLEAU DE BORD CLIENT (lecture seule)
+// ─────────────────────────────────────────────────────────────────────────
+async function _espaceChargerClient() {
+  const zoneChantiers = document.getElementById('espaceCliChantiers');
+  const corpsVersements = document.getElementById('espaceCliVersements');
+  const corpsSorties = document.getElementById('espaceCliSorties');
+  const zoneSoldes = document.getElementById('espaceCliSoldes');
+
+  try {
+    const { data: chantiers, error } = await sb.from('chantiers')
+      .select('id,nom,statut,date_debut,superviseurs(nom,prenom)')
+      .eq('client_id', _espaceSession.id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    if (!chantiers || !chantiers.length) {
+      zoneChantiers.innerHTML = '<div style="color:#9CA3AF;font-size:13px;">Aucun chantier pour le moment.</div>';
+      corpsVersements.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#9CA3AF;">Aucune donnée</td></tr>';
+      corpsSorties.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#9CA3AF;">Aucune donnée</td></tr>';
+      zoneSoldes.innerHTML = '<div style="color:#9CA3AF;font-size:13px;">Aucune donnée.</div>';
+      return;
+    }
+
+    const chantierIds = chantiers.map(c => c.id);
+
+    // Formule de service : vit sur contrats (type='forfait_service'), pas
+    // sur chantiers — peut être absente si aucun contrat forfait créé.
+    let formulesParChantier = {};
+    try {
+      const { data: contrats } = await sb.from('contrats').select('chantier_id,formule_service').eq('type', 'forfait_service').in('chantier_id', chantierIds);
+      (contrats || []).forEach(c => { formulesParChantier[c.chantier_id] = c.formule_service; });
+    } catch (e) { /* pas de contrat forfait, normal */ }
+
+    zoneChantiers.innerHTML = chantiers.map(c => {
+      const sc = _rcStatutChantierConfig(c.statut);
+      const superviseur = c.superviseurs ? ((c.superviseurs.prenom ? c.superviseurs.prenom + ' ' : '') + c.superviseurs.nom) : '—';
+      const dateDebut = c.date_debut ? new Date(c.date_debut).toLocaleDateString('fr-FR') : '—';
+      return `<div style="border:1.5px solid #F0F0F8;border-radius:12px;padding:14px;">
+        <div style="font-size:13px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">${c.nom}</div>
+        <div style="font-size:11.5px;color:#6B7280;margin-bottom:8px;">Superviseur : ${superviseur} · Début : ${dateDebut}</div>
+        <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
+        <div style="font-size:11.5px;color:#6B7280;margin-top:8px;">Formule : ${formulesParChantier[c.id] || '—'}</div>
+      </div>`;
+    }).join('');
+
+    // Versements : versement_declare (client_id=moi) + événements de
+    // validation/rejet qui les référencent, pour calculer le statut.
+    const { data: versements, error: errV } = await sb.from('registre_transactions')
+      .select('*, comptes_materiaux(fournisseurs_materiaux(nom_entreprise))')
+      .in('chantier_id', chantierIds)
+      .in('type_operation', ['versement_declare', 'versement_valide', 'versement_rejete'])
+      .order('created_at', { ascending: false });
+    if (errV) throw errV;
+
+    const declares = (versements || []).filter(t => t.type_operation === 'versement_declare' && t.client_id === _espaceSession.id);
+    const traitements = (versements || []).filter(t => t.type_operation !== 'versement_declare');
+    corpsVersements.innerHTML = declares.length ? declares.map(t => {
+      const traitement = traitements.find(tr => tr.reference_transaction_id === t.id);
+      const statutLabel = traitement ? (traitement.type_operation === 'versement_valide' ? 'Validé' : 'Rejeté') : 'Déclaré';
+      const statutCouleur = traitement ? (traitement.type_operation === 'versement_valide' ? '#059669' : '#DC2626') : '#D97706';
+      const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const fournisseur = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || '—';
+      return `<tr style="border-bottom:1px solid #F7F8FC;">
+        <td style="padding:10px 12px;font-size:12px;color:#6B7280;white-space:nowrap;">${date}</td>
+        <td style="padding:10px 12px;font-size:12px;color:#374151;">${fournisseur}</td>
+        <td style="padding:10px 12px;text-align:right;font-size:12.5px;font-weight:700;color:#1A1A4E;">${Number(t.montant_gnf).toLocaleString('fr-FR')} GNF</td>
+        <td style="padding:10px 12px;text-align:center;"><span style="background:#F4F6FB;color:${statutCouleur};border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:700;">${statutLabel}</span></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="4" style="text-align:center;padding:20px;color:#9CA3AF;">Aucun versement</td></tr>';
+
+    // Sorties validées sur ses chantiers
+    const { data: sorties, error: errS } = await sb.from('registre_transactions')
+      .select('*, comptes_materiaux(fournisseurs_materiaux(nom_entreprise))')
+      .in('chantier_id', chantierIds)
+      .eq('type_operation', 'sortie_confirmee')
+      .order('created_at', { ascending: false });
+    if (errS) throw errS;
+
+    corpsSorties.innerHTML = (sorties && sorties.length) ? sorties.map(t => {
+      const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const fournisseur = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || '—';
+      return `<tr style="border-bottom:1px solid #F7F8FC;">
+        <td style="padding:10px 12px;font-size:12px;color:#6B7280;white-space:nowrap;">${date}</td>
+        <td style="padding:10px 12px;font-size:12px;color:#374151;">${t.materiau || '—'} (${t.quantite || ''} ${t.unite || ''})</td>
+        <td style="padding:10px 12px;font-size:12px;color:#374151;">${fournisseur}</td>
+        <td style="padding:10px 12px;text-align:right;font-size:12.5px;font-weight:700;color:#1A1A4E;">${Number(t.montant_gnf).toLocaleString('fr-FR')} GNF</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="4" style="text-align:center;padding:20px;color:#9CA3AF;">Aucune sortie validée</td></tr>';
+
+    // Solde par fournisseur
+    const { data: comptes, error: errC } = await sb.from('comptes_materiaux')
+      .select('solde_gnf,chantiers(nom),fournisseurs_materiaux(nom_entreprise)')
+      .in('chantier_id', chantierIds);
+    if (errC) throw errC;
+
+    zoneSoldes.innerHTML = (comptes && comptes.length) ? comptes.map(c => `
+      <div style="border:1.5px solid #F0F0F8;border-radius:12px;padding:14px;">
+        <div style="font-size:12.5px;font-weight:700;color:#1A1A4E;">${c.fournisseurs_materiaux?.nom_entreprise || '—'}</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-bottom:8px;">${c.chantiers?.nom || '—'}</div>
+        <div style="font-size:17px;font-weight:800;color:#1A1A4E;">${Number(c.solde_gnf || 0).toLocaleString('fr-FR')} GNF</div>
+      </div>`).join('') : '<div style="color:#9CA3AF;font-size:13px;">Aucun compte matériaux.</div>';
+  } catch (e) {
+    zoneChantiers.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
+  }
+}
+</script>
+
 <div class="page" id="page-inscription">
 <div style="background:linear-gradient(135deg,#1A1A4E 0%,#0D0D2E 100%);min-height:100vh;padding:40px 20px;display:flex;align-items:flex-start;justify-content:center;">
 <div style="background:#fff;border-radius:24px;padding:32px;width:100%;max-width:500px;box-shadow:0 32px 80px rgba(0,0,0,.3);">
@@ -7998,7 +8749,7 @@ window._inscrUpdateSousCat = _inscrUpdateSousCat;
 // ROUTEUR SPA — YOUMMA JOBS TOUT-EN-UN
 // ══════════════════════════════════════════
 
-const PAGES = ['home','login','inscription','dashboard','admin'];
+const PAGES = ['home','login','inscription','dashboard','admin','espace'];
 
 // Gérer le bouton retour navigateur
 window.addEventListener('popstate', (e) => {
@@ -8008,8 +8759,8 @@ window.addEventListener('popstate', (e) => {
 
 // Init au chargement
 (async function initRouter() {
-  const hash = location.hash.replace('#','');
-  
+  const hash = location.hash.replace('#','').toLowerCase().trim();
+
   // Vérifier session prestataire
   const pid = await verifierSession();
   
@@ -8049,6 +8800,11 @@ window.addEventListener('popstate', (e) => {
   } else if (hash === 'login') {
     if (pid) { navigate('dashboard'); await chargerDashboard(pid); return; }
     navigate('login');
+  } else if (hash === 'espace') {
+    // Espace pro (clients/fournisseurs/superviseurs) : session distincte de
+    // la session prestataire (pid) — aucun redirect vers le dashboard ici.
+    navigate('espace');
+    if (typeof _espaceInit === 'function') _espaceInit();
   } else {
     // Session active → restaurer le dashboard sans attendre le hash
     if (pid) {
@@ -10520,6 +11276,7 @@ window.addEventListener('load', async function() {
     if (typeof chargerDashboard==='function') await chargerDashboard(pid);
   } else if (hash === 'inscription') { navigate('inscription'); }
   else if (hash === 'login') { navigate('login'); }
+  else if (hash === 'espace') { navigate('espace'); if (typeof _espaceInit === 'function') _espaceInit(); }
   else if (hash === 'nouveautes') { openSoonHub(); }
   else if (hash === 'construire') { showPageConstruire(); }
   else if (typeof SOON_MODULES !== 'undefined' && SOON_MODULES[hash]) {
@@ -10590,6 +11347,7 @@ window.addEventListener('hashchange', async function() {
   }
   if (hash === 'inscription') { if(typeof _realNavigate==='function') _realNavigate('inscription'); return; }
   if (hash === 'login') { if(typeof _realNavigate==='function') _realNavigate('login'); return; }
+  if (hash === 'espace') { if(typeof _realNavigate==='function') _realNavigate('espace'); if(typeof _espaceInit==='function') _espaceInit(); return; }
   if (hash === 'nouveautes') { if(typeof openSoonHub==='function') openSoonHub(); return; }
   if (hash === 'construire') { if(typeof showPageConstruire==='function') showPageConstruire(); return; }
   if (typeof SOON_MODULES !== 'undefined' && SOON_MODULES[hash]) { if(typeof openSoonPage==='function') openSoonPage(hash); return; }
