@@ -24,8 +24,11 @@
 --   dans `provider_sessions(provider_id, token)`. Il n'y a PAS de Supabase
 --   Auth (pas de auth.uid()) — voir section RLS plus bas, c'est important.
 -- - Un système d'OTP SMS générique existe déjà : table `verification_codes
---   (phone, code, expires_at, used, created_at)`, réutilisable tel quel pour
---   la confirmation de signature de contrat.
+--   (phone, code, expires_at, used, created_at)`. Réutilisé pour DEUX
+--   usages dans ce fichier : (a) l'authentification de clients/
+--   superviseurs/fournisseurs_materiaux (téléphone + code, PAS de mot de
+--   passe/PIN pour ces 3 tables — contrairement à `providers` qui a un
+--   vrai password_hash), et (b) la confirmation de signature de contrat.
 -- - Décision validée : fournisseurs, superviseurs et clients sont chacun une
 --   table dédiée, indépendante de `providers` (voir sections 2 à 4). Un
 --   fournisseur du Registre Chantier a son propre couple abonnement_actif /
@@ -56,24 +59,38 @@ CREATE INDEX IF NOT EXISTS idx_leads_construction_telephone ON leads_constructio
 -- ─────────────────────────────────────────────────────────────────────────
 -- 2. CLIENTS (comptes authentifiés, propriétaires d'un chantier)
 -- ─────────────────────────────────────────────────────────────────────────
--- Renommée `clients_construction` → `clients` (décision validée). Auth
--- calquée sur le pattern existant du site (téléphone + password_hash +
--- session token) pour rester cohérent avec le reste du site.
+-- Renommée `clients_construction` → `clients` (décision validée). Auth par
+-- OTP SMS (téléphone + code via la table `verification_codes` déjà en
+-- place, jamais de mot de passe) — pas de colonne password_hash ici,
+-- contrairement à `providers` qui utilise un vrai PIN/mot de passe.
+-- `user_id` est un lien optionnel vers auth.users : ce site n'utilise pas
+-- Supabase Auth comme mécanisme principal (OTP SMS partout), mais la
+-- colonne reste disponible si un client venait à avoir un compte
+-- Supabase Auth par un autre biais.
 
 CREATE TABLE IF NOT EXISTS clients (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   lead_id       UUID REFERENCES leads_construction(id) ON DELETE SET NULL,
+  user_id       UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   nom           TEXT NOT NULL,
   prenom        TEXT,
   telephone     TEXT NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL,
+  email         TEXT,
   ville         TEXT,
   commune       TEXT,
+  adresse       TEXT,
   statut        TEXT NOT NULL DEFAULT 'actif' CHECK (statut IN ('actif','suspendu'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_clients_telephone ON clients(telephone);
+
+-- fn_set_updated_at() est définie plus bas (section 5, réutilisée par
+-- chantiers/contrats/rapport_final_chantier) — la table clients est créée
+-- avant, donc ce trigger est rattaché juste après la définition de la
+-- fonction pour respecter l'ordre de dépendance (voir plus bas, "Trigger
+-- clients.updated_at").
 
 -- Sessions, même pattern que provider_sessions (best-effort, non bloquant)
 CREATE TABLE IF NOT EXISTS client_sessions (
@@ -92,8 +109,9 @@ CREATE INDEX IF NOT EXISTS idx_client_sessions_client_id ON client_sessions(clie
 -- essai/abonnement, ni fiche publique dans l'annuaire — c'est un rôle
 -- opérationnel interne au chantier, pas une offre de service. Il PEUT être
 -- rattaché à un compte provider existant via `provider_id` (nullable) si la
--- même personne est aussi inscrite comme prestataire — purement informatif,
--- pas utilisé pour l'auth (le superviseur a son propre couple téléphone/PIN).
+-- même personne est aussi inscrite comme prestataire — purement informatif.
+-- Auth par OTP SMS comme `clients` (téléphone + verification_codes), pas de
+-- mot de passe : aucune colonne password_hash ici.
 
 CREATE TABLE IF NOT EXISTS superviseurs (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -102,7 +120,6 @@ CREATE TABLE IF NOT EXISTS superviseurs (
   nom           TEXT NOT NULL,
   prenom        TEXT,
   telephone     TEXT NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL,
   statut        TEXT NOT NULL DEFAULT 'actif' CHECK (statut IN ('actif','inactif'))
 );
 
@@ -127,14 +144,15 @@ CREATE INDEX IF NOT EXISTS idx_superviseur_sessions_superviseur_id ON superviseu
 -- Ce fichier ne contient donc plus l'ALTER TABLE providers / le flag — ils
 -- sont remplacés par la table ci-dessous. Le fournisseur porte désormais
 -- son propre abonnement_actif/abonnement_fin (30 jours, renouvelable),
--- indépendant de celui des prestataires.
+-- indépendant de celui des prestataires. Auth par OTP SMS comme
+-- clients/superviseurs (téléphone + verification_codes), pas de colonne
+-- password_hash.
 
 CREATE TABLE IF NOT EXISTS fournisseurs_materiaux (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
   nom_entreprise    TEXT NOT NULL,
   telephone         TEXT NOT NULL UNIQUE,
-  password_hash     TEXT NOT NULL,
   ville             TEXT,
   commune           TEXT,
   statut            TEXT NOT NULL DEFAULT 'actif' CHECK (statut IN ('actif','suspendu')),
@@ -216,6 +234,12 @@ CREATE TRIGGER trg_chantiers_updated_at
   BEFORE UPDATE ON chantiers
   FOR EACH ROW EXECUTE FUNCTION fn_set_updated_at();
 
+-- Trigger clients.updated_at (colonne ajoutée section 2 ; rattaché ici car
+-- fn_set_updated_at() n'existe qu'à partir de cette ligne).
+CREATE TRIGGER trg_clients_updated_at
+  BEFORE UPDATE ON clients
+  FOR EACH ROW EXECUTE FUNCTION fn_set_updated_at();
+
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- 6. COMPTES MATÉRIAUX (une ardoise par chantier)
@@ -272,6 +296,7 @@ CREATE TABLE IF NOT EXISTS registre_transactions (
   type_operation            TEXT NOT NULL CHECK (type_operation IN (
                                'versement_declare',  -- client déclare montant+date
                                'versement_valide',   -- fournisseur confirme
+                               'versement_rejete',   -- fournisseur refuse le versement déclaré
                                'sortie_demandee',    -- superviseur demande X unités d'un matériau
                                'sortie_confirmee',   -- fournisseur valide la sortie, montant déduit
                                'sortie_rejetee'      -- fournisseur refuse la sortie, réservation libérée
@@ -296,12 +321,15 @@ CREATE TABLE IF NOT EXISTS registre_transactions (
   CONSTRAINT chk_registre_acteur_coherent CHECK (
     (type_operation = 'versement_declare' AND client_id      IS NOT NULL AND superviseur_id IS NULL AND fournisseur_id IS NULL)
     OR (type_operation = 'versement_valide' AND fournisseur_id IS NOT NULL AND client_id      IS NULL AND superviseur_id IS NULL)
+    -- Symétrique à versement_valide : c'est le fournisseur qui rejette un
+    -- versement déclaré par le client (montant erroné, jamais reçu, etc.).
+    OR (type_operation = 'versement_rejete' AND fournisseur_id IS NOT NULL AND client_id      IS NULL AND superviseur_id IS NULL)
     OR (type_operation = 'sortie_demandee'  AND superviseur_id IS NOT NULL AND client_id      IS NULL AND fournisseur_id IS NULL)
     OR (type_operation = 'sortie_confirmee' AND fournisseur_id IS NOT NULL AND client_id      IS NULL AND superviseur_id IS NULL)
-    -- ⚠️ Ajout non explicitement demandé : je considère que c'est le
-    -- fournisseur qui rejette une sortie (symétrique à sortie_confirmee).
-    -- Dis-moi si c'est plutôt le superviseur qui doit pouvoir annuler sa
-    -- propre demande.
+    -- ⚠️ Ajout non explicitement demandé (toujours pas confirmé) : je
+    -- considère que c'est le fournisseur qui rejette une sortie (symétrique
+    -- à sortie_confirmee). Dis-moi si c'est plutôt le superviseur qui doit
+    -- pouvoir annuler sa propre demande.
     OR (type_operation = 'sortie_rejetee'   AND fournisseur_id IS NOT NULL AND client_id      IS NULL AND superviseur_id IS NULL)
   ),
   CONSTRAINT chk_registre_sortie_materiau CHECK (
@@ -309,10 +337,10 @@ CREATE TABLE IF NOT EXISTS registre_transactions (
     OR (materiau IS NOT NULL AND quantite IS NOT NULL AND unite IS NOT NULL)
   ),
   CONSTRAINT chk_registre_reference_requise CHECK (
-    -- ⚠️ Ajout non explicitement demandé : reference_transaction_id est
-    -- aussi rendue obligatoire pour sortie_rejetee (il faut bien savoir
-    -- QUELLE sortie_demandee est rejetée pour libérer la bonne réservation).
-    type_operation NOT IN ('versement_valide','sortie_confirmee','sortie_rejetee')
+    -- reference_transaction_id obligatoire pour toute ligne de validation
+    -- ou de rejet : il faut toujours savoir QUELLE ligne de demande
+    -- (versement_declare ou sortie_demandee) est traitée.
+    type_operation NOT IN ('versement_valide','versement_rejete','sortie_confirmee','sortie_rejetee')
     OR reference_transaction_id IS NOT NULL
   )
 );
@@ -363,7 +391,11 @@ $$ LANGUAGE sql STABLE;
 -- Cœur de la mécanique du registre : tient à jour comptes_materiaux.solde_gnf
 -- et .solde_reserve au fil des insertions, et bloque toute sortie_demandee
 -- dont le montant dépasse le solde disponible (solde_gnf − solde_reserve).
+--   - versement_declare → aucun effet (solde_gnf ne bouge QUE sur validation,
+--                         jamais sur une simple ligne de demande/déclaration)
 --   - versement_valide  → solde_gnf += montant_gnf
+--   - versement_rejete  → aucun effet (le versement déclaré n'avait jamais
+--                         été ajouté au solde, rien à retirer)
 --   - sortie_demandee   → vérifie (solde_gnf − solde_reserve) >= montant_gnf,
 --                         puis solde_reserve += montant_gnf
 --   - sortie_confirmee  → solde_gnf -= montant_gnf ET solde_reserve -= montant_gnf
@@ -454,9 +486,22 @@ CREATE TABLE IF NOT EXISTS contrats (
   formule_service                 TEXT CHECK (formule_service IN ('assistance','suivi','gestion')),
   fournisseur_id                  UUID REFERENCES fournisseurs_materiaux(id) ON DELETE RESTRICT,  -- requis si type='materiaux'
 
+  -- Téléphone de chaque partie au moment de la signature (capture figée,
+  -- volontairement distincte de clients.telephone / fournisseurs_materiaux.telephone
+  -- qui peuvent changer après coup) : trace exactement quel numéro a reçu et
+  -- validé le code OTP pour CE contrat, même si le numéro change plus tard
+  -- dans le profil du client ou du fournisseur.
+  contact_client                  TEXT,
+  -- Code OTP en clair, présent UNIQUEMENT entre l'envoi et la validation :
+  -- purgé (mis à NULL) automatiquement dès que signature_client_otp_verifie
+  -- passe à true — voir trg_contrats_purger_code_sms plus bas. Jamais
+  -- conservé en clair après usage.
+  code_sms_client                 TEXT,
   signature_client_at             TIMESTAMPTZ,
   signature_client_otp_verifie    BOOLEAN NOT NULL DEFAULT false,
   -- "partie2" = fournisseur si type='materiaux', YOUMMA (staff/admin) si type='forfait_service'
+  contact_partie2                 TEXT,
+  code_sms_partie2                TEXT,  -- même purge automatique, voir trg_contrats_purger_code_sms
   signature_partie2_at            TIMESTAMPTZ,
   signature_partie2_otp_verifie   BOOLEAN NOT NULL DEFAULT false,
 
@@ -478,6 +523,36 @@ CREATE TRIGGER trg_contrats_updated_at
 CREATE TRIGGER trg_contrats_verifier_fournisseur
   BEFORE INSERT OR UPDATE OF fournisseur_id ON contrats
   FOR EACH ROW EXECUTE FUNCTION fn_verifier_fournisseur_actif();
+
+-- Purge du code SMS en clair dès validation : ne doit JAMAIS rester lisible
+-- une fois utilisé. Se déclenche quand signature_client_otp_verifie ou
+-- signature_partie2_otp_verifie passe de false à true, et met NULL le
+-- code_sms_* correspondant via un UPDATE imbriqué sur la même ligne, dans
+-- la même transaction que la validation (comportement par défaut des
+-- triggers Postgres — pas besoin de transaction séparée).
+-- Sécurité anti-boucle : l'UPDATE imbriqué déclenche à nouveau ce trigger,
+-- mais lors de ce second passage OLD et NEW ont la même valeur pour les
+-- deux booléens (rien n'a changé depuis le premier UPDATE), donc la clause
+-- WHEN est fausse et la fonction ne s'exécute pas une seconde fois.
+CREATE OR REPLACE FUNCTION fn_purger_code_sms_valide()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE contrats
+    SET code_sms_client  = CASE WHEN NEW.signature_client_otp_verifie  AND NOT OLD.signature_client_otp_verifie  THEN NULL ELSE code_sms_client  END,
+        code_sms_partie2 = CASE WHEN NEW.signature_partie2_otp_verifie AND NOT OLD.signature_partie2_otp_verifie THEN NULL ELSE code_sms_partie2 END
+    WHERE id = NEW.id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_contrats_purger_code_sms
+  AFTER UPDATE ON contrats
+  FOR EACH ROW
+  WHEN (
+    (NEW.signature_client_otp_verifie  AND NOT OLD.signature_client_otp_verifie)
+    OR (NEW.signature_partie2_otp_verifie AND NOT OLD.signature_partie2_otp_verifie)
+  )
+  EXECUTE FUNCTION fn_purger_code_sms_valide();
 
 -- Règle : le fournisseur doit avoir un abonnement actif pour VALIDER
 -- (signer) un contrat matériaux. Se déclenche uniquement au passage à
@@ -979,4 +1054,129 @@ LEFT JOIN superviseurs sv            ON sv.id = ch.superviseur_id;
 --
 -- J. RLS : toujours entièrement commentée, aucune décision prise sur
 --    Supabase Auth (a) vs policies permissives (b) — cf. section 11.
+-- ═══════════════════════════════════════════════════════════════════════════
+
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- CORRECTIONS DEMANDÉES (passe suivante) — 6 points vérifiés, statut ci-dessous
+-- ═══════════════════════════════════════════════════════════════════════════
+-- 1. AJOUTÉ : 'versement_rejete' manquait dans type_operation (on avait
+--    sortie_rejetee mais pas son équivalent côté versement) — ajouté avec
+--    la même contrainte d'acteur (fournisseur) que versement_valide, et
+--    reference_transaction_id désormais obligatoire pour ce type aussi.
+--    Le registre reste 100% event-sourced : aucune colonne "statut" n'a
+--    jamais existé sur registre_transactions, donc rien à changer côté
+--    immutabilité (déjà garantie par les triggers no_update/no_delete).
+--
+-- 2. DÉJÀ PRÉSENT : le champ d'auto-référence existe sous le nom
+--    `reference_transaction_id` (pas `transaction_liee_id`) — non renommé,
+--    consigne étant de ne rien changer d'autre. Permet bien une requête du
+--    type "sorties en attente depuis plus de X jours" :
+--      SELECT sd.* FROM registre_transactions sd
+--      WHERE sd.type_operation = 'sortie_demandee'
+--        AND sd.created_at < now() - interval '3 days'
+--        AND NOT EXISTS (
+--          SELECT 1 FROM registre_transactions r
+--          WHERE r.reference_transaction_id = sd.id
+--        );
+--
+-- 3. DÉJÀ CORRECT : vérifié dans fn_gerer_solde_registre() ET dans
+--    solde_compte_materiaux_recalcule() — les deux ne font varier/sommer
+--    que versement_valide (+) et sortie_confirmee (−). Les lignes de
+--    demande/déclaration (versement_declare, sortie_demandee) et les rejets
+--    n'ont jamais d'effet sur solde_gnf. Commentaire du trigger complété
+--    pour lister explicitement les 6 types et confirmer ce point par écrit.
+--
+-- 4. COMPLÉTÉ (passe suivante) : `contact_client` et `contact_partie2` (TEXT)
+--    ajoutés sur contrats — le "moment d'acceptation" (signature_*_at) et
+--    la vérification OTP (signature_*_otp_verifie) existaient déjà pour les
+--    deux parties, seul le numéro de téléphone manquait (y compris pour le
+--    client, pas seulement la partie 2).
+--    Sur la question du code SMS en clair (laissée ouverte juste au-dessus) :
+--    ajout de `code_sms_client`/`code_sms_partie2` + trigger
+--    `trg_contrats_purger_code_sms` qui les met à NULL automatiquement dès
+--    que le `*_otp_verifie` correspondant passe à true, dans la même
+--    transaction. Le code ne reste donc en clair QUE le temps strictement
+--    nécessaire à sa vérification, jamais après.
+--
+-- 5. NE S'APPLIQUE PAS À CE FICHIER : `montant_forfait_service` n'a jamais
+--    été sur `chantiers` ici (c'était une particularité de l'autre brouillon
+--    comparé au tour précédent) — chez nous il est déjà uniquement sur
+--    `contrats.montant` pour type='forfait_service', donc déjà versionnable
+--    par nature (une nouvelle ligne contrats = une renégociation). Rien à
+--    déplacer.
+--
+-- 6. CONFIRMÉ INCHANGÉ : le modèle 3 FK nullables (client_id/superviseur_id/
+--    fournisseur_id) + CHECK "exactement une non-nulle" reste tel quel sur
+--    registre_transactions, étendu au nouveau type versement_rejete selon
+--    le même principe. Pas de colonne uuid générique sans FK introduite.
+--
+-- Statuts toujours en TEXT + CHECK (pas d'ENUM) et solde bloquant toujours
+-- vérifié en trigger BEFORE INSERT : aucun des deux n'a été touché, comme
+-- demandé.
+-- ═══════════════════════════════════════════════════════════════════════════
+
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- DEMANDE "AJOUTER TABLE CLIENTS" — déjà présente, 4 points vérifiés
+-- ═══════════════════════════════════════════════════════════════════════════
+-- La demande décrivait une table `clients` et un `chantiers.client_id` à
+-- créer/migrer — les deux existent déjà ici depuis plusieurs passes
+-- (section 2 et section 5). Statut des 4 points :
+--
+-- 1. Table clients : déjà présente. Complétée avec les colonnes réellement
+--    absentes et pertinentes : `email`, `adresse`, `updated_at` (+ trigger
+--    trg_clients_updated_at, rattaché après la définition de
+--    fn_set_updated_at() puisque clients est créée avant dans le fichier).
+--    MISE À JOUR (passe suivante) : `user_id UUID REFERENCES auth.users(id)`
+--    finalement ajouté (nullable) sur demande explicite — ce site n'utilise
+--    toujours pas Supabase Auth comme mécanisme principal, mais la colonne
+--    reste disponible en réserve. Voir aussi le retrait de password_hash
+--    sur clients/superviseurs/fournisseurs_materiaux plus bas (auth par OTP
+--    SMS pour ces 3 tables, pas par mot de passe).
+--
+-- 2. chantiers.client_id : déjà `UUID NOT NULL REFERENCES clients(id)`
+--    depuis sa création — il n'y a jamais eu client_telephone/
+--    client_user_id sur chantiers dans CE fichier (particularité de
+--    l'autre brouillon comparé precédemment). Rien à migrer.
+--
+-- 3. contrats : PAS changé. `contact_client` (ajouté il y a 2 passes) est
+--    délibérément un instantané du téléphone AU MOMENT de la signature,
+--    distinct de clients.telephone qui peut changer après coup — le
+--    transformer en FK vers clients(id) ferait perdre cette traçabilité
+--    figée (une FK résoudrait toujours le téléphone ACTUEL via jointure).
+--    Le lien de propriété client↔contrat existe déjà, via
+--    contrats.chantier_id → chantiers.client_id.
+--
+-- 4. RLS : `clients` est déjà dans la liste commentée (section 11), avec
+--    policies déjà rédigées. Rien à ajouter.
+-- ═══════════════════════════════════════════════════════════════════════════
+
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- CORRECTIF AUTH — retrait password_hash, ajout clients.user_id
+-- ═══════════════════════════════════════════════════════════════════════════
+-- Erreur de conception identifiée et corrigée : clients, superviseurs et
+-- fournisseurs_materiaux avaient chacun un `password_hash TEXT NOT NULL`,
+-- calqué par erreur sur le pattern de `providers` (qui, lui, utilise
+-- vraiment un PIN/mot de passe hashé). ⚠️ Ce projet authentifie ces 3
+-- rôles par OTP SMS (téléphone + code via `verification_codes`, déjà
+-- réutilisée par ailleurs dans ce fichier pour la signature de contrat),
+-- jamais par mot de passe. Colonne `password_hash` retirée des 3 tables ;
+-- aucune colonne de remplacement n'est nécessaire côté schéma puisque
+-- `verification_codes` est générique (clé = numéro de téléphone, pas
+-- besoin d'une colonne dédiée sur chaque table de rôle).
+--
+-- `clients.user_id UUID REFERENCES auth.users(id)` (nullable) ajouté sur
+-- demande explicite — annule le refus argumenté dans la section
+-- précédente ("PAS ajouté"). Toujours pas de Supabase Auth comme
+-- mécanisme principal sur ce site, mais la colonne existe désormais en
+-- réserve pour `clients` spécifiquement (pas étendue à superviseurs/
+-- fournisseurs_materiaux, non demandé).
+--
+-- Confirmé inchangés à cette passe : les 3 FK nullables + CHECK "exactement
+-- une non-nulle" sur registre_transactions (chk_registre_acteur_coherent),
+-- et le trigger trg_contrats_purger_code_sms (purge du code SMS en clair
+-- dès validation OTP, sur contrats — sans rapport avec l'auth des 3 tables
+-- ci-dessus, portée volontairement distincte).
 -- ═══════════════════════════════════════════════════════════════════════════

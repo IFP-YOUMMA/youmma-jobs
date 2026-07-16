@@ -5955,6 +5955,7 @@ async function chargerAvis() {
       <span class="sidebar-notif-badge hidden" id="sidebarNotifBadge">0</span>
     </div>
     <div onclick="showAdmin('equipe');_adminLoadEquipe();" id="amenu-equipe" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-users-gear" style="width:16px;"></i> Équipe</div>
+    <div onclick="showAdmin('registre_chantier');_adminLoadRegistreChantier();" id="amenu-registre_chantier" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-clipboard-list" style="width:16px;"></i> Registre chantier</div>
   </div>
   <div style="padding:8px;border-top:1px solid rgba(255,255,255,.08);margin-top:10px;">
     <div onclick="logoutAdmin()" style="padding:10px 12px;border-radius:8px;color:#FCA5A5;font-size:13px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.1);"><i class="fa-solid fa-right-from-bracket" style="width:16px;"></i> Déconnexion</div>
@@ -6244,6 +6245,171 @@ async function chargerAvis() {
           <button onclick="document.getElementById('equipeModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
           <button id="equipeModalSave" onclick="_adminEquipeSauvegarder()" style="background:#E8650A;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer</button>
         </div>
+      </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         REGISTRE CHANTIER (admin) — accessible agent + super_admin
+         Consomme : clients, fournisseurs_materiaux, superviseurs,
+         chantiers, comptes_materiaux, registre_transactions
+         (supabase/migrations/20260714_registre_chantier.sql)
+         ══════════════════════════════════════════════════════════ -->
+    <div class="admin-section" id="admin-registre_chantier">
+      <div class="admin-section-inner">
+
+        <div class="adm-section-header">
+          <div class="adm-section-title">
+            <i class="fa-solid fa-clipboard-list" style="color:#E85D04;"></i> Registre chantier
+          </div>
+        </div>
+
+        <!-- 3 cartes de création rapide -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:28px;">
+
+          <div class="adm-stat-card" style="border-top:3px solid #2563EB;">
+            <div class="adm-stat-icon" style="background:#2563EB;"><i class="fa-solid fa-user"></i></div>
+            <div class="adm-stat-num" id="rcStatClients">—</div>
+            <div class="adm-stat-label">Clients actifs</div>
+            <button onclick="_rcOuvrirClientModal()" style="width:100%;margin-top:12px;padding:8px;background:#EFF6FF;color:#2563EB;border:1.5px solid #BFDBFE;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;">+ Créer un client</button>
+          </div>
+
+          <div class="adm-stat-card" style="border-top:3px solid #E8650A;">
+            <div class="adm-stat-icon" style="background:#E8650A;"><i class="fa-solid fa-truck-fast"></i></div>
+            <div class="adm-stat-num" id="rcStatFournisseurs">—</div>
+            <div class="adm-stat-label">Fournisseurs <span id="rcStatFournisseursExpires" style="color:#DC2626;font-weight:700;"></span></div>
+            <button onclick="_rcOuvrirFournisseurModal()" style="width:100%;margin-top:12px;padding:8px;background:#FFF7F0;color:#E8650A;border:1.5px solid #FDE1C7;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;">+ Créer un fournisseur</button>
+          </div>
+
+          <div class="adm-stat-card" style="border-top:3px solid #7C3AED;">
+            <div class="adm-stat-icon" style="background:#7C3AED;"><i class="fa-solid fa-helmet-safety"></i></div>
+            <div class="adm-stat-num" id="rcStatSuperviseurs">—</div>
+            <div class="adm-stat-label">Superviseurs actifs</div>
+            <button onclick="_rcOuvrirSuperviseurModal()" style="width:100%;margin-top:12px;padding:8px;background:#F5F3FF;color:#7C3AED;border:1.5px solid #DDD6FE;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;">+ Créer un superviseur</button>
+          </div>
+
+        </div>
+
+        <!-- Filtres + tableau registre_transactions -->
+        <div class="adm-section-header" style="margin-bottom:14px;">
+          <div class="adm-section-title" style="font-size:15px;">
+            <i class="fa-solid fa-list-check" style="color:#E85D04;"></i> Transactions du registre
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <select id="rcFiltreChantier" onchange="_rcLoadTransactions()" style="padding:8px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;background:#fff;min-width:180px;">
+              <option value="">Tous les chantiers</option>
+            </select>
+            <select id="rcFiltreType" onchange="_rcLoadTransactions()" style="padding:8px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;background:#fff;min-width:180px;">
+              <option value="">Tous les statuts</option>
+              <option value="versement_declare">Versement déclaré</option>
+              <option value="versement_valide">Versement validé</option>
+              <option value="versement_rejete">Versement rejeté</option>
+              <option value="sortie_demandee">Sortie demandée</option>
+              <option value="sortie_confirmee">Sortie confirmée</option>
+              <option value="sortie_rejetee">Sortie rejetée</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="adm-table-wrap">
+          <table class="adm-table" id="rcTransactionsTable" style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#F4F6FB;border-bottom:2px solid #E5E7EB;">
+                <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Chantier</th>
+                <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Type</th>
+                <th style="padding:12px 14px;text-align:right;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Montant</th>
+                <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Statut</th>
+                <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Date</th>
+              </tr>
+            </thead>
+            <tbody id="rcTransactionsList">
+              <tr><td colspan="5" style="text-align:center;padding:40px;color:#9CA3AF;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Modal création client -->
+        <div id="rcClientModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+          <div style="background:#fff;border-radius:16px;padding:28px;width:min(440px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.25);max-height:88vh;overflow-y:auto;">
+            <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 20px;font-size:17px;"><i class="fa-solid fa-user" style="color:#2563EB;margin-right:8px;"></i>Créer un client</h3>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom complet *</label>
+                <input id="rcClientNom" type="text" placeholder="Mamadou Diallo" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Téléphone *</label>
+                <input id="rcClientTelephone" type="text" placeholder="224XXXXXXXXX" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Email</label>
+                <input id="rcClientEmail" type="email" placeholder="client@email.com" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Ville</label>
+                <input id="rcClientVille" type="text" placeholder="Conakry" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Adresse</label>
+                <input id="rcClientAdresse" type="text" placeholder="Quartier, commune..." style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div id="rcClientErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
+              <button onclick="document.getElementById('rcClientModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
+              <button id="rcClientSave" onclick="_rcSauvegarderClient()" style="background:#2563EB;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal création fournisseur -->
+        <div id="rcFournisseurModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+          <div style="background:#fff;border-radius:16px;padding:28px;width:min(440px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.25);max-height:88vh;overflow-y:auto;">
+            <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 20px;font-size:17px;"><i class="fa-solid fa-truck-fast" style="color:#E8650A;margin-right:8px;"></i>Créer un fournisseur</h3>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom de l'entreprise *</label>
+                <input id="rcFournisseurNom" type="text" placeholder="Conakry Matériaux SARL" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Téléphone *</label>
+                <input id="rcFournisseurTelephone" type="text" placeholder="224XXXXXXXXX" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Ville</label>
+                <input id="rcFournisseurVille" type="text" placeholder="Conakry" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Commune</label>
+                <input id="rcFournisseurCommune" type="text" placeholder="Ratoma" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div id="rcFournisseurErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
+              <button onclick="document.getElementById('rcFournisseurModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
+              <button id="rcFournisseurSave" onclick="_rcSauvegarderFournisseur()" style="background:#E8650A;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal création superviseur -->
+        <div id="rcSuperviseurModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+          <div style="background:#fff;border-radius:16px;padding:28px;width:min(440px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.25);max-height:88vh;overflow-y:auto;">
+            <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 20px;font-size:17px;"><i class="fa-solid fa-helmet-safety" style="color:#7C3AED;margin-right:8px;"></i>Créer un superviseur</h3>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom complet *</label>
+                <input id="rcSuperviseurNom" type="text" placeholder="Mamadou Diallo" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Téléphone *</label>
+                <input id="rcSuperviseurTelephone" type="text" placeholder="224XXXXXXXXX" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div>
+                <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Rattacher à un prestataire existant (optionnel)</label>
+                <select id="rcSuperviseurProviderId" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;background:#fff;">
+                  <option value="">— Aucun —</option>
+                </select>
+                <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">⚠️ Le schéma lie un superviseur à un <code>provider_id</code> (prestataire), pas à un compte admin — voir note en fin de réponse.</div>
+              </div>
+              <div id="rcSuperviseurErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
+              <button onclick="document.getElementById('rcSuperviseurModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
+              <button id="rcSuperviseurSave" onclick="_rcSauvegarderSuperviseur()" style="background:#7C3AED;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal détail transaction / chantier -->
+        <div id="rcDetailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+          <div style="background:#fff;border-radius:20px;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.3);">
+            <div style="padding:20px 24px;border-bottom:1px solid #F0F0F8;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;">
+              <div id="rcDetailTitre" style="font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:#1A1A4E;"></div>
+              <button onclick="document.getElementById('rcDetailModal').style.display='none'" style="width:30px;height:30px;border-radius:50%;background:#F4F6FB;border:none;cursor:pointer;color:#6B7280;font-size:15px;">✕</button>
+            </div>
+            <div id="rcDetailContenu" style="padding:20px 24px;"></div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -10382,12 +10548,13 @@ function showAdmin(name) {
     campagne: '<i class="fa-solid fa-bullhorn" style="color:#E8650A;margin-right:6px;"></i>Campagne SMS',
     equipe: '<i class="fa-solid fa-users-gear" style="color:#E8650A;margin-right:6px;"></i>Équipe admin',
     activite: '<i class="fa-solid fa-chart-bar" style="color:#E85D04;margin-right:6px;"></i>Activité équipe',
+    registre_chantier: '<i class="fa-solid fa-clipboard-list" style="color:#E8650A;margin-right:6px;"></i>Registre chantier',
   };
   const tt = document.getElementById('adminTopbarTitle');
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','missions','projets_clients','ambassadeurs','rapports','activite','notifications','equipe'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','missions','projets_clients','ambassadeurs','rapports','activite','notifications','equipe','registre_chantier'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (!el) return;
     // Ne pas réafficher un élément restreint à l'agent
@@ -10403,6 +10570,7 @@ function showAdmin(name) {
   else if (name==='campagne') { _campagneInit(); }
   else if (name==='equipe') { _adminLoadEquipe(); }
   else if (name==='activite') { _adminLoadActivite(); }
+  else if (name==='registre_chantier') { _adminLoadRegistreChantier(); }
   else if (name!=='dashboard') { if(typeof _adminLoadAll==='function') _adminLoadAll(); }
 }
 
@@ -10473,6 +10641,393 @@ async function _logAdminAction(action, cible_nom, cible_matricule, details) {
       details: details || ''
     });
   } catch(e) { console.log('[logAdminAction]', e.message); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// REGISTRE CHANTIER (admin) — clients / fournisseurs_materiaux /
+// superviseurs / chantiers / comptes_materiaux / registre_transactions
+// Consomme supabase/migrations/20260714_registre_chantier.sql (+ patch
+// table clients). Accessible aux rôles agent ET super_admin.
+// ══════════════════════════════════════════════════════════════
+
+// Pas de mot de passe/PIN sur clients, fournisseurs_materiaux et
+// superviseurs : ces 3 tables s'authentifient par OTP SMS (téléphone +
+// code via `verification_codes`, déjà en place pour tout le site), jamais
+// par un secret créé côté admin — voir supabase/migrations/20260714_registre_chantier.sql.
+
+function _rcTelephoneValide(tel) {
+  return /^224\d{9}$/.test(tel || '');
+}
+
+function _rcAfficherErreur(elId, msg) {
+  const el = document.getElementById(elId);
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+function _rcCacherErreur(elId) {
+  const el = document.getElementById(elId);
+  if (el) { el.style.display = 'none'; el.textContent = ''; }
+}
+
+// ── Chargement principal de l'onglet ──
+function _adminLoadRegistreChantier() {
+  _rcLoadCartes();
+  _rcLoadChantiersDropdown();
+  _rcLoadTransactions();
+}
+
+// ── 3 cartes de comptage (chaque requête est isolée : une erreur sur une
+// carte affiche '—' sans empêcher le chargement des deux autres) ──
+async function _rcLoadCartes() {
+  try {
+    const { count, error } = await sb.from('clients').select('id', { count: 'exact', head: true }).eq('statut', 'actif');
+    document.getElementById('rcStatClients').textContent = error ? '—' : (count ?? 0);
+  } catch (e) {
+    document.getElementById('rcStatClients').textContent = '—';
+    console.warn('[registre_chantier] clients indisponible:', e.message);
+  }
+
+  try {
+    const { data, error } = await sb.from('fournisseurs_materiaux').select('id, abonnement_fin');
+    if (error) throw error;
+    const total = (data || []).length;
+    const now = new Date();
+    const expires = (data || []).filter(f => f.abonnement_fin && new Date(f.abonnement_fin) < now).length;
+    document.getElementById('rcStatFournisseurs').textContent = total;
+    document.getElementById('rcStatFournisseursExpires').textContent = expires > 0 ? ('(' + expires + ' expiré' + (expires > 1 ? 's' : '') + ')') : '';
+  } catch (e) {
+    document.getElementById('rcStatFournisseurs').textContent = '—';
+    console.warn('[registre_chantier] fournisseurs_materiaux indisponible:', e.message);
+  }
+
+  try {
+    const { count, error } = await sb.from('superviseurs').select('id', { count: 'exact', head: true }).eq('statut', 'actif');
+    document.getElementById('rcStatSuperviseurs').textContent = error ? '—' : (count ?? 0);
+  } catch (e) {
+    document.getElementById('rcStatSuperviseurs').textContent = '—';
+    console.warn('[registre_chantier] superviseurs indisponible:', e.message);
+  }
+}
+
+// ── Création CLIENT ──
+function _rcOuvrirClientModal() {
+  ['rcClientNom','rcClientTelephone','rcClientEmail','rcClientVille','rcClientAdresse'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  _rcCacherErreur('rcClientErreur');
+  document.getElementById('rcClientModal').style.display = 'flex';
+}
+
+async function _rcSauvegarderClient() {
+  const nom = document.getElementById('rcClientNom').value.trim();
+  const telephone = document.getElementById('rcClientTelephone').value.trim();
+  const email = document.getElementById('rcClientEmail').value.trim();
+  const ville = document.getElementById('rcClientVille').value.trim();
+  const adresse = document.getElementById('rcClientAdresse').value.trim();
+  _rcCacherErreur('rcClientErreur');
+
+  if (!nom) { _rcAfficherErreur('rcClientErreur', 'Le nom est obligatoire.'); return; }
+  if (!_rcTelephoneValide(telephone)) { _rcAfficherErreur('rcClientErreur', 'Téléphone au format 224XXXXXXXXX.'); return; }
+
+  const btn = document.getElementById('rcClientSave');
+  btn.disabled = true; btn.textContent = 'Création...';
+  try {
+    const { error } = await sb.from('clients').insert({
+      nom, telephone, email: email || null, ville: ville || null, adresse: adresse || null
+    });
+    if (error) {
+      if (error.code === '23505') { _rcAfficherErreur('rcClientErreur', 'Ce numéro de téléphone est déjà utilisé par un autre client.'); return; }
+      throw error;
+    }
+    await _logAdminAction('creation_client', nom, '', 'tel: ' + telephone);
+    document.getElementById('rcClientModal').style.display = 'none';
+    if (typeof showToast === 'function') showToast('✅ Client créé — il se connecte avec son téléphone (code reçu par SMS)', 'success');
+    _rcLoadCartes();
+  } catch (e) {
+    _rcAfficherErreur('rcClientErreur', 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Créer';
+  }
+}
+
+// ── Création FOURNISSEUR ──
+function _rcOuvrirFournisseurModal() {
+  ['rcFournisseurNom','rcFournisseurTelephone','rcFournisseurVille','rcFournisseurCommune'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  _rcCacherErreur('rcFournisseurErreur');
+  document.getElementById('rcFournisseurModal').style.display = 'flex';
+}
+
+async function _rcSauvegarderFournisseur() {
+  const nom_entreprise = document.getElementById('rcFournisseurNom').value.trim();
+  const telephone = document.getElementById('rcFournisseurTelephone').value.trim();
+  const ville = document.getElementById('rcFournisseurVille').value.trim();
+  const commune = document.getElementById('rcFournisseurCommune').value.trim();
+  _rcCacherErreur('rcFournisseurErreur');
+
+  if (!nom_entreprise) { _rcAfficherErreur('rcFournisseurErreur', "Le nom de l'entreprise est obligatoire."); return; }
+  if (!_rcTelephoneValide(telephone)) { _rcAfficherErreur('rcFournisseurErreur', 'Téléphone au format 224XXXXXXXXX.'); return; }
+
+  const btn = document.getElementById('rcFournisseurSave');
+  btn.disabled = true; btn.textContent = 'Création...';
+  try {
+    const { error } = await sb.from('fournisseurs_materiaux').insert({
+      nom_entreprise, telephone, ville: ville || null, commune: commune || null
+    });
+    if (error) {
+      if (error.code === '23505') { _rcAfficherErreur('rcFournisseurErreur', 'Ce numéro de téléphone est déjà utilisé par un autre fournisseur.'); return; }
+      throw error;
+    }
+    await _logAdminAction('creation_fournisseur', nom_entreprise, '', 'tel: ' + telephone);
+    document.getElementById('rcFournisseurModal').style.display = 'none';
+    if (typeof showToast === 'function') showToast('✅ Fournisseur créé — il se connecte avec son téléphone (code reçu par SMS). Abonnement inactif par défaut.', 'success');
+    _rcLoadCartes();
+  } catch (e) {
+    _rcAfficherErreur('rcFournisseurErreur', 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Créer';
+  }
+}
+
+// ── Création SUPERVISEUR ──
+// ⚠️ La demande voulait un select peuplé depuis admin_users (agent panel
+// admin) pour lier "admin_user_id". Le schéma réel (superviseurs.provider_id
+// REFERENCES providers(id)) lie un superviseur à un PRESTATAIRE existant,
+// pas à un compte admin — il n'y a pas de colonne admin_user_id. Select
+// repeuplé depuis `providers` en conséquence ; voir note de fin de réponse.
+async function _rcOuvrirSuperviseurModal() {
+  ['rcSuperviseurNom','rcSuperviseurTelephone'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  _rcCacherErreur('rcSuperviseurErreur');
+  const sel = document.getElementById('rcSuperviseurProviderId');
+  sel.innerHTML = '<option value="">— Aucun —</option>';
+  document.getElementById('rcSuperviseurModal').style.display = 'flex';
+  try {
+    const { data, error } = await sb.from('providers').select('id,prenom,nom,metier').eq('statut', 'valide').order('nom').limit(200);
+    if (error) throw error;
+    sel.innerHTML = '<option value="">— Aucun —</option>' +
+      (data || []).map(p => `<option value="${p.id}">${(p.prenom || '') + ' ' + (p.nom || '')} — ${p.metier || ''}</option>`).join('');
+  } catch (e) {
+    console.warn('[registre_chantier] providers indisponible:', e.message);
+  }
+}
+
+async function _rcSauvegarderSuperviseur() {
+  const nom = document.getElementById('rcSuperviseurNom').value.trim();
+  const telephone = document.getElementById('rcSuperviseurTelephone').value.trim();
+  const providerId = document.getElementById('rcSuperviseurProviderId').value || null;
+  _rcCacherErreur('rcSuperviseurErreur');
+
+  if (!nom) { _rcAfficherErreur('rcSuperviseurErreur', 'Le nom est obligatoire.'); return; }
+  if (!_rcTelephoneValide(telephone)) { _rcAfficherErreur('rcSuperviseurErreur', 'Téléphone au format 224XXXXXXXXX.'); return; }
+
+  const btn = document.getElementById('rcSuperviseurSave');
+  btn.disabled = true; btn.textContent = 'Création...';
+  try {
+    const { error } = await sb.from('superviseurs').insert({
+      nom, telephone, provider_id: providerId
+    });
+    if (error) {
+      if (error.code === '23505') { _rcAfficherErreur('rcSuperviseurErreur', 'Ce numéro de téléphone est déjà utilisé par un autre superviseur.'); return; }
+      throw error;
+    }
+    await _logAdminAction('creation_superviseur', nom, '', 'tel: ' + telephone + (providerId ? ' | provider_id: ' + providerId : ''));
+    document.getElementById('rcSuperviseurModal').style.display = 'none';
+    if (typeof showToast === 'function') showToast('✅ Superviseur créé — il se connecte avec son téléphone (code reçu par SMS)', 'success');
+    _rcLoadCartes();
+  } catch (e) {
+    _rcAfficherErreur('rcSuperviseurErreur', 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Créer';
+  }
+}
+
+// ── Dropdown filtre chantier ──
+async function _rcLoadChantiersDropdown() {
+  const sel = document.getElementById('rcFiltreChantier');
+  if (!sel) return;
+  try {
+    const { data, error } = await sb.from('chantiers').select('id,nom').order('nom').limit(300);
+    if (error) throw error;
+    sel.innerHTML = '<option value="">Tous les chantiers</option>' +
+      (data || []).map(c => `<option value="${c.id}">${c.nom}</option>`).join('');
+  } catch (e) {
+    console.warn('[registre_chantier] chantiers indisponible:', e.message);
+  }
+}
+
+// type_operation EST le statut (registre event-sourced, pas de colonne
+// statut séparée) — mapping couleur vert=validé / ambre=en attente /
+// rouge=rejeté sur les 6 valeurs réelles du schéma.
+function _rcStatutConfig(type) {
+  const CONFIG = {
+    versement_declare: { label: 'Versement déclaré', bg: '#FFFBEB', color: '#D97706' },
+    versement_valide:  { label: 'Versement validé',  bg: '#ECFDF5', color: '#059669' },
+    versement_rejete:  { label: 'Versement rejeté',  bg: '#FEF2F2', color: '#DC2626' },
+    sortie_demandee:   { label: 'Sortie demandée',   bg: '#FFFBEB', color: '#D97706' },
+    sortie_confirmee:  { label: 'Sortie confirmée',  bg: '#ECFDF5', color: '#059669' },
+    sortie_rejetee:    { label: 'Sortie rejetée',    bg: '#FEF2F2', color: '#DC2626' },
+  };
+  return CONFIG[type] || { label: type, bg: '#F3F4F6', color: '#6B7280' };
+}
+
+let _rcTransactionsCache = [];
+
+// Tableau principal — même triptyque de repli que renderAdminMissions :
+// table manquante (42P01) / RLS (42501) / erreur générique, pour ne jamais
+// planter si la migration n'a pas encore été appliquée.
+async function _rcLoadTransactions() {
+  const tbody = document.getElementById('rcTransactionsList');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#9CA3AF;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</td></tr>';
+
+  const chantierId = document.getElementById('rcFiltreChantier')?.value || '';
+  const typeOp = document.getElementById('rcFiltreType')?.value || '';
+
+  try {
+    let q = sb.from('registre_transactions').select('*, chantiers(nom)').order('created_at', { ascending: false }).limit(200);
+    if (chantierId) q = q.eq('chantier_id', chantierId);
+    if (typeOp) q = q.eq('type_operation', typeOp);
+    const { data, error } = await q;
+
+    if (error) {
+      const msg = (error.message || '').toLowerCase();
+      const isTableMissing = error.code === '42P01' || msg.includes('does not exist');
+      const isRLS = error.code === '42501' || msg.includes('permission') || msg.includes('policy');
+      if (isTableMissing) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;"><div style="background:#FFFBEB;border-radius:12px;padding:20px;display:inline-block;"><div style="font-size:20px;margin-bottom:8px;">📋</div><div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">Table registre_transactions manquante</div><div style="font-size:13px;color:#6B7280;">La migration supabase/migrations/20260714_registre_chantier.sql n'a pas encore été exécutée en base.</div></div></td></tr>`;
+      } else if (isRLS) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;"><div style="background:#FEF2F2;border-radius:12px;padding:24px;display:inline-block;max-width:480px;"><div style="font-size:20px;margin-bottom:8px;">🔒</div><div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:8px;">RLS bloque l'accès au registre</div><div style="font-size:13px;color:#6B7280;">Row Level Security empêche la lecture de registre_transactions.</div></div></td></tr>`;
+      } else {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;"><div style="background:#FEF2F2;border-radius:12px;padding:20px;display:inline-block;max-width:480px;"><div style="font-size:20px;margin-bottom:8px;">⚠️</div><div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:8px;">Erreur lors du chargement</div><div style="font-size:12px;color:#DC2626;font-family:monospace;background:#fff;padding:10px;border-radius:8px;border:1px solid #FECACA;">${error.message}</div></div></td></tr>`;
+      }
+      return;
+    }
+
+    _rcTransactionsCache = data || [];
+    if (!_rcTransactionsCache.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#9CA3AF;"><i class="fa-solid fa-inbox" style="font-size:24px;display:block;margin-bottom:10px;"></i>Aucune transaction trouvée</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = _rcTransactionsCache.map(t => {
+      const sc = _rcStatutConfig(t.type_operation);
+      const typeLabel = String(t.type_operation).startsWith('versement') ? '💰 Versement' : '📦 Sortie';
+      const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const montant = t.montant_gnf != null ? Number(t.montant_gnf).toLocaleString('fr-FR') + ' GNF' : '—';
+      const chantierNom = t.chantiers?.nom || '—';
+      return `<tr style="border-bottom:1px solid #F7F8FC;cursor:pointer;" onclick="_rcOuvrirDetail('${t.chantier_id}','${t.compte_id}')" onmouseover="this.style.background='#FAFBFF'" onmouseout="this.style.background=''">
+        <td style="padding:12px 14px;font-size:13px;font-weight:700;color:#1A1A4E;">${chantierNom}</td>
+        <td style="padding:12px 14px;font-size:12.5px;color:#374151;">${typeLabel}</td>
+        <td style="padding:12px 14px;text-align:right;font-size:13px;font-weight:700;color:#1A1A4E;">${montant}</td>
+        <td style="padding:12px 14px;text-align:center;"><span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;white-space:nowrap;">${sc.label}</span></td>
+        <td style="padding:12px 14px;text-align:center;font-size:12px;color:#6B7280;white-space:nowrap;">${date}</td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#EF4444;">Erreur: ' + e.message + '</td></tr>';
+  }
+}
+
+// ── Vue détail : chantier complet + solde + historique event-sourced ──
+async function _rcOuvrirDetail(chantierId, compteId) {
+  const modal = document.getElementById('rcDetailModal');
+  const titre = document.getElementById('rcDetailTitre');
+  const contenu = document.getElementById('rcDetailContenu');
+  if (contenu) contenu.innerHTML = '<div style="text-align:center;padding:30px;color:#9CA3AF;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>';
+  modal.style.display = 'flex';
+
+  try {
+    const { data: chantier, error: errCh } = await sb.from('chantiers')
+      .select('*, clients(nom,prenom,telephone), fournisseurs_materiaux(nom_entreprise,telephone), superviseurs(nom,prenom,telephone)')
+      .eq('id', chantierId).single();
+    if (errCh) throw errCh;
+
+    if (titre) titre.innerHTML = '<i class="fa-solid fa-building" style="color:#E85D04;margin-right:8px;"></i>' + (chantier.nom || 'Chantier');
+
+    // Formule de service : vit sur contrats (type='forfait_service'), pas
+    // sur chantiers — peut ne pas exister si aucun contrat forfait n'a
+    // encore été créé pour ce chantier.
+    let formule = '—';
+    try {
+      const { data: contrat } = await sb.from('contrats').select('formule_service').eq('chantier_id', chantierId).eq('type', 'forfait_service').maybeSingle();
+      if (contrat?.formule_service) formule = contrat.formule_service;
+    } catch (e) { /* pas de contrat forfait pour ce chantier, normal */ }
+
+    const { data: compte, error: errCompte } = await sb.from('comptes_materiaux').select('*').eq('id', compteId).single();
+    if (errCompte) throw errCompte;
+
+    const statutChantierConfig = {
+      en_etude: { label: 'En étude', bg: '#EFF6FF', color: '#2563EB' },
+      en_cours: { label: 'En cours', bg: '#FFFBEB', color: '#D97706' },
+      termine:  { label: 'Terminé',  bg: '#ECFDF5', color: '#059669' },
+    };
+    const scChantier = statutChantierConfig[chantier.statut] || { label: chantier.statut, bg: '#F3F4F6', color: '#6B7280' };
+    const soldeDisponible = (compte.solde_gnf || 0) - (compte.solde_reserve || 0);
+    const nomClient = chantier.clients ? ((chantier.clients.prenom ? chantier.clients.prenom + ' ' : '') + chantier.clients.nom) : '—';
+    const nomSuperviseur = chantier.superviseurs ? ((chantier.superviseurs.prenom ? chantier.superviseurs.prenom + ' ' : '') + chantier.superviseurs.nom) : '—';
+
+    let html = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+        <div style="background:#F4F6FB;border-radius:12px;padding:14px;">
+          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">Client</div>
+          <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${nomClient}</div>
+          <div style="font-size:12px;color:#6B7280;">${chantier.clients?.telephone || ''}</div>
+        </div>
+        <div style="background:#F4F6FB;border-radius:12px;padding:14px;">
+          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">Fournisseur</div>
+          <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${chantier.fournisseurs_materiaux?.nom_entreprise || '—'}</div>
+          <div style="font-size:12px;color:#6B7280;">${chantier.fournisseurs_materiaux?.telephone || ''}</div>
+        </div>
+        <div style="background:#F4F6FB;border-radius:12px;padding:14px;">
+          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">Superviseur</div>
+          <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${nomSuperviseur}</div>
+          <div style="font-size:12px;color:#6B7280;">${chantier.superviseurs?.telephone || ''}</div>
+        </div>
+        <div style="background:#F4F6FB;border-radius:12px;padding:14px;">
+          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">Statut chantier / Formule</div>
+          <span style="background:${scChantier.bg};color:${scChantier.color};border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;">${scChantier.label}</span>
+          <div style="font-size:12px;color:#6B7280;margin-top:6px;">Formule : ${formule}</div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,#1A1A4E,#2D2D6B);border-radius:12px;padding:16px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em;">Solde du compte matériaux</div>
+          <div style="font-size:22px;font-weight:800;color:#fff;">${Number(compte.solde_gnf || 0).toLocaleString('fr-FR')} GNF</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;">Réservé</div>
+          <div style="font-size:14px;font-weight:700;color:#F5C842;">${Number(compte.solde_reserve || 0).toLocaleString('fr-FR')} GNF</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:4px;">Disponible : ${soldeDisponible.toLocaleString('fr-FR')} GNF</div>
+        </div>
+      </div>
+    `;
+
+    const { data: histo, error: errHisto } = await sb.from('registre_transactions')
+      .select('*')
+      .eq('compte_id', compteId)
+      .order('created_at', { ascending: true });
+    if (errHisto) throw errHisto;
+
+    html += '<div style="font-size:13px;font-weight:700;color:#1A1A4E;margin-bottom:10px;">Historique du registre (' + (histo?.length || 0) + ' événements)</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;">';
+    (histo || []).forEach(h => {
+      const sc = _rcStatutConfig(h.type_operation);
+      const date = new Date(h.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const acteur = h.client_id ? 'Client' : h.superviseur_id ? 'Superviseur' : h.fournisseur_id ? 'Fournisseur' : '—';
+      const materiauInfo = h.materiau ? `<div style="font-size:11.5px;color:#6B7280;">${h.materiau} — ${h.quantite || ''} ${h.unite || ''}</div>` : '';
+      const refInfo = h.reference_transaction_id ? '<div style="font-size:10.5px;color:#9CA3AF;">↳ référence : ' + String(h.reference_transaction_id).slice(0, 8) + '…</div>' : '';
+      html += `<div style="border:1.5px solid #F0F0F8;border-radius:10px;padding:10px 12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
+          <span style="font-size:12px;font-weight:700;color:#1A1A4E;">${Number(h.montant_gnf).toLocaleString('fr-FR')} GNF</span>
+        </div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">${acteur} · ${date}</div>
+        ${materiauInfo}
+        ${refInfo}
+      </div>`;
+    });
+    html += '</div>';
+
+    if (contenu) contenu.innerHTML = html;
+  } catch (e) {
+    if (contenu) contenu.innerHTML = '<div style="text-align:center;padding:30px;color:#DC2626;">Erreur : ' + e.message + '</div>';
+  }
 }
 
 async function _adminAction(type, id) {
