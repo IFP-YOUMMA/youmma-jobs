@@ -2845,14 +2845,77 @@ function _espaceCacherErreur(elId) {
 // est déjà active en mémoire (navigation interne, pas de rechargement),
 // on ré-affiche directement le tableau de bord plutôt que de repartir du
 // formulaire de connexion.
-function _espaceInit() {
+const _ESPACE_SESSION_KEY = 'youmma_espace_session';
+
+// Session persistante 30 jours — localStorage (survit à la fermeture du
+// navigateur, contrairement à _espaceSession qui est effacée au rechargement).
+// Contenu volontairement minimal : role/id/nom/telephone/expiry, jamais de
+// code OTP ni de hash.
+function _espaceSauvegarderSessionLocale(session) {
+  try {
+    localStorage.setItem(_ESPACE_SESSION_KEY, JSON.stringify({
+      role: session.role,
+      id: session.id,
+      nom: session.nom,
+      telephone: session.telephone,
+      expiry: Date.now() + 30 * 24 * 60 * 60 * 1000
+    }));
+  } catch (e) { /* localStorage indisponible (navigation privée, quota) — non bloquant */ }
+}
+
+// Restaure la session persistante si présente et non expirée. Le statut
+// réel est TOUJOURS revérifié en base avant de rétablir le tableau de
+// bord — jamais de confiance aveugle dans les données locales : un compte
+// suspendu ou remis en attente entre-temps doit être déconnecté, pas
+// silencieusement conservé.
+async function _espaceRestaurerSession() {
+  let brut;
+  try { brut = localStorage.getItem(_ESPACE_SESSION_KEY); } catch (e) { return { ok: false }; }
+  if (!brut) return { ok: false };
+
+  let session;
+  try { session = JSON.parse(brut); } catch (e) { localStorage.removeItem(_ESPACE_SESSION_KEY); return { ok: false }; }
+
+  if (!session || !session.role || !session.id || !session.expiry || session.expiry <= Date.now()) {
+    localStorage.removeItem(_ESPACE_SESSION_KEY);
+    return { ok: false };
+  }
+
+  const table = session.role === 'client' ? 'clients' : session.role === 'fournisseur' ? 'fournisseurs_materiaux' : session.role === 'superviseur' ? 'superviseurs' : null;
+  if (!table) { localStorage.removeItem(_ESPACE_SESSION_KEY); return { ok: false }; }
+
+  try {
+    const { data, error } = await sb.from(table).select('statut').eq('id', session.id).maybeSingle();
+    if (error || !data) { localStorage.removeItem(_ESPACE_SESSION_KEY); return { ok: false }; }
+    if (data.statut !== 'actif') {
+      localStorage.removeItem(_ESPACE_SESSION_KEY);
+      return { ok: false, message: "Votre session a expiré : votre compte n'est plus actif. Contactez YOUMMA JOBS si besoin." };
+    }
+  } catch (e) {
+    // Panne réseau/Supabase : par précaution, ne pas rétablir la session
+    // sans confirmation du statut réel — l'utilisateur devra juste
+    // renvoyer un code, la session locale reste intacte pour le prochain essai.
+    return { ok: false };
+  }
+
+  _espaceSession = { role: session.role, id: session.id, nom: session.nom, telephone: session.telephone };
+  _espaceAfficherTableauBord();
+  return { ok: true };
+}
+
+async function _espaceInit() {
   if (_espaceSession) { _espaceAfficherTableauBord(); return; }
+
+  const resultat = await _espaceRestaurerSession();
+  if (resultat.ok) return;
+
   document.getElementById('espaceEtapeTel').style.display = 'block';
   document.getElementById('espaceEtapeOtp').style.display = 'none';
   document.getElementById('espaceEtapeInscription').style.display = 'none';
   ['espaceDashFournisseur', 'espaceDashSuperviseur', 'espaceDashClient'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-  _espaceCacherErreur('espaceErreurTel');
   const tel = document.getElementById('espaceTelephone'); if (tel) tel.value = '';
+  if (resultat.message) { _espaceAfficherErreur('espaceErreurTel', resultat.message); }
+  else { _espaceCacherErreur('espaceErreurTel'); }
 }
 
 function _espaceRetourTel() {
@@ -3060,6 +3123,7 @@ async function _espaceValiderCode() {
     await sb.from('verification_codes').update({ used: true }).eq('id', data[0].id);
 
     _espaceSession = { role: _espaceContexte.role, id: _espaceContexte.id, nom: _espaceContexte.nom, telephone: _espaceContexte.telephone };
+    _espaceSauvegarderSessionLocale(_espaceSession);
     _espaceContexte = null;
     document.getElementById('espaceEtapeOtp').style.display = 'none';
     _espaceAfficherTableauBord();
@@ -3073,6 +3137,7 @@ async function _espaceValiderCode() {
 function _espaceDeconnexion() {
   _espaceSession = null;
   _espaceContexte = null;
+  try { localStorage.removeItem(_ESPACE_SESSION_KEY); } catch (e) { /* non bloquant */ }
   _espaceInit();
 }
 
