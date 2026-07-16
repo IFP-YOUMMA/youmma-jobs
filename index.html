@@ -2741,44 +2741,61 @@ if (typeof connexionPrestataire === 'undefined') {
 
   <!-- Tableau de bord FOURNISSEUR -->
   <div id="espaceDashFournisseur" style="display:none;width:100%;max-width:820px;">
-    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
-      <div style="display:flex;align-items:center;gap:14px;">
-        <div id="espaceFourAvatar" style="width:48px;height:48px;border-radius:50%;background:#FFF7F0;color:#E8650A;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;"></div>
-        <div>
-          <div style="font-size:16px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceFourNom"></div>
-          <div style="font-size:12px;color:#E8650A;font-weight:700;">Fournisseur YOUMMA JOBS</div>
+    <div style="background:#fff;border-radius:18px;padding:22px 24px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div id="espaceFourAvatar" style="width:56px;height:56px;border-radius:50%;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:18px;font-weight:800;flex-shrink:0;"></div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Fournisseur YOUMMA JOBS</div>
+            <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceFourNom"></div>
+          </div>
         </div>
+        <button onclick="_espaceDeconnexion()" style="display:inline-flex;align-items:center;gap:7px;background:#FEF2F2;color:#DC2626;border:none;border-radius:10px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-right-from-bracket" style="font-size:11px;"></i> Déconnexion</button>
       </div>
-      <button onclick="_espaceDeconnexion()" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">Déconnexion</button>
+      <div style="font-size:22px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;line-height:1.25;">Bonjour <span id="espaceFourPrenom"></span> 👋</div>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;">
-      <div class="adm-stat-card" style="border-top:3px solid #E8650A;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+      <div class="adm-stat-card" style="border-top:3px solid #059669;">
         <div class="adm-stat-num" id="espaceFourSoldeTotal">—</div>
         <div class="adm-stat-label">Solde total disponible</div>
       </div>
-      <div class="adm-stat-card" style="border-top:3px solid #059669;">
+      <div class="adm-stat-card" style="border-top:3px solid #E8650A;">
         <div class="adm-stat-num" id="espaceFourNbChantiers">—</div>
         <div class="adm-stat-label">Chantiers actifs</div>
       </div>
     </div>
 
-    <div id="espaceFourBandeau" style="display:none;background:#FFFBEB;border:1px solid #FED7AA;border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:13px;font-weight:700;color:#9A3412;"></div>
+    <div id="espaceFourBandeau" style="display:none;background:#FFFBEB;border:1.5px solid #FED7AA;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;font-weight:700;color:#9A3412;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i><span id="espaceFourBandeauTexte"></span></div>
 
     <div id="espaceFourChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
   </div>
 
   <!-- Tableau de bord SUPERVISEUR -->
   <div id="espaceDashSuperviseur" style="display:none;width:100%;max-width:820px;">
-    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
-      <div style="display:flex;align-items:center;gap:14px;">
-        <div id="espaceSupAvatar" style="width:48px;height:48px;border-radius:50%;background:#F5F3FF;color:#7C3AED;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;"></div>
-        <div>
-          <div style="font-size:16px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceSupNom"></div>
-          <div style="font-size:12px;color:#7C3AED;font-weight:700;">Superviseur YOUMMA JOBS</div>
+    <div style="background:#fff;border-radius:18px;padding:22px 24px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div id="espaceSupAvatar" style="width:56px;height:56px;border-radius:50%;background:#7C3AED;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:18px;font-weight:800;flex-shrink:0;"></div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Superviseur YOUMMA JOBS</div>
+            <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceSupNom"></div>
+          </div>
         </div>
+        <button onclick="_espaceDeconnexion()" style="display:inline-flex;align-items:center;gap:7px;background:#FEF2F2;color:#DC2626;border:none;border-radius:10px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-right-from-bracket" style="font-size:11px;"></i> Déconnexion</button>
       </div>
-      <button onclick="_espaceDeconnexion()" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">Déconnexion</button>
+      <div style="font-size:22px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;line-height:1.25;">Bonjour <span id="espaceSupPrenom"></span> 👋</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+      <div class="adm-stat-card" style="border-top:3px solid #7C3AED;">
+        <div class="adm-stat-num" id="espaceSupNbChantiers">—</div>
+        <div class="adm-stat-label">Chantiers assignés</div>
+      </div>
+      <div class="adm-stat-card" style="border-top:3px solid #059669;">
+        <div class="adm-stat-num" id="espaceSupSoldeTotal">—</div>
+        <div class="adm-stat-label">Solde total</div>
+      </div>
     </div>
 
     <div id="espaceSupChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
@@ -2786,24 +2803,27 @@ if (typeof connexionPrestataire === 'undefined') {
 
   <!-- Tableau de bord CLIENT (lecture seule) -->
   <div id="espaceDashClient" style="display:none;width:100%;max-width:820px;">
-    <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
-      <div style="display:flex;align-items:center;gap:14px;">
-        <div id="espaceCliAvatar" style="width:48px;height:48px;border-radius:50%;background:#EFF6FF;color:#2563EB;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;"></div>
-        <div>
-          <div style="font-size:16px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceCliNom"></div>
-          <div style="font-size:12px;color:#2563EB;font-weight:700;">Espace client YOUMMA JOBS</div>
+    <div style="background:#fff;border-radius:18px;padding:22px 24px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div id="espaceCliAvatar" style="width:56px;height:56px;border-radius:50%;background:#2563EB;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:18px;font-weight:800;flex-shrink:0;"></div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:#2563EB;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Espace client YOUMMA JOBS</div>
+            <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceCliNom"></div>
+          </div>
         </div>
+        <button onclick="_espaceDeconnexion()" style="display:inline-flex;align-items:center;gap:7px;background:#FEF2F2;color:#DC2626;border:none;border-radius:10px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-right-from-bracket" style="font-size:11px;"></i> Déconnexion</button>
       </div>
-      <button onclick="_espaceDeconnexion()" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">Déconnexion</button>
+      <div style="font-size:22px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;line-height:1.25;">Bonjour <span id="espaceCliPrenom"></span> 👋</div>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
       <div class="adm-stat-card" style="border-top:3px solid #2563EB;">
         <div class="adm-stat-num" id="espaceCliNbChantiers">—</div>
         <div class="adm-stat-label">Chantiers</div>
       </div>
       <div class="adm-stat-card" style="border-top:3px solid #059669;">
-        <div class="adm-stat-num" id="espaceCliTotalVerse" style="font-size:18px;">—</div>
+        <div class="adm-stat-num" id="espaceCliTotalVerse" style="font-size:17px;">—</div>
         <div class="adm-stat-label">Total versé</div>
       </div>
     </div>
@@ -3155,16 +3175,19 @@ function _espaceAfficherTableauBord() {
   if (_espaceSession.role === 'fournisseur') {
     document.getElementById('espaceDashFournisseur').style.display = 'block';
     document.getElementById('espaceFourNom').textContent = _espaceSession.nom;
+    document.getElementById('espaceFourPrenom').textContent = _espaceSession.nom;
     document.getElementById('espaceFourAvatar').textContent = initiales;
     _espaceChargerFournisseur();
   } else if (_espaceSession.role === 'superviseur') {
     document.getElementById('espaceDashSuperviseur').style.display = 'block';
     document.getElementById('espaceSupNom').textContent = _espaceSession.nom;
+    document.getElementById('espaceSupPrenom').textContent = _espaceSession.nom;
     document.getElementById('espaceSupAvatar').textContent = initiales;
     _espaceChargerSuperviseur();
   } else if (_espaceSession.role === 'client') {
     document.getElementById('espaceDashClient').style.display = 'block';
     document.getElementById('espaceCliNom').textContent = _espaceSession.nom;
+    document.getElementById('espaceCliPrenom').textContent = _espaceSession.nom;
     document.getElementById('espaceCliAvatar').textContent = initiales;
     _espaceChargerClient();
   }
@@ -3174,6 +3197,9 @@ function _espaceAfficherTableauBord() {
 // TABLEAU DE BORD FOURNISSEUR — cartes uniquement, pas de tableau
 // ─────────────────────────────────────────────────────────────────────────
 let _espaceFourTransactionsCache = [];
+
+// GNF : même formatage que partout ailleurs dans le site (toLocaleString('fr-FR') + ' GNF').
+function _espaceFormatGNF(n) { return Number(n || 0).toLocaleString('fr-FR') + ' GNF'; }
 
 async function _espaceChargerFournisseur() {
   const zone = document.getElementById('espaceFourChantiers');
@@ -3187,18 +3213,21 @@ async function _espaceChargerFournisseur() {
 
     const soldeTotal = (comptes || []).reduce((s, c) => s + Number(c.solde_gnf || 0), 0);
     const nbActifs = (comptes || []).filter(c => c.chantiers?.statut === 'en_cours').length;
-    document.getElementById('espaceFourSoldeTotal').textContent = soldeTotal.toLocaleString('fr-FR') + ' GNF';
+    document.getElementById('espaceFourSoldeTotal').textContent = _espaceFormatGNF(soldeTotal);
     document.getElementById('espaceFourNbChantiers').textContent = nbActifs;
 
     if (!comptes || !comptes.length) {
-      zone.innerHTML = '<div style="color:#9CA3AF;font-size:13px;">Aucun chantier assigné pour le moment.</div>';
+      zone.innerHTML = '<div style="background:#fff;border-radius:18px;padding:24px;text-align:center;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-building" style="font-size:22px;display:block;margin-bottom:8px;color:#D1D5DB;"></i>Aucun chantier assigné pour le moment.</div>';
       bandeau.style.display = 'none';
       return;
     }
 
     const compteIds = comptes.map(c => c.id);
+    // superviseurs(nom,prenom) : nécessaire pour afficher "Demandé par [nom]"
+    // sur chaque sortie en attente (ajout minimal au select, aucune requête
+    // supplémentaire — la logique de chargement reste la même).
     const { data: transactions, error: errT } = await sb.from('registre_transactions')
-      .select('*, chantiers(nom)')
+      .select('*, chantiers(nom), superviseurs(nom,prenom)')
       .in('compte_id', compteIds)
       .order('created_at', { ascending: false });
     if (errT) throw errT;
@@ -3209,7 +3238,7 @@ async function _espaceChargerFournisseur() {
 
     if (enAttenteTotal.length) {
       bandeau.style.display = 'block';
-      bandeau.innerHTML = '⏳ ' + enAttenteTotal.length + ' sortie(s) en attente de votre validation';
+      document.getElementById('espaceFourBandeauTexte').textContent = enAttenteTotal.length + ' sortie(s) en attente de votre validation';
     } else {
       bandeau.style.display = 'none';
     }
@@ -3217,31 +3246,45 @@ async function _espaceChargerFournisseur() {
     zone.innerHTML = comptes.map(c => {
       const sc = _rcStatutChantierConfig(c.chantiers?.statut);
       const enAttenteCompte = enAttenteTotal.filter(t => t.compte_id === c.id);
-      const listeAttente = enAttenteCompte.length ? enAttenteCompte.map(t => {
-        const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        return `<div style="background:#FFFBEB;border:1px solid #FED7AA;border-radius:10px;padding:10px 12px;margin-bottom:8px;">
-          <div style="font-size:12.5px;font-weight:700;color:#1A1A4E;">${t.materiau || ''} — ${t.quantite || ''} ${t.unite || ''}</div>
-          <div style="font-size:11px;color:#9CA3AF;margin-bottom:8px;">${Number(t.montant_gnf).toLocaleString('fr-FR')} GNF · Demandé par le superviseur le ${date}</div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="_espaceTraiterSortie('${t.id}','valider')" style="flex:1;background:#059669;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Valider</button>
-            <button onclick="_espaceTraiterSortie('${t.id}','rejeter')" style="flex:1;background:#fff;color:#DC2626;border:1.5px solid #FECACA;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Rejeter</button>
-          </div>
-        </div>`;
-      }).join('') : '';
+      const listeAttente = enAttenteCompte.length ? `
+        <div style="border-top:1px solid #F0F0F8;padding-top:14px;margin-top:4px;margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:700;color:#9A3412;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;"><i class="fa-solid fa-clock" style="margin-right:6px;"></i>En attente de validation</div>
+          ${enAttenteCompte.map(t => {
+            const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const demandeur = t.superviseurs ? ((t.superviseurs.prenom ? t.superviseurs.prenom + ' ' : '') + t.superviseurs.nom) : 'le superviseur';
+            return `<div style="background:#FFFBEB;border:1.5px solid #FED7AA;border-radius:12px;padding:14px;margin-bottom:10px;">
+              <div style="font-size:13px;font-weight:700;color:#1A1A4E;margin-bottom:4px;"><i class="fa-solid fa-boxes-stacked" style="color:#D97706;margin-right:6px;font-size:12px;"></i>${t.materiau || ''} — ${t.quantite || ''} ${t.unite || ''}</div>
+              <div style="font-size:12px;color:#6B7280;margin-bottom:2px;">Montant estimé : <strong style="color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</strong></div>
+              <div style="font-size:11px;color:#9CA3AF;margin-bottom:10px;">Demandé le ${date} par ${demandeur}</div>
+              <div style="display:flex;gap:8px;">
+                <button onclick="_espaceTraiterSortie('${t.id}','valider')" style="flex:1;background:#059669;color:#fff;border:none;border-radius:8px;padding:9px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-check" style="margin-right:6px;"></i>Valider</button>
+                <button onclick="_espaceBasculerRejetSortie('${t.id}')" style="flex:1;background:#fff;color:#DC2626;border:1.5px solid #FECACA;border-radius:8px;padding:9px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-xmark" style="margin-right:6px;"></i>Rejeter</button>
+              </div>
+              <div id="espaceRejetZone-${t.id}" style="display:none;margin-top:10px;background:#fff;border:1px solid #FECACA;border-radius:10px;padding:12px;">
+                <label style="display:block;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:6px;">Motif du rejet (optionnel)</label>
+                <textarea id="espaceRejetMotif-${t.id}" rows="2" placeholder="Ex : matériau non disponible, quantité incorrecte..." style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;font-family:inherit;resize:vertical;margin-bottom:10px;"></textarea>
+                <div style="display:flex;gap:8px;">
+                  <button onclick="_espaceBasculerRejetSortie('${t.id}')" style="flex:1;background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;">Annuler</button>
+                  <button onclick="_espaceConfirmerRejetSortie('${t.id}')" style="flex:1;background:#DC2626;color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;">Confirmer le rejet</button>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>` : '';
 
-      return `<div style="background:#fff;border-radius:16px;padding:18px 20px;">
+      return `<div style="background:#fff;border-radius:18px;padding:20px;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;">
           <div>
-            <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:6px;">${c.chantiers?.nom || '—'}</div>
+            <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:6px;"><i class="fa-solid fa-building" style="color:#9CA3AF;margin-right:6px;font-size:13px;"></i>${c.chantiers?.nom || '—'}</div>
             <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:17px;font-weight:800;color:#1A1A4E;">${Number(c.solde_gnf || 0).toLocaleString('fr-FR')} GNF</div>
+            <div style="font-size:18px;font-weight:800;color:#059669;">${_espaceFormatGNF(c.solde_gnf)}</div>
             <div style="font-size:10.5px;color:#9CA3AF;">solde de ce compte</div>
           </div>
         </div>
         ${listeAttente}
-        <button onclick="_espaceBasculerHistoriqueCompte('${c.id}')" style="background:none;border:none;color:#2563EB;font-size:12px;font-weight:700;cursor:pointer;padding:0;">Voir l'historique</button>
+        <button onclick="_espaceBasculerHistoriqueCompte('${c.id}')" style="background:none;border:none;color:#2563EB;font-size:12px;font-weight:700;cursor:pointer;padding:0;"><i class="fa-solid fa-clock-rotate-left" style="margin-right:6px;"></i>Voir l'historique complet</button>
         <div id="espaceFourHistoCompte-${c.id}" style="display:none;margin-top:10px;max-height:220px;overflow-y:auto;"></div>
       </div>`;
     }).join('');
@@ -3263,7 +3306,7 @@ function _espaceBasculerHistoriqueCompte(compteId) {
     return `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #F7F8FC;font-size:11.5px;">
       <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:2px 8px;font-weight:700;">${sc.label}</span>
       <span style="color:#6B7280;">${date}</span>
-      <span style="font-weight:700;color:#1A1A4E;">${Number(t.montant_gnf).toLocaleString('fr-FR')} GNF</span>
+      <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
     </div>`;
   }).join('');
 }
@@ -3273,12 +3316,7 @@ function _espaceBasculerHistoriqueCompte(compteId) {
 // chk_registre_acteur_coherent pour sortie_confirmee/sortie_rejetee). Motif
 // de rejet optionnel stocké dans description de CET événement (pas celle
 // de la demande d'origine, qui reste inchangée — append-only oblige).
-async function _espaceTraiterSortie(transactionId, decision) {
-  let motif = null;
-  if (decision === 'rejeter') {
-    if (!window.confirm('Rejeter cette demande de sortie ?')) return;
-    motif = window.prompt('Motif du rejet (optionnel) :') || null;
-  }
+async function _espaceTraiterSortie(transactionId, decision, motif) {
   try {
     const { data: origine, error: errOrig } = await sb.from('registre_transactions').select('*').eq('id', transactionId).single();
     if (errOrig) throw errOrig;
@@ -3294,7 +3332,7 @@ async function _espaceTraiterSortie(transactionId, decision) {
       unite: origine.unite,
       reference_transaction_id: origine.id,
       fournisseur_id: _espaceSession.id,
-      description: motif
+      description: motif || null
     };
     const { error } = await sb.from('registre_transactions').insert(payload);
     if (error) {
@@ -3310,6 +3348,21 @@ async function _espaceTraiterSortie(transactionId, decision) {
   }
 }
 
+// Rejet : champ motif inline (accordéon), pas de window.prompt — peu fiable
+// sur mobile Safari/Chrome Android (suspendu ou masqué dans certains
+// contextes de navigateur embarqué). Même pattern que le formulaire
+// "Demander une sortie" du superviseur (zone qui s'affiche/se cache).
+function _espaceBasculerRejetSortie(transactionId) {
+  const el = document.getElementById('espaceRejetZone-' + transactionId);
+  if (el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+}
+
+async function _espaceConfirmerRejetSortie(transactionId) {
+  const motifEl = document.getElementById('espaceRejetMotif-' + transactionId);
+  const motif = motifEl ? motifEl.value.trim() : '';
+  await _espaceTraiterSortie(transactionId, 'rejeter', motif || null);
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // TABLEAU DE BORD SUPERVISEUR — cartes uniquement, formulaire de demande de
 // sortie inline (accordéon par carte, pas de modale ni de zone partagée).
@@ -3323,38 +3376,52 @@ async function _espaceChargerSuperviseur() {
       .order('created_at', { ascending: false });
     if (error) throw error;
 
+    document.getElementById('espaceSupNbChantiers').textContent = (chantiers || []).length;
+    const soldeGlobal = (chantiers || []).reduce((s, c) => s + (c.comptes_materiaux || []).reduce((s2, cm) => s2 + Number(cm.solde_gnf || 0), 0), 0);
+    document.getElementById('espaceSupSoldeTotal').textContent = _espaceFormatGNF(soldeGlobal);
+
     if (!chantiers || !chantiers.length) {
-      zone.innerHTML = '<div style="color:#9CA3AF;font-size:13px;">Aucun chantier assigné pour le moment.</div>';
+      zone.innerHTML = '<div style="background:#fff;border-radius:18px;padding:24px;text-align:center;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-building" style="font-size:22px;display:block;margin-bottom:8px;color:#D1D5DB;"></i>Aucun chantier assigné pour le moment.</div>';
       return;
     }
 
     zone.innerHTML = chantiers.map(c => {
       const sc = _rcStatutChantierConfig(c.statut);
       const client = c.clients ? ((c.clients.prenom ? c.clients.prenom + ' ' : '') + c.clients.nom) : '—';
+      const nbFournisseurs = (c.comptes_materiaux || []).length;
       const soldeTotal = (c.comptes_materiaux || []).reduce((s, cm) => s + Number(cm.solde_gnf || 0), 0);
       const dateDebut = c.date_debut ? new Date(c.date_debut).toLocaleDateString('fr-FR') : '—';
-      return `<div style="background:#fff;border-radius:16px;padding:18px 20px;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;">
+      return `<div style="background:#fff;border-radius:18px;padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;">
           <div>
-            <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">${c.nom}</div>
-            <div style="font-size:11.5px;color:#6B7280;margin-bottom:6px;">Client : ${client} · Début : ${dateDebut}</div>
+            <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:6px;"><i class="fa-solid fa-building" style="color:#9CA3AF;margin-right:6px;font-size:13px;"></i>${c.nom}</div>
             <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:17px;font-weight:800;color:#1A1A4E;">${soldeTotal.toLocaleString('fr-FR')} GNF</div>
+            <div style="font-size:18px;font-weight:800;color:#1A1A4E;">${_espaceFormatGNF(soldeTotal)}</div>
             <div style="font-size:10.5px;color:#9CA3AF;">solde total</div>
           </div>
         </div>
+        <div style="font-size:12.5px;color:#6B7280;margin-bottom:16px;"><i class="fa-solid fa-user" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Client : ${client} · <i class="fa-solid fa-truck" style="width:14px;color:#9CA3AF;margin-left:6px;margin-right:4px;"></i>${nbFournisseurs} fournisseur${nbFournisseurs > 1 ? 's' : ''}</div>
 
-        <button onclick="_espaceBasculerFormulaireSortie('${c.id}')" style="width:100%;background:#F5F3FF;color:#7C3AED;border:none;border-radius:8px;padding:9px;font-size:12.5px;font-weight:700;cursor:pointer;margin-bottom:12px;">Demander une sortie</button>
+        <button onclick="_espaceBasculerFormulaireSortie('${c.id}')" style="width:100%;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;"><i class="fa-solid fa-truck-fast" style="margin-right:8px;"></i>Demander une sortie de matériaux</button>
 
-        <div id="espaceSupForm-${c.id}" style="display:none;background:#F9FAFB;border-radius:10px;padding:14px;margin-bottom:14px;">
+        <div id="espaceSupForm-${c.id}" style="display:none;background:#F9FAFB;border-radius:12px;padding:14px;margin-bottom:14px;">
           <div style="display:flex;flex-direction:column;gap:10px;">
             <select id="espaceSupFournisseur-${c.id}" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;"><option value="">Chargement...</option></select>
             <input id="espaceSupMateriau-${c.id}" type="text" placeholder="Matériau *" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
             <div style="display:flex;gap:8px;">
               <input id="espaceSupQuantite-${c.id}" type="number" min="1" placeholder="Quantité *" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
-              <input id="espaceSupUnite-${c.id}" type="text" placeholder="Unité *" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
+              <select id="espaceSupUnite-${c.id}" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;">
+                <option value="">Unité *</option>
+                <option value="sacs">Sacs</option>
+                <option value="kg">Kg</option>
+                <option value="m²">M²</option>
+                <option value="m³">M³</option>
+                <option value="tonnes">Tonnes</option>
+                <option value="unités">Unités</option>
+                <option value="litres">Litres</option>
+              </select>
             </div>
             <input id="espaceSupMontant-${c.id}" type="number" min="1" placeholder="Montant estimé (GNF) *" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
             <textarea id="espaceSupDescription-${c.id}" rows="2" placeholder="Description" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
@@ -3363,9 +3430,11 @@ async function _espaceChargerSuperviseur() {
           </div>
         </div>
 
-        <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:8px;">Dernières transactions</div>
-        <div id="espaceSupHisto-${c.id}"><div style="color:#9CA3AF;font-size:12px;">Chargement...</div></div>
-        <button onclick="_espaceVoirToutesTransactionsChantier('${c.id}')" id="espaceSupVoirTout-${c.id}" style="background:none;border:none;color:#2563EB;font-size:11.5px;font-weight:700;cursor:pointer;padding:0;margin-top:8px;">Voir tout</button>
+        <div style="border-top:1px solid #F0F0F8;padding-top:14px;">
+          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;"><i class="fa-solid fa-clock-rotate-left" style="margin-right:6px;"></i>Dernières transactions</div>
+          <div id="espaceSupHisto-${c.id}"><div style="color:#9CA3AF;font-size:12px;">Chargement...</div></div>
+          <button onclick="_espaceVoirToutesTransactionsChantier('${c.id}')" id="espaceSupVoirTout-${c.id}" style="background:none;border:none;color:#2563EB;font-size:11.5px;font-weight:700;cursor:pointer;padding:0;margin-top:8px;">Voir tout l'historique</button>
+        </div>
       </div>`;
     }).join('');
 
@@ -3416,7 +3485,7 @@ async function _espaceChargerHistoriqueChantier(chantierId, limite) {
         <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:2px 8px;font-weight:700;white-space:nowrap;">${sc.label}</span>
         <span style="color:#6B7280;">${fournisseur} · ${acteur}</span>
         <span style="color:#9CA3AF;">${date}</span>
-        <span style="font-weight:700;color:#1A1A4E;">${Number(t.montant_gnf).toLocaleString('fr-FR')} GNF</span>
+        <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
       </div>`;
     }).join('');
   } catch (e) {
@@ -3493,7 +3562,7 @@ async function _espaceChargerClient() {
     document.getElementById('espaceCliNbChantiers').textContent = (chantiers || []).length;
 
     if (!chantiers || !chantiers.length) {
-      zone.innerHTML = '<div style="color:#9CA3AF;font-size:13px;">Aucun chantier pour le moment.</div>';
+      zone.innerHTML = '<div style="background:#fff;border-radius:18px;padding:24px;text-align:center;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-building" style="font-size:22px;display:block;margin-bottom:8px;color:#D1D5DB;"></i>Aucun chantier pour le moment.</div>';
       document.getElementById('espaceCliTotalVerse').textContent = '0 GNF';
       return;
     }
@@ -3508,15 +3577,22 @@ async function _espaceChargerClient() {
       (contrats || []).forEach(c => { formulesParChantier[c.chantier_id] = c.formule_service; });
     } catch (e) { /* pas de contrat forfait, normal */ }
 
-    // "Total versé" = somme des versements VALIDÉS (reçus par le fournisseur),
-    // pas des simples déclarations — plus fidèle au mot "versé".
-    const { data: versementsValides, error: errV } = await sb.from('registre_transactions')
-      .select('montant_gnf')
+    // Versements (déclare + valide/rejete) par chantier, pour la section
+    // "Mes versements sur ce chantier" ET pour le total versé global.
+    const { data: versements, error: errV } = await sb.from('registre_transactions')
+      .select('*, comptes_materiaux(fournisseurs_materiaux(nom_entreprise))')
       .in('chantier_id', chantierIds)
-      .eq('type_operation', 'versement_valide');
+      .in('type_operation', ['versement_declare', 'versement_valide', 'versement_rejete'])
+      .order('created_at', { ascending: false });
     if (errV) throw errV;
-    const totalVerse = (versementsValides || []).reduce((s, t) => s + Number(t.montant_gnf || 0), 0);
-    document.getElementById('espaceCliTotalVerse').textContent = totalVerse.toLocaleString('fr-FR') + ' GNF';
+
+    const totalVerse = (versements || []).filter(t => t.type_operation === 'versement_valide').reduce((s, t) => s + Number(t.montant_gnf || 0), 0);
+    document.getElementById('espaceCliTotalVerse').textContent = _espaceFormatGNF(totalVerse);
+
+    const traitementsParDemande = {};
+    (versements || []).filter(t => t.type_operation !== 'versement_declare').forEach(t => { if (t.reference_transaction_id) traitementsParDemande[t.reference_transaction_id] = t; });
+    const declaresParChantier = {};
+    (versements || []).filter(t => t.type_operation === 'versement_declare').forEach(t => { (declaresParChantier[t.chantier_id] = declaresParChantier[t.chantier_id] || []).push(t); });
 
     // Solde par fournisseur, groupé par chantier
     const { data: comptes, error: errC } = await sb.from('comptes_materiaux')
@@ -3530,24 +3606,57 @@ async function _espaceChargerClient() {
       const sc = _rcStatutChantierConfig(c.statut);
       const superviseur = c.superviseurs ? ((c.superviseurs.prenom ? c.superviseurs.prenom + ' ' : '') + c.superviseurs.nom) : '—';
       const dateDebut = c.date_debut ? new Date(c.date_debut).toLocaleDateString('fr-FR') : '—';
-      const soldes = comptesParChantier[c.id] || [];
-      const listeSoldes = soldes.length ? soldes.map(cm => `
-        <div style="display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid #F7F8FC;">
-          <span style="color:#374151;">${cm.fournisseurs_materiaux?.nom_entreprise || '—'}</span>
-          <span style="font-weight:700;color:#1A1A4E;">${Number(cm.solde_gnf || 0).toLocaleString('fr-FR')} GNF</span>
-        </div>`).join('') : '<div style="color:#9CA3AF;font-size:12px;">Aucun fournisseur assigné.</div>';
+      const formule = formulesParChantier[c.id];
 
-      return `<div style="background:#fff;border-radius:16px;padding:18px 20px;">
+      const soldes = comptesParChantier[c.id] || [];
+      const listeSoldes = soldes.length ? soldes.map(cm => {
+        const solde = Number(cm.solde_gnf || 0);
+        return `<div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:7px 0;border-bottom:1px solid #F7F8FC;">
+          <span style="color:#374151;"><i class="fa-solid fa-truck" style="width:16px;color:#9CA3AF;margin-right:6px;"></i>${cm.fournisseurs_materiaux?.nom_entreprise || '—'}</span>
+          <span style="font-weight:700;color:${solde > 0 ? '#059669' : '#9CA3AF'};">${_espaceFormatGNF(solde)}</span>
+        </div>`;
+      }).join('') : '<div style="color:#9CA3AF;font-size:12px;">Aucun fournisseur assigné.</div>';
+
+      const declares = declaresParChantier[c.id] || [];
+      const ligneVersement = t => {
+        const traitement = traitementsParDemande[t.id];
+        const statutLabel = traitement ? (traitement.type_operation === 'versement_valide' ? 'Validé' : 'Rejeté') : 'Déclaré';
+        const statutCouleur = traitement ? (traitement.type_operation === 'versement_valide' ? '#059669' : '#DC2626') : '#D97706';
+        const statutFond = traitement ? (traitement.type_operation === 'versement_valide' ? '#ECFDF5' : '#FEF2F2') : '#FFFBEB';
+        const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;padding:7px 0;border-bottom:1px solid #F7F8FC;flex-wrap:wrap;">
+          <span style="color:#6B7280;">${date}</span>
+          <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
+          <span style="background:${statutFond};color:${statutCouleur};border-radius:20px;padding:2px 9px;font-size:10.5px;font-weight:700;">${statutLabel}</span>
+        </div>`;
+      };
+      const versementsVisibles = declares.slice(0, 3).map(ligneVersement).join('');
+      const versementsCaches = declares.length > 3 ? declares.slice(3).map(ligneVersement).join('') : '';
+      const versementsHtml = declares.length
+        ? versementsVisibles
+          + (versementsCaches ? `<div id="espaceCliVersementsPlus-${c.id}" style="display:none;">${versementsCaches}</div>
+             <button onclick="document.getElementById('espaceCliVersementsPlus-${c.id}').style.display='block';this.style.display='none';" style="background:none;border:none;color:#2563EB;font-size:11.5px;font-weight:700;cursor:pointer;padding:0;margin-top:8px;">Voir tout (${declares.length})</button>` : '')
+        : '<div style="color:#9CA3AF;font-size:12px;">Aucun versement.</div>';
+
+      return `<div style="background:#fff;border-radius:18px;padding:20px;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;">
           <div>
-            <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">${c.nom}</div>
-            <div style="font-size:11.5px;color:#6B7280;margin-bottom:6px;">Superviseur : ${superviseur} · Début : ${dateDebut}</div>
+            <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:6px;"><i class="fa-solid fa-building" style="color:#9CA3AF;margin-right:6px;font-size:13px;"></i>${c.nom}</div>
             <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
           </div>
-          <div style="font-size:11px;color:#6B7280;text-align:right;">Formule<br><strong style="color:#1A1A4E;font-size:12.5px;">${formulesParChantier[c.id] || '—'}</strong></div>
         </div>
-        <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;margin:12px 0 4px;">Solde par fournisseur</div>
-        ${listeSoldes}
+        <div style="font-size:12.5px;color:#6B7280;margin-bottom:2px;"><i class="fa-solid fa-user" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Superviseur : ${superviseur} · Début : ${dateDebut}</div>
+        ${formule ? `<div style="font-size:12.5px;color:#6B7280;margin-bottom:2px;"><i class="fa-solid fa-file-signature" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Formule : ${formule}</div>` : ''}
+
+        <div style="border-top:1px solid #F0F0F8;padding-top:14px;margin-top:12px;">
+          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;"><i class="fa-solid fa-truck" style="margin-right:6px;color:#059669;"></i>Solde par fournisseur</div>
+          ${listeSoldes}
+        </div>
+
+        <div style="border-top:1px solid #F0F0F8;padding-top:14px;margin-top:14px;">
+          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;"><i class="fa-solid fa-wallet" style="margin-right:6px;color:#2563EB;"></i>Mes versements sur ce chantier</div>
+          ${versementsHtml}
+        </div>
       </div>`;
     }).join('');
   } catch (e) {
