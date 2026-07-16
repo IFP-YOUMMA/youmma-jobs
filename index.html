@@ -6288,6 +6288,67 @@ async function chargerAvis() {
             <button onclick="_rcOuvrirSuperviseurModal()" style="width:100%;margin-top:12px;padding:8px;background:#F5F3FF;color:#7C3AED;border:1.5px solid #DDD6FE;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;">+ Créer un superviseur</button>
           </div>
 
+          <div class="adm-stat-card" style="border-top:3px solid #059669;">
+            <div class="adm-stat-icon" style="background:#059669;"><i class="fa-solid fa-building"></i></div>
+            <div class="adm-stat-num" id="rcStatChantiers">—</div>
+            <div class="adm-stat-label">Chantiers</div>
+            <button onclick="_rcOuvrirChantierModal()" style="width:100%;margin-top:12px;padding:8px;background:#ECFDF5;color:#059669;border:1.5px solid #A7F3D0;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;">+ Créer un chantier</button>
+          </div>
+
+        </div>
+
+        <!-- Listes clients / fournisseurs / superviseurs (modifier/supprimer) -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:28px;">
+          <div>
+            <div class="adm-section-title" style="font-size:13px;margin-bottom:8px;"><i class="fa-solid fa-user" style="color:#2563EB;"></i> Clients</div>
+            <div class="adm-table-wrap" style="max-height:260px;overflow-y:auto;">
+              <table class="adm-table" style="width:100%;border-collapse:collapse;">
+                <tbody id="rcClientsListe"><tr><td style="text-align:center;padding:20px;color:#9CA3AF;font-size:12px;">Chargement...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="adm-section-title" style="font-size:13px;margin-bottom:8px;"><i class="fa-solid fa-truck-fast" style="color:#E8650A;"></i> Fournisseurs</div>
+            <div class="adm-table-wrap" style="max-height:260px;overflow-y:auto;">
+              <table class="adm-table" style="width:100%;border-collapse:collapse;">
+                <tbody id="rcFournisseursListe"><tr><td style="text-align:center;padding:20px;color:#9CA3AF;font-size:12px;">Chargement...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="adm-section-title" style="font-size:13px;margin-bottom:8px;"><i class="fa-solid fa-helmet-safety" style="color:#7C3AED;"></i> Superviseurs</div>
+            <div class="adm-table-wrap" style="max-height:260px;overflow-y:auto;">
+              <table class="adm-table" style="width:100%;border-collapse:collapse;">
+                <tbody id="rcSuperviseursListe"><tr><td style="text-align:center;padding:20px;color:#9CA3AF;font-size:12px;">Chargement...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tableau chantiers -->
+        <div class="adm-section-header" style="margin-bottom:14px;">
+          <div class="adm-section-title" style="font-size:15px;">
+            <i class="fa-solid fa-building" style="color:#059669;"></i> Chantiers
+          </div>
+        </div>
+
+        <div class="adm-table-wrap" style="margin-bottom:28px;">
+          <table class="adm-table" id="rcChantiersTable" style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#F4F6FB;border-bottom:2px solid #E5E7EB;">
+                <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Nom</th>
+                <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Client</th>
+                <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Fournisseur(s)</th>
+                <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Superviseur</th>
+                <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Statut</th>
+                <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Début</th>
+                <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rcChantiersList">
+              <tr><td colspan="7" style="text-align:center;padding:40px;color:#9CA3AF;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</td></tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- Filtres + tableau registre_transactions -->
@@ -6395,6 +6456,63 @@ async function chargerAvis() {
             <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
               <button onclick="document.getElementById('rcSuperviseurModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
               <button id="rcSuperviseurSave" onclick="_rcSauvegarderSuperviseur()" style="background:#7C3AED;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal création chantier -->
+        <div id="rcChantierModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+          <div style="background:#fff;border-radius:16px;padding:28px;width:min(480px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.25);max-height:88vh;overflow-y:auto;">
+            <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 20px;font-size:17px;"><i class="fa-solid fa-building" style="color:#059669;margin-right:8px;"></i>Créer un chantier</h3>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom du chantier *</label>
+                <input id="rcChantierNom" type="text" placeholder="Villa Kipé — Résidence Diallo" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Date de début *</label>
+                <input id="rcChantierDateDebut" type="date" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Client *</label>
+                <select id="rcChantierClientId" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;background:#fff;">
+                  <option value="">— Sélectionner —</option>
+                </select>
+              </div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Premier fournisseur *</label>
+                <select id="rcChantierFournisseurId" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;background:#fff;">
+                  <option value="">— Sélectionner —</option>
+                </select>
+                <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">Seuls les fournisseurs au statut actif sont proposés — un compte matériaux est ouvert avec ce fournisseur à la création. D'autres fournisseurs pourront être ajoutés ensuite depuis le détail du chantier.</div>
+              </div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Superviseur *</label>
+                <select id="rcChantierSuperviseurId" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;background:#fff;">
+                  <option value="">— Sélectionner —</option>
+                </select>
+              </div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Adresse / description</label>
+                <textarea id="rcChantierDescription" rows="2" placeholder="Quartier, commune, précisions..." style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;font-family:inherit;resize:vertical;"></textarea></div>
+              <div id="rcChantierErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
+              <button onclick="document.getElementById('rcChantierModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
+              <button id="rcChantierSave" onclick="_rcSauvegarderChantier()" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal édition chantier : nom/date toujours modifiables, client
+             uniquement si statut='en_etude' (verrouillé après validation
+             de l'ouverture) — superviseur a sa propre édition dans le détail. -->
+        <div id="rcChantierEditModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+          <div style="background:#fff;border-radius:16px;padding:28px;width:min(480px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.25);max-height:88vh;overflow-y:auto;">
+            <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 20px;font-size:17px;"><i class="fa-solid fa-building" style="color:#059669;margin-right:8px;"></i>Modifier le chantier</h3>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom du chantier *</label>
+                <input id="rcChantierEditNom" type="text" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Date de début *</label>
+                <input id="rcChantierEditDateDebut" type="date" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div id="rcChantierEditClientZone"></div>
+              <div id="rcChantierEditErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
+              <button onclick="document.getElementById('rcChantierEditModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
+              <button id="rcChantierEditSave" onclick="_rcSauvegarderEditionChantier()" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer</button>
             </div>
           </div>
         </div>
@@ -10672,7 +10790,138 @@ function _rcCacherErreur(elId) {
 function _adminLoadRegistreChantier() {
   _rcLoadCartes();
   _rcLoadChantiersDropdown();
+  _rcLoadChantiersListe();
+  _rcLoadClientsListe();
+  _rcLoadFournisseursListe();
+  _rcLoadSuperviseursListe();
   _rcLoadTransactions();
+}
+
+// Ids en cours d'édition (null = mode création) pour les 3 modales
+// client/fournisseur/superviseur, réutilisées à la fois pour créer et
+// modifier un enregistrement existant.
+let _rcClientEditId = null;
+let _rcFournisseurEditId = null;
+let _rcSuperviseurEditId = null;
+let _rcChantierEditId = null;
+
+// Compte les lignes référençant `id` dans table.colonne — utilisé avant
+// toute suppression pour donner un message précis plutôt que l'erreur
+// Postgres brute. Retourne null (jamais 0) si le comptage lui-même a
+// échoué, pour ne jamais autoriser une suppression qu'on n'a pas pu
+// vérifier.
+async function _rcCompterReferences(table, colonne, id) {
+  try {
+    const { count, error } = await sb.from(table).select('id', { count: 'exact', head: true }).eq(colonne, id);
+    if (error) throw error;
+    return count || 0;
+  } catch (e) {
+    console.warn('[registre_chantier] comptage ' + table + '.' + colonne + ' indisponible:', e.message);
+    return null;
+  }
+}
+
+// Suppression générique avec précheck des FK bloquantes (RESTRICT/NO
+// ACTION) + avertissement informatif pour les FK non bloquantes (SET
+// NULL) + confirmation obligatoire + log admin_actions. Ne tente jamais le
+// DELETE si un comptage a échoué (mieux vaut bloquer que supprimer sans
+// certitude sur une donnée financière).
+async function _rcSupprimerAvecVerification({ table, id, nom, verifications, avertissements = [], action }) {
+  const resultatsBloquants = await Promise.all(verifications.map(v => _rcCompterReferences(v.table, v.colonne, id)));
+  if (resultatsBloquants.some(r => r === null)) {
+    if (typeof showToast === 'function') showToast("Impossible de vérifier les dépendances (table/RLS indisponible) — suppression annulée par précaution.", 'error');
+    return false;
+  }
+  const bloquants = verifications.map((v, i) => ({ ...v, count: resultatsBloquants[i] })).filter(v => v.count > 0);
+  if (bloquants.length) {
+    const detail = bloquants.map(b => b.count + ' ' + b.label).join(', ');
+    const message = 'Impossible de supprimer : lié à ' + detail + '.';
+    if (typeof showToast === 'function') showToast(message, 'error'); else window.alert(message);
+    return false;
+  }
+
+  let messageConfirm = 'Supprimer définitivement "' + nom + '" ? Cette action est irréversible.';
+  if (avertissements.length) {
+    const resAvert = await Promise.all(avertissements.map(v => _rcCompterReferences(v.table, v.colonne, id)));
+    const notes = avertissements.map((v, i) => ({ ...v, count: resAvert[i] })).filter(v => v.count > 0);
+    if (notes.length) messageConfirm += '\n\n⚠️ ' + notes.map(n => n.count + ' ' + n.label + ' seront détaché(s) (lien remis à vide)').join(', ') + '.';
+  }
+  if (!window.confirm(messageConfirm)) return false;
+
+  const { error } = await sb.from(table).delete().eq('id', id);
+  if (error) {
+    const message = 'Erreur lors de la suppression : ' + error.message;
+    if (typeof showToast === 'function') showToast(message, 'error'); else window.alert(message);
+    return false;
+  }
+  await _logAdminAction(action, nom, '', table + '_id: ' + id);
+  if (typeof showToast === 'function') showToast('✅ Supprimé', 'success');
+  return true;
+}
+
+async function _rcSupprimerClient(id, nom) {
+  await _rcSupprimerAvecVerification({
+    table: 'clients', id, nom,
+    verifications: [
+      { table: 'chantiers', colonne: 'client_id', label: 'chantier(s)' },
+      { table: 'registre_transactions', colonne: 'client_id', label: 'transaction(s) du registre' },
+      { table: 'rapport_final_chantier', colonne: 'validation_client_id', label: 'rapport(s) final(aux)' },
+    ],
+    action: 'suppression_client'
+  });
+  _rcLoadCartes(); _rcLoadClientsListe();
+}
+
+async function _rcSupprimerFournisseur(id, nom) {
+  await _rcSupprimerAvecVerification({
+    table: 'fournisseurs_materiaux', id, nom,
+    verifications: [
+      { table: 'comptes_materiaux', colonne: 'fournisseur_id', label: 'compte(s) matériaux' },
+      { table: 'registre_transactions', colonne: 'fournisseur_id', label: 'transaction(s) du registre' },
+      { table: 'contrats', colonne: 'fournisseur_id', label: 'contrat(s)' },
+      { table: 'rapport_final_chantier', colonne: 'validation_fournisseur_id', label: 'rapport(s) final(aux)' },
+    ],
+    action: 'suppression_fournisseur'
+  });
+  _rcLoadCartes(); _rcLoadFournisseursListe();
+}
+
+// chantiers.superviseur_id est ON DELETE SET NULL (vérifié dans le fichier
+// de migration original, ligne 183) — un superviseur affecté à des
+// chantiers reste supprimable, les chantiers sont juste détachés (pas de
+// blocage), d'où l'avertissement plutôt qu'un blocage sur cette relation.
+async function _rcSupprimerSuperviseur(id, nom) {
+  await _rcSupprimerAvecVerification({
+    table: 'superviseurs', id, nom,
+    verifications: [
+      { table: 'registre_transactions', colonne: 'superviseur_id', label: 'transaction(s) du registre' },
+      { table: 'rapport_final_chantier', colonne: 'validation_superviseur_id', label: 'rapport(s) final(aux)' },
+    ],
+    avertissements: [
+      { table: 'chantiers', colonne: 'superviseur_id', label: 'chantier(s)' }
+    ],
+    action: 'suppression_superviseur'
+  });
+  _rcLoadCartes(); _rcLoadSuperviseursListe();
+}
+
+// En pratique : un chantier a un comptes_materiaux dès sa création (voir
+// _rcSauvegarderChantier), donc cette vérification bloquera la suppression
+// de quasi tous les chantiers créés via ce panel — comportement attendu
+// (RESTRICT), pas un bug : signalé explicitement plutôt que masqué.
+async function _rcSupprimerChantier(id, nom) {
+  await _rcSupprimerAvecVerification({
+    table: 'chantiers', id, nom,
+    verifications: [
+      { table: 'comptes_materiaux', colonne: 'chantier_id', label: 'compte(s) matériaux' },
+      { table: 'registre_transactions', colonne: 'chantier_id', label: 'transaction(s) du registre' },
+      { table: 'contrats', colonne: 'chantier_id', label: 'contrat(s)' },
+      { table: 'rapport_final_chantier', colonne: 'chantier_id', label: 'rapport(s) final(aux)' },
+      { table: 'rapport_final_lignes', colonne: 'chantier_id', label: 'ligne(s) de rapport' },
+    ],
+    action: 'suppression_chantier'
+  });
+  _rcLoadCartes(); _rcLoadChantiersListe(); _rcLoadChantiersDropdown();
 }
 
 // ── 3 cartes de comptage (chaque requête est isolée : une erreur sur une
@@ -10706,13 +10955,120 @@ async function _rcLoadCartes() {
     document.getElementById('rcStatSuperviseurs').textContent = '—';
     console.warn('[registre_chantier] superviseurs indisponible:', e.message);
   }
+
+  try {
+    const { count, error } = await sb.from('chantiers').select('id', { count: 'exact', head: true });
+    document.getElementById('rcStatChantiers').textContent = error ? '—' : (count ?? 0);
+  } catch (e) {
+    document.getElementById('rcStatChantiers').textContent = '—';
+    console.warn('[registre_chantier] chantiers indisponible:', e.message);
+  }
+}
+
+// ── Listes clients / fournisseurs / superviseurs (modifier/supprimer) ──
+// Même triptyque de repli (table manquante / RLS / erreur générique) que
+// les autres tableaux du panel, condensé en une ligne par cas faute de
+// place dans ces mini-listes.
+function _rcMessageRepli(err, quoi) {
+  const msg = (err.message || '').toLowerCase();
+  if (err.code === '42P01' || msg.includes('does not exist')) return 'Table ' + quoi + ' manquante (migration non exécutée).';
+  if (err.code === '42501' || msg.includes('permission') || msg.includes('policy')) return "RLS bloque l'accès à " + quoi + '.';
+  return 'Erreur : ' + err.message;
+}
+
+async function _rcLoadClientsListe() {
+  const tbody = document.getElementById('rcClientsListe');
+  if (!tbody) return;
+  try {
+    const { data, error } = await sb.from('clients').select('id,nom,telephone,ville,statut').order('nom').limit(300);
+    if (error) throw error;
+    if (!data || !data.length) { tbody.innerHTML = '<tr><td style="text-align:center;padding:16px;color:#9CA3AF;font-size:12px;">Aucun client</td></tr>'; return; }
+    tbody.innerHTML = data.map(c => {
+      const nomEchap = String(c.nom || '').replace(/'/g, "\\'");
+      return `<tr style="border-bottom:1px solid #F7F8FC;">
+        <td style="padding:8px 10px;font-size:12.5px;font-weight:600;color:#1A1A4E;">${c.nom}<div style="font-weight:400;color:#9CA3AF;font-size:11px;">${c.telephone || ''}${c.ville ? ' · ' + c.ville : ''}</div></td>
+        <td style="padding:8px 10px;text-align:center;font-size:11px;color:${c.statut === 'actif' ? '#059669' : '#DC2626'};font-weight:700;">${c.statut}</td>
+        <td style="padding:8px 6px;text-align:right;white-space:nowrap;">
+          <button onclick="_rcOuvrirClientModal('${c.id}')" title="Modifier" style="background:#EFF6FF;color:#2563EB;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;margin-right:4px;">✏️</button>
+          <button onclick="_rcSupprimerClient('${c.id}','${nomEchap}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    tbody.innerHTML = '<tr><td style="text-align:center;padding:16px;color:#DC2626;font-size:11.5px;">' + _rcMessageRepli(e, 'clients') + '</td></tr>';
+  }
+}
+
+async function _rcLoadFournisseursListe() {
+  const tbody = document.getElementById('rcFournisseursListe');
+  if (!tbody) return;
+  try {
+    const { data, error } = await sb.from('fournisseurs_materiaux').select('id,nom_entreprise,telephone,statut,abonnement_actif').order('nom_entreprise').limit(300);
+    if (error) throw error;
+    if (!data || !data.length) { tbody.innerHTML = '<tr><td style="text-align:center;padding:16px;color:#9CA3AF;font-size:12px;">Aucun fournisseur</td></tr>'; return; }
+    tbody.innerHTML = data.map(f => {
+      const nomEchap = String(f.nom_entreprise || '').replace(/'/g, "\\'");
+      return `<tr style="border-bottom:1px solid #F7F8FC;">
+        <td style="padding:8px 10px;font-size:12.5px;font-weight:600;color:#1A1A4E;">${f.nom_entreprise}<div style="font-weight:400;color:#9CA3AF;font-size:11px;">${f.telephone || ''} · ${f.abonnement_actif ? 'abonné' : 'non abonné'}</div></td>
+        <td style="padding:8px 10px;text-align:center;font-size:11px;color:${f.statut === 'actif' ? '#059669' : '#DC2626'};font-weight:700;">${f.statut}</td>
+        <td style="padding:8px 6px;text-align:right;white-space:nowrap;">
+          <button onclick="_rcOuvrirFournisseurModal('${f.id}')" title="Modifier" style="background:#FFF7F0;color:#E8650A;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;margin-right:4px;">✏️</button>
+          <button onclick="_rcSupprimerFournisseur('${f.id}','${nomEchap}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    tbody.innerHTML = '<tr><td style="text-align:center;padding:16px;color:#DC2626;font-size:11.5px;">' + _rcMessageRepli(e, 'fournisseurs_materiaux') + '</td></tr>';
+  }
+}
+
+async function _rcLoadSuperviseursListe() {
+  const tbody = document.getElementById('rcSuperviseursListe');
+  if (!tbody) return;
+  try {
+    const { data, error } = await sb.from('superviseurs').select('id,nom,telephone,statut').order('nom').limit(300);
+    if (error) throw error;
+    if (!data || !data.length) { tbody.innerHTML = '<tr><td style="text-align:center;padding:16px;color:#9CA3AF;font-size:12px;">Aucun superviseur</td></tr>'; return; }
+    tbody.innerHTML = data.map(s => {
+      const nomEchap = String(s.nom || '').replace(/'/g, "\\'");
+      return `<tr style="border-bottom:1px solid #F7F8FC;">
+        <td style="padding:8px 10px;font-size:12.5px;font-weight:600;color:#1A1A4E;">${s.nom}<div style="font-weight:400;color:#9CA3AF;font-size:11px;">${s.telephone || ''}</div></td>
+        <td style="padding:8px 10px;text-align:center;font-size:11px;color:${s.statut === 'actif' ? '#059669' : '#DC2626'};font-weight:700;">${s.statut}</td>
+        <td style="padding:8px 6px;text-align:right;white-space:nowrap;">
+          <button onclick="_rcOuvrirSuperviseurModal('${s.id}')" title="Modifier" style="background:#F5F3FF;color:#7C3AED;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;margin-right:4px;">✏️</button>
+          <button onclick="_rcSupprimerSuperviseur('${s.id}','${nomEchap}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    tbody.innerHTML = '<tr><td style="text-align:center;padding:16px;color:#DC2626;font-size:11.5px;">' + _rcMessageRepli(e, 'superviseurs') + '</td></tr>';
+  }
 }
 
 // ── Création CLIENT ──
-function _rcOuvrirClientModal() {
-  ['rcClientNom','rcClientTelephone','rcClientEmail','rcClientVille','rcClientAdresse'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+async function _rcOuvrirClientModal(id) {
+  _rcClientEditId = id || null;
+  ['rcClientNom','rcClientTelephone','rcClientEmail','rcClientVille','rcClientAdresse'].forEach(fid => { const el = document.getElementById(fid); if (el) el.value = ''; });
   _rcCacherErreur('rcClientErreur');
+  const titre = document.querySelector('#rcClientModal h3');
+  const btn = document.getElementById('rcClientSave');
+  if (titre) titre.innerHTML = '<i class="fa-solid fa-user" style="color:#2563EB;margin-right:8px;"></i>' + (_rcClientEditId ? 'Modifier un client' : 'Créer un client');
+  if (btn) btn.textContent = _rcClientEditId ? 'Enregistrer' : 'Créer';
   document.getElementById('rcClientModal').style.display = 'flex';
+
+  if (_rcClientEditId) {
+    try {
+      const { data, error } = await sb.from('clients').select('nom,telephone,email,ville,adresse').eq('id', _rcClientEditId).single();
+      if (error) throw error;
+      document.getElementById('rcClientNom').value = data.nom || '';
+      document.getElementById('rcClientTelephone').value = data.telephone || '';
+      document.getElementById('rcClientEmail').value = data.email || '';
+      document.getElementById('rcClientVille').value = data.ville || '';
+      document.getElementById('rcClientAdresse').value = data.adresse || '';
+    } catch (e) {
+      _rcAfficherErreur('rcClientErreur', 'Erreur de chargement : ' + e.message);
+    }
+  }
 }
 
 async function _rcSauvegarderClient() {
@@ -10726,32 +11082,53 @@ async function _rcSauvegarderClient() {
   if (!nom) { _rcAfficherErreur('rcClientErreur', 'Le nom est obligatoire.'); return; }
   if (!_rcTelephoneValide(telephone)) { _rcAfficherErreur('rcClientErreur', 'Téléphone au format 224XXXXXXXXX.'); return; }
 
+  const enEdition = !!_rcClientEditId;
   const btn = document.getElementById('rcClientSave');
-  btn.disabled = true; btn.textContent = 'Création...';
+  btn.disabled = true; btn.textContent = enEdition ? 'Enregistrement...' : 'Création...';
   try {
-    const { error } = await sb.from('clients').insert({
-      nom, telephone, email: email || null, ville: ville || null, adresse: adresse || null
-    });
+    const payload = { nom, telephone, email: email || null, ville: ville || null, adresse: adresse || null };
+    const { error } = enEdition
+      ? await sb.from('clients').update(payload).eq('id', _rcClientEditId)
+      : await sb.from('clients').insert(payload);
     if (error) {
       if (error.code === '23505') { _rcAfficherErreur('rcClientErreur', 'Ce numéro de téléphone est déjà utilisé par un autre client.'); return; }
       throw error;
     }
-    await _logAdminAction('creation_client', nom, '', 'tel: ' + telephone);
+    await _logAdminAction(enEdition ? 'modification_client' : 'creation_client', nom, '', 'tel: ' + telephone);
     document.getElementById('rcClientModal').style.display = 'none';
-    if (typeof showToast === 'function') showToast('✅ Client créé — il se connecte avec son téléphone (code reçu par SMS)', 'success');
+    if (typeof showToast === 'function') showToast(enEdition ? '✅ Client mis à jour' : '✅ Client créé — il se connecte avec son téléphone (code reçu par SMS)', 'success');
     _rcLoadCartes();
+    _rcLoadClientsListe();
   } catch (e) {
     _rcAfficherErreur('rcClientErreur', 'Erreur : ' + e.message);
   } finally {
-    btn.disabled = false; btn.textContent = 'Créer';
+    btn.disabled = false; btn.textContent = enEdition ? 'Enregistrer' : 'Créer';
   }
 }
 
 // ── Création FOURNISSEUR ──
-function _rcOuvrirFournisseurModal() {
-  ['rcFournisseurNom','rcFournisseurTelephone','rcFournisseurVille','rcFournisseurCommune'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+async function _rcOuvrirFournisseurModal(id) {
+  _rcFournisseurEditId = id || null;
+  ['rcFournisseurNom','rcFournisseurTelephone','rcFournisseurVille','rcFournisseurCommune'].forEach(fid => { const el = document.getElementById(fid); if (el) el.value = ''; });
   _rcCacherErreur('rcFournisseurErreur');
+  const titre = document.querySelector('#rcFournisseurModal h3');
+  const btn = document.getElementById('rcFournisseurSave');
+  if (titre) titre.innerHTML = '<i class="fa-solid fa-truck-fast" style="color:#E8650A;margin-right:8px;"></i>' + (_rcFournisseurEditId ? 'Modifier un fournisseur' : 'Créer un fournisseur');
+  if (btn) btn.textContent = _rcFournisseurEditId ? 'Enregistrer' : 'Créer';
   document.getElementById('rcFournisseurModal').style.display = 'flex';
+
+  if (_rcFournisseurEditId) {
+    try {
+      const { data, error } = await sb.from('fournisseurs_materiaux').select('nom_entreprise,telephone,ville,commune').eq('id', _rcFournisseurEditId).single();
+      if (error) throw error;
+      document.getElementById('rcFournisseurNom').value = data.nom_entreprise || '';
+      document.getElementById('rcFournisseurTelephone').value = data.telephone || '';
+      document.getElementById('rcFournisseurVille').value = data.ville || '';
+      document.getElementById('rcFournisseurCommune').value = data.commune || '';
+    } catch (e) {
+      _rcAfficherErreur('rcFournisseurErreur', 'Erreur de chargement : ' + e.message);
+    }
+  }
 }
 
 async function _rcSauvegarderFournisseur() {
@@ -10764,24 +11141,27 @@ async function _rcSauvegarderFournisseur() {
   if (!nom_entreprise) { _rcAfficherErreur('rcFournisseurErreur', "Le nom de l'entreprise est obligatoire."); return; }
   if (!_rcTelephoneValide(telephone)) { _rcAfficherErreur('rcFournisseurErreur', 'Téléphone au format 224XXXXXXXXX.'); return; }
 
+  const enEdition = !!_rcFournisseurEditId;
   const btn = document.getElementById('rcFournisseurSave');
-  btn.disabled = true; btn.textContent = 'Création...';
+  btn.disabled = true; btn.textContent = enEdition ? 'Enregistrement...' : 'Création...';
   try {
-    const { error } = await sb.from('fournisseurs_materiaux').insert({
-      nom_entreprise, telephone, ville: ville || null, commune: commune || null
-    });
+    const payload = { nom_entreprise, telephone, ville: ville || null, commune: commune || null };
+    const { error } = enEdition
+      ? await sb.from('fournisseurs_materiaux').update(payload).eq('id', _rcFournisseurEditId)
+      : await sb.from('fournisseurs_materiaux').insert(payload);
     if (error) {
       if (error.code === '23505') { _rcAfficherErreur('rcFournisseurErreur', 'Ce numéro de téléphone est déjà utilisé par un autre fournisseur.'); return; }
       throw error;
     }
-    await _logAdminAction('creation_fournisseur', nom_entreprise, '', 'tel: ' + telephone);
+    await _logAdminAction(enEdition ? 'modification_fournisseur' : 'creation_fournisseur', nom_entreprise, '', 'tel: ' + telephone);
     document.getElementById('rcFournisseurModal').style.display = 'none';
-    if (typeof showToast === 'function') showToast('✅ Fournisseur créé — il se connecte avec son téléphone (code reçu par SMS). Abonnement inactif par défaut.', 'success');
+    if (typeof showToast === 'function') showToast(enEdition ? '✅ Fournisseur mis à jour' : '✅ Fournisseur créé — il se connecte avec son téléphone (code reçu par SMS). Abonnement inactif par défaut.', 'success');
     _rcLoadCartes();
+    _rcLoadFournisseursListe();
   } catch (e) {
     _rcAfficherErreur('rcFournisseurErreur', 'Erreur : ' + e.message);
   } finally {
-    btn.disabled = false; btn.textContent = 'Créer';
+    btn.disabled = false; btn.textContent = enEdition ? 'Enregistrer' : 'Créer';
   }
 }
 
@@ -10791,17 +11171,36 @@ async function _rcSauvegarderFournisseur() {
 // REFERENCES providers(id)) lie un superviseur à un PRESTATAIRE existant,
 // pas à un compte admin — il n'y a pas de colonne admin_user_id. Select
 // repeuplé depuis `providers` en conséquence ; voir note de fin de réponse.
-async function _rcOuvrirSuperviseurModal() {
-  ['rcSuperviseurNom','rcSuperviseurTelephone'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+async function _rcOuvrirSuperviseurModal(id) {
+  _rcSuperviseurEditId = id || null;
+  ['rcSuperviseurNom','rcSuperviseurTelephone'].forEach(fid => { const el = document.getElementById(fid); if (el) el.value = ''; });
   _rcCacherErreur('rcSuperviseurErreur');
+  const titre = document.querySelector('#rcSuperviseurModal h3');
+  const btn = document.getElementById('rcSuperviseurSave');
+  if (titre) titre.innerHTML = '<i class="fa-solid fa-helmet-safety" style="color:#7C3AED;margin-right:8px;"></i>' + (_rcSuperviseurEditId ? 'Modifier un superviseur' : 'Créer un superviseur');
+  if (btn) btn.textContent = _rcSuperviseurEditId ? 'Enregistrer' : 'Créer';
   const sel = document.getElementById('rcSuperviseurProviderId');
   sel.innerHTML = '<option value="">— Aucun —</option>';
   document.getElementById('rcSuperviseurModal').style.display = 'flex';
+
+  let superviseurExistant = null;
+  if (_rcSuperviseurEditId) {
+    try {
+      const { data, error } = await sb.from('superviseurs').select('nom,telephone,provider_id').eq('id', _rcSuperviseurEditId).single();
+      if (error) throw error;
+      superviseurExistant = data;
+      document.getElementById('rcSuperviseurNom').value = data.nom || '';
+      document.getElementById('rcSuperviseurTelephone').value = data.telephone || '';
+    } catch (e) {
+      _rcAfficherErreur('rcSuperviseurErreur', 'Erreur de chargement : ' + e.message);
+    }
+  }
+
   try {
     const { data, error } = await sb.from('providers').select('id,prenom,nom,metier').eq('statut', 'valide').order('nom').limit(200);
     if (error) throw error;
     sel.innerHTML = '<option value="">— Aucun —</option>' +
-      (data || []).map(p => `<option value="${p.id}">${(p.prenom || '') + ' ' + (p.nom || '')} — ${p.metier || ''}</option>`).join('');
+      (data || []).map(p => `<option value="${p.id}" ${superviseurExistant && superviseurExistant.provider_id === p.id ? 'selected' : ''}>${(p.prenom || '') + ' ' + (p.nom || '')} — ${p.metier || ''}</option>`).join('');
   } catch (e) {
     console.warn('[registre_chantier] providers indisponible:', e.message);
   }
@@ -10816,24 +11215,229 @@ async function _rcSauvegarderSuperviseur() {
   if (!nom) { _rcAfficherErreur('rcSuperviseurErreur', 'Le nom est obligatoire.'); return; }
   if (!_rcTelephoneValide(telephone)) { _rcAfficherErreur('rcSuperviseurErreur', 'Téléphone au format 224XXXXXXXXX.'); return; }
 
+  const enEdition = !!_rcSuperviseurEditId;
   const btn = document.getElementById('rcSuperviseurSave');
-  btn.disabled = true; btn.textContent = 'Création...';
+  btn.disabled = true; btn.textContent = enEdition ? 'Enregistrement...' : 'Création...';
   try {
-    const { error } = await sb.from('superviseurs').insert({
-      nom, telephone, provider_id: providerId
-    });
+    const payload = { nom, telephone, provider_id: providerId };
+    const { error } = enEdition
+      ? await sb.from('superviseurs').update(payload).eq('id', _rcSuperviseurEditId)
+      : await sb.from('superviseurs').insert(payload);
     if (error) {
       if (error.code === '23505') { _rcAfficherErreur('rcSuperviseurErreur', 'Ce numéro de téléphone est déjà utilisé par un autre superviseur.'); return; }
       throw error;
     }
-    await _logAdminAction('creation_superviseur', nom, '', 'tel: ' + telephone + (providerId ? ' | provider_id: ' + providerId : ''));
+    await _logAdminAction(enEdition ? 'modification_superviseur' : 'creation_superviseur', nom, '', 'tel: ' + telephone + (providerId ? ' | provider_id: ' + providerId : ''));
     document.getElementById('rcSuperviseurModal').style.display = 'none';
-    if (typeof showToast === 'function') showToast('✅ Superviseur créé — il se connecte avec son téléphone (code reçu par SMS)', 'success');
+    if (typeof showToast === 'function') showToast(enEdition ? '✅ Superviseur mis à jour' : '✅ Superviseur créé — il se connecte avec son téléphone (code reçu par SMS)', 'success');
     _rcLoadCartes();
+    _rcLoadSuperviseursListe();
   } catch (e) {
     _rcAfficherErreur('rcSuperviseurErreur', 'Erreur : ' + e.message);
   } finally {
+    btn.disabled = false; btn.textContent = enEdition ? 'Enregistrer' : 'Créer';
+  }
+}
+
+// ── Création CHANTIER ──
+// Colonnes réelles de chantiers (supabase/migrations/20260714_registre_chantier.sql
+// ~ligne 178) : seules client_id, nom et statut sont NOT NULL côté schéma —
+// fournisseur_id et superviseur_id sont nullables. On les rend obligatoires
+// ici côté formulaire par choix produit (et parce que comptes_materiaux.
+// fournisseur_id, lui, EST NOT NULL : sans fournisseur choisi, le compte
+// matériaux ouvert juste après ne pourrait pas être créé). Statut initial
+// forcé à 'en_cours' (valeur valide de la CHECK, le défaut réel de la
+// colonne est 'en_etude') comme demandé.
+async function _rcOuvrirChantierModal() {
+  ['rcChantierNom','rcChantierDateDebut','rcChantierDescription'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  _rcCacherErreur('rcChantierErreur');
+
+  const selClient = document.getElementById('rcChantierClientId');
+  const selFournisseur = document.getElementById('rcChantierFournisseurId');
+  const selSuperviseur = document.getElementById('rcChantierSuperviseurId');
+  selClient.innerHTML = '<option value="">— Sélectionner —</option>';
+  selFournisseur.innerHTML = '<option value="">— Sélectionner —</option>';
+  selSuperviseur.innerHTML = '<option value="">— Sélectionner —</option>';
+  document.getElementById('rcChantierModal').style.display = 'flex';
+
+  try {
+    const { data, error } = await sb.from('clients').select('id,nom,prenom,telephone').eq('statut', 'actif').order('nom').limit(300);
+    if (error) throw error;
+    selClient.innerHTML = '<option value="">— Sélectionner —</option>' +
+      (data || []).map(c => `<option value="${c.id}">${(c.prenom ? c.prenom + ' ' : '') + c.nom} — ${c.telephone || ''}</option>`).join('');
+  } catch (e) { console.warn('[registre_chantier] clients indisponible:', e.message); }
+
+  try {
+    // Filtré sur statut='actif' : un fournisseur suspendu ferait échouer
+    // l'insert (trg_chantiers_verifier_fournisseur / trg_comptes_materiaux_
+    // verifier_fournisseur lèvent une exception sinon).
+    const { data, error } = await sb.from('fournisseurs_materiaux').select('id,nom_entreprise').eq('statut', 'actif').order('nom_entreprise').limit(300);
+    if (error) throw error;
+    selFournisseur.innerHTML = '<option value="">— Sélectionner —</option>' +
+      (data || []).map(f => `<option value="${f.id}">${f.nom_entreprise}</option>`).join('');
+  } catch (e) { console.warn('[registre_chantier] fournisseurs_materiaux indisponible:', e.message); }
+
+  try {
+    const { data, error } = await sb.from('superviseurs').select('id,nom,prenom').eq('statut', 'actif').order('nom').limit(300);
+    if (error) throw error;
+    selSuperviseur.innerHTML = '<option value="">— Sélectionner —</option>' +
+      (data || []).map(s => `<option value="${s.id}">${(s.prenom ? s.prenom + ' ' : '') + s.nom}</option>`).join('');
+  } catch (e) { console.warn('[registre_chantier] superviseurs indisponible:', e.message); }
+}
+
+async function _rcSauvegarderChantier() {
+  const nom = document.getElementById('rcChantierNom').value.trim();
+  const dateDebut = document.getElementById('rcChantierDateDebut').value;
+  const clientId = document.getElementById('rcChantierClientId').value;
+  const fournisseurId = document.getElementById('rcChantierFournisseurId').value;
+  const superviseurId = document.getElementById('rcChantierSuperviseurId').value;
+  const description = document.getElementById('rcChantierDescription').value.trim();
+  _rcCacherErreur('rcChantierErreur');
+
+  if (!nom) { _rcAfficherErreur('rcChantierErreur', 'Le nom du chantier est obligatoire.'); return; }
+  if (!dateDebut) { _rcAfficherErreur('rcChantierErreur', 'La date de début est obligatoire.'); return; }
+  if (!clientId) { _rcAfficherErreur('rcChantierErreur', 'Le client est obligatoire.'); return; }
+  if (!fournisseurId) { _rcAfficherErreur('rcChantierErreur', 'Le fournisseur est obligatoire.'); return; }
+  if (!superviseurId) { _rcAfficherErreur('rcChantierErreur', 'Le superviseur est obligatoire.'); return; }
+
+  const btn = document.getElementById('rcChantierSave');
+  btn.disabled = true; btn.textContent = 'Création...';
+  try {
+    // ⚠️ chantiers.fournisseur_id n'existe plus (supprimée par
+    // supabase/migrations/20260716_registre_chantier_multi_fournisseur.sql
+    // — un chantier peut avoir plusieurs fournisseurs, l'info vit
+    // uniquement dans comptes_materiaux désormais). `statut` n'est plus
+    // forcé : le DEFAULT réel de la colonne ('en_etude') s'applique, à
+    // faire passer à 'en_cours' via "Valider l'ouverture" dans le détail.
+    const { data: chantier, error: errChantier } = await sb.from('chantiers').insert({
+      nom,
+      date_debut: dateDebut,
+      client_id: clientId,
+      superviseur_id: superviseurId,
+      description: description || null
+    }).select('id').single();
+
+    if (errChantier) {
+      _rcAfficherErreur('rcChantierErreur', 'Erreur : ' + errChantier.message);
+      return;
+    }
+
+    // Premier compte matériaux du chantier (un par fournisseur assigné,
+    // comptes_materiaux.chantier_id n'est plus UNIQUE seul depuis cette
+    // migration — voir UNIQUE(chantier_id, fournisseur_id)). solde_gnf/
+    // solde_reserve pas fournis, laissés au DEFAULT 0 de la colonne. Si cet
+    // insert échoue (ex. fournisseur devenu inactif entre l'ouverture du
+    // formulaire et la validation), le chantier existe déjà sans compte :
+    // signalé explicitement plutôt que masqué, pas de transaction cross-
+    // requêtes possible côté client anon.
+    const { error: errCompte } = await sb.from('comptes_materiaux').insert({
+      chantier_id: chantier.id,
+      fournisseur_id: fournisseurId
+    });
+    if (errCompte) {
+      const msg = (errCompte.message || '').toLowerCase();
+      const raison = msg.includes("n'est pas actif") || msg.includes('n est pas actif')
+        ? "ce fournisseur n'est plus actif"
+        : errCompte.message;
+      _rcAfficherErreur('rcChantierErreur', 'Chantier créé, mais le compte matériaux n\'a pas pu être ouvert (' + raison + ').');
+      _rcLoadCartes(); _rcLoadChantiersDropdown(); _rcLoadChantiersListe();
+      return;
+    }
+
+    await _logAdminAction('creation_chantier', nom, '', 'client_id: ' + clientId + ' | fournisseur_id: ' + fournisseurId + ' | superviseur_id: ' + superviseurId);
+    document.getElementById('rcChantierModal').style.display = 'none';
+    if (typeof showToast === 'function') showToast('✅ Chantier créé — compte matériaux ouvert (solde 0 GNF)', 'success');
+    _rcLoadCartes();
+    _rcLoadChantiersDropdown();
+    _rcLoadChantiersListe();
+  } catch (e) {
+    _rcAfficherErreur('rcChantierErreur', 'Erreur : ' + e.message);
+  } finally {
     btn.disabled = false; btn.textContent = 'Créer';
+  }
+}
+
+// ── Édition CHANTIER ──
+// Tant que statut='en_etude' : nom, date_debut ET client modifiables (c'est
+// la fenêtre de correction d'erreur de saisie). Une fois validé
+// ('en_cours'/'termine') : client définitivement verrouillé — plus de
+// select client dans la modale, juste un affichage. nom/date_debut restent
+// modifiables à tout statut (seul le client se verrouille, comme demandé).
+// Le superviseur a sa propre édition dédiée (_rcBasculerEditionSuperviseur),
+// pas dupliquée ici.
+async function _rcOuvrirEditionChantier(chantierId) {
+  _rcChantierEditId = chantierId;
+  _rcCacherErreur('rcChantierEditErreur');
+  document.getElementById('rcChantierEditModal').style.display = 'flex';
+  const zone = document.getElementById('rcChantierEditClientZone');
+  zone.innerHTML = '<div style="color:#9CA3AF;font-size:12px;">Chargement...</div>';
+
+  try {
+    const { data: chantier, error } = await sb.from('chantiers')
+      .select('nom,date_debut,client_id,statut,clients(nom,prenom)')
+      .eq('id', chantierId).single();
+    if (error) throw error;
+
+    document.getElementById('rcChantierEditNom').value = chantier.nom || '';
+    document.getElementById('rcChantierEditDateDebut').value = chantier.date_debut || '';
+
+    if (chantier.statut === 'en_etude') {
+      zone.innerHTML = `<label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Client *</label>
+        <select id="rcChantierEditClientId" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;background:#fff;"><option value="">Chargement...</option></select>`;
+      try {
+        // .or() inclut le client actuel même s'il n'est plus 'actif', pour
+        // ne pas le faire disparaître silencieusement du select.
+        const { data: clientsData, error: errClients } = await sb.from('clients')
+          .select('id,nom,prenom,statut')
+          .or('statut.eq.actif,id.eq.' + chantier.client_id)
+          .order('nom').limit(300);
+        if (errClients) throw errClients;
+        const sel = document.getElementById('rcChantierEditClientId');
+        if (sel) sel.innerHTML = (clientsData || []).map(c => `<option value="${c.id}" ${c.id === chantier.client_id ? 'selected' : ''}>${(c.prenom ? c.prenom + ' ' : '') + c.nom}${c.statut !== 'actif' ? ' (suspendu)' : ''}</option>`).join('');
+      } catch (e) {
+        zone.innerHTML = '<div style="color:#DC2626;font-size:12px;">Erreur chargement clients : ' + e.message + '</div>';
+      }
+    } else {
+      const nomClient = chantier.clients ? ((chantier.clients.prenom ? chantier.clients.prenom + ' ' : '') + chantier.clients.nom) : '—';
+      zone.innerHTML = `<label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Client</label>
+        <div style="margin-top:4px;padding:10px 12px;background:#F4F6FB;border-radius:8px;font-size:14px;color:#6B7280;">${nomClient} <span style="font-size:11px;color:#9CA3AF;">🔒 verrouillé après validation de l'ouverture</span></div>`;
+    }
+  } catch (e) {
+    _rcAfficherErreur('rcChantierEditErreur', 'Erreur de chargement : ' + e.message);
+  }
+}
+
+async function _rcSauvegarderEditionChantier() {
+  const nom = document.getElementById('rcChantierEditNom').value.trim();
+  const dateDebut = document.getElementById('rcChantierEditDateDebut').value;
+  _rcCacherErreur('rcChantierEditErreur');
+
+  if (!nom) { _rcAfficherErreur('rcChantierEditErreur', 'Le nom du chantier est obligatoire.'); return; }
+  if (!dateDebut) { _rcAfficherErreur('rcChantierEditErreur', 'La date de début est obligatoire.'); return; }
+
+  const payload = { nom, date_debut: dateDebut };
+  // Présent uniquement si statut='en_etude' (voir _rcOuvrirEditionChantier) —
+  // absent du DOM ailleurs, donc pas de risque d'écraser client_id à tort.
+  const selClient = document.getElementById('rcChantierEditClientId');
+  if (selClient) {
+    if (!selClient.value) { _rcAfficherErreur('rcChantierEditErreur', 'Le client est obligatoire.'); return; }
+    payload.client_id = selClient.value;
+  }
+
+  const btn = document.getElementById('rcChantierEditSave');
+  btn.disabled = true; btn.textContent = 'Enregistrement...';
+  try {
+    const { error } = await sb.from('chantiers').update(payload).eq('id', _rcChantierEditId);
+    if (error) throw error;
+    await _logAdminAction('modification_chantier', nom, '', 'chantier_id: ' + _rcChantierEditId + (payload.client_id ? ' | client_id: ' + payload.client_id : ''));
+    document.getElementById('rcChantierEditModal').style.display = 'none';
+    if (typeof showToast === 'function') showToast('✅ Chantier mis à jour', 'success');
+    _rcOuvrirDetail(_rcChantierEditId);
+    _rcLoadChantiersListe();
+  } catch (e) {
+    _rcAfficherErreur('rcChantierEditErreur', 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Enregistrer';
   }
 }
 
@@ -10864,6 +11468,77 @@ function _rcStatutConfig(type) {
     sortie_rejetee:    { label: 'Sortie rejetée',    bg: '#FEF2F2', color: '#DC2626' },
   };
   return CONFIG[type] || { label: type, bg: '#F3F4F6', color: '#6B7280' };
+}
+
+// statut de chantiers : 3 valeurs réelles de la CHECK (en_etude/en_cours/termine)
+function _rcStatutChantierConfig(statut) {
+  const CONFIG = {
+    en_etude: { label: 'En étude', bg: '#EFF6FF', color: '#2563EB' },
+    en_cours: { label: 'En cours', bg: '#FFFBEB', color: '#D97706' },
+    termine:  { label: 'Terminé',  bg: '#ECFDF5', color: '#059669' },
+  };
+  return CONFIG[statut] || { label: statut, bg: '#F3F4F6', color: '#6B7280' };
+}
+
+// ── Tableau liste des chantiers ── même triptyque de repli (table
+// manquante / RLS / erreur générique) que _rcLoadTransactions.
+async function _rcLoadChantiersListe() {
+  const tbody = document.getElementById('rcChantiersList');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#9CA3AF;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</td></tr>';
+
+  try {
+    // chantiers.fournisseur_id n'existe plus (migration multi-fournisseur) —
+    // les fournisseurs d'un chantier sont désormais les N lignes de
+    // comptes_materiaux qui lui sont rattachées, embarquées ici via la FK.
+    const { data, error } = await sb.from('chantiers')
+      .select('id, nom, statut, date_debut, clients(nom,prenom), comptes_materiaux(fournisseurs_materiaux(nom_entreprise)), superviseurs(nom,prenom)')
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    if (error) {
+      const msg = (error.message || '').toLowerCase();
+      const isTableMissing = error.code === '42P01' || msg.includes('does not exist');
+      const isRLS = error.code === '42501' || msg.includes('permission') || msg.includes('policy');
+      if (isTableMissing) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;"><div style="background:#FFFBEB;border-radius:12px;padding:20px;display:inline-block;"><div style="font-size:20px;margin-bottom:8px;">🏗️</div><div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">Table chantiers manquante</div><div style="font-size:13px;color:#6B7280;">La migration supabase/migrations/20260714_registre_chantier.sql n'a pas encore été exécutée en base.</div></div></td></tr>`;
+      } else if (isRLS) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;"><div style="background:#FEF2F2;border-radius:12px;padding:24px;display:inline-block;max-width:480px;"><div style="font-size:20px;margin-bottom:8px;">🔒</div><div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:8px;">RLS bloque l'accès aux chantiers</div><div style="font-size:13px;color:#6B7280;">Row Level Security empêche la lecture de chantiers.</div></div></td></tr>`;
+      } else {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;"><div style="background:#FEF2F2;border-radius:12px;padding:20px;display:inline-block;max-width:480px;"><div style="font-size:20px;margin-bottom:8px;">⚠️</div><div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:8px;">Erreur lors du chargement</div><div style="font-size:12px;color:#DC2626;font-family:monospace;background:#fff;padding:10px;border-radius:8px;border:1px solid #FECACA;">${error.message}</div></div></td></tr>`;
+      }
+      return;
+    }
+
+    const chantiers = data || [];
+    if (!chantiers.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#9CA3AF;"><i class="fa-solid fa-building" style="font-size:24px;display:block;margin-bottom:10px;"></i>Aucun chantier créé</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = chantiers.map(c => {
+      const sc = _rcStatutChantierConfig(c.statut);
+      const client = c.clients ? ((c.clients.prenom ? c.clients.prenom + ' ' : '') + c.clients.nom) : '—';
+      const noms = (c.comptes_materiaux || []).map(cm => cm.fournisseurs_materiaux?.nom_entreprise).filter(Boolean);
+      const fournisseur = noms.length ? (noms.length > 1 ? noms.length + ' fournisseurs' : noms[0]) : '—';
+      const superviseur = c.superviseurs ? ((c.superviseurs.prenom ? c.superviseurs.prenom + ' ' : '') + c.superviseurs.nom) : '—';
+      const dateDebut = c.date_debut ? new Date(c.date_debut).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
+      const nomEchap = String(c.nom || '').replace(/'/g, "\\'");
+      return `<tr style="border-bottom:1px solid #F7F8FC;cursor:pointer;" onclick="_rcOuvrirDetail('${c.id}')" onmouseover="this.style.background='#FAFBFF'" onmouseout="this.style.background=''" title="${noms.join(', ')}">
+        <td style="padding:12px 14px;font-size:13px;font-weight:700;color:#1A1A4E;">${c.nom}</td>
+        <td style="padding:12px 14px;font-size:12.5px;color:#374151;">${client}</td>
+        <td style="padding:12px 14px;font-size:12.5px;color:#374151;">${fournisseur}</td>
+        <td style="padding:12px 14px;font-size:12.5px;color:#374151;">${superviseur}</td>
+        <td style="padding:12px 14px;text-align:center;"><span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;white-space:nowrap;">${sc.label}</span></td>
+        <td style="padding:12px 14px;text-align:center;font-size:12px;color:#6B7280;white-space:nowrap;">${dateDebut}</td>
+        <td style="padding:12px 14px;text-align:center;" onclick="event.stopPropagation()">
+          <button onclick="_rcSupprimerChantier('${c.id}','${nomEchap}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 9px;font-size:12px;cursor:pointer;">🗑</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:#EF4444;">Erreur: ' + e.message + '</td></tr>';
+  }
 }
 
 let _rcTransactionsCache = [];
@@ -10911,7 +11586,7 @@ async function _rcLoadTransactions() {
       const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       const montant = t.montant_gnf != null ? Number(t.montant_gnf).toLocaleString('fr-FR') + ' GNF' : '—';
       const chantierNom = t.chantiers?.nom || '—';
-      return `<tr style="border-bottom:1px solid #F7F8FC;cursor:pointer;" onclick="_rcOuvrirDetail('${t.chantier_id}','${t.compte_id}')" onmouseover="this.style.background='#FAFBFF'" onmouseout="this.style.background=''">
+      return `<tr style="border-bottom:1px solid #F7F8FC;cursor:pointer;" onclick="_rcOuvrirDetail('${t.chantier_id}')" onmouseover="this.style.background='#FAFBFF'" onmouseout="this.style.background=''">
         <td style="padding:12px 14px;font-size:13px;font-weight:700;color:#1A1A4E;">${chantierNom}</td>
         <td style="padding:12px 14px;font-size:12.5px;color:#374151;">${typeLabel}</td>
         <td style="padding:12px 14px;text-align:right;font-size:13px;font-weight:700;color:#1A1A4E;">${montant}</td>
@@ -10924,8 +11599,10 @@ async function _rcLoadTransactions() {
   }
 }
 
-// ── Vue détail : chantier complet + solde + historique event-sourced ──
-async function _rcOuvrirDetail(chantierId, compteId) {
+// ── Vue détail : chantier complet + N fournisseurs (1 compte + 1 historique
+// chacun, jamais mélangés — un fournisseur ne doit jamais voir les
+// transactions d'un autre fournisseur du même chantier). ──
+async function _rcOuvrirDetail(chantierId) {
   const modal = document.getElementById('rcDetailModal');
   const titre = document.getElementById('rcDetailTitre');
   const contenu = document.getElementById('rcDetailContenu');
@@ -10933,8 +11610,10 @@ async function _rcOuvrirDetail(chantierId, compteId) {
   modal.style.display = 'flex';
 
   try {
+    // chantiers.fournisseur_id n'existe plus (migration multi-fournisseur) —
+    // plus de jointure fournisseurs_materiaux directement sur chantiers ici.
     const { data: chantier, error: errCh } = await sb.from('chantiers')
-      .select('*, clients(nom,prenom,telephone), fournisseurs_materiaux(nom_entreprise,telephone), superviseurs(nom,prenom,telephone)')
+      .select('*, clients(nom,prenom,telephone), superviseurs(nom,prenom,telephone)')
       .eq('id', chantierId).single();
     if (errCh) throw errCh;
 
@@ -10949,84 +11628,188 @@ async function _rcOuvrirDetail(chantierId, compteId) {
       if (contrat?.formule_service) formule = contrat.formule_service;
     } catch (e) { /* pas de contrat forfait pour ce chantier, normal */ }
 
-    const { data: compte, error: errCompte } = await sb.from('comptes_materiaux').select('*').eq('id', compteId).single();
-    if (errCompte) throw errCompte;
+    // Tous les comptes matériaux du chantier — un par fournisseur assigné
+    // (UNIQUE(chantier_id, fournisseur_id) depuis la migration 20260716).
+    const { data: comptes, error: errComptes } = await sb.from('comptes_materiaux')
+      .select('*, fournisseurs_materiaux(nom_entreprise,telephone)')
+      .eq('chantier_id', chantierId)
+      .order('created_at', { ascending: true });
+    if (errComptes) throw errComptes;
 
-    const statutChantierConfig = {
-      en_etude: { label: 'En étude', bg: '#EFF6FF', color: '#2563EB' },
-      en_cours: { label: 'En cours', bg: '#FFFBEB', color: '#D97706' },
-      termine:  { label: 'Terminé',  bg: '#ECFDF5', color: '#059669' },
-    };
-    const scChantier = statutChantierConfig[chantier.statut] || { label: chantier.statut, bg: '#F3F4F6', color: '#6B7280' };
-    const soldeDisponible = (compte.solde_gnf || 0) - (compte.solde_reserve || 0);
+    const scChantier = _rcStatutChantierConfig(chantier.statut);
     const nomClient = chantier.clients ? ((chantier.clients.prenom ? chantier.clients.prenom + ' ' : '') + chantier.clients.nom) : '—';
     const nomSuperviseur = chantier.superviseurs ? ((chantier.superviseurs.prenom ? chantier.superviseurs.prenom + ' ' : '') + chantier.superviseurs.nom) : '—';
 
     let html = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
         <div style="background:#F4F6FB;border-radius:12px;padding:14px;">
-          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">Client</div>
-          <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${nomClient}</div>
-          <div style="font-size:12px;color:#6B7280;">${chantier.clients?.telephone || ''}</div>
-        </div>
-        <div style="background:#F4F6FB;border-radius:12px;padding:14px;">
-          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">Fournisseur</div>
-          <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${chantier.fournisseurs_materiaux?.nom_entreprise || '—'}</div>
-          <div style="font-size:12px;color:#6B7280;">${chantier.fournisseurs_materiaux?.telephone || ''}</div>
-        </div>
-        <div style="background:#F4F6FB;border-radius:12px;padding:14px;">
-          <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">Superviseur</div>
-          <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${nomSuperviseur}</div>
-          <div style="font-size:12px;color:#6B7280;">${chantier.superviseurs?.telephone || ''}</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">${chantier.statut === 'en_etude' ? 'Client, nom, date' : 'Client (verrouillé après validation)'}</div>
+              <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${nomClient}</div>
+              <div style="font-size:12px;color:#6B7280;">${chantier.clients?.telephone || ''}</div>
+            </div>
+            <button onclick="_rcOuvrirEditionChantier('${chantierId}')" title="Modifier le chantier" style="background:#ECFDF5;color:#059669;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;flex-shrink:0;">✏️</button>
+          </div>
         </div>
         <div style="background:#F4F6FB;border-radius:12px;padding:14px;">
           <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">Statut chantier / Formule</div>
           <span style="background:${scChantier.bg};color:${scChantier.color};border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;">${scChantier.label}</span>
           <div style="font-size:12px;color:#6B7280;margin-top:6px;">Formule : ${formule}</div>
+          ${chantier.statut === 'en_etude' ? `<button onclick="_rcValiderOuvertureChantier('${chantierId}')" style="margin-top:10px;width:100%;padding:7px;background:#059669;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">✅ Valider l'ouverture</button>` : ''}
         </div>
       </div>
-      <div style="background:linear-gradient(135deg,#1A1A4E,#2D2D6B);border-radius:12px;padding:16px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-        <div>
-          <div style="font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em;">Solde du compte matériaux</div>
-          <div style="font-size:22px;font-weight:800;color:#fff;">${Number(compte.solde_gnf || 0).toLocaleString('fr-FR')} GNF</div>
+
+      <div style="background:#F4F6FB;border-radius:12px;padding:14px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">Superviseur</div>
+            <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${nomSuperviseur} <span style="font-weight:400;color:#6B7280;font-size:12px;">${chantier.superviseurs?.telephone || ''}</span></div>
+          </div>
+          <button onclick="_rcBasculerEditionSuperviseur()" style="background:#EEF2FF;color:#4338CA;border:none;border-radius:8px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;">✏️ Modifier</button>
         </div>
-        <div style="text-align:right;">
-          <div style="font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;">Réservé</div>
-          <div style="font-size:14px;font-weight:700;color:#F5C842;">${Number(compte.solde_reserve || 0).toLocaleString('fr-FR')} GNF</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:4px;">Disponible : ${soldeDisponible.toLocaleString('fr-FR')} GNF</div>
+        <div id="rcDetailSuperviseurEdition" style="display:none;gap:8px;margin-top:10px;">
+          <select id="rcDetailSuperviseurSelect" style="flex:1;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;"></select>
+          <button onclick="_rcEnregistrerSuperviseurChantier('${chantierId}')" style="background:#4338CA;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;">Enregistrer</button>
         </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:14px;font-weight:700;color:#1A1A4E;"><i class="fa-solid fa-truck-fast" style="color:#E8650A;margin-right:6px;"></i>Fournisseurs du chantier (${(comptes || []).length})</div>
+        <button onclick="_rcBasculerAjoutFournisseur()" style="background:#ECFDF5;color:#059669;border:1.5px solid #A7F3D0;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;">+ Ajouter un fournisseur</button>
+      </div>
+      <div id="rcAjoutFournisseurZone" style="display:none;background:#F4F6FB;border-radius:10px;padding:12px;margin-bottom:16px;gap:8px;align-items:center;">
+        <select id="rcAjoutFournisseurSelect" style="flex:1;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;"></select>
+        <button onclick="_rcConfirmerAjoutFournisseur('${chantierId}')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;">Ajouter</button>
       </div>
     `;
 
-    const { data: histo, error: errHisto } = await sb.from('registre_transactions')
-      .select('*')
-      .eq('compte_id', compteId)
-      .order('created_at', { ascending: true });
-    if (errHisto) throw errHisto;
+    if (!comptes || !comptes.length) {
+      html += '<div style="text-align:center;padding:20px;color:#9CA3AF;">Aucun fournisseur assigné à ce chantier.</div>';
+    } else {
+      for (const compte of comptes) {
+        const soldeDisponible = (compte.solde_gnf || 0) - (compte.solde_reserve || 0);
+        const { data: histo, error: errHisto } = await sb.from('registre_transactions')
+          .select('*')
+          .eq('compte_id', compte.id)
+          .order('created_at', { ascending: true });
+        if (errHisto) { html += '<div style="color:#DC2626;font-size:12px;margin-bottom:16px;">Erreur historique fournisseur : ' + errHisto.message + '</div>'; continue; }
 
-    html += '<div style="font-size:13px;font-weight:700;color:#1A1A4E;margin-bottom:10px;">Historique du registre (' + (histo?.length || 0) + ' événements)</div>';
-    html += '<div style="display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;">';
-    (histo || []).forEach(h => {
-      const sc = _rcStatutConfig(h.type_operation);
-      const date = new Date(h.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-      const acteur = h.client_id ? 'Client' : h.superviseur_id ? 'Superviseur' : h.fournisseur_id ? 'Fournisseur' : '—';
-      const materiauInfo = h.materiau ? `<div style="font-size:11.5px;color:#6B7280;">${h.materiau} — ${h.quantite || ''} ${h.unite || ''}</div>` : '';
-      const refInfo = h.reference_transaction_id ? '<div style="font-size:10.5px;color:#9CA3AF;">↳ référence : ' + String(h.reference_transaction_id).slice(0, 8) + '…</div>' : '';
-      html += `<div style="border:1.5px solid #F0F0F8;border-radius:10px;padding:10px 12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-          <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
-          <span style="font-size:12px;font-weight:700;color:#1A1A4E;">${Number(h.montant_gnf).toLocaleString('fr-FR')} GNF</span>
-        </div>
-        <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">${acteur} · ${date}</div>
-        ${materiauInfo}
-        ${refInfo}
-      </div>`;
-    });
-    html += '</div>';
+        html += `
+          <div style="border:1.5px solid #F0F0F8;border-radius:12px;padding:16px;margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${compte.fournisseurs_materiaux?.nom_entreprise || '—'}</div>
+                <div style="font-size:11.5px;color:#6B7280;">${compte.fournisseurs_materiaux?.telephone || ''}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:16px;font-weight:800;color:#1A1A4E;">${Number(compte.solde_gnf || 0).toLocaleString('fr-FR')} GNF</div>
+                <div style="font-size:10.5px;color:#9CA3AF;">Réservé : ${Number(compte.solde_reserve || 0).toLocaleString('fr-FR')} · Disponible : ${soldeDisponible.toLocaleString('fr-FR')}</div>
+              </div>
+            </div>
+            <div style="font-size:11.5px;font-weight:700;color:#6B7280;margin-bottom:8px;">Historique (${histo?.length || 0} événements)</div>
+            <div style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;">
+        `;
+        (histo || []).forEach(h => {
+          const sc = _rcStatutConfig(h.type_operation);
+          const date = new Date(h.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+          const acteur = h.client_id ? 'Client' : h.superviseur_id ? 'Superviseur' : h.fournisseur_id ? 'Fournisseur' : '—';
+          const materiauInfo = h.materiau ? `<div style="font-size:11px;color:#6B7280;">${h.materiau} — ${h.quantite || ''} ${h.unite || ''}</div>` : '';
+          html += `<div style="border:1px solid #F0F0F8;border-radius:8px;padding:8px 10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+              <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 9px;font-size:10.5px;font-weight:700;">${sc.label}</span>
+              <span style="font-size:11.5px;font-weight:700;color:#1A1A4E;">${Number(h.montant_gnf).toLocaleString('fr-FR')} GNF</span>
+            </div>
+            <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;">${acteur} · ${date}</div>
+            ${materiauInfo}
+          </div>`;
+        });
+        if (!histo || !histo.length) html += '<div style="text-align:center;color:#9CA3AF;font-size:11.5px;padding:10px;">Aucune transaction</div>';
+        html += '</div></div>';
+      }
+    }
 
     if (contenu) contenu.innerHTML = html;
+
+    // Peuple le select d'édition superviseur (statut actif uniquement)
+    try {
+      const { data: sups } = await sb.from('superviseurs').select('id,nom,prenom').eq('statut', 'actif').order('nom').limit(300);
+      const sel = document.getElementById('rcDetailSuperviseurSelect');
+      if (sel) sel.innerHTML = (sups || []).map(s => `<option value="${s.id}" ${s.id === chantier.superviseur_id ? 'selected' : ''}>${(s.prenom ? s.prenom + ' ' : '') + s.nom}</option>`).join('');
+    } catch (e) { console.warn('[registre_chantier] superviseurs indisponible:', e.message); }
+
+    // Peuple le select d'ajout fournisseur : actifs, pas déjà assignés à ce chantier
+    try {
+      const dejaAssignes = new Set((comptes || []).map(c => c.fournisseur_id));
+      const { data: fournisseurs } = await sb.from('fournisseurs_materiaux').select('id,nom_entreprise').eq('statut', 'actif').order('nom_entreprise').limit(300);
+      const dispo = (fournisseurs || []).filter(f => !dejaAssignes.has(f.id));
+      const sel = document.getElementById('rcAjoutFournisseurSelect');
+      if (sel) sel.innerHTML = dispo.length
+        ? dispo.map(f => `<option value="${f.id}">${f.nom_entreprise}</option>`).join('')
+        : '<option value="">— Aucun fournisseur disponible —</option>';
+    } catch (e) { console.warn('[registre_chantier] fournisseurs_materiaux indisponible:', e.message); }
+
   } catch (e) {
     if (contenu) contenu.innerHTML = '<div style="text-align:center;padding:30px;color:#DC2626;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+function _rcBasculerEditionSuperviseur() {
+  const el = document.getElementById('rcDetailSuperviseurEdition');
+  if (el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'flex' : 'none';
+}
+
+async function _rcEnregistrerSuperviseurChantier(chantierId) {
+  const sel = document.getElementById('rcDetailSuperviseurSelect');
+  const superviseurId = sel?.value || null;
+  try {
+    const { error } = await sb.from('chantiers').update({ superviseur_id: superviseurId }).eq('id', chantierId);
+    if (error) throw error;
+    await _logAdminAction('modification_superviseur_chantier', '', '', 'chantier_id: ' + chantierId + ' | superviseur_id: ' + superviseurId);
+    if (typeof showToast === 'function') showToast('✅ Superviseur mis à jour', 'success');
+    _rcOuvrirDetail(chantierId);
+    _rcLoadChantiersListe();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+
+function _rcBasculerAjoutFournisseur() {
+  const el = document.getElementById('rcAjoutFournisseurZone');
+  if (el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'flex' : 'none';
+}
+
+// Insère une ligne comptes_materiaux supplémentaire (solde_gnf 0 par
+// DEFAULT) — UNIQUE(chantier_id, fournisseur_id) empêche un doublon si le
+// select d'ajout n'a pas été rafraîchi entre-temps.
+async function _rcConfirmerAjoutFournisseur(chantierId) {
+  const sel = document.getElementById('rcAjoutFournisseurSelect');
+  const fournisseurId = sel?.value;
+  if (!fournisseurId) { if (typeof showToast === 'function') showToast('Sélectionne un fournisseur.', 'error'); return; }
+  try {
+    const { error } = await sb.from('comptes_materiaux').insert({ chantier_id: chantierId, fournisseur_id: fournisseurId });
+    if (error) throw error;
+    await _logAdminAction('ajout_fournisseur_chantier', '', '', 'chantier_id: ' + chantierId + ' | fournisseur_id: ' + fournisseurId);
+    if (typeof showToast === 'function') showToast('✅ Fournisseur ajouté — compte matériaux ouvert (solde 0 GNF)', 'success');
+    _rcOuvrirDetail(chantierId);
+    _rcLoadChantiersListe();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+
+async function _rcValiderOuvertureChantier(chantierId) {
+  if (!window.confirm("Valider l'ouverture de ce chantier (passage en_etude → en_cours) ?")) return;
+  try {
+    const { error } = await sb.from('chantiers').update({ statut: 'en_cours' }).eq('id', chantierId);
+    if (error) throw error;
+    await _logAdminAction('validation_ouverture_chantier', '', '', 'chantier_id: ' + chantierId);
+    if (typeof showToast === 'function') showToast('✅ Chantier passé en cours', 'success');
+    _rcOuvrirDetail(chantierId);
+    _rcLoadChantiersListe();
+    _rcLoadCartes();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
   }
 }
 
