@@ -4025,7 +4025,7 @@ async function _espaceChargerClient() {
     // select (en plus du nom déjà utilisé) pour permettre l'agrégation par
     // fournisseur de l'onglet "Mon fournisseur" sans requête supplémentaire.
     const { data: comptes, error: errC } = await sb.from('comptes_materiaux')
-      .select('chantier_id,fournisseur_id,solde_gnf,fournisseurs_materiaux(nom_entreprise,ville,commune)')
+      .select('id,chantier_id,fournisseur_id,solde_gnf,fournisseurs_materiaux(nom_entreprise,ville,commune)')
       .in('chantier_id', chantierIds);
     if (errC) throw errC;
     const comptesParChantier = {};
@@ -4087,33 +4087,183 @@ async function _espaceChargerClient() {
       }).join('') : '<div class="esp-empty">Aucun versement pour le moment.</div>';
     }
 
-    // Onglet "Mon fournisseur" — fournisseurs distincts liés aux chantiers
-    // du client, avec le solde total cumulé sur l'ensemble de ses chantiers.
+    // Onglet "Mon fournisseur" — un compte matériaux par chantier
+    // (comptes_materiaux, UNIQUE(chantier_id,fournisseur_id)), avec
+    // déclaration/retrait directs par le client. Décision explicite : pas
+    // de statut "en attente de validation" intermédiaire — l'insertion est
+    // immédiate (comptes_materiaux.statut garde son défaut 'ouvert'),
+    // conforme au flux "Confirmer la déclaration" → succès immédiat fourni.
     const fournisseurZone = document.getElementById('espaceCliFournisseurListe');
     if (fournisseurZone) {
-      const fournisseursMap = {};
-      (comptes || []).forEach(c => {
-        if (!c.fournisseur_id) return;
-        if (!fournisseursMap[c.fournisseur_id]) {
-          fournisseursMap[c.fournisseur_id] = {
-            nom: c.fournisseurs_materiaux?.nom_entreprise || '—',
-            ville: c.fournisseurs_materiaux?.ville,
-            commune: c.fournisseurs_materiaux?.commune,
-            solde: 0
-          };
-        }
-        fournisseursMap[c.fournisseur_id].solde += Number(c.solde_gnf || 0);
-      });
-      const listeFournisseurs = Object.values(fournisseursMap);
-      fournisseurZone.innerHTML = listeFournisseurs.length ? listeFournisseurs.map(f => `
-        <div class="esp-card" style="margin-bottom:12px;">
-          <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:6px;"><i class="fa-solid fa-truck" style="color:#2563EB;margin-right:8px;"></i>${f.nom}</div>
-          ${(f.ville || f.commune) ? `<div style="font-size:12px;color:#6B7280;margin-bottom:8px;"><i class="fa-solid fa-location-dot" style="margin-right:5px;"></i>${[f.ville, f.commune].filter(Boolean).join(', ')}</div>` : ''}
-          <div style="font-size:12px;color:#6B7280;">Solde total : <strong style="color:${f.solde > 0 ? '#059669' : '#9CA3AF'};">${_espaceFormatGNF(f.solde)}</strong></div>
-        </div>`).join('') : '<div class="esp-empty"><i class="fa-solid fa-truck" style="font-size:22px;display:block;margin-bottom:8px;color:#D1D5DB;"></i>Bientôt : le profil détaillé de vos fournisseurs.</div>';
+      fournisseurZone.innerHTML = chantiers.map(c => {
+        const comptesChantier = comptesParChantier[c.id] || [];
+        const lignesFournisseurs = comptesChantier.length ? comptesChantier.map(cm => {
+          const solde = Number(cm.solde_gnf || 0);
+          const nomF = cm.fournisseurs_materiaux?.nom_entreprise || '—';
+          const zoneTxt = [cm.fournisseurs_materiaux?.ville, cm.fournisseurs_materiaux?.commune].filter(Boolean).join(', ');
+          return `<div class="esp-row" style="align-items:flex-start;flex-wrap:wrap;">
+            <div style="flex:1;min-width:140px;">
+              <div style="color:#374151;font-weight:700;"><i class="fa-solid fa-truck" style="width:16px;color:#9CA3AF;margin-right:6px;"></i>${nomF}</div>
+              ${zoneTxt ? `<div style="font-size:11px;color:#9CA3AF;margin-top:2px;">${zoneTxt}</div>` : ''}
+              <div style="font-size:11.5px;color:#6B7280;margin-top:3px;">Solde : <strong style="color:${solde > 0 ? '#059669' : '#9CA3AF'};">${_espaceFormatGNF(solde)}</strong></div>
+            </div>
+            <button onclick="_espaceCliBasculerRetraitCompte('${cm.id}')" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;padding:7px 12px;font-size:11.5px;font-weight:700;cursor:pointer;">Retirer</button>
+            <div id="espaceCliRetraitZone-${cm.id}" style="display:none;width:100%;margin-top:8px;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:12px;">
+              <div style="font-size:12px;color:#7F1D1D;margin-bottom:10px;">Retirer <strong>${nomF}</strong> du chantier <strong>${c.nom}</strong> ? Impossible si des transactions existent déjà sur ce compte.</div>
+              <div id="espaceCliRetraitErreur-${cm.id}" style="display:none;color:#DC2626;font-size:11.5px;margin-bottom:8px;"></div>
+              <div style="display:flex;gap:8px;">
+                <button onclick="_espaceCliBasculerRetraitCompte('${cm.id}')" style="flex:1;background:#fff;color:#374151;border:1.5px solid #E5E7EB;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Annuler</button>
+                <button onclick="_espaceCliConfirmerRetraitCompte('${cm.id}')" style="flex:1;background:#DC2626;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Confirmer le retrait</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('') : '<div style="color:#9CA3AF;font-size:12px;padding:8px 0;">Aucun fournisseur déclaré sur ce chantier.</div>';
+
+        return `<div class="esp-card" style="margin-bottom:14px;" id="espaceCliFourCard-${c.id}">
+          <div style="font-size:14px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:10px;"><i class="fa-solid fa-building" style="color:#9CA3AF;margin-right:6px;font-size:13px;"></i>${c.nom}</div>
+          ${lignesFournisseurs}
+          <button onclick="_espaceCliBasculerAjoutFournisseur('${c.id}')" style="width:100%;margin-top:12px;background:#EFF6FF;color:#2563EB;border:none;border-radius:9px;padding:10px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-plus" style="margin-right:6px;"></i>Ajouter un fournisseur</button>
+          <div id="espaceCliAjoutFourForm-${c.id}" style="display:none;background:#F9FAFB;border-radius:10px;padding:14px;margin-top:10px;">
+            <select id="espaceCliAjoutFourSelect-${c.id}" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;margin-bottom:10px;"><option value="">Chargement...</option></select>
+            <div id="espaceCliAjoutFourErreur-${c.id}" style="display:none;color:#DC2626;font-size:11.5px;margin-bottom:8px;"></div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="_espaceCliBasculerAjoutFournisseur('${c.id}')" style="flex:1;background:#fff;color:#374151;border:1.5px solid #E5E7EB;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;">Annuler</button>
+              <button onclick="_espaceCliConfirmerAjoutFournisseur('${c.id}')" style="flex:1;background:#2563EB;color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;">Confirmer la déclaration</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
     }
+
+    // Partie 3 — pré-sélection auto depuis #construire (bouton "Choisir
+    // pour mon chantier"). Le flag sessionStorage est retiré dès sa lecture
+    // par _espaceCliGererDeclarationEnAttente : un rechargement ultérieur
+    // de _espaceChargerClient() (après ajout/retrait) ne redéclenche pas le
+    // flux une seconde fois.
+    _espaceCliGererDeclarationEnAttente(chantiers);
   } catch (e) {
     zone.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+// Lit le flag posé par declarerFournisseurDepuisVitrine() sur #construire
+// et ouvre directement le bon formulaire de déclaration : aucun chantier
+// (message + WhatsApp), un seul (ouverture directe), plusieurs (petit
+// sélecteur "Pour quel chantier ?" au-dessus de la liste).
+function _espaceCliGererDeclarationEnAttente(chantiers) {
+  let fournisseurADeclarer;
+  try { fournisseurADeclarer = sessionStorage.getItem('fournisseur_a_declarer'); } catch (e) { return; }
+  if (!fournisseurADeclarer) return;
+  try { sessionStorage.removeItem('fournisseur_a_declarer'); } catch (e) {}
+
+  _espaceBasculerOnglet('cli', 'fournisseur');
+  const zone = document.getElementById('espaceCliFournisseurListe');
+  if (!zone) return;
+
+  if (!chantiers || !chantiers.length) {
+    zone.innerHTML = '<div class="esp-empty"><i class="fa-solid fa-triangle-exclamation" style="font-size:22px;display:block;margin-bottom:8px;color:#F59E0B;"></i>Pas de chantier actif pour le moment — contactez YOUMMA JOBS pour en démarrer un.<br/><a href="https://wa.me/22461252510?text=Bonjour%20YOUMMA%20JOBS%2C%20je%20veux%20d%C3%A9marrer%20un%20chantier" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;background:#25D366;color:#fff;padding:10px 18px;border-radius:9px;font-weight:700;font-size:12.5px;text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Contacter YOUMMA JOBS</a></div>';
+    return;
+  }
+
+  if (chantiers.length === 1) {
+    _espaceCliOuvrirDeclarationPourChantier(chantiers[0].id, fournisseurADeclarer);
+    return;
+  }
+
+  const options = chantiers.map(c => `<option value="${c.id}">${c.nom}</option>`).join('');
+  const banniere = document.createElement('div');
+  banniere.className = 'esp-card';
+  banniere.style.cssText = 'margin-bottom:14px;border:1.5px solid #BFDBFE;background:#EFF6FF;';
+  banniere.innerHTML = `<div style="font-size:13px;font-weight:700;color:#1A1A4E;margin-bottom:10px;"><i class="fa-solid fa-truck" style="color:#2563EB;margin-right:6px;"></i>Pour quel chantier voulez-vous déclarer ce fournisseur ?</div>
+    <div style="display:flex;gap:8px;">
+      <select id="espaceCliChoixChantierDeclaration" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #BFDBFE;border-radius:8px;font-size:13px;background:#fff;">${options}</select>
+      <button onclick="_espaceCliOuvrirDeclarationPourChantier(document.getElementById('espaceCliChoixChantierDeclaration').value,'${fournisseurADeclarer}');this.closest('.esp-card').remove();" style="background:#2563EB;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">Continuer</button>
+    </div>`;
+  zone.insertBefore(banniere, zone.firstChild);
+}
+
+async function _espaceCliOuvrirDeclarationPourChantier(chantierId, fournisseurId) {
+  await _espaceCliBasculerAjoutFournisseur(chantierId);
+  const card = document.getElementById('espaceCliFourCard-' + chantierId);
+  if (card && card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const sel = document.getElementById('espaceCliAjoutFourSelect-' + chantierId);
+  if (sel && fournisseurId && [...sel.options].some(o => o.value === fournisseurId)) sel.value = fournisseurId;
+}
+
+async function _espaceCliBasculerAjoutFournisseur(chantierId) {
+  const form = document.getElementById('espaceCliAjoutFourForm-' + chantierId);
+  if (!form) return;
+  const ouverture = (form.style.display === 'none' || !form.style.display);
+  form.style.display = ouverture ? 'block' : 'none';
+  if (ouverture) await _espaceCliChargerSelectAjoutFournisseur(chantierId);
+}
+
+// Fournisseurs actifs non encore liés à CE chantier — filtrage fait
+// côté client (deux requêtes simples) plutôt qu'un NOT IN imbriqué,
+// même esprit que le NOT IN demandé mais compatible avec l'API supabase-js.
+async function _espaceCliChargerSelectAjoutFournisseur(chantierId) {
+  const sel = document.getElementById('espaceCliAjoutFourSelect-' + chantierId);
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Chargement...</option>';
+  try {
+    const { data: dejaLies, error: errDeja } = await sb.from('comptes_materiaux').select('fournisseur_id').eq('chantier_id', chantierId);
+    if (errDeja) throw errDeja;
+    const idsExclus = (dejaLies || []).map(c => c.fournisseur_id);
+    const { data: fournisseurs, error } = await sb.from('fournisseurs_materiaux').select('id,nom_entreprise,telephone').eq('statut', 'actif').order('nom_entreprise', { ascending: true });
+    if (error) throw error;
+    const disponibles = (fournisseurs || []).filter(f => !idsExclus.includes(f.id));
+    sel.innerHTML = disponibles.length
+      ? '<option value="">— Sélectionner un fournisseur —</option>' + disponibles.map(f => `<option value="${f.id}">${f.nom_entreprise}${f.telephone ? ' (' + f.telephone + ')' : ''}</option>`).join('')
+      : '<option value="">Aucun fournisseur disponible</option>';
+  } catch (e) {
+    sel.innerHTML = '<option value="">Erreur de chargement</option>';
+  }
+}
+
+async function _espaceCliConfirmerAjoutFournisseur(chantierId) {
+  const sel = document.getElementById('espaceCliAjoutFourSelect-' + chantierId);
+  const erreurId = 'espaceCliAjoutFourErreur-' + chantierId;
+  _espaceCacherErreur(erreurId);
+  const fournisseurId = sel ? sel.value : '';
+  if (!fournisseurId) { _espaceAfficherErreur(erreurId, 'Sélectionnez un fournisseur.'); return; }
+  try {
+    const { error } = await sb.from('comptes_materiaux').insert({ chantier_id: chantierId, fournisseur_id: fournisseurId });
+    if (error) {
+      const msg = (error.message || '').toLowerCase();
+      const propre = (msg.includes('duplicate') || msg.includes('unique')) ? 'Ce fournisseur est déjà lié à ce chantier.' : ('Erreur : ' + error.message);
+      _espaceAfficherErreur(erreurId, propre);
+      return;
+    }
+    if (typeof showToast === 'function') showToast('✅ Fournisseur déclaré avec succès', 'success');
+    _espaceChargerClient();
+  } catch (e) {
+    _espaceAfficherErreur(erreurId, 'Erreur : ' + e.message);
+  }
+}
+
+function _espaceCliBasculerRetraitCompte(compteId) {
+  const el = document.getElementById('espaceCliRetraitZone-' + compteId);
+  if (el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+}
+
+// Retrait bloqué si des transactions existent déjà sur ce compte — vérifié
+// via COUNT avant tout DELETE, jamais de suppression à l'aveugle.
+async function _espaceCliConfirmerRetraitCompte(compteId) {
+  const erreurId = 'espaceCliRetraitErreur-' + compteId;
+  _espaceCacherErreur(erreurId);
+  try {
+    const { count, error: errCount } = await sb.from('registre_transactions').select('id', { count: 'exact', head: true }).eq('compte_id', compteId);
+    if (errCount) throw errCount;
+    if (count > 0) {
+      _espaceAfficherErreur(erreurId, 'Impossible : des transactions existent déjà sur ce compte.');
+      return;
+    }
+    const { error } = await sb.from('comptes_materiaux').delete().eq('id', compteId);
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('✅ Fournisseur retiré du chantier', 'success');
+    _espaceChargerClient();
+  } catch (e) {
+    _espaceAfficherErreur(erreurId, 'Erreur : ' + e.message);
   }
 }
 </script>
@@ -11704,8 +11854,23 @@ function _pcFournisseurCardHTML(f) {
     +   '<button onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="flex:1;padding:11px;background:var(--bleu);border:none;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;cursor:pointer;">Catalogue complet</button>'
     +   (telWa ? '<a href="https://wa.me/' + telWa + '" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;background:#25D366;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Contacter</a>' : '')
     + '</div>'
+    + '<button onclick="event.stopPropagation();declarerFournisseurDepuisVitrine(\'' + f.id + '\')" style="width:100%;margin-top:8px;padding:10px;background:#16a34a;border:none;color:#fff;border-radius:10px;font-weight:700;font-size:0.85rem;cursor:pointer;">🏗️ Choisir pour mon chantier</button>'
     + '</div>'
     + '</div>';
+}
+
+// Bouton "Choisir pour mon chantier" (cartes fournisseurs #construire) —
+// dépose le fournisseur visé dans sessionStorage puis redirige vers
+// #espace. Redirection via location.hash (JAMAIS navigate()) pour que le
+// listener 'hashchange' déclenche bien _espaceInit() → _espaceRestaurerSession()
+// (session persistante 30 jours) avant d'afficher quoi que ce soit — cf.
+// le correctif appliqué précédemment sur les boutons "Espace Pro" de la
+// navbar. Le comportement est identique qu'une session client existe déjà
+// ou non : c'est _espaceCliGererDeclarationEnAttente() (dans le tableau de
+// bord client) qui décide quoi faire du flag, une fois #espace chargé.
+function declarerFournisseurDepuisVitrine(fournisseurId) {
+  try { sessionStorage.setItem('fournisseur_a_declarer', fournisseurId); } catch (e) {}
+  location.hash = 'espace';
 }
 
 async function _pcChargerFournisseurs() {
