@@ -2933,16 +2933,56 @@ if (typeof connexionPrestataire === 'undefined') {
 
     <div class="esp-tabbar" style="--esp-accent:#7C3AED;">
       <button class="esp-tab active" data-esp-tab="sup" data-esp-tab-id="chantiers" onclick="_espaceBasculerOnglet('sup','chantiers')"><i class="fa-solid fa-building"></i>Mes chantiers</button>
-      <button class="esp-tab" data-esp-tab="sup" data-esp-tab-id="transactions" onclick="_espaceBasculerOnglet('sup','transactions')"><i class="fa-solid fa-clock-rotate-left"></i>Transactions</button>
+      <button class="esp-tab" data-esp-tab="sup" data-esp-tab-id="sorties" onclick="_espaceBasculerOnglet('sup','sorties')"><i class="fa-solid fa-truck-fast"></i>Sorties matériaux</button>
+      <button class="esp-tab" data-esp-tab="sup" data-esp-tab-id="registre" onclick="_espaceBasculerOnglet('sup','registre')"><i class="fa-solid fa-clock-rotate-left"></i>Registre</button>
+      <button class="esp-tab" data-esp-tab="sup" data-esp-tab-id="rapports" onclick="_espaceBasculerOnglet('sup','rapports')"><i class="fa-solid fa-file-lines"></i>Rapports</button>
     </div>
 
     <div class="esp-panel" data-esp-panel="sup" data-esp-panel-id="chantiers" style="display:block;">
       <div id="espaceSupChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
     </div>
 
-    <div class="esp-panel" data-esp-panel="sup" data-esp-panel-id="transactions" style="display:none;">
+    <div class="esp-panel" data-esp-panel="sup" data-esp-panel-id="sorties" style="display:none;">
       <div class="esp-card">
+        <div style="font-size:14px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:14px;"><i class="fa-solid fa-truck-fast" style="color:#7C3AED;margin-right:8px;"></i>Déclarer une sortie de matériaux</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <select id="espaceSupSortieChantier" onchange="_espaceSupChargerComptesSortie()" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;"><option value="">Chargement...</option></select>
+          <select id="espaceSupSortieCompte" onchange="_espaceSupAfficherSoldeSortie()" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;"><option value="">— Choisir un chantier d'abord —</option></select>
+          <div id="espaceSupSortieSoldeInfo" style="font-size:12px;font-weight:700;color:#6B7280;"></div>
+          <input id="espaceSupSortieMateriau" type="text" placeholder="Matériau *" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
+          <div style="display:flex;gap:8px;">
+            <input id="espaceSupSortieQuantite" type="number" min="1" placeholder="Quantité *" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
+            <select id="espaceSupSortieUnite" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;">
+              <option value="">Unité *</option>
+              <option value="sacs">Sacs</option>
+              <option value="kg">Kg</option>
+              <option value="m²">M²</option>
+              <option value="m³">M³</option>
+              <option value="tonnes">Tonnes</option>
+              <option value="unités">Unités</option>
+              <option value="litres">Litres</option>
+            </select>
+          </div>
+          <input id="espaceSupSortieMontant" type="number" min="1" placeholder="Montant estimé (GNF) *" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
+          <textarea id="espaceSupSortieDescription" rows="2" placeholder="Description (optionnel)" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
+          <div id="espaceSupSortieErreur" style="display:none;color:#DC2626;font-size:12px;"></div>
+          <button id="espaceSupSortieBtn" onclick="_espaceSupDeclarerSortie()" style="background:#7C3AED;color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;">Déclarer la sortie</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="esp-panel" data-esp-panel="sup" data-esp-panel-id="registre" style="display:none;">
+      <div class="esp-card">
+        <select id="espaceSupRegistreFiltreChantier" onchange="_espaceSupFiltrerRegistre()" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;margin-bottom:14px;"><option value="">Tous les chantiers</option></select>
         <div id="espaceSupTransactionsGlobal"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+      </div>
+    </div>
+
+    <div class="esp-panel" data-esp-panel="sup" data-esp-panel-id="rapports" style="display:none;">
+      <div class="esp-card" style="text-align:center;padding:32px 20px;">
+        <i class="fa-solid fa-file-circle-plus" style="font-size:28px;color:#D1D5DB;display:block;margin-bottom:12px;"></i>
+        <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:6px;">Fonctionnalité bientôt disponible</div>
+        <div style="font-size:12.5px;color:#6B7280;">Les rapports de fin de chantier avec photos arrivent prochainement.</div>
       </div>
     </div>
   </div>
@@ -3887,14 +3927,25 @@ async function _espaceConfirmerRejetVersement(transactionId) {
 // TABLEAU DE BORD SUPERVISEUR — cartes uniquement, formulaire de demande de
 // sortie inline (accordéon par carte, pas de modale ni de zone partagée).
 // ─────────────────────────────────────────────────────────────────────────
+let _espaceSupChantiersCache = [];
+
 async function _espaceChargerSuperviseur() {
   const zone = document.getElementById('espaceSupChantiers');
   try {
+    // clients(...,telephone) et comptes_materiaux(id,solde_gnf,
+    // fournisseurs_materiaux(nom_entreprise,telephone)) ajoutés à l'embed
+    // pour la nouvelle section dépliable "Fournisseurs & Soldes" et
+    // l'affichage du téléphone client — même requête groupée, pas de
+    // requête supplémentaire.
     const { data: chantiers, error } = await sb.from('chantiers')
-      .select('id,nom,statut,date_debut,clients(nom,prenom),comptes_materiaux(solde_gnf)')
+      .select('id,nom,statut,date_debut,clients(nom,prenom,telephone),comptes_materiaux(id,solde_gnf,fournisseurs_materiaux(nom_entreprise,telephone))')
       .eq('superviseur_id', _espaceSession.id)
-      .order('created_at', { ascending: false });
+      .order('date_debut', { ascending: false });
     if (error) throw error;
+
+    _espaceSupChantiersCache = chantiers || [];
+    _espaceSupInitFormSortie();
+    _espaceSupInitFiltreRegistre();
 
     document.getElementById('espaceSupNbChantiers').textContent = (chantiers || []).length;
     const soldeGlobal = (chantiers || []).reduce((s, c) => s + (c.comptes_materiaux || []).reduce((s2, cm) => s2 + Number(cm.solde_gnf || 0), 0), 0);
@@ -3902,6 +3953,7 @@ async function _espaceChargerSuperviseur() {
 
     if (!chantiers || !chantiers.length) {
       zone.innerHTML = '<div style="background:#fff;border-radius:18px;padding:24px;text-align:center;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-building" style="font-size:22px;display:block;margin-bottom:8px;color:#D1D5DB;"></i>Aucun chantier assigné pour le moment.</div>';
+      _espaceSuperviseurChargerTransactionsGlobal([], {});
       return;
     }
 
@@ -3929,11 +3981,23 @@ async function _espaceChargerSuperviseur() {
     zone.innerHTML = chantiers.map(c => {
       const sc = _rcStatutChantierConfig(c.statut);
       const client = c.clients ? ((c.clients.prenom ? c.clients.prenom + ' ' : '') + c.clients.nom) : '—';
-      const nbFournisseurs = (c.comptes_materiaux || []).length;
-      const soldeTotal = (c.comptes_materiaux || []).reduce((s, cm) => s + Number(cm.solde_gnf || 0), 0);
+      const clientTel = c.clients?.telephone || '';
+      const comptes = c.comptes_materiaux || [];
+      const soldeTotal = comptes.reduce((s, cm) => s + Number(cm.solde_gnf || 0), 0);
       const dateDebut = c.date_debut ? new Date(c.date_debut).toLocaleDateString('fr-FR') : '—';
       const totalVerseChantierSup = totalVerseParChantierSup[c.id] || 0;
       const commissionSup = _commissionCalculer(totalVerseChantierSup, commissionParChantierSup[c.id] || null);
+
+      const fournisseursHtml = comptes.length ? comptes.map(cm => `
+        <div class="esp-row">
+          <div>
+            <div style="color:#374151;font-weight:700;">${cm.fournisseurs_materiaux?.nom_entreprise || '—'}</div>
+            <div style="font-size:11px;color:#9CA3AF;">${cm.fournisseurs_materiaux?.telephone || ''}</div>
+          </div>
+          <span style="font-weight:700;color:${Number(cm.solde_gnf || 0) > 0 ? '#059669' : '#9CA3AF'};">${_espaceFormatGNF(cm.solde_gnf)}</span>
+        </div>
+      `).join('') : '<div style="color:#9CA3AF;font-size:12px;">Aucun fournisseur déclaré.</div>';
+
       return `<div style="background:#fff;border-radius:18px;padding:20px;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;">
           <div>
@@ -3945,89 +4009,201 @@ async function _espaceChargerSuperviseur() {
             <div style="font-size:10.5px;color:#9CA3AF;">solde total</div>
           </div>
         </div>
-        <div style="font-size:12.5px;color:#6B7280;margin-bottom:16px;"><i class="fa-solid fa-user" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Client : ${client} · <i class="fa-solid fa-truck" style="width:14px;color:#9CA3AF;margin-left:6px;margin-right:4px;"></i>${nbFournisseurs} fournisseur${nbFournisseurs > 1 ? 's' : ''}</div>
+        <div style="font-size:12.5px;color:#6B7280;margin-bottom:2px;"><i class="fa-solid fa-user" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Client : ${client}${clientTel ? ' · ' + clientTel : ''}</div>
+        <div style="font-size:12.5px;color:#6B7280;margin-bottom:14px;"><i class="fa-solid fa-calendar" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Début : ${dateDebut}</div>
 
-        <div style="background:${commissionSup.bg};border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+        <button onclick="_espaceSupBasculerFournisseurs('${c.id}')" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:#F9FAFB;border:1.5px solid #F0F0F8;border-radius:10px;padding:11px 14px;font-size:12.5px;font-weight:700;color:#374151;cursor:pointer;margin-bottom:10px;">
+          <span><i class="fa-solid fa-truck" style="color:#7C3AED;margin-right:8px;"></i>Fournisseurs &amp; Soldes (${comptes.length})</span>
+          <i class="fa-solid fa-chevron-down" id="espaceSupFournisseursChevron-${c.id}"></i>
+        </button>
+        <div id="espaceSupFournisseurs-${c.id}" style="display:none;margin-bottom:14px;">
+          ${fournisseursHtml}
+        </div>
+
+        <div style="background:${commissionSup.bg};border-radius:10px;padding:12px 14px;">
           <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">💰 Commission YOUMMA (lecture seule)</div>
           <div style="font-size:12px;color:#374151;margin-bottom:2px;">Total versé : <strong>${_espaceFormatGNF(totalVerseChantierSup)}</strong> · Commission (${commissionSup.taux}%) : <strong style="color:${commissionSup.color};">${_espaceFormatGNF(commissionSup.montant)}</strong></div>
           <div style="font-size:12px;font-weight:700;color:${commissionSup.color};margin-top:4px;">${commissionSup.label}</div>
         </div>
-
-        <button onclick="_espaceBasculerFormulaireSortie('${c.id}')" style="width:100%;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;"><i class="fa-solid fa-truck-fast" style="margin-right:8px;"></i>Demander une sortie de matériaux</button>
-
-        <div id="espaceSupForm-${c.id}" style="display:none;background:#F9FAFB;border-radius:12px;padding:14px;margin-bottom:14px;">
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            <select id="espaceSupFournisseur-${c.id}" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;"><option value="">Chargement...</option></select>
-            <input id="espaceSupMateriau-${c.id}" type="text" placeholder="Matériau *" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
-            <div style="display:flex;gap:8px;">
-              <input id="espaceSupQuantite-${c.id}" type="number" min="1" placeholder="Quantité *" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
-              <select id="espaceSupUnite-${c.id}" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;">
-                <option value="">Unité *</option>
-                <option value="sacs">Sacs</option>
-                <option value="kg">Kg</option>
-                <option value="m²">M²</option>
-                <option value="m³">M³</option>
-                <option value="tonnes">Tonnes</option>
-                <option value="unités">Unités</option>
-                <option value="litres">Litres</option>
-              </select>
-            </div>
-            <input id="espaceSupMontant-${c.id}" type="number" min="1" placeholder="Montant estimé (GNF) *" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
-            <textarea id="espaceSupDescription-${c.id}" rows="2" placeholder="Description" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
-            <div id="espaceSupErreur-${c.id}" style="display:none;color:#DC2626;font-size:12px;"></div>
-            <button onclick="_espaceSauvegarderDemandeSortie('${c.id}')" style="background:#7C3AED;color:#fff;border:none;border-radius:8px;padding:10px;font-size:12.5px;font-weight:700;cursor:pointer;">Envoyer la demande</button>
-          </div>
-        </div>
-
-        <div style="border-top:1px solid #F0F0F8;padding-top:14px;">
-          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;"><i class="fa-solid fa-clock-rotate-left" style="margin-right:6px;"></i>Dernières transactions</div>
-          <div id="espaceSupHisto-${c.id}"><div style="color:#9CA3AF;font-size:12px;">Chargement...</div></div>
-          <button onclick="_espaceVoirToutesTransactionsChantier('${c.id}')" id="espaceSupVoirTout-${c.id}" style="background:none;border:none;color:#2563EB;font-size:11.5px;font-weight:700;cursor:pointer;padding:0;margin-top:8px;">Voir tout l'historique</button>
-        </div>
       </div>`;
     }).join('');
 
-    chantiers.forEach(c => _espaceChargerSelectFournisseur(c.id));
-    chantiers.forEach(c => _espaceChargerHistoriqueChantier(c.id, 5));
-
     const nomsParId = {}; chantiers.forEach(c => { nomsParId[c.id] = c.nom; });
-    _espaceSuperviseurChargerTransactionsGlobal(chantiers.map(c => c.id), nomsParId);
+    _espaceSuperviseurChargerTransactionsGlobal(chantierIdsSup, nomsParId);
   } catch (e) {
     zone.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
   }
 }
 
-// Onglet "Transactions" — historique complet agrégé de tous les chantiers
-// du superviseur (l'onglet "Mes chantiers" garde ses 5 dernières lignes
-// par chantier + "Voir tout l'historique" individuel, sans changement).
+function _espaceSupBasculerFournisseurs(chantierId) {
+  const el = document.getElementById('espaceSupFournisseurs-' + chantierId);
+  const chevron = document.getElementById('espaceSupFournisseursChevron-' + chantierId);
+  if (!el) return;
+  const ouverture = (el.style.display === 'none' || !el.style.display);
+  el.style.display = ouverture ? 'block' : 'none';
+  if (chevron) chevron.style.transform = ouverture ? 'rotate(180deg)' : '';
+}
+
+// ── Onglet "Sorties matériaux" — formulaire dédié (remplace l'ancien
+// formulaire inline par carte chantier). Insert seul, append-only,
+// type_operation='sortie_demandee' : c'est le fournisseur qui valide/rejette
+// ensuite depuis son propre tableau de bord — jamais de solde décrémenté
+// directement ici. Le trigger fn_gerer_solde_registre gère solde_reserve à
+// la demande puis solde_gnf à la confirmation.
+function _espaceSupInitFormSortie() {
+  const sel = document.getElementById('espaceSupSortieChantier');
+  if (!sel) return;
+  sel.innerHTML = _espaceSupChantiersCache.length
+    ? '<option value="">— Sélectionner —</option>' + _espaceSupChantiersCache.map(c => `<option value="${c.id}">${c.nom}</option>`).join('')
+    : '<option value="">Aucun chantier</option>';
+  const selCompte = document.getElementById('espaceSupSortieCompte');
+  if (selCompte) selCompte.innerHTML = '<option value="">— Choisir un chantier d\'abord —</option>';
+  const info = document.getElementById('espaceSupSortieSoldeInfo');
+  if (info) info.textContent = '';
+}
+
+let _espaceSupComptesSortieCache = [];
+
+async function _espaceSupChargerComptesSortie() {
+  const chantierId = document.getElementById('espaceSupSortieChantier').value;
+  const sel = document.getElementById('espaceSupSortieCompte');
+  const info = document.getElementById('espaceSupSortieSoldeInfo');
+  if (info) info.textContent = '';
+  if (!chantierId) { sel.innerHTML = '<option value="">— Choisir un chantier d\'abord —</option>'; return; }
+  sel.innerHTML = '<option value="">Chargement...</option>';
+  try {
+    const { data, error } = await sb.from('comptes_materiaux').select('id,solde_gnf,solde_reserve,fournisseurs_materiaux(nom_entreprise)').eq('chantier_id', chantierId);
+    if (error) throw error;
+    _espaceSupComptesSortieCache = data || [];
+    sel.innerHTML = _espaceSupComptesSortieCache.length
+      ? '<option value="">— Sélectionner un fournisseur —</option>' + _espaceSupComptesSortieCache.map(c => `<option value="${c.id}">${c.fournisseurs_materiaux?.nom_entreprise || '—'}</option>`).join('')
+      : '<option value="">Aucun fournisseur sur ce chantier</option>';
+  } catch (e) {
+    sel.innerHTML = '<option value="">Erreur de chargement</option>';
+  }
+}
+
+// "Solde disponible" = solde_gnf - solde_reserve (jamais solde_gnf seul) :
+// une sortie déjà demandée mais pas encore confirmée réserve déjà une
+// partie du solde — même calcul que le message d'erreur du trigger
+// ("Solde disponible insuffisant").
+function _espaceSupAfficherSoldeSortie() {
+  const compteId = document.getElementById('espaceSupSortieCompte').value;
+  const info = document.getElementById('espaceSupSortieSoldeInfo');
+  if (!info) return;
+  const compte = _espaceSupComptesSortieCache.find(c => c.id === compteId);
+  if (!compte) { info.textContent = ''; return; }
+  const disponible = Number(compte.solde_gnf || 0) - Number(compte.solde_reserve || 0);
+  info.textContent = 'Solde disponible : ' + _espaceFormatGNF(disponible);
+  info.style.color = disponible > 0 ? '#059669' : '#9CA3AF';
+}
+
+async function _espaceSupDeclarerSortie() {
+  const chantierId = document.getElementById('espaceSupSortieChantier').value;
+  const compteId = document.getElementById('espaceSupSortieCompte').value;
+  const materiau = document.getElementById('espaceSupSortieMateriau').value.trim();
+  const quantite = parseInt(document.getElementById('espaceSupSortieQuantite').value, 10);
+  const unite = document.getElementById('espaceSupSortieUnite').value.trim();
+  const montant = parseInt(document.getElementById('espaceSupSortieMontant').value, 10);
+  const description = document.getElementById('espaceSupSortieDescription').value.trim();
+  _espaceCacherErreur('espaceSupSortieErreur');
+
+  if (!chantierId) { _espaceAfficherErreur('espaceSupSortieErreur', 'Sélectionnez un chantier.'); return; }
+  if (!compteId) { _espaceAfficherErreur('espaceSupSortieErreur', 'Sélectionnez un fournisseur.'); return; }
+  if (!materiau) { _espaceAfficherErreur('espaceSupSortieErreur', 'Le matériau est obligatoire.'); return; }
+  if (!quantite || quantite <= 0) { _espaceAfficherErreur('espaceSupSortieErreur', 'La quantité doit être un nombre positif.'); return; }
+  if (!unite) { _espaceAfficherErreur('espaceSupSortieErreur', "L'unité est obligatoire."); return; }
+  if (!montant || montant <= 0) { _espaceAfficherErreur('espaceSupSortieErreur', 'Le montant estimé doit être un nombre positif.'); return; }
+
+  const compte = _espaceSupComptesSortieCache.find(c => c.id === compteId);
+  if (compte) {
+    const disponible = Number(compte.solde_gnf || 0) - Number(compte.solde_reserve || 0);
+    if (montant > disponible) { _espaceAfficherErreur('espaceSupSortieErreur', 'Montant supérieur au solde disponible (' + _espaceFormatGNF(disponible) + ').'); return; }
+  }
+
+  const btn = document.getElementById('espaceSupSortieBtn');
+  btn.disabled = true; btn.textContent = 'Envoi...';
+  try {
+    const { error } = await sb.from('registre_transactions').insert({
+      chantier_id: chantierId,
+      compte_id: compteId,
+      type_operation: 'sortie_demandee',
+      montant_gnf: montant,
+      materiau, quantite, unite,
+      description: description || null,
+      superviseur_id: _espaceSession.id
+    });
+    if (error) {
+      const msg = (error.message || '').toLowerCase();
+      const propre = msg.includes('solde disponible insuffisant') ? 'Solde disponible insuffisant sur ce compte.' : ('Erreur : ' + error.message);
+      _espaceAfficherErreur('espaceSupSortieErreur', propre);
+      return;
+    }
+    if (typeof showToast === 'function') showToast('✅ Sortie demandée — en attente de validation du fournisseur', 'success');
+    ['espaceSupSortieMateriau','espaceSupSortieQuantite','espaceSupSortieUnite','espaceSupSortieMontant','espaceSupSortieDescription'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    _espaceSupChargerComptesSortie();
+  } catch (e) {
+    _espaceAfficherErreur('espaceSupSortieErreur', 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Déclarer la sortie';
+  }
+}
+
+// ── Onglet "Registre" — historique complet en lecture seule, agrégé de
+// tous les chantiers du superviseur, avec filtre par chantier (purement
+// côté client : les transactions sont chargées une fois, aucune re-requête
+// Supabase au changement de filtre).
+let _espaceSupTransactionsCache = [];
+let _espaceSupNomsParIdCache = {};
+
+function _espaceSupInitFiltreRegistre() {
+  const sel = document.getElementById('espaceSupRegistreFiltreChantier');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Tous les chantiers</option>' + _espaceSupChantiersCache.map(c => `<option value="${c.id}">${c.nom}</option>`).join('');
+}
+
 async function _espaceSuperviseurChargerTransactionsGlobal(chantierIds, nomsParId) {
   const zone = document.getElementById('espaceSupTransactionsGlobal');
   if (!zone) return;
-  if (!chantierIds.length) { zone.innerHTML = '<div class="esp-empty">Aucune transaction.</div>'; return; }
+  _espaceSupNomsParIdCache = nomsParId;
+  if (!chantierIds.length) { _espaceSupTransactionsCache = []; _espaceSupRenderRegistre(''); return; }
   try {
     const { data, error } = await sb.from('registre_transactions')
       .select('*, comptes_materiaux(fournisseurs_materiaux(nom_entreprise))')
       .in('chantier_id', chantierIds)
       .order('created_at', { ascending: false });
     if (error) throw error;
-    if (!data || !data.length) { zone.innerHTML = '<div class="esp-empty">Aucune transaction.</div>'; return; }
-    zone.innerHTML = data.map(t => {
-      const sc = _rcStatutConfig(t.type_operation);
-      const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-      const acteur = t.client_id ? 'Client' : t.superviseur_id ? 'Superviseur' : t.fournisseur_id ? 'Fournisseur' : '—';
-      const fournisseur = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || '—';
-      const chantierNom = nomsParId[t.chantier_id] || '—';
-      return `<div class="esp-row" style="flex-wrap:wrap;">
-        <span class="esp-badge" style="background:${sc.bg};color:${sc.color};">${sc.label}</span>
-        <span style="color:#374151;font-weight:700;">${chantierNom}</span>
-        <span style="color:#6B7280;">${fournisseur} · ${acteur}</span>
-        <span style="color:#9CA3AF;">${date}</span>
-        <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
-      </div>`;
-    }).join('');
+    _espaceSupTransactionsCache = data || [];
+    _espaceSupRenderRegistre('');
   } catch (e) {
     zone.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
   }
+}
+
+function _espaceSupFiltrerRegistre() {
+  const chantierId = document.getElementById('espaceSupRegistreFiltreChantier').value;
+  _espaceSupRenderRegistre(chantierId);
+}
+
+function _espaceSupRenderRegistre(filtreChantierId) {
+  const zone = document.getElementById('espaceSupTransactionsGlobal');
+  if (!zone) return;
+  const lignes = filtreChantierId ? _espaceSupTransactionsCache.filter(t => t.chantier_id === filtreChantierId) : _espaceSupTransactionsCache;
+  if (!lignes.length) { zone.innerHTML = '<div class="esp-empty">Aucune transaction.</div>'; return; }
+  zone.innerHTML = lignes.map(t => {
+    const sc = _rcStatutConfig(t.type_operation);
+    const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const acteur = t.client_id ? 'Client' : t.superviseur_id ? 'Superviseur' : t.fournisseur_id ? 'Fournisseur' : '—';
+    const fournisseur = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || '—';
+    const chantierNom = _espaceSupNomsParIdCache[t.chantier_id] || '—';
+    return `<div class="esp-row" style="flex-wrap:wrap;">
+      <span class="esp-badge" style="background:${sc.bg};color:${sc.color};">${sc.label}</span>
+      <span style="color:#374151;font-weight:700;">${chantierNom}</span>
+      <span style="color:#6B7280;">${fournisseur} · ${acteur}</span>
+      <span style="color:#9CA3AF;">${date}</span>
+      <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
+    </div>`;
+  }).join('');
 }
 
 async function _espaceChargerSelectFournisseur(chantierId) {
