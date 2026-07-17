@@ -2767,11 +2767,13 @@ if (typeof connexionPrestataire === 'undefined') {
   <!-- Tableau de bord FOURNISSEUR -->
   <div id="espaceDashFournisseur" style="display:none;width:100%;max-width:820px;">
     <div class="esp-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
-      <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+      <div style="display:flex;align-items:flex-start;gap:12px;min-width:0;">
         <div id="espaceFourAvatar" class="esp-avatar" style="background:#059669;"></div>
         <div style="min-width:0;">
+          <img src="data:image/png;base64,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" alt="YOUMMA JOBS" style="width:18px;height:18px;object-fit:contain;border-radius:5px;display:block;margin-bottom:5px;"/>
           <div style="font-size:16px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Bonjour, <span id="espaceFourPrenom"></span> 👋</div>
-          <div style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.04em;">Fournisseur YOUMMA JOBS</div>
+          <div style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.04em;margin-top:1px;">Fournisseur YOUMMA JOBS</div>
+          <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;line-height:1.35;">Vous êtes connecté à votre espace professionnel YOUMMA JOBS</div>
         </div>
       </div>
       <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Sortir</button>
@@ -2800,20 +2802,35 @@ if (typeof connexionPrestataire === 'undefined') {
     </div>
 
     <div class="esp-panel" data-esp-panel="four" data-esp-panel-id="profil" style="display:none;">
-      <div class="esp-card">
-        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
-            <div id="espaceFourProfilPhotoApercu" style="width:80px;height:80px;border-radius:16px;background:#F4F6FB;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#9CA3AF;font-size:24px;flex-shrink:0;"><i class="fa-solid fa-image"></i></div>
-            <label style="font-size:11px;font-weight:700;color:#2563EB;cursor:pointer;">
-              Changer la photo
+      <div class="esp-card" style="padding:0;overflow:hidden;">
+
+        <!-- Couverture — dégradé YOUMMA en fallback si aucune photo -->
+        <div style="position:relative;width:100%;aspect-ratio:3/1;background:linear-gradient(135deg,#E85D04,#1A1A4E);">
+          <div id="espaceFourCouvertureApercu" style="position:absolute;inset:0;"></div>
+          <label style="position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+            <i class="fa-solid fa-camera" style="font-size:12px;"></i>
+            <input type="file" accept="image/*" id="espaceFourCouvertureInput" style="display:none;" onchange="_espaceFournisseurChangerCouverture(this)"/>
+          </label>
+
+          <!-- Avatar superposé, en bas de la couverture -->
+          <div style="position:absolute;left:20px;bottom:-32px;width:74px;height:74px;">
+            <div id="espaceFourProfilPhotoApercu" style="width:74px;height:74px;border-radius:50%;background:#F4F6FB;border:4px solid #fff;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#9CA3AF;font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,.15);"><i class="fa-solid fa-image"></i></div>
+            <label style="position:absolute;bottom:-2px;right:-2px;width:23px;height:23px;border-radius:50%;background:#E85D04;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #fff;">
+              <i class="fa-solid fa-camera" style="font-size:9px;"></i>
               <input type="file" accept="image/*" id="espaceFourProfilPhotoInput" style="display:none;" onchange="_espaceFournisseurChangerPhoto(this)"/>
             </label>
           </div>
-          <div style="flex:1;min-width:200px;">
+        </div>
+
+        <div style="padding:42px 20px 20px;">
+          <div style="font-size:17px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:2px;" id="espaceFourProfilNomAffiche"></div>
+          <div style="font-size:12.5px;color:#6B7280;margin-bottom:12px;" id="espaceFourProfilZoneAffiche"></div>
+          <span class="esp-badge" style="background:#F0FDF4;color:#16A34A;display:inline-flex;align-items:center;gap:5px;margin-bottom:20px;">✅ Fournisseur certifié YOUMMA JOBS</span>
+
+          <div style="margin-bottom:18px;">
             <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Description</label>
             <textarea id="espaceFourProfilDescription" rows="3" placeholder="Présentez votre entreprise, vos matériaux, votre zone de livraison..." style="width:100%;box-sizing:border-box;margin-top:6px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
           </div>
-        </div>
 
         <div style="display:flex;gap:12px;margin-bottom:18px;">
           <div style="flex:1;">
@@ -2836,6 +2853,7 @@ if (typeof connexionPrestataire === 'undefined') {
 
         <div id="espaceFourProfilErreur" style="display:none;color:#DC2626;font-size:12.5px;margin-bottom:12px;"></div>
         <button onclick="_espaceFournisseurEnregistrerProfil()" class="esp-btn-block" style="background:#059669;color:#fff;"><i class="fa-solid fa-check"></i>Enregistrer mon profil</button>
+        </div>
       </div>
     </div>
 
@@ -2882,11 +2900,13 @@ if (typeof connexionPrestataire === 'undefined') {
   <!-- Tableau de bord SUPERVISEUR -->
   <div id="espaceDashSuperviseur" style="display:none;width:100%;max-width:820px;">
     <div class="esp-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
-      <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+      <div style="display:flex;align-items:flex-start;gap:12px;min-width:0;">
         <div id="espaceSupAvatar" class="esp-avatar" style="background:#7C3AED;"></div>
         <div style="min-width:0;">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAFnElEQVR42u2YX4xcVR3HP79z7vy5M3t3d2ZntjvbWSndtKTdQrAlKbsIilFpmqghBgjE+EIkIZEHIgYSXkj0xTefTDQEHzBRVIL4P0IkEVOt0gJBrbRAu9At3W6n3e7Mzr177/nxMLPb1uID2+2QmjnJZG5mck7u55zv73e+v5+oqnIVD8NVPvoAfYA+QB+gD9AHuKqHt5ZJquAudCCXmJEPcSciGAERWVcA6bUXimOHMbJuIB/pBJwqRoTD7y7yu78cI+UZXBzjnMMALgqp1yPamiCRSpHwDKiSTVk2lbLcNFWgUAw6aznFGOktgCog8M7cEk8+f4jBlCEKI3Axy9Ummgi4cTLLzaMVtnhz5MwSqnA6DDh0pMSvfz/KeCnP/fdMMVbKEceKtdL7GEgmDLkgRZC2aNjmbC1ievcED249zK7Fp+HUG3C2ClEMAngeZIdpTuzgt83beeSJE9x35xR790wRxw5rTe+DOHYKLuZMHb50S4lvZX5E8pVnaTXBJTKI9WFF56GilRp2/k98ZXgfn959F4691+TcUpN77951WRDeWsmtgaWG8sXpUR633yXc/wKNTBGbAetiwF2cjKyBxBD1ZcfIq0/x/ekqD/xR2Vga5LZbt6w5JtaELSI0miFbtpT45sCPCV97gTgYw4oD5zqBgpw/gW4axTk8ozRToyRefZbv7D7ID58+SHWpjkg3xnoCoDFRMuD+TW/iv/4TotQwJmxAHIKLup8QonZXcw6i7n8INm7SIKD8/i+YGZvnmef+hYjgnOsNQLPt2DqeYbccoC0D2MECms1DMAr+IGRyEGyAXLkzIeHD0Bj4Qx2IoIhNpYnPNbhz5BUOvH6CKIwwxvQGoEWSnfkzJNoniab2wuQMEoxCroxMfw0Gi+AH6HW3w/h29JqdsPF62LEHDYqw/XNIIkV401cpNV5jQBd5++iZroy0BxKyCTZna/DvFxEvCe06JH2oLqA2CcZDaxVYeBsmPgnpwY68whZMzkBzGc1P4DAwXGTczHNsrrZ6wV1xAONZBqUKqkhlFt75Gxq3UevBy09COoBkBmktw1svI/OHURy68CZy9B9oowIqyJE/gycEXpNqLexdGrVGiLGdTHN0P1iLHH8DpLsfb+1DrAenZqGcAz+JvD8LmTQMekj8H3Bt8C2cPU1s9+DZHtjplaQ4nLEsmhFIpjuSEQteRzoYDxKp89+xQTbkIZWBhkPG8pBIw0AAfgpKZSpNn8KIv5qirxxAd/Fri0lO2jIMjGOiVodMtWuj9eLnbBI9XgFPwBr0vQost6AdYc+cJYpHmI/zXLc5t3pdXDEJiXQcaWkkRZTdwLHcp/jEiUOEkkE0utRvJCzU21CpXbgAGME5Q8qrcXBhK+l8kWIxWNNt/NGDWDtiunVqmN/IHsyGMnGrcV7/F/tvWKh2Xnxla42AsbhwGSlv46fHd/DlOyZ7V1IaIzhVZqbyLAeT7B9/kEy6TRQ5+LCLyPuv34wlbLbIFH2eb99NsjDBzM3X9tgLIagKD+yd4Of1z3Bo+yNk/CZxs4ET2zkN6foh7e6+WByWuF4lW0yyr/AQv5zdzKPfmMY5Za0F2ppLSlVFRJibX+J7PzvC59N/5QuLT8HJw0RtiEwSFQPa8U6ehni+gfINPNO6ixfnNvHtR29jrJRbXavnNfFKiVmrNfjBr47RmJ/ls6n9XN/6O0HjPYjrXRkNsOhfwwHdyR/mt5EbG+fhr+/Cz/qXXVpedlF/4e7980iFlw6epnKqQrpVwXc11Ck151M3QxQKQ9xxy0amto1dMvdj7Uqodl5mZSfb7ZCTlRbnaiGoMjTgMV7w8ZKJVb8jIqxHY2Jd2ypOFdWO1fhfLRUxglnH3tAV6wup6mpFKax/Q+tja2z1e6N9gD5AH6AP0AfoA/w/AXwAjTBZvRzzaNUAAAAASUVORK5CYII=" alt="YOUMMA JOBS" style="width:18px;height:18px;object-fit:contain;border-radius:5px;display:block;margin-bottom:5px;"/>
           <div style="font-size:16px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Bonjour, <span id="espaceSupPrenom"></span> 👋</div>
-          <div style="font-size:11px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:.04em;">Superviseur YOUMMA JOBS</div>
+          <div style="font-size:11px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:.04em;margin-top:1px;">Superviseur YOUMMA JOBS</div>
+          <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;line-height:1.35;">Vous êtes connecté à votre espace professionnel YOUMMA JOBS</div>
         </div>
       </div>
       <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Sortir</button>
@@ -2922,11 +2942,13 @@ if (typeof connexionPrestataire === 'undefined') {
   <!-- Tableau de bord CLIENT (lecture seule) -->
   <div id="espaceDashClient" style="display:none;width:100%;max-width:820px;">
     <div class="esp-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
-      <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+      <div style="display:flex;align-items:flex-start;gap:12px;min-width:0;">
         <div id="espaceCliAvatar" class="esp-avatar" style="background:#2563EB;"></div>
         <div style="min-width:0;">
+          <img src="data:image/png;base64,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" alt="YOUMMA JOBS" style="width:18px;height:18px;object-fit:contain;border-radius:5px;display:block;margin-bottom:5px;"/>
           <div style="font-size:16px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Bonjour, <span id="espaceCliPrenom"></span> 👋</div>
-          <div style="font-size:11px;font-weight:700;color:#2563EB;text-transform:uppercase;letter-spacing:.04em;">Espace client YOUMMA JOBS</div>
+          <div style="font-size:11px;font-weight:700;color:#2563EB;text-transform:uppercase;letter-spacing:.04em;margin-top:1px;">Espace client YOUMMA JOBS</div>
+          <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;line-height:1.35;">Vous êtes connecté à votre espace professionnel YOUMMA JOBS</div>
         </div>
       </div>
       <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Sortir</button>
@@ -3475,7 +3497,7 @@ let _espaceFourProduitDispoState = true;
 
 async function _espaceFournisseurChargerProfilEtCatalogue() {
   try {
-    const { data, error } = await sb.from('fournisseurs_materiaux').select('description,photo_url,ville,commune,profil_public').eq('id', _espaceSession.id).single();
+    const { data, error } = await sb.from('fournisseurs_materiaux').select('description,photo_url,photo_couverture_url,ville,commune,profil_public').eq('id', _espaceSession.id).single();
     if (error) throw error;
     const desc = document.getElementById('espaceFourProfilDescription'); if (desc) desc.value = data.description || '';
     const ville = document.getElementById('espaceFourProfilVille'); if (ville) ville.value = data.ville || '';
@@ -3484,8 +3506,13 @@ async function _espaceFournisseurChargerProfilEtCatalogue() {
     _espaceFournisseurRendreToggleProfilPublic();
     const apercu = document.getElementById('espaceFourProfilPhotoApercu');
     if (apercu && data.photo_url) apercu.innerHTML = `<img src="${data.photo_url}" style="width:100%;height:100%;object-fit:cover;"/>`;
+    const couvertureApercu = document.getElementById('espaceFourCouvertureApercu');
+    if (couvertureApercu && data.photo_couverture_url) couvertureApercu.innerHTML = `<img src="${data.photo_couverture_url}" style="width:100%;height:100%;object-fit:cover;"/>`;
+    const nomAffiche = document.getElementById('espaceFourProfilNomAffiche'); if (nomAffiche) nomAffiche.textContent = _espaceSession.nom;
+    const zoneAffiche = document.getElementById('espaceFourProfilZoneAffiche');
+    if (zoneAffiche) zoneAffiche.textContent = [data.ville, data.commune].filter(Boolean).join(' · ') || 'Zone non renseignée';
   } catch (e) {
-    console.warn('[espace] profil fournisseur indisponible (migration 20260716_fournisseur_profil_catalogue.sql pas encore appliquée ?):', e.message);
+    console.warn('[espace] profil fournisseur indisponible (migration 20260716_fournisseur_profil_catalogue.sql / 20260717_fournisseur_photo_couverture.sql pas encore appliquées ?):', e.message);
   }
   _espaceFournisseurChargerCatalogue();
 }
@@ -3520,6 +3547,33 @@ async function _espaceFournisseurChangerPhoto(input) {
     if (typeof showToast === 'function') showToast('✅ Photo mise à jour', 'success');
   } catch (e) {
     if (typeof showToast === 'function') showToast('Erreur upload photo : ' + e.message, 'error'); else window.alert('Erreur upload photo : ' + e.message);
+  } finally {
+    input.value = '';
+  }
+}
+
+// Couverture : même bucket/pattern que photo_url, colonne
+// photo_couverture_url distincte (20260717_fournisseur_photo_couverture.sql).
+// resizeImage(file, 'couverture') tombe dans la branche générique (max
+// 1200px, ratio conservé) — surtout PAS 'profil', qui force un recadrage
+// carré 400×400 inadapté à un bandeau large 3:1.
+async function _espaceFournisseurChangerCouverture(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const apercu = document.getElementById('espaceFourCouvertureApercu');
+  try {
+    let fileToUpload = file;
+    try { fileToUpload = await resizeImage(file, 'couverture'); } catch (e) { fileToUpload = file; }
+    const filename = `fournisseurs/${_espaceSession.id}/couverture-${Date.now()}.jpg`;
+    const { error: uploadError } = await sb.storage.from('Photos').upload(filename, fileToUpload, { cacheControl: '3600', upsert: false, contentType: 'image/jpeg' });
+    if (uploadError) throw uploadError;
+    const { data: urlData } = sb.storage.from('Photos').getPublicUrl(filename);
+    const { error } = await sb.from('fournisseurs_materiaux').update({ photo_couverture_url: urlData.publicUrl }).eq('id', _espaceSession.id);
+    if (error) throw error;
+    if (apercu) apercu.innerHTML = `<img src="${urlData.publicUrl}" style="width:100%;height:100%;object-fit:cover;"/>`;
+    if (typeof showToast === 'function') showToast('✅ Couverture mise à jour', 'success');
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur upload couverture : ' + e.message, 'error'); else window.alert('Erreur upload couverture : ' + e.message);
   } finally {
     input.value = '';
   }
@@ -11624,11 +11678,22 @@ function _pcFournisseurCardHTML(f) {
       + '</div>'
     : '';
 
-  return '<div class="pc-fournisseur-card" style="padding:22px;">'
+  // Couverture optionnelle (20260717_fournisseur_photo_couverture.sql) —
+  // même ratio 3:1 que dans le tableau de bord fournisseur (#espace). Si
+  // présente, l'avatar chevauche légèrement son bord bas (bordure blanche),
+  // même motif visuel que #espace ; sinon design actuel inchangé.
+  const couvertureHtml = f.photo_couverture_url
+    ? '<img src="' + f.photo_couverture_url + '" loading="lazy" alt="" style="width:100%;aspect-ratio:3/1;object-fit:cover;display:block;"/>'
+    : '';
+  const avatarStyleChevauche = f.photo_couverture_url ? 'margin-top:-40px;border:3px solid #fff;' : '';
+
+  return '<div class="pc-fournisseur-card" style="padding:0;overflow:hidden;">'
+    + couvertureHtml
+    + '<div style="padding:22px;">'
     + '<div onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="cursor:pointer;">'
     + (f.photo_url
-        ? '<img src="' + f.photo_url + '" loading="lazy" alt="' + nom + '" style="width:52px;height:52px;border-radius:14px;object-fit:cover;margin-bottom:14px;display:block;"/>'
-        : '<div style="width:52px;height:52px;border-radius:14px;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-bottom:14px;">' + ini + '</div>')
+        ? '<img src="' + f.photo_url + '" loading="lazy" alt="' + nom + '" style="width:52px;height:52px;border-radius:14px;object-fit:cover;margin-bottom:14px;display:block;' + avatarStyleChevauche + '"/>'
+        : '<div style="width:52px;height:52px;border-radius:14px;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-bottom:14px;' + avatarStyleChevauche + '">' + ini + '</div>')
     + '<div style="font-size:16px;font-weight:700;color:var(--texte);margin-bottom:6px;">' + nom + '</div>'
     + (zone ? '<div style="font-size:12.5px;color:var(--gris);margin-bottom:10px;">📍 ' + zone + '</div>' : '')
     + (desc ? '<div style="font-size:12.5px;color:var(--texte);line-height:1.5;margin-bottom:10px;">' + desc + '</div>' : '')
@@ -11638,6 +11703,7 @@ function _pcFournisseurCardHTML(f) {
     + '<div style="display:flex;gap:8px;margin-top:14px;">'
     +   '<button onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="flex:1;padding:11px;background:var(--bleu);border:none;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;cursor:pointer;">Catalogue complet</button>'
     +   (telWa ? '<a href="https://wa.me/' + telWa + '" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;background:#25D366;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Contacter</a>' : '')
+    + '</div>'
     + '</div>'
     + '</div>';
 }
