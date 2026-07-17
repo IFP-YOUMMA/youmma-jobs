@@ -2779,34 +2779,57 @@ if (typeof connexionPrestataire === 'undefined') {
       <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Sortir</button>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
-      <div class="adm-stat-card" style="border-top:3px solid #059669;">
-        <div class="adm-stat-num" id="espaceFourSoldeTotal">—</div>
-        <div class="adm-stat-label">Solde total disponible</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div class="adm-stat-card" style="border-top:3px solid #7C3AED;">
+        <div class="adm-stat-num" id="espaceFourNbChantiersTotal" style="font-size:20px;">—</div>
+        <div class="adm-stat-label">Chantiers liés</div>
       </div>
       <div class="adm-stat-card" style="border-top:3px solid #E8650A;">
-        <div class="adm-stat-num" id="espaceFourNbChantiers">—</div>
+        <div class="adm-stat-num" id="espaceFourNbChantiers" style="font-size:20px;">—</div>
         <div class="adm-stat-label">Chantiers actifs</div>
+      </div>
+      <div class="adm-stat-card" style="border-top:3px solid #059669;">
+        <div class="adm-stat-num" id="espaceFourSoldeTotal" style="font-size:15px;">—</div>
+        <div class="adm-stat-label">Solde global</div>
       </div>
     </div>
 
     <div class="esp-tabbar" style="--esp-accent:#059669;">
       <button class="esp-tab active" data-esp-tab="four" data-esp-tab-id="chantiers" onclick="_espaceBasculerOnglet('four','chantiers')"><i class="fa-solid fa-building"></i>Mes chantiers</button>
+      <button class="esp-tab" data-esp-tab="four" data-esp-tab-id="versements" onclick="_espaceBasculerOnglet('four','versements')"><i class="fa-solid fa-money-bill-wave"></i>Versements à valider<span id="espaceFourVersementsBadge" style="display:none;background:#DC2626;color:#fff;border-radius:20px;min-width:16px;height:16px;padding:0 5px;font-size:10px;font-weight:800;align-items:center;justify-content:center;margin-left:6px;"></span></button>
+      <button class="esp-tab" data-esp-tab="four" data-esp-tab-id="historique" onclick="_espaceBasculerOnglet('four','historique')"><i class="fa-solid fa-clock-rotate-left"></i>Historique</button>
       <button class="esp-tab" data-esp-tab="four" data-esp-tab-id="profil" onclick="_espaceBasculerOnglet('four','profil')"><i class="fa-solid fa-id-card"></i>Mon profil</button>
       <button class="esp-tab" data-esp-tab="four" data-esp-tab-id="catalogue" onclick="_espaceBasculerOnglet('four','catalogue')"><i class="fa-solid fa-boxes-stacked"></i>Catalogue</button>
     </div>
 
     <div class="esp-panel" data-esp-panel="four" data-esp-panel-id="chantiers" style="display:block;">
       <div id="espaceFourBandeau" style="display:none;background:#FFFBEB;border:1.5px solid #FED7AA;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;font-weight:700;color:#9A3412;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i><span id="espaceFourBandeauTexte"></span></div>
+      <div id="espaceFourChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
 
-      <div id="espaceFourVersementsAttenteZone" style="display:none;margin-bottom:16px;">
-        <div class="esp-card">
-          <div style="font-size:14px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:14px;">💰 Versements à valider</div>
-          <div id="espaceFourVersementsAttente" style="display:flex;flex-direction:column;gap:12px;"></div>
+    <div class="esp-panel" data-esp-panel="four" data-esp-panel-id="versements" style="display:none;">
+      <div class="esp-card">
+        <div style="font-size:14px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:14px;">💰 Versements à valider</div>
+        <div id="espaceFourVersementsAttente" style="display:flex;flex-direction:column;gap:12px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+      </div>
+    </div>
+
+    <div class="esp-panel" data-esp-panel="four" data-esp-panel-id="historique" style="display:none;">
+      <div class="esp-card">
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+          <select id="espaceFourHistoFiltreChantier" onchange="_espaceFourFiltrerHistorique()" style="flex:1;min-width:140px;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;"><option value="">Tous les chantiers</option></select>
+          <select id="espaceFourHistoFiltreType" onchange="_espaceFourFiltrerHistorique()" style="flex:1;min-width:120px;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;">
+            <option value="">Tous types</option>
+            <option value="versement">Versements</option>
+            <option value="sortie">Sorties</option>
+          </select>
+        </div>
+        <div id="espaceFourHistoriqueListe"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+        <div style="border-top:1px solid #F0F0F8;margin-top:14px;padding-top:14px;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;">
+          <span style="color:#6B7280;">Total filtré</span>
+          <span id="espaceFourHistoTotalFiltre" style="color:#1A1A4E;font-size:15px;">0 GNF</span>
         </div>
       </div>
-
-      <div id="espaceFourChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
     </div>
 
     <div class="esp-panel" data-esp-panel="four" data-esp-panel-id="profil" style="display:none;">
@@ -2833,7 +2856,20 @@ if (typeof connexionPrestataire === 'undefined') {
         <div style="padding:42px 20px 20px;">
           <div style="font-size:17px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:2px;" id="espaceFourProfilNomAffiche"></div>
           <div style="font-size:12.5px;color:#6B7280;margin-bottom:12px;" id="espaceFourProfilZoneAffiche"></div>
-          <span class="esp-badge" style="background:#F0FDF4;color:#16A34A;display:inline-flex;align-items:center;gap:5px;margin-bottom:20px;">✅ Fournisseur certifié YOUMMA JOBS</span>
+          <span class="esp-badge" style="background:#F0FDF4;color:#16A34A;display:inline-flex;align-items:center;gap:5px;margin-bottom:16px;">✅ Fournisseur certifié YOUMMA JOBS</span>
+
+          <div id="espaceFourAbonnementInfo" style="margin-bottom:20px;"></div>
+
+          <div style="display:flex;gap:12px;margin-bottom:18px;">
+            <div style="flex:1;">
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Nom de l'entreprise</label>
+              <input id="espaceFourProfilNomEntreprise" type="text" style="width:100%;box-sizing:border-box;margin-top:6px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;"/>
+            </div>
+            <div style="flex:1;">
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Téléphone</label>
+              <input id="espaceFourProfilTelephone" type="tel" style="width:100%;box-sizing:border-box;margin-top:6px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;"/>
+            </div>
+          </div>
 
           <div style="margin-bottom:18px;">
             <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Description</label>
@@ -3464,7 +3500,7 @@ async function _espaceChargerFournisseur() {
 
   try {
     const { data: comptes, error } = await sb.from('comptes_materiaux')
-      .select('id,solde_gnf,solde_reserve,chantiers(id,nom,statut)')
+      .select('id,solde_gnf,solde_reserve,chantiers(id,nom,statut,clients(nom,prenom,telephone))')
       .eq('fournisseur_id', _espaceSession.id);
     if (error) throw error;
 
@@ -3472,10 +3508,15 @@ async function _espaceChargerFournisseur() {
     const nbActifs = (comptes || []).filter(c => c.chantiers?.statut === 'en_cours').length;
     document.getElementById('espaceFourSoldeTotal').textContent = _espaceFormatGNF(soldeTotal);
     document.getElementById('espaceFourNbChantiers').textContent = nbActifs;
+    document.getElementById('espaceFourNbChantiersTotal').textContent = (comptes || []).length;
 
     if (!comptes || !comptes.length) {
       zone.innerHTML = '<div style="background:#fff;border-radius:18px;padding:24px;text-align:center;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-building" style="font-size:22px;display:block;margin-bottom:8px;color:#D1D5DB;"></i>Aucun chantier assigné pour le moment.</div>';
       bandeau.style.display = 'none';
+      const zoneVersVide = document.getElementById('espaceFourVersementsAttente');
+      if (zoneVersVide) zoneVersVide.innerHTML = '<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:14px;text-align:center;font-size:13px;font-weight:700;color:#059669;">✅ Aucun versement en attente</div>';
+      const badgeVide = document.getElementById('espaceFourVersementsBadge'); if (badgeVide) badgeVide.style.display = 'none';
+      _espaceFourInitHistorique([]);
       return;
     }
 
@@ -3510,10 +3551,13 @@ async function _espaceChargerFournisseur() {
       .slice()
       .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-    const zoneVersAttente = document.getElementById('espaceFourVersementsAttenteZone');
     const listeVersAttente = document.getElementById('espaceFourVersementsAttente');
+    const badgeVersAttente = document.getElementById('espaceFourVersementsBadge');
+    if (badgeVersAttente) {
+      if (versementsAttente.length) { badgeVersAttente.textContent = versementsAttente.length; badgeVersAttente.style.display = 'inline-flex'; }
+      else { badgeVersAttente.style.display = 'none'; }
+    }
     if (versementsAttente.length) {
-      zoneVersAttente.style.display = 'block';
       listeVersAttente.innerHTML = versementsAttente.map(t => {
         const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         return `<div style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:14px;">
@@ -3538,11 +3582,25 @@ async function _espaceChargerFournisseur() {
         </div>`;
       }).join('');
     } else {
-      zoneVersAttente.style.display = 'none';
+      listeVersAttente.innerHTML = '<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:14px;text-align:center;font-size:13px;font-weight:700;color:#059669;">✅ Aucun versement en attente</div>';
     }
+
+    // Total reçu par compte (versement_valide) pour la barre de progression
+    // "solde utilisé / solde total reçu" — calculé depuis les transactions
+    // déjà chargées ci-dessus, aucune requête supplémentaire.
+    const totalRecuParCompte = {};
+    _espaceFourTransactionsCache.filter(t => t.type_operation === 'versement_valide').forEach(t => {
+      totalRecuParCompte[t.compte_id] = (totalRecuParCompte[t.compte_id] || 0) + Number(t.montant_gnf || 0);
+    });
 
     zone.innerHTML = comptes.map(c => {
       const sc = _rcStatutChantierConfig(c.chantiers?.statut);
+      const client = c.chantiers?.clients ? ((c.chantiers.clients.prenom ? c.chantiers.clients.prenom + ' ' : '') + c.chantiers.clients.nom) : '—';
+      const clientTel = c.chantiers?.clients?.telephone || '';
+      const totalRecu = totalRecuParCompte[c.id] || 0;
+      const soldeActuel = Number(c.solde_gnf || 0);
+      const utilise = Math.max(0, totalRecu - soldeActuel);
+      const pctUtilise = totalRecu > 0 ? Math.min(100, Math.round((utilise / totalRecu) * 100)) : 0;
       const enAttenteCompte = enAttenteTotal.filter(t => t.compte_id === c.id);
       const listeAttente = enAttenteCompte.length ? `
         <div style="border-top:1px solid #F0F0F8;padding-top:14px;margin-top:4px;margin-bottom:14px;">
@@ -3578,7 +3636,17 @@ async function _espaceChargerFournisseur() {
           </div>
           <div style="text-align:right;">
             <div style="font-size:18px;font-weight:800;color:#059669;">${_espaceFormatGNF(c.solde_gnf)}</div>
-            <div style="font-size:10.5px;color:#9CA3AF;">solde de ce compte</div>
+            <div style="font-size:10.5px;color:#9CA3AF;">solde disponible</div>
+          </div>
+        </div>
+        <div style="font-size:12.5px;color:#6B7280;margin-bottom:12px;"><i class="fa-solid fa-user" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Client : ${client}${clientTel ? ' · ' + clientTel : ''}</div>
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;font-size:10.5px;color:#9CA3AF;margin-bottom:4px;">
+            <span>Utilisé : ${_espaceFormatGNF(utilise)}</span>
+            <span>Reçu : ${_espaceFormatGNF(totalRecu)}</span>
+          </div>
+          <div style="background:#F0F0F8;border-radius:20px;height:8px;overflow:hidden;">
+            <div style="width:${pctUtilise}%;height:100%;background:linear-gradient(90deg,#E8650A,#059669);border-radius:20px;"></div>
           </div>
         </div>
         ${listeAttente}
@@ -3586,6 +3654,8 @@ async function _espaceChargerFournisseur() {
         <div id="espaceFourHistoCompte-${c.id}" style="display:none;margin-top:10px;max-height:220px;overflow-y:auto;"></div>
       </div>`;
     }).join('');
+
+    _espaceFourInitHistorique(comptes);
   } catch (e) {
     zone.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
   }
@@ -3609,6 +3679,60 @@ function _espaceBasculerHistoriqueCompte(compteId) {
   }).join('');
 }
 
+// ── Onglet "Historique" — toutes les transactions du fournisseur, avec
+// filtre chantier + type, purement côté client (_espaceFourTransactionsCache
+// déjà chargée dans _espaceChargerFournisseur(), aucune requête
+// supplémentaire au changement de filtre).
+function _espaceFourInitHistorique(comptes) {
+  const sel = document.getElementById('espaceFourHistoFiltreChantier');
+  if (!sel) return;
+  const vus = new Set();
+  const chantiersUniques = [];
+  (comptes || []).forEach(c => { if (c.chantiers && !vus.has(c.chantiers.id)) { vus.add(c.chantiers.id); chantiersUniques.push(c.chantiers); } });
+  sel.innerHTML = '<option value="">Tous les chantiers</option>' + chantiersUniques.map(c => `<option value="${c.id}">${c.nom}</option>`).join('');
+  _espaceFourRenderHistorique();
+}
+
+function _espaceFourFiltrerHistorique() {
+  _espaceFourRenderHistorique();
+}
+
+function _espaceFourRenderHistorique() {
+  const zone = document.getElementById('espaceFourHistoriqueListe');
+  const totalEl = document.getElementById('espaceFourHistoTotalFiltre');
+  if (!zone) return;
+  const chantierId = document.getElementById('espaceFourHistoFiltreChantier')?.value || '';
+  const type = document.getElementById('espaceFourHistoFiltreType')?.value || '';
+
+  let lignes = _espaceFourTransactionsCache.slice();
+  if (chantierId) lignes = lignes.filter(t => t.chantier_id === chantierId);
+  if (type === 'versement') lignes = lignes.filter(t => String(t.type_operation).startsWith('versement'));
+  else if (type === 'sortie') lignes = lignes.filter(t => String(t.type_operation).includes('sortie'));
+
+  if (!lignes.length) {
+    zone.innerHTML = '<div class="esp-empty">Aucune transaction.</div>';
+    if (totalEl) totalEl.textContent = _espaceFormatGNF(0);
+    return;
+  }
+
+  zone.innerHTML = lignes.map(t => {
+    const sc = _rcStatutConfig(t.type_operation);
+    const typeLabel = String(t.type_operation).startsWith('versement') ? '💰 Versement' : '📦 Sortie';
+    const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const chantierNom = t.chantiers?.nom || '—';
+    return `<div class="esp-row" style="flex-wrap:wrap;">
+      <span style="color:#374151;font-weight:700;">${chantierNom}</span>
+      <span style="color:#6B7280;">${typeLabel}</span>
+      <span style="color:#9CA3AF;">${date}</span>
+      <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
+      <span class="esp-badge" style="background:${sc.bg};color:${sc.color};">${sc.label}</span>
+    </div>`;
+  }).join('');
+
+  const total = lignes.reduce((s, t) => s + Number(t.montant_gnf || 0), 0);
+  if (totalEl) totalEl.textContent = _espaceFormatGNF(total);
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // MON PROFIL PUBLIC (fournisseur) — description/photo/ville/commune/
 // profil_public + catalogue_produits. Colonnes ajoutées par
@@ -3621,8 +3745,10 @@ let _espaceFourProduitDispoState = true;
 
 async function _espaceFournisseurChargerProfilEtCatalogue() {
   try {
-    const { data, error } = await sb.from('fournisseurs_materiaux').select('description,photo_url,photo_couverture_url,ville,commune,profil_public').eq('id', _espaceSession.id).single();
+    const { data, error } = await sb.from('fournisseurs_materiaux').select('nom_entreprise,telephone,statut,abonnement_fin,description,photo_url,photo_couverture_url,ville,commune,profil_public').eq('id', _espaceSession.id).single();
     if (error) throw error;
+    const nomEntreprise = document.getElementById('espaceFourProfilNomEntreprise'); if (nomEntreprise) nomEntreprise.value = data.nom_entreprise || '';
+    const telephone = document.getElementById('espaceFourProfilTelephone'); if (telephone) telephone.value = data.telephone || '';
     const desc = document.getElementById('espaceFourProfilDescription'); if (desc) desc.value = data.description || '';
     const ville = document.getElementById('espaceFourProfilVille'); if (ville) ville.value = data.ville || '';
     const commune = document.getElementById('espaceFourProfilCommune'); if (commune) commune.value = data.commune || '';
@@ -3632,9 +3758,24 @@ async function _espaceFournisseurChargerProfilEtCatalogue() {
     if (apercu && data.photo_url) apercu.innerHTML = `<img src="${data.photo_url}" style="width:100%;height:100%;object-fit:cover;"/>`;
     const couvertureApercu = document.getElementById('espaceFourCouvertureApercu');
     if (couvertureApercu && data.photo_couverture_url) couvertureApercu.innerHTML = `<img src="${data.photo_couverture_url}" style="width:100%;height:100%;object-fit:cover;"/>`;
-    const nomAffiche = document.getElementById('espaceFourProfilNomAffiche'); if (nomAffiche) nomAffiche.textContent = _espaceSession.nom;
+    const nomAffiche = document.getElementById('espaceFourProfilNomAffiche'); if (nomAffiche) nomAffiche.textContent = data.nom_entreprise || _espaceSession.nom;
     const zoneAffiche = document.getElementById('espaceFourProfilZoneAffiche');
     if (zoneAffiche) zoneAffiche.textContent = [data.ville, data.commune].filter(Boolean).join(' · ') || 'Zone non renseignée';
+
+    // Statut d'abonnement — badge + lien WhatsApp si non abonné (numéro
+    // YOUMMA JOBS déjà utilisé partout ailleurs sur le site : 22461252510).
+    const abonnementZone = document.getElementById('espaceFourAbonnementInfo');
+    if (abonnementZone) {
+      const abonneOk = data.abonnement_fin && new Date(data.abonnement_fin) > new Date();
+      const dateAbo = data.abonnement_fin ? new Date(data.abonnement_fin).toLocaleDateString('fr-FR') : null;
+      abonnementZone.innerHTML = abonneOk
+        ? `<span class="esp-badge" style="background:#ECFDF5;color:#059669;">✅ Abonné jusqu'au ${dateAbo}</span>`
+        : `<div style="background:#FEF2F2;border:1.5px solid #FECACA;border-radius:10px;padding:12px 14px;">
+            <span class="esp-badge" style="background:#FEE2E2;color:#DC2626;margin-bottom:8px;">❌ Non abonné</span>
+            <div style="font-size:12px;color:#7F1D1D;margin:8px 0 10px;">Contactez YOUMMA JOBS pour activer votre abonnement.</div>
+            <a href="https://wa.me/22461252510?text=Bonjour%20YOUMMA%20JOBS%2C%20je%20veux%20activer%20mon%20abonnement%20fournisseur" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;padding:8px 14px;border-radius:8px;font-weight:700;font-size:12px;text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Contacter sur WhatsApp</a>
+          </div>`;
+    }
   } catch (e) {
     console.warn('[espace] profil fournisseur indisponible (migration 20260716_fournisseur_profil_catalogue.sql / 20260717_fournisseur_photo_couverture.sql pas encore appliquées ?):', e.message);
   }
@@ -3704,19 +3845,35 @@ async function _espaceFournisseurChangerCouverture(input) {
 }
 
 async function _espaceFournisseurEnregistrerProfil() {
+  const nomEntreprise = document.getElementById('espaceFourProfilNomEntreprise').value.trim();
+  const telephone = document.getElementById('espaceFourProfilTelephone').value.trim();
   const description = document.getElementById('espaceFourProfilDescription').value.trim();
   const ville = document.getElementById('espaceFourProfilVille').value.trim();
   const commune = document.getElementById('espaceFourProfilCommune').value.trim();
   _espaceCacherErreur('espaceFourProfilErreur');
+
+  if (!nomEntreprise) { _espaceAfficherErreur('espaceFourProfilErreur', "Le nom de l'entreprise est obligatoire."); return; }
+  if (!_rcTelephoneValide(telephone)) { _espaceAfficherErreur('espaceFourProfilErreur', 'Téléphone au format 224XXXXXXXXX.'); return; }
+
   try {
     const { error } = await sb.from('fournisseurs_materiaux').update({
+      nom_entreprise: nomEntreprise,
+      telephone,
       description: description || null,
       ville: ville || null,
       commune: commune || null,
       profil_public: _espaceFourProfilPublicState
     }).eq('id', _espaceSession.id);
-    if (error) throw error;
-    if (typeof showToast === 'function') showToast('✅ Profil enregistré', 'success');
+    if (error) {
+      if (error.code === '23505') { _espaceAfficherErreur('espaceFourProfilErreur', 'Ce numéro de téléphone est déjà utilisé par un autre fournisseur.'); return; }
+      throw error;
+    }
+    _espaceSession.nom = nomEntreprise;
+    _espaceSession.telephone = telephone;
+    _espaceSauvegarderSessionLocale(_espaceSession);
+    const prenomEl = document.getElementById('espaceFourPrenom'); if (prenomEl) prenomEl.textContent = nomEntreprise;
+    const nomAfficheEl = document.getElementById('espaceFourProfilNomAffiche'); if (nomAfficheEl) nomAfficheEl.textContent = nomEntreprise;
+    if (typeof showToast === 'function') showToast('✅ Profil mis à jour', 'success');
   } catch (e) {
     _espaceAfficherErreur('espaceFourProfilErreur', 'Erreur : ' + e.message);
   }
