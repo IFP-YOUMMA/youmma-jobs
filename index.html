@@ -8129,10 +8129,11 @@ async function chargerAvis() {
                   <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Téléphone</th>
                   <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Statut</th>
                   <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Chantiers assignés</th>
+                  <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Statut terrain</th>
                   <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Actions</th>
                 </tr>
               </thead>
-              <tbody id="rcSuperviseursListe"><tr><td colspan="5" style="text-align:center;padding:30px;color:#9CA3AF;font-size:12px;">Chargement...</td></tr></tbody>
+              <tbody id="rcSuperviseursListe"><tr><td colspan="6" style="text-align:center;padding:30px;color:#9CA3AF;font-size:12px;">Chargement...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -13134,14 +13135,30 @@ async function _rcLoadSuperviseursListe() {
   const tbody = document.getElementById('rcSuperviseursListe');
   if (!tbody) return;
   try {
-    const { data, error } = await sb.from('superviseurs').select('id,nom,telephone,statut,created_at,chantiers(id)').order('nom').limit(300);
+    // Requête unique groupée : chantiers(id,statut) embarqué par superviseur
+    // suffit à la fois pour le compteur "Chantiers assignés" et pour le
+    // badge "Statut terrain" (chantiers.statut === 'en_cours').
+    const { data, error } = await sb.from('superviseurs').select('id,nom,telephone,statut,created_at,chantiers(id,statut)').order('nom').limit(300);
     if (error) throw error;
     _rcSuperviseursCache = data || [];
-    _rcRenderSuperviseursListe(_rcSuperviseursCache);
-    _rcRenderEnAttente('rcSuperviseursEnAttenteZone', 'rcSuperviseursEnAttente', _rcSuperviseursCache, { getNom: s => s.nom, roleLabel: 'Superviseur', validerFn: '_rcValiderInscriptionSuperviseur', refuserFn: '_rcRefuserInscriptionSuperviseur' });
   } catch (e) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:16px;color:#DC2626;font-size:11.5px;">' + _rcMessageRepli(e, 'superviseurs') + '</td></tr>';
+    // Repli : deux requêtes séparées si la relation groupée échoue (ex.
+    // RLS, schéma inattendu) — jamais un tableau vide silencieux si évitable.
+    try {
+      const { data: sups, error: errSup } = await sb.from('superviseurs').select('id,nom,telephone,statut,created_at').order('nom').limit(300);
+      if (errSup) throw errSup;
+      const { data: chants, error: errCh } = await sb.from('chantiers').select('id,statut,superviseur_id').not('superviseur_id', 'is', null);
+      if (errCh) throw errCh;
+      const parSuperviseur = {};
+      (chants || []).forEach(c => { (parSuperviseur[c.superviseur_id] = parSuperviseur[c.superviseur_id] || []).push({ id: c.id, statut: c.statut }); });
+      _rcSuperviseursCache = (sups || []).map(s => Object.assign({}, s, { chantiers: parSuperviseur[s.id] || [] }));
+    } catch (e2) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:#DC2626;font-size:11.5px;">' + _rcMessageRepli(e2, 'superviseurs') + '</td></tr>';
+      return;
+    }
   }
+  _rcRenderSuperviseursListe(_rcSuperviseursCache);
+  _rcRenderEnAttente('rcSuperviseursEnAttenteZone', 'rcSuperviseursEnAttente', _rcSuperviseursCache, { getNom: s => s.nom, roleLabel: 'Superviseur', validerFn: '_rcValiderInscriptionSuperviseur', refuserFn: '_rcRefuserInscriptionSuperviseur' });
 }
 
 function _rcFiltrerSuperviseurs() {
@@ -13150,24 +13167,226 @@ function _rcFiltrerSuperviseurs() {
   _rcRenderSuperviseursListe(filtres);
 }
 
+// Accordéon inline : un seul superviseur ouvert à la fois.
+let _rcSupDetailOuvert = null;
+
+function _rcSupBasculerDetail(id) {
+  const row = document.getElementById('rcSupDetailRow-' + id);
+  if (!row) return;
+  const dejaOuvert = row.style.display === 'table-row';
+  if (_rcSupDetailOuvert && _rcSupDetailOuvert !== id) {
+    const prev = document.getElementById('rcSupDetailRow-' + _rcSupDetailOuvert);
+    if (prev) prev.style.display = 'none';
+  }
+  row.style.display = dejaOuvert ? 'none' : 'table-row';
+  _rcSupDetailOuvert = dejaOuvert ? null : id;
+  if (!dejaOuvert) _rcSupChargerDetail(id);
+}
+
 function _rcRenderSuperviseursListe(superviseurs) {
   const tbody = document.getElementById('rcSuperviseursListe');
   if (!tbody) return;
-  if (!superviseurs.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:16px;color:#9CA3AF;font-size:12px;">Aucun superviseur</td></tr>'; return; }
+  if (!superviseurs.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:#9CA3AF;font-size:12px;">Aucun superviseur</td></tr>'; return; }
   tbody.innerHTML = superviseurs.map(s => {
     const nomEchap = String(s.nom || '').replace(/'/g, "\\'");
-    const chantiersAssignes = (s.chantiers || []).length;
-    return `<tr style="border-bottom:1px solid #F7F8FC;">
+    const chantiersListe = s.chantiers || [];
+    const chantiersAssignes = chantiersListe.length;
+    const enChantierNb = chantiersListe.filter(c => c.statut === 'en_cours').length;
+    const terrainBadge = enChantierNb >= 1
+      ? `<span style="background:#ECFDF5;color:#059669;border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;white-space:nowrap;">🟢 Sur chantier (${enChantierNb})</span>`
+      : `<span style="background:#F3F4F6;color:#6B7280;border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;white-space:nowrap;">⚪ Disponible</span>`;
+    return `<tr style="border-bottom:1px solid #F7F8FC;cursor:pointer;" onclick="_rcSupBasculerDetail('${s.id}')" onmouseover="this.style.background='#FAFBFF'" onmouseout="this.style.background=''">
       <td style="padding:10px 12px;font-size:12.5px;font-weight:700;color:#1A1A4E;">${s.nom}</td>
       <td style="padding:10px 12px;font-size:12px;color:#374151;">${s.telephone || '—'}</td>
       <td style="padding:10px 12px;text-align:center;font-size:11px;color:${s.statut === 'actif' ? '#059669' : '#DC2626'};font-weight:700;">${s.statut}</td>
       <td style="padding:10px 12px;text-align:center;font-size:12px;color:#1A1A4E;font-weight:700;">${chantiersAssignes}</td>
-      <td style="padding:10px 12px;text-align:center;white-space:nowrap;">
+      <td style="padding:10px 12px;text-align:center;">${terrainBadge}</td>
+      <td style="padding:10px 12px;text-align:center;white-space:nowrap;" onclick="event.stopPropagation()">
         <button onclick="_rcOuvrirSuperviseurModal('${s.id}')" title="Modifier" style="background:#F5F3FF;color:#7C3AED;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;margin-right:4px;">✏️</button>
         <button onclick="_rcSupprimerSuperviseur('${s.id}','${nomEchap}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
       </td>
+    </tr>
+    <tr id="rcSupDetailRow-${s.id}" style="display:none;">
+      <td colspan="6" style="padding:0;background:#FAFBFF;border-bottom:1px solid #F7F8FC;">
+        <div id="rcSupDetailContenu-${s.id}" style="padding:20px;">
+          <div style="text-align:center;color:#9CA3AF;font-size:12px;padding:20px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>
+        </div>
+      </td>
     </tr>`;
   }).join('');
+}
+
+// ── Fiche détail superviseur (accordéon) ──
+// Bloc 1 : 4 métriques. Bloc 2 : chantiers assignés (registre + changement
+// de superviseur inline). Bloc 3 : suspendre/réactiver/modifier.
+async function _rcSupChargerDetail(superviseurId) {
+  const zone = document.getElementById('rcSupDetailContenu-' + superviseurId);
+  if (!zone) return;
+  try {
+    const { data: chantiers, error } = await sb.from('chantiers')
+      .select('id,nom,statut,date_debut,clients(nom,prenom),comptes_materiaux(id,solde_gnf)')
+      .eq('superviseur_id', superviseurId)
+      .order('date_debut', { ascending: false });
+    if (error) throw error;
+
+    const totalChantiers = (chantiers || []).length;
+    const enCours = (chantiers || []).filter(c => c.statut === 'en_cours').length;
+    const termines = (chantiers || []).filter(c => c.statut === 'termine').length;
+
+    // Total sorties gérées : SUM(montant_gnf) des transactions dont
+    // type_operation contient 'sortie' (demandee/confirmee/rejetee),
+    // liées aux chantiers de ce superviseur — tel que demandé.
+    let totalSorties = 0;
+    const chantierIds = (chantiers || []).map(c => c.id);
+    if (chantierIds.length) {
+      try {
+        const { data: sorties, error: errS } = await sb.from('registre_transactions')
+          .select('montant_gnf')
+          .in('chantier_id', chantierIds)
+          .like('type_operation', '%sortie%');
+        if (errS) throw errS;
+        totalSorties = (sorties || []).reduce((s, t) => s + Number(t.montant_gnf || 0), 0);
+      } catch (e) { console.warn('[registre_chantier] sorties superviseur indisponibles:', e.message); }
+    }
+
+    const superviseur = _rcSuperviseursCache.find(s => s.id === superviseurId) || {};
+
+    let html = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;">
+        <div class="adm-stat-card" style="border-top:3px solid #7C3AED;"><div class="adm-stat-num">${totalChantiers}</div><div class="adm-stat-label">Total chantiers</div></div>
+        <div class="adm-stat-card" style="border-top:3px solid #D97706;"><div class="adm-stat-num">${enCours}</div><div class="adm-stat-label">En cours</div></div>
+        <div class="adm-stat-card" style="border-top:3px solid #059669;"><div class="adm-stat-num">${termines}</div><div class="adm-stat-label">Terminés</div></div>
+        <div class="adm-stat-card" style="border-top:3px solid #E8650A;"><div class="adm-stat-num" style="font-size:15px;">${formatGNF(totalSorties)}</div><div class="adm-stat-label">Total sorties gérées</div></div>
+      </div>
+    `;
+
+    if (!chantiers || !chantiers.length) {
+      html += '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:12.5px;">Aucun chantier assigné.</div>';
+    } else {
+      html += '<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">' + chantiers.map(c => {
+        const sc = _rcStatutChantierConfig(c.statut);
+        const client = c.clients ? ((c.clients.prenom ? c.clients.prenom + ' ' : '') + c.clients.nom) : '—';
+        const nbFournisseurs = (c.comptes_materiaux || []).length;
+        const soldeTotal = (c.comptes_materiaux || []).reduce((s, cm) => s + Number(cm.solde_gnf || 0), 0);
+        const dateDebut = c.date_debut ? new Date(c.date_debut).toLocaleDateString('fr-FR') : '—';
+        return `<div style="background:#fff;border:1.5px solid #F0F0F8;border-radius:12px;padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:13.5px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">${c.nom}</div>
+              <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:15px;font-weight:800;color:#1A1A4E;">${formatGNF(soldeTotal)}</div>
+              <div style="font-size:10px;color:#9CA3AF;">solde total · ${nbFournisseurs} fournisseur${nbFournisseurs > 1 ? 's' : ''}</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#6B7280;margin-bottom:12px;">Client : ${client} · Début : ${dateDebut}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="_rcOuvrirDetail('${c.id}')" style="background:#EFF6FF;color:#2563EB;border:none;border-radius:8px;padding:7px 12px;font-size:11.5px;font-weight:700;cursor:pointer;">📋 Voir registre</button>
+            <button onclick="_rcSupBasculerChangement('${c.id}','${superviseurId}')" style="background:#F5F3FF;color:#7C3AED;border:none;border-radius:8px;padding:7px 12px;font-size:11.5px;font-weight:700;cursor:pointer;">🔁 Changer superviseur</button>
+          </div>
+          <div id="rcSupChangementZone-${c.id}" style="display:none;background:#F9FAFB;border-radius:10px;padding:12px;margin-top:10px;">
+            <select id="rcSupChangementSelect-${c.id}" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;margin-bottom:8px;"><option value="">Chargement...</option></select>
+            <div style="display:flex;gap:8px;">
+              <button onclick="_rcSupBasculerChangement('${c.id}','${superviseurId}')" style="flex:1;background:#fff;color:#374151;border:1.5px solid #E5E7EB;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Annuler</button>
+              <button onclick="_rcSupConfirmerChangement('${c.id}','${superviseurId}')" style="flex:1;background:#7C3AED;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Confirmer</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+    }
+
+    const estActif = superviseur.statut === 'actif';
+    html += `
+      <div style="border-top:1.5px solid #E5E7EB;padding-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+        ${estActif
+          ? `<button onclick="_rcSupBasculerSuspension('${superviseurId}')" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">⏸ Suspendre</button>`
+          : `<button onclick="_rcReactiverSuperviseur('${superviseurId}')" style="background:#ECFDF5;color:#059669;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">▶️ Réactiver</button>`}
+        <button onclick="_rcOuvrirSuperviseurModal('${superviseurId}')" style="background:#F5F3FF;color:#7C3AED;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">✏️ Modifier</button>
+      </div>
+      <div id="rcSupSuspensionZone-${superviseurId}" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:14px;margin-top:12px;">
+        <div style="font-size:12.5px;color:#7F1D1D;margin-bottom:10px;">Suspendre ce superviseur ? Il ne pourra plus se connecter à son espace tant qu'il n'est pas réactivé.</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="_rcSupBasculerSuspension('${superviseurId}')" style="flex:1;background:#fff;color:#374151;border:1.5px solid #E5E7EB;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Annuler</button>
+          <button onclick="_rcConfirmerSuspensionSuperviseur('${superviseurId}')" style="flex:1;background:#DC2626;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Confirmer la suspension</button>
+        </div>
+      </div>
+    `;
+
+    zone.innerHTML = html;
+  } catch (e) {
+    zone.innerHTML = '<div style="text-align:center;padding:20px;color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+function _rcSupBasculerSuspension(id) {
+  const el = document.getElementById('rcSupSuspensionZone-' + id);
+  if (el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+}
+
+async function _rcConfirmerSuspensionSuperviseur(id) {
+  try {
+    const { error } = await sb.from('superviseurs').update({ statut: 'suspendu' }).eq('id', id);
+    if (error) throw error;
+    await _logAdminAction('suspension_superviseur', '', '', 'superviseur_id: ' + id);
+    if (typeof showToast === 'function') showToast('✅ Superviseur suspendu', 'success');
+    _rcLoadSuperviseursListe();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+
+async function _rcReactiverSuperviseur(id) {
+  try {
+    const { error } = await sb.from('superviseurs').update({ statut: 'actif' }).eq('id', id);
+    if (error) throw error;
+    await _logAdminAction('reactivation_superviseur', '', '', 'superviseur_id: ' + id);
+    if (typeof showToast === 'function') showToast('✅ Superviseur réactivé', 'success');
+    _rcLoadSuperviseursListe();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+
+// Changer le superviseur d'un chantier depuis la fiche détail — select
+// limité aux superviseurs actifs, superviseur actuel exclu.
+async function _rcSupBasculerChangement(chantierId, superviseurActuelId) {
+  const el = document.getElementById('rcSupChangementZone-' + chantierId);
+  if (!el) return;
+  const ouverture = (el.style.display === 'none' || !el.style.display);
+  el.style.display = ouverture ? 'block' : 'none';
+  if (ouverture) await _rcSupChargerSelectChangement(chantierId, superviseurActuelId);
+}
+
+async function _rcSupChargerSelectChangement(chantierId, superviseurActuelId) {
+  const sel = document.getElementById('rcSupChangementSelect-' + chantierId);
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Chargement...</option>';
+  try {
+    const { data, error } = await sb.from('superviseurs').select('id,nom,prenom').eq('statut', 'actif').neq('id', superviseurActuelId).order('nom').limit(300);
+    if (error) throw error;
+    sel.innerHTML = (data && data.length)
+      ? '<option value="">— Sélectionner —</option>' + data.map(s => `<option value="${s.id}">${(s.prenom ? s.prenom + ' ' : '') + s.nom}</option>`).join('')
+      : '<option value="">Aucun autre superviseur actif</option>';
+  } catch (e) {
+    sel.innerHTML = '<option value="">Erreur de chargement</option>';
+  }
+}
+
+async function _rcSupConfirmerChangement(chantierId, superviseurActuelId) {
+  const sel = document.getElementById('rcSupChangementSelect-' + chantierId);
+  const nouveauId = sel ? sel.value : '';
+  if (!nouveauId) { if (typeof showToast === 'function') showToast('Sélectionne un superviseur.', 'error'); return; }
+  try {
+    const { error } = await sb.from('chantiers').update({ superviseur_id: nouveauId }).eq('id', chantierId);
+    if (error) throw error;
+    await _logAdminAction('changement_superviseur_chantier', '', '', 'chantier_id: ' + chantierId + ' | ancien: ' + superviseurActuelId + ' | nouveau: ' + nouveauId);
+    if (typeof showToast === 'function') showToast('✅ Superviseur changé', 'success');
+    _rcLoadSuperviseursListe();
+    if (typeof _rcLoadChantiersListe === 'function') _rcLoadChantiersListe();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
 }
 
 // ── Création CLIENT ──
