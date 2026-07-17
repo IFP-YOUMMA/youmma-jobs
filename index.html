@@ -2769,6 +2769,82 @@ if (typeof connexionPrestataire === 'undefined') {
     <div id="espaceFourBandeau" style="display:none;background:#FFFBEB;border:1.5px solid #FED7AA;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;font-weight:700;color:#9A3412;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i><span id="espaceFourBandeauTexte"></span></div>
 
     <div id="espaceFourChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+
+    <!-- Mon profil public -->
+    <div style="background:#fff;border-radius:18px;padding:20px;margin-top:16px;">
+      <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:16px;"><i class="fa-solid fa-id-card" style="color:#059669;margin-right:8px;"></i>Mon profil public</div>
+
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div id="espaceFourProfilPhotoApercu" style="width:80px;height:80px;border-radius:16px;background:#F4F6FB;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#9CA3AF;font-size:24px;flex-shrink:0;"><i class="fa-solid fa-image"></i></div>
+          <label style="font-size:11px;font-weight:700;color:#2563EB;cursor:pointer;">
+            Changer la photo
+            <input type="file" accept="image/*" id="espaceFourProfilPhotoInput" style="display:none;" onchange="_espaceFournisseurChangerPhoto(this)"/>
+          </label>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Description</label>
+          <textarea id="espaceFourProfilDescription" rows="3" placeholder="Présentez votre entreprise, vos matériaux, votre zone de livraison..." style="width:100%;box-sizing:border-box;margin-top:4px;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:14px;">
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Ville</label>
+          <input id="espaceFourProfilVille" type="text" style="width:100%;box-sizing:border-box;margin-top:4px;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Commune</label>
+          <input id="espaceFourProfilCommune" type="text" style="width:100%;box-sizing:border-box;margin-top:4px;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
+        </div>
+      </div>
+
+      <button id="espaceFourProfilPublicToggle" onclick="_espaceFournisseurBasculerPublic()" style="display:flex;align-items:center;gap:10px;width:100%;padding:12px;border-radius:10px;border:2px solid #E5E7EB;background:#fff;cursor:pointer;margin-bottom:16px;text-align:left;">
+        <span id="espaceFourProfilPublicDot" style="width:16px;height:16px;border-radius:50%;background:#D1D5DB;flex-shrink:0;"></span>
+        <span style="font-size:12.5px;font-weight:700;color:#1A1A4E;">Rendre mon profil visible sur la page Construire</span>
+      </button>
+
+      <div id="espaceFourProfilErreur" style="display:none;color:#DC2626;font-size:12.5px;margin-bottom:10px;"></div>
+      <button onclick="_espaceFournisseurEnregistrerProfil()" style="width:100%;background:#059669;color:#fff;border:none;border-radius:10px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;">Enregistrer mon profil</button>
+    </div>
+
+    <!-- Mon catalogue -->
+    <div style="background:#fff;border-radius:18px;padding:20px;margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+        <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;"><i class="fa-solid fa-boxes-stacked" style="color:#E8650A;margin-right:8px;"></i>Mon catalogue</div>
+        <button onclick="_espaceFournisseurOuvrirFormProduit()" style="background:#ECFDF5;color:#059669;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;">+ Ajouter un produit</button>
+      </div>
+
+      <div id="espaceFourProduitForm" style="display:none;background:#F9FAFB;border-radius:12px;padding:14px;margin-bottom:16px;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <input id="espaceFourProduitNom" type="text" placeholder="Nom du produit *" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
+          <div style="display:flex;gap:8px;">
+            <select id="espaceFourProduitUnite" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;">
+              <option value="">Unité</option>
+              <option value="sac">Sac</option>
+              <option value="kg">Kg</option>
+              <option value="m²">M²</option>
+              <option value="m³">M³</option>
+              <option value="tonne">Tonne</option>
+              <option value="unité">Unité</option>
+              <option value="litre">Litre</option>
+            </select>
+            <input id="espaceFourProduitPrix" type="number" min="0" placeholder="Prix GNF" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
+          </div>
+          <button id="espaceFourProduitDispoToggle" onclick="_espaceFournisseurBasculerDispoForm()" style="display:flex;align-items:center;gap:8px;padding:10px;border-radius:8px;border:1.5px solid #A7F3D0;background:#ECFDF5;cursor:pointer;">
+            <span id="espaceFourProduitDispoDot" style="width:12px;height:12px;border-radius:50%;background:#059669;flex-shrink:0;"></span>
+            <span style="font-size:12px;font-weight:700;color:#059669;">Disponible</span>
+          </button>
+          <div id="espaceFourProduitErreur" style="display:none;color:#DC2626;font-size:12px;"></div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="_espaceFournisseurFermerFormProduit()" style="flex:1;background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:10px;font-size:12.5px;font-weight:700;cursor:pointer;">Annuler</button>
+            <button onclick="_espaceFournisseurEnregistrerProduit()" style="flex:1;background:#E8650A;color:#fff;border:none;border-radius:8px;padding:10px;font-size:12.5px;font-weight:700;cursor:pointer;">Enregistrer</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="espaceFourProduitsListe"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
   </div>
 
   <!-- Tableau de bord SUPERVISEUR -->
@@ -3178,6 +3254,7 @@ function _espaceAfficherTableauBord() {
     document.getElementById('espaceFourPrenom').textContent = _espaceSession.nom;
     document.getElementById('espaceFourAvatar').textContent = initiales;
     _espaceChargerFournisseur();
+    _espaceFournisseurChargerProfilEtCatalogue();
   } else if (_espaceSession.role === 'superviseur') {
     document.getElementById('espaceDashSuperviseur').style.display = 'block';
     document.getElementById('espaceSupNom').textContent = _espaceSession.nom;
@@ -3309,6 +3386,194 @@ function _espaceBasculerHistoriqueCompte(compteId) {
       <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
     </div>`;
   }).join('');
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// MON PROFIL PUBLIC (fournisseur) — description/photo/ville/commune/
+// profil_public + catalogue_produits. Colonnes ajoutées par
+// supabase/migrations/20260716_fournisseur_profil_catalogue.sql.
+// ─────────────────────────────────────────────────────────────────────────
+let _espaceFourProfilPublicState = false;
+let _espaceFourCatalogueCache = [];
+let _espaceFourProduitEditId = null;
+let _espaceFourProduitDispoState = true;
+
+async function _espaceFournisseurChargerProfilEtCatalogue() {
+  try {
+    const { data, error } = await sb.from('fournisseurs_materiaux').select('description,photo_url,ville,commune,profil_public').eq('id', _espaceSession.id).single();
+    if (error) throw error;
+    const desc = document.getElementById('espaceFourProfilDescription'); if (desc) desc.value = data.description || '';
+    const ville = document.getElementById('espaceFourProfilVille'); if (ville) ville.value = data.ville || '';
+    const commune = document.getElementById('espaceFourProfilCommune'); if (commune) commune.value = data.commune || '';
+    _espaceFourProfilPublicState = !!data.profil_public;
+    _espaceFournisseurRendreToggleProfilPublic();
+    const apercu = document.getElementById('espaceFourProfilPhotoApercu');
+    if (apercu && data.photo_url) apercu.innerHTML = `<img src="${data.photo_url}" style="width:100%;height:100%;object-fit:cover;"/>`;
+  } catch (e) {
+    console.warn('[espace] profil fournisseur indisponible (migration 20260716_fournisseur_profil_catalogue.sql pas encore appliquée ?):', e.message);
+  }
+  _espaceFournisseurChargerCatalogue();
+}
+
+function _espaceFournisseurRendreToggleProfilPublic() {
+  const btn = document.getElementById('espaceFourProfilPublicToggle');
+  const dot = document.getElementById('espaceFourProfilPublicDot');
+  if (!btn || !dot) return;
+  if (_espaceFourProfilPublicState) { btn.style.borderColor = '#A7F3D0'; btn.style.background = '#ECFDF5'; dot.style.background = '#059669'; }
+  else { btn.style.borderColor = '#E5E7EB'; btn.style.background = '#fff'; dot.style.background = '#D1D5DB'; }
+}
+
+function _espaceFournisseurBasculerPublic() {
+  _espaceFourProfilPublicState = !_espaceFourProfilPublicState;
+  _espaceFournisseurRendreToggleProfilPublic();
+}
+
+// Photo : même bucket 'Photos' + même fonction resizeImage() que le reste
+// du site (uploadProviderPhoto) — pas de nouveau pattern d'upload créé.
+async function _espaceFournisseurChangerPhoto(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const apercu = document.getElementById('espaceFourProfilPhotoApercu');
+  try {
+    let fileToUpload = file;
+    try { fileToUpload = await resizeImage(file, 'profil'); } catch (e) { fileToUpload = file; }
+    const filename = `fournisseurs/${_espaceSession.id}/${Date.now()}.jpg`;
+    const { error: uploadError } = await sb.storage.from('Photos').upload(filename, fileToUpload, { cacheControl: '3600', upsert: false, contentType: 'image/jpeg' });
+    if (uploadError) throw uploadError;
+    const { data: urlData } = sb.storage.from('Photos').getPublicUrl(filename);
+    const { error } = await sb.from('fournisseurs_materiaux').update({ photo_url: urlData.publicUrl }).eq('id', _espaceSession.id);
+    if (error) throw error;
+    if (apercu) apercu.innerHTML = `<img src="${urlData.publicUrl}" style="width:100%;height:100%;object-fit:cover;"/>`;
+    if (typeof showToast === 'function') showToast('✅ Photo mise à jour', 'success');
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur upload photo : ' + e.message, 'error'); else window.alert('Erreur upload photo : ' + e.message);
+  } finally {
+    input.value = '';
+  }
+}
+
+async function _espaceFournisseurEnregistrerProfil() {
+  const description = document.getElementById('espaceFourProfilDescription').value.trim();
+  const ville = document.getElementById('espaceFourProfilVille').value.trim();
+  const commune = document.getElementById('espaceFourProfilCommune').value.trim();
+  _espaceCacherErreur('espaceFourProfilErreur');
+  try {
+    const { error } = await sb.from('fournisseurs_materiaux').update({
+      description: description || null,
+      ville: ville || null,
+      commune: commune || null,
+      profil_public: _espaceFourProfilPublicState
+    }).eq('id', _espaceSession.id);
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('✅ Profil enregistré', 'success');
+  } catch (e) {
+    _espaceAfficherErreur('espaceFourProfilErreur', 'Erreur : ' + e.message);
+  }
+}
+
+async function _espaceFournisseurChargerCatalogue() {
+  const zone = document.getElementById('espaceFourProduitsListe');
+  if (!zone) return;
+  try {
+    const { data, error } = await sb.from('catalogue_produits').select('*').eq('fournisseur_id', _espaceSession.id).order('ordre', { ascending: true }).order('created_at', { ascending: true });
+    if (error) throw error;
+    _espaceFourCatalogueCache = data || [];
+    if (!_espaceFourCatalogueCache.length) { zone.innerHTML = '<div style="color:#9CA3AF;font-size:13px;">Aucun produit pour le moment.</div>'; return; }
+    zone.innerHTML = _espaceFourCatalogueCache.map(p => `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F7F8FC;">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#1A1A4E;">${p.nom_produit}${p.unite ? ' <span style="font-weight:400;color:#9CA3AF;">/ ' + p.unite + '</span>' : ''}</div>
+          <div style="font-size:12px;color:#6B7280;">${p.prix_gnf != null ? _espaceFormatGNF(p.prix_gnf) : 'Prix non renseigné'} · <span style="color:${p.disponible ? '#059669' : '#DC2626'};font-weight:700;">${p.disponible ? 'Disponible' : 'Indisponible'}</span></div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button onclick="_espaceFournisseurOuvrirFormProduit('${p.id}')" style="background:#EFF6FF;color:#2563EB;border:none;border-radius:6px;padding:6px 10px;font-size:11px;cursor:pointer;">Modifier</button>
+          <button onclick="_espaceFournisseurSupprimerProduit('${p.id}')" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:6px 10px;font-size:11px;cursor:pointer;">Supprimer</button>
+        </div>
+      </div>`).join('');
+  } catch (e) {
+    zone.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + ' (migration catalogue_produits pas encore appliquée ?)</div>';
+  }
+}
+
+function _espaceFournisseurRendreToggleDispoForm() {
+  const btn = document.getElementById('espaceFourProduitDispoToggle');
+  const dot = document.getElementById('espaceFourProduitDispoDot');
+  const label = btn ? btn.querySelector('span:last-child') : null;
+  if (!btn || !dot) return;
+  if (_espaceFourProduitDispoState) { btn.style.borderColor = '#A7F3D0'; btn.style.background = '#ECFDF5'; dot.style.background = '#059669'; if (label) { label.style.color = '#059669'; label.textContent = 'Disponible'; } }
+  else { btn.style.borderColor = '#FECACA'; btn.style.background = '#FEF2F2'; dot.style.background = '#DC2626'; if (label) { label.style.color = '#DC2626'; label.textContent = 'Indisponible'; } }
+}
+
+function _espaceFournisseurBasculerDispoForm() {
+  _espaceFourProduitDispoState = !_espaceFourProduitDispoState;
+  _espaceFournisseurRendreToggleDispoForm();
+}
+
+function _espaceFournisseurOuvrirFormProduit(produitId) {
+  _espaceFourProduitEditId = produitId || null;
+  _espaceCacherErreur('espaceFourProduitErreur');
+  const zone = document.getElementById('espaceFourProduitForm');
+  zone.style.display = 'block';
+  if (_espaceFourProduitEditId) {
+    const p = _espaceFourCatalogueCache.find(x => x.id === _espaceFourProduitEditId);
+    document.getElementById('espaceFourProduitNom').value = p ? p.nom_produit : '';
+    document.getElementById('espaceFourProduitUnite').value = p ? (p.unite || '') : '';
+    document.getElementById('espaceFourProduitPrix').value = (p && p.prix_gnf != null) ? p.prix_gnf : '';
+    _espaceFourProduitDispoState = p ? !!p.disponible : true;
+  } else {
+    document.getElementById('espaceFourProduitNom').value = '';
+    document.getElementById('espaceFourProduitUnite').value = '';
+    document.getElementById('espaceFourProduitPrix').value = '';
+    _espaceFourProduitDispoState = true;
+  }
+  _espaceFournisseurRendreToggleDispoForm();
+}
+
+function _espaceFournisseurFermerFormProduit() {
+  const zone = document.getElementById('espaceFourProduitForm');
+  if (zone) zone.style.display = 'none';
+  _espaceFourProduitEditId = null;
+}
+
+async function _espaceFournisseurEnregistrerProduit() {
+  const nom = document.getElementById('espaceFourProduitNom').value.trim();
+  const unite = document.getElementById('espaceFourProduitUnite').value;
+  const prixRaw = document.getElementById('espaceFourProduitPrix').value;
+  const prix = prixRaw !== '' ? Number(prixRaw) : null;
+  _espaceCacherErreur('espaceFourProduitErreur');
+
+  if (!nom) { _espaceAfficherErreur('espaceFourProduitErreur', 'Le nom du produit est obligatoire.'); return; }
+  if (prixRaw !== '' && (isNaN(prix) || prix < 0)) { _espaceAfficherErreur('espaceFourProduitErreur', 'Le prix doit être un nombre positif.'); return; }
+
+  try {
+    const payload = { nom_produit: nom, unite: unite || null, prix_gnf: prix, disponible: _espaceFourProduitDispoState };
+    let error;
+    if (_espaceFourProduitEditId) {
+      ({ error } = await sb.from('catalogue_produits').update(payload).eq('id', _espaceFourProduitEditId));
+    } else {
+      payload.fournisseur_id = _espaceSession.id;
+      payload.ordre = _espaceFourCatalogueCache.length;
+      ({ error } = await sb.from('catalogue_produits').insert(payload));
+    }
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast(_espaceFourProduitEditId ? '✅ Produit mis à jour' : '✅ Produit ajouté', 'success');
+    _espaceFournisseurFermerFormProduit();
+    _espaceFournisseurChargerCatalogue();
+  } catch (e) {
+    _espaceAfficherErreur('espaceFourProduitErreur', 'Erreur : ' + e.message);
+  }
+}
+
+async function _espaceFournisseurSupprimerProduit(produitId) {
+  if (!window.confirm('Supprimer ce produit du catalogue ?')) return;
+  try {
+    const { error } = await sb.from('catalogue_produits').delete().eq('id', produitId);
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('✅ Produit supprimé', 'success');
+    _espaceFournisseurChargerCatalogue();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error'); else window.alert('Erreur : ' + e.message);
+  }
 }
 
 // Valider/Rejeter une sortie demandée — append-only : insert seul, jamais
@@ -11188,47 +11453,82 @@ function _pcInitiales(nom) {
   return (nom || '').split(/\s+/).slice(0, 2).map(function(w) { return w[0] || ''; }).join('').toUpperCase();
 }
 
-// ── Fournisseurs partenaires : chargement Supabase avec repli statique ──
-// Les fournisseurs de repli portent un id 'fallback-N' (pas un vrai UUID
-// Supabase) : _pcChargerCatalogue() le détecte et n'interroge pas la base
-// pour ceux-là, il n'y a rien à catalogeur derrière un exemple statique.
-const _PC_FOURNISSEURS_FALLBACK = [
-  { id: 'fallback-1', nom_entreprise: 'Conakry Matériaux SARL', specialite: 'Quincaillerie générale', adresse: 'Ratoma, Conakry', telephone: '224622000000', description: null },
-  { id: 'fallback-2', nom_entreprise: 'Ciments & Fers Guinée', specialite: 'Ciment, fer à béton', adresse: 'Kaloum, Conakry', telephone: '224628000000', description: null },
-  { id: 'fallback-3', nom_entreprise: 'Bois & Menuiserie Elite', specialite: 'Bois, contreplaqué', adresse: 'Matam, Conakry', telephone: '224655000000', description: null }
-];
+// ── Fournisseurs partenaires : profil public opt-in ──
+// Visible seulement si statut='actif' (compte validé par l'admin) ET
+// profil_public=true (le fournisseur a lui-même choisi d'être visible,
+// depuis son tableau de bord #espace). Colonnes ajoutées par
+// supabase/migrations/20260716_fournisseur_profil_catalogue.sql — avant
+// cette migration, aucun fournisseur n'a profil_public=true (DEFAULT
+// false), donc la section affiche naturellement l'état vide ci-dessous.
+// ⚠️ Corrigé : l'ancienne version filtrait sur une colonne `actif` et
+// lisait `specialite`/`adresse`, qui n'existent pas sur
+// fournisseurs_materiaux (vérifié dans 20260714_registre_chantier.sql),
+// et interrogeait une table `catalogue_materiaux` jamais créée — plus
+// aucun repli statique : en l'absence de données réelles, on affiche
+// "Bientôt nos fournisseurs partenaires" plutôt qu'un faux contenu.
 let _pcFournisseursData = [];
 
 function _pcFournisseurCardHTML(f) {
   const nom = f.nom_entreprise || 'Fournisseur';
   const ini = _pcInitiales(nom);
-  const zone = f.adresse || '';
-  const spec = f.specialite || '';
-  return '<div class="pc-fournisseur-card" onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="padding:22px;">'
-    + '<div style="width:52px;height:52px;border-radius:14px;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-bottom:14px;">' + ini + '</div>'
-    + '<div style="font-size:16px;font-weight:700;color:var(--texte);margin-bottom:8px;">' + nom + '</div>'
-    + (spec ? '<div style="margin-bottom:10px;"><span style="display:inline-block;font-size:11px;font-weight:700;color:var(--orange);background:var(--orange-light);padding:3px 10px;border-radius:20px;">' + spec + '</span></div>' : '')
-    + (zone ? '<div style="font-size:12.5px;color:var(--gris);margin-bottom:12px;">📍 ' + zone + '</div>' : '')
-    + '<div style="margin-bottom:16px;"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#16A34A;background:#F0FDF4;padding:4px 11px;border-radius:20px;">✅ Vérifié YOUMMA JOBS</span></div>'
-    + '<button onclick="event.stopPropagation();_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="width:100%;padding:11px;background:var(--bleu);border:none;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;cursor:pointer;">Voir le catalogue →</button>'
+  const zone = f.ville || '';
+  const desc = f.description ? (f.description.length > 110 ? f.description.slice(0, 110) + '…' : f.description) : '';
+  const produitsDispo = (f.catalogue_produits || []).filter(function(p) { return p.disponible; }).sort(function(a, b) { return (a.ordre || 0) - (b.ordre || 0); });
+  const apercu = produitsDispo.slice(0, 3);
+  const reste = produitsDispo.length - apercu.length;
+  const telWa = f.telephone ? String(f.telephone).replace(/\D/g, '') : '';
+
+  const apercuHtml = apercu.length
+    ? '<div style="border-top:1.5px solid var(--bordure);margin:14px 0;padding-top:12px;">'
+      + apercu.map(function(p) {
+          return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;">'
+            + '<span style="color:var(--texte);">' + (p.nom_produit || '') + '</span>'
+            + '<span style="font-weight:700;color:var(--orange);">' + (p.prix_gnf != null ? formatGNF(p.prix_gnf) : '—') + '</span>'
+            + '</div>';
+        }).join('')
+      + (reste > 0 ? '<div style="font-size:11.5px;color:var(--gris);margin-top:4px;">+ ' + reste + ' autre' + (reste > 1 ? 's' : '') + '</div>' : '')
+      + '</div>'
+    : '';
+
+  return '<div class="pc-fournisseur-card" style="padding:22px;">'
+    + '<div onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="cursor:pointer;">'
+    + (f.photo_url
+        ? '<img src="' + f.photo_url + '" loading="lazy" alt="' + nom + '" style="width:52px;height:52px;border-radius:14px;object-fit:cover;margin-bottom:14px;display:block;"/>'
+        : '<div style="width:52px;height:52px;border-radius:14px;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-bottom:14px;">' + ini + '</div>')
+    + '<div style="font-size:16px;font-weight:700;color:var(--texte);margin-bottom:6px;">' + nom + '</div>'
+    + (zone ? '<div style="font-size:12.5px;color:var(--gris);margin-bottom:10px;">📍 ' + zone + '</div>' : '')
+    + (desc ? '<div style="font-size:12.5px;color:var(--texte);line-height:1.5;margin-bottom:10px;">' + desc + '</div>' : '')
+    + '<div style="margin-bottom:6px;"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#16A34A;background:#F0FDF4;padding:4px 11px;border-radius:20px;">✅ Vérifié YOUMMA JOBS</span></div>'
+    + apercuHtml
+    + '</div>'
+    + '<div style="display:flex;gap:8px;margin-top:14px;">'
+    +   '<button onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="flex:1;padding:11px;background:var(--bleu);border:none;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;cursor:pointer;">Catalogue complet</button>'
+    +   (telWa ? '<a href="https://wa.me/' + telWa + '" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;background:#25D366;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Contacter</a>' : '')
+    + '</div>'
     + '</div>';
 }
 
 async function _pcChargerFournisseurs() {
   const grid = document.getElementById('pcFournisseursGrid');
   if (!grid || grid.dataset.loaded === '1') return;
-  let list = _PC_FOURNISSEURS_FALLBACK;
   try {
     const { data, error } = await sb.from('fournisseurs_materiaux')
-      .select('*')
-      .eq('actif', true)
+      .select('*, catalogue_produits(nom_produit,prix_gnf,unite,disponible,ordre)')
+      .eq('statut', 'actif')
+      .eq('profil_public', true)
       .order('nom_entreprise');
-    if (!error && data && data.length > 0) list = data;
+    if (error) throw error;
+    _pcFournisseursData = data || [];
   } catch (e) {
-    console.warn('[construire] fournisseurs_materiaux indisponible, repli statique:', e.message);
+    console.warn('[construire] fournisseurs_materiaux indisponible (migration 20260716_fournisseur_profil_catalogue.sql pas encore appliquée ?):', e.message);
+    _pcFournisseursData = [];
   }
-  _pcFournisseursData = list;
-  grid.innerHTML = list.map(_pcFournisseurCardHTML).join('');
+
+  if (!_pcFournisseursData.length) {
+    grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--gris);font-size:14px;grid-column:1/-1;">🏗️ Bientôt nos fournisseurs partenaires</div>';
+  } else {
+    grid.innerHTML = _pcFournisseursData.map(_pcFournisseurCardHTML).join('');
+  }
   grid.dataset.loaded = '1';
 }
 
@@ -11244,18 +11544,20 @@ function _pcOuvrirFournisseurModal(id) {
   const titleEl = document.getElementById('pcCatalogueModalTitle');
   if (titleEl) titleEl.textContent = f.nom_entreprise || 'Fournisseur';
 
+  const zone = [f.ville, f.commune].filter(Boolean).join(', ');
   const body = document.getElementById('pcCatalogueModalBody');
   if (body) {
     body.innerHTML =
       '<div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">'
-      +   '<div style="width:64px;height:64px;border-radius:16px;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;">' + ini + '</div>'
+      +   (f.photo_url
+            ? '<img src="' + f.photo_url + '" alt="' + (f.nom_entreprise || '') + '" style="width:64px;height:64px;border-radius:16px;object-fit:cover;flex-shrink:0;"/>'
+            : '<div style="width:64px;height:64px;border-radius:16px;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;">' + ini + '</div>')
       +   '<div>'
       +     '<div style="font-size:17px;font-weight:700;color:var(--texte);">' + (f.nom_entreprise || '') + '</div>'
-      +     (f.specialite ? '<span style="display:inline-block;margin-top:4px;font-size:11px;font-weight:700;color:var(--orange);background:var(--orange-light);padding:3px 10px;border-radius:20px;">' + f.specialite + '</span>' : '')
+      +     (zone ? '<div style="font-size:12.5px;color:var(--gris);margin-top:2px;">📍 ' + zone + '</div>' : '')
       +   '</div>'
       + '</div>'
       + '<div style="margin-bottom:14px;"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#16A34A;background:#F0FDF4;padding:3px 10px;border-radius:20px;">✅ Vérifié YOUMMA JOBS</span></div>'
-      + (f.adresse ? '<div style="font-size:13.5px;color:var(--texte);margin-bottom:8px;">📍 ' + f.adresse + '</div>' : '')
       + (f.telephone ? '<div style="font-size:13.5px;color:var(--texte);margin-bottom:8px;">📞 ' + f.telephone + '</div>' : '')
       + (f.description ? '<div style="font-size:13px;color:var(--gris);line-height:1.6;margin-bottom:10px;">📝 ' + f.description + '</div>' : '')
       + '<div style="border-top:1.5px solid var(--bordure);margin-top:14px;padding-top:18px;">'
@@ -11289,17 +11591,12 @@ async function _pcChargerCatalogue(fournisseurId) {
   if (!list) return;
   const f = _pcFournisseursData.find(function(x) { return String(x.id) === String(fournisseurId); });
 
-  // Fournisseurs de repli statiques : pas de vrai id Supabase, inutile d'interroger la base.
-  if (String(fournisseurId).indexOf('fallback-') === 0) {
-    list.innerHTML = _pcCatalogueMessageIndisponible(f && f.telephone);
-    return;
-  }
-
   try {
-    const { data, error } = await sb.from('catalogue_materiaux')
+    const { data, error } = await sb.from('catalogue_produits')
       .select('*')
       .eq('fournisseur_id', fournisseurId)
       .eq('disponible', true)
+      .order('ordre')
       .order('nom_produit');
     if (error || !data || data.length === 0) {
       list.innerHTML = _pcCatalogueMessageIndisponible(f && f.telephone);
@@ -11307,19 +11604,14 @@ async function _pcChargerCatalogue(fournisseurId) {
     }
     list.innerHTML = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">'
       + data.map(function(p) {
-          return '<div style="border:1.5px solid var(--bordure);border-radius:12px;overflow:hidden;">'
-            + (p.photo_url
-                ? '<img src="' + p.photo_url + '" loading="lazy" alt="' + (p.nom_produit || '') + '" style="width:100%;height:90px;object-fit:cover;display:block;"/>'
-                : '<div style="width:100%;height:90px;background:var(--fond);"></div>')
-            + '<div style="padding:10px;">'
+          return '<div style="border:1.5px solid var(--bordure);border-radius:12px;padding:12px;">'
             +   '<div style="font-size:12.5px;font-weight:700;color:var(--texte);margin-bottom:4px;">' + (p.nom_produit || '') + '</div>'
-            +   '<div style="font-size:12px;font-weight:700;color:var(--orange);">' + (p.prix_unitaire != null ? formatGNF(p.prix_unitaire) : '—') + (p.unite ? ' <span style="font-weight:600;color:var(--gris);">/ ' + p.unite + '</span>' : '') + '</div>'
-            + '</div>'
+            +   '<div style="font-size:12px;font-weight:700;color:var(--orange);">' + (p.prix_gnf != null ? formatGNF(p.prix_gnf) : '—') + (p.unite ? ' <span style="font-weight:600;color:var(--gris);">/ ' + p.unite + '</span>' : '') + '</div>'
             + '</div>';
         }).join('')
       + '</div>';
   } catch (e) {
-    console.warn('[construire] catalogue_materiaux indisponible:', e.message);
+    console.warn('[construire] catalogue_produits indisponible (migration pas encore appliquée ?):', e.message);
     list.innerHTML = _pcCatalogueMessageIndisponible(f && f.telephone);
   }
 }
