@@ -8099,10 +8099,11 @@ async function chargerAvis() {
                   <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Abonnement</th>
                   <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Ville / Commune</th>
                   <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Chantiers actifs</th>
+                  <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Solde global</th>
                   <th style="padding:12px 14px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Actions</th>
                 </tr>
               </thead>
-              <tbody id="rcFournisseursListe"><tr><td colspan="7" style="text-align:center;padding:30px;color:#9CA3AF;font-size:12px;">Chargement...</td></tr></tbody>
+              <tbody id="rcFournisseursListe"><tr><td colspan="8" style="text-align:center;padding:30px;color:#9CA3AF;font-size:12px;">Chargement...</td></tr></tbody>
             </table>
           </div>
           <div style="font-size:11px;color:#9CA3AF;margin-top:8px;">⚠️ La colonne "Spécialité" demandée n'existe pas dans le schéma (<code>fournisseurs_materiaux</code> n'a pas de colonne métier/spécialité) — remplacée par Ville/Commune, colonnes réelles.</div>
@@ -8221,6 +8222,22 @@ async function chargerAvis() {
             <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
               <button onclick="document.getElementById('rcFournisseurModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
               <button id="rcFournisseurSave" onclick="_rcSauvegarderFournisseur()" style="background:#E8650A;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal gestion abonnement fournisseur -->
+        <div id="rcAbonnementModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+          <div style="background:#fff;border-radius:16px;padding:28px;width:min(400px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.25);">
+            <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 20px;font-size:17px;"><i class="fa-solid fa-calendar-check" style="color:#E8650A;margin-right:8px;"></i>Gérer l'abonnement</h3>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Fin d'abonnement</label>
+                <input id="rcAbonnementDate" type="date" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div id="rcAbonnementErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
+              <button onclick="document.getElementById('rcAbonnementModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
+              <button id="rcAbonnementSave" onclick="_rcFourSauvegarderAbonnement()" style="background:#E8650A;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer</button>
             </div>
           </div>
         </div>
@@ -13073,16 +13090,31 @@ async function _rcLoadFournisseursListe() {
   const tbody = document.getElementById('rcFournisseursListe');
   if (!tbody) return;
   try {
+    // Requête unique groupée : comptes_materiaux(chantier_id,solde_gnf,
+    // chantiers(statut)) embarqué par fournisseur suffit pour le compteur
+    // "Chantiers actifs" ET pour le "Solde global" (SUM solde_gnf).
     const { data, error } = await sb.from('fournisseurs_materiaux')
-      .select('id,nom_entreprise,telephone,statut,abonnement_actif,abonnement_fin,ville,commune,created_at,comptes_materiaux(chantier_id,chantiers(statut))')
+      .select('id,nom_entreprise,telephone,statut,abonnement_actif,abonnement_fin,ville,commune,created_at,comptes_materiaux(chantier_id,solde_gnf,chantiers(statut))')
       .order('nom_entreprise').limit(300);
     if (error) throw error;
     _rcFournisseursCache = data || [];
-    _rcRenderFournisseursListe(_rcFournisseursCache);
-    _rcRenderEnAttente('rcFournisseursEnAttenteZone', 'rcFournisseursEnAttente', _rcFournisseursCache, { getNom: f => f.nom_entreprise, roleLabel: 'Fournisseur', validerFn: '_rcValiderInscriptionFournisseur', refuserFn: '_rcRefuserInscriptionFournisseur' });
   } catch (e) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:#DC2626;font-size:11.5px;">' + _rcMessageRepli(e, 'fournisseurs_materiaux') + '</td></tr>';
+    // Repli : deux requêtes séparées si la relation groupée échoue.
+    try {
+      const { data: fours, error: errFour } = await sb.from('fournisseurs_materiaux').select('id,nom_entreprise,telephone,statut,abonnement_actif,abonnement_fin,ville,commune,created_at').order('nom_entreprise').limit(300);
+      if (errFour) throw errFour;
+      const { data: comptes, error: errC } = await sb.from('comptes_materiaux').select('id,chantier_id,fournisseur_id,solde_gnf,chantiers(statut)');
+      if (errC) throw errC;
+      const parFournisseur = {};
+      (comptes || []).forEach(c => { (parFournisseur[c.fournisseur_id] = parFournisseur[c.fournisseur_id] || []).push(c); });
+      _rcFournisseursCache = (fours || []).map(f => Object.assign({}, f, { comptes_materiaux: parFournisseur[f.id] || [] }));
+    } catch (e2) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:16px;color:#DC2626;font-size:11.5px;">' + _rcMessageRepli(e2, 'fournisseurs_materiaux') + '</td></tr>';
+      return;
+    }
   }
+  _rcRenderFournisseursListe(_rcFournisseursCache);
+  _rcRenderEnAttente('rcFournisseursEnAttenteZone', 'rcFournisseursEnAttente', _rcFournisseursCache, { getNom: f => f.nom_entreprise, roleLabel: 'Fournisseur', validerFn: '_rcValiderInscriptionFournisseur', refuserFn: '_rcRefuserInscriptionFournisseur' });
 }
 
 function _rcFiltrerFournisseurs() {
@@ -13091,29 +13123,334 @@ function _rcFiltrerFournisseurs() {
   _rcRenderFournisseursListe(filtres);
 }
 
+// Accordéon inline : un seul fournisseur ouvert à la fois (même pattern
+// que _rcSupBasculerDetail pour les superviseurs).
+let _rcFourDetailOuvert = null;
+
+function _rcFourBasculerDetail(id) {
+  const row = document.getElementById('rcFourDetailRow-' + id);
+  if (!row) return;
+  const dejaOuvert = row.style.display === 'table-row';
+  if (_rcFourDetailOuvert && _rcFourDetailOuvert !== id) {
+    const prev = document.getElementById('rcFourDetailRow-' + _rcFourDetailOuvert);
+    if (prev) prev.style.display = 'none';
+  }
+  row.style.display = dejaOuvert ? 'none' : 'table-row';
+  _rcFourDetailOuvert = dejaOuvert ? null : id;
+  if (!dejaOuvert) _rcFourChargerDetail(id);
+}
+
 function _rcRenderFournisseursListe(fournisseurs) {
   const tbody = document.getElementById('rcFournisseursListe');
   if (!tbody) return;
-  if (!fournisseurs.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:16px;color:#9CA3AF;font-size:12px;">Aucun fournisseur</td></tr>'; return; }
+  if (!fournisseurs.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:16px;color:#9CA3AF;font-size:12px;">Aucun fournisseur</td></tr>'; return; }
   const now = new Date();
   tbody.innerHTML = fournisseurs.map(f => {
     const nomEchap = String(f.nom_entreprise || '').replace(/'/g, "\\'");
     const abonneOk = f.abonnement_actif && f.abonnement_fin && new Date(f.abonnement_fin) > now;
-    const chantiersActifs = (f.comptes_materiaux || []).filter(cm => cm.chantiers?.statut === 'en_cours').length;
+    const comptesF = f.comptes_materiaux || [];
+    const chantiersActifs = comptesF.filter(cm => cm.chantiers?.statut === 'en_cours').length;
+    const soldeGlobal = comptesF.reduce((s, cm) => s + Number(cm.solde_gnf || 0), 0);
     const villeCommune = [f.ville, f.commune].filter(Boolean).join(' / ') || '—';
-    return `<tr style="border-bottom:1px solid #F7F8FC;">
+    return `<tr style="border-bottom:1px solid #F7F8FC;cursor:pointer;" onclick="_rcFourBasculerDetail('${f.id}')" onmouseover="this.style.background='#FAFBFF'" onmouseout="this.style.background=''">
       <td style="padding:10px 12px;font-size:12.5px;font-weight:700;color:#1A1A4E;">${f.nom_entreprise}</td>
       <td style="padding:10px 12px;font-size:12px;color:#374151;">${f.telephone || '—'}</td>
       <td style="padding:10px 12px;text-align:center;font-size:11px;color:${f.statut === 'actif' ? '#059669' : '#DC2626'};font-weight:700;">${f.statut}</td>
       <td style="padding:10px 12px;text-align:center;font-size:11px;color:${abonneOk ? '#059669' : '#DC2626'};font-weight:700;">${abonneOk ? 'Actif' : 'Non abonné'}</td>
       <td style="padding:10px 12px;font-size:12px;color:#374151;">${villeCommune}</td>
       <td style="padding:10px 12px;text-align:center;font-size:12px;color:#1A1A4E;font-weight:700;">${chantiersActifs}</td>
-      <td style="padding:10px 12px;text-align:center;white-space:nowrap;">
+      <td style="padding:10px 12px;text-align:center;font-size:12px;font-weight:700;color:${soldeGlobal > 0 ? '#059669' : '#9CA3AF'};">${formatGNF(soldeGlobal)}</td>
+      <td style="padding:10px 12px;text-align:center;white-space:nowrap;" onclick="event.stopPropagation()">
         <button onclick="_rcOuvrirFournisseurModal('${f.id}')" title="Modifier" style="background:#FFF7F0;color:#E8650A;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;margin-right:4px;">✏️</button>
         <button onclick="_rcSupprimerFournisseur('${f.id}','${nomEchap}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
       </td>
+    </tr>
+    <tr id="rcFourDetailRow-${f.id}" style="display:none;">
+      <td colspan="8" style="padding:0;background:#FAFBFF;border-bottom:1px solid #F7F8FC;">
+        <div id="rcFourDetailContenu-${f.id}" style="padding:20px;">
+          <div style="text-align:center;color:#9CA3AF;font-size:12px;padding:20px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>
+        </div>
+      </td>
     </tr>`;
   }).join('');
+}
+
+// ── Fiche détail fournisseur (accordéon) ──
+// Bloc 1 : 4 métriques. Bloc 2 : chantiers où ce fournisseur est déclaré
+// (registre + retrait). Bloc 3 : ajouter à un chantier. Bloc 4 : actions
+// rapides (suspendre/réactiver/modifier/abonnement).
+async function _rcFourChargerDetail(fournisseurId) {
+  const zone = document.getElementById('rcFourDetailContenu-' + fournisseurId);
+  if (!zone) return;
+  try {
+    const { data: comptes, error } = await sb.from('comptes_materiaux')
+      .select('id,chantier_id,solde_gnf,chantiers(id,nom,statut,client_id,clients(nom,prenom))')
+      .eq('fournisseur_id', fournisseurId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    const totalChantiers = (comptes || []).length;
+    const chantiersEnCours = (comptes || []).filter(c => c.chantiers?.statut === 'en_cours').length;
+
+    // Total reçu / sorti : scopé par compte_id (chaque compte appartient à
+    // CE fournisseur exactement), pas par chantier_id — un chantier peut
+    // avoir plusieurs fournisseurs (comptes_materiaux) depuis la migration
+    // multi-fournisseur, donc chantier_id mélangerait d'autres fournisseurs.
+    let totalRecu = 0, totalSorti = 0;
+    const compteIds = (comptes || []).map(c => c.id);
+    if (compteIds.length) {
+      try {
+        const { data: trans, error: errT } = await sb.from('registre_transactions').select('montant_gnf,type_operation').in('compte_id', compteIds);
+        if (errT) throw errT;
+        (trans || []).forEach(t => {
+          const type = t.type_operation || '';
+          if (type.includes('versement')) totalRecu += Number(t.montant_gnf || 0);
+          else if (type.includes('sortie')) totalSorti += Number(t.montant_gnf || 0);
+        });
+      } catch (e) { console.warn('[registre_chantier] transactions fournisseur indisponibles:', e.message); }
+    }
+
+    const fournisseur = _rcFournisseursCache.find(f => f.id === fournisseurId) || {};
+
+    let html = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;">
+        <div class="adm-stat-card" style="border-top:3px solid #E8650A;"><div class="adm-stat-num">${totalChantiers}</div><div class="adm-stat-label">Total chantiers liés</div></div>
+        <div class="adm-stat-card" style="border-top:3px solid #D97706;"><div class="adm-stat-num">${chantiersEnCours}</div><div class="adm-stat-label">Chantiers en cours</div></div>
+        <div class="adm-stat-card" style="border-top:3px solid #059669;"><div class="adm-stat-num" style="font-size:15px;">${formatGNF(totalRecu)}</div><div class="adm-stat-label">Total reçu en versements</div></div>
+        <div class="adm-stat-card" style="border-top:3px solid #DC2626;"><div class="adm-stat-num" style="font-size:15px;">${formatGNF(totalSorti)}</div><div class="adm-stat-label">Total sorti en matériaux</div></div>
+      </div>
+    `;
+
+    if (!comptes || !comptes.length) {
+      html += '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:12.5px;">Aucun chantier lié.</div>';
+    } else {
+      html += '<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">' + comptes.map(c => {
+        const ch = c.chantiers || {};
+        const sc = _rcStatutChantierConfig(ch.statut);
+        const client = ch.clients ? ((ch.clients.prenom ? ch.clients.prenom + ' ' : '') + ch.clients.nom) : '—';
+        const nomChap = String(ch.nom || '').replace(/'/g, "\\'");
+        return `<div style="background:#fff;border:1.5px solid #F0F0F8;border-radius:12px;padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:13.5px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">${ch.nom || '—'}</div>
+              <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:15px;font-weight:800;color:${Number(c.solde_gnf || 0) > 0 ? '#059669' : '#9CA3AF'};">${formatGNF(c.solde_gnf)}</div>
+              <div style="font-size:10px;color:#9CA3AF;">solde du compte</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#6B7280;margin-bottom:12px;">Client : ${client}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="_rcFourOuvrirTransactionsCompte('${c.id}','${nomChap}')" style="background:#EFF6FF;color:#2563EB;border:none;border-radius:8px;padding:7px 12px;font-size:11.5px;font-weight:700;cursor:pointer;">📋 Voir transactions</button>
+            <button onclick="_rcFourBasculerRetrait('${c.id}')" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;padding:7px 12px;font-size:11.5px;font-weight:700;cursor:pointer;">Retirer de ce chantier</button>
+          </div>
+          <div id="rcFourRetraitZone-${c.id}" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:12px;margin-top:10px;">
+            <div id="rcFourRetraitMsg-${c.id}" style="font-size:12px;color:#7F1D1D;margin-bottom:10px;">Retirer ce fournisseur du chantier <strong>${ch.nom || ''}</strong> ? Impossible si des transactions existent déjà sur ce compte.</div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="_rcFourBasculerRetrait('${c.id}')" style="flex:1;background:#fff;color:#374151;border:1.5px solid #E5E7EB;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Annuler</button>
+              <button onclick="_rcFourConfirmerRetrait('${c.id}','${fournisseurId}')" style="flex:1;background:#DC2626;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Confirmer le retrait</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+    }
+
+    html += `
+      <div style="border-top:1.5px solid #E5E7EB;padding-top:16px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:700;color:#1A1A4E;"><i class="fa-solid fa-plus" style="color:#059669;margin-right:6px;"></i>Ajouter ce fournisseur à un chantier</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <select id="rcFourAjoutChantierSelect-${fournisseurId}" style="flex:1;min-width:200px;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;"><option value="">Chargement...</option></select>
+          <button onclick="_rcFourConfirmerAjoutChantier('${fournisseurId}')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">Confirmer</button>
+        </div>
+      </div>
+    `;
+
+    const estActif = fournisseur.statut === 'actif';
+    html += `
+      <div style="border-top:1.5px solid #E5E7EB;padding-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+        ${estActif
+          ? `<button onclick="_rcFourBasculerSuspension('${fournisseurId}')" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">⏸ Suspendre</button>`
+          : `<button onclick="_rcReactiverFournisseur('${fournisseurId}')" style="background:#ECFDF5;color:#059669;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">▶️ Réactiver</button>`}
+        <button onclick="_rcOuvrirFournisseurModal('${fournisseurId}')" style="background:#FFF7F0;color:#E8650A;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">✏️ Modifier</button>
+        <button onclick="_rcFourOuvrirAbonnementModal('${fournisseurId}')" style="background:#EFF6FF;color:#2563EB;border:none;border-radius:8px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;">📅 Gérer abonnement</button>
+      </div>
+      <div id="rcFourSuspensionZone-${fournisseurId}" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:14px;margin-top:12px;">
+        <div style="font-size:12.5px;color:#7F1D1D;margin-bottom:10px;">Suspendre ce fournisseur ? Il ne pourra plus se connecter à son espace tant qu'il n'est pas réactivé.</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="_rcFourBasculerSuspension('${fournisseurId}')" style="flex:1;background:#fff;color:#374151;border:1.5px solid #E5E7EB;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Annuler</button>
+          <button onclick="_rcConfirmerSuspensionFournisseur('${fournisseurId}')" style="flex:1;background:#DC2626;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Confirmer la suspension</button>
+        </div>
+      </div>
+    `;
+
+    zone.innerHTML = html;
+    _rcFourChargerSelectAjout(fournisseurId);
+  } catch (e) {
+    zone.innerHTML = '<div style="text-align:center;padding:20px;color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+function _rcFourBasculerSuspension(id) {
+  const el = document.getElementById('rcFourSuspensionZone-' + id);
+  if (el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+}
+
+async function _rcConfirmerSuspensionFournisseur(id) {
+  try {
+    const { error } = await sb.from('fournisseurs_materiaux').update({ statut: 'suspendu' }).eq('id', id);
+    if (error) throw error;
+    await _logAdminAction('suspension_fournisseur', '', '', 'fournisseur_id: ' + id);
+    if (typeof showToast === 'function') showToast('✅ Fournisseur suspendu', 'success');
+    _rcLoadFournisseursListe();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+
+async function _rcReactiverFournisseur(id) {
+  try {
+    const { error } = await sb.from('fournisseurs_materiaux').update({ statut: 'actif' }).eq('id', id);
+    if (error) throw error;
+    await _logAdminAction('reactivation_fournisseur', '', '', 'fournisseur_id: ' + id);
+    if (typeof showToast === 'function') showToast('✅ Fournisseur réactivé', 'success');
+    _rcLoadFournisseursListe();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+
+// Réutilise la modale de détail chantier (#rcDetailModal) pour un 3e usage
+// (liste des transactions d'un seul compte matériaux) — même pattern que
+// _rcOuvrirDetail (chantier complet) et _rcOuvrirDetailTransaction (une
+// transaction), déjà réutilisée deux fois dans ce panel.
+async function _rcFourOuvrirTransactionsCompte(compteId, chantierNom) {
+  const modal = document.getElementById('rcDetailModal');
+  const titre = document.getElementById('rcDetailTitre');
+  const contenu = document.getElementById('rcDetailContenu');
+  if (contenu) contenu.innerHTML = '<div style="text-align:center;padding:30px;color:#9CA3AF;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>';
+  if (titre) titre.innerHTML = '<i class="fa-solid fa-receipt" style="color:#E85D04;margin-right:8px;"></i>Transactions — ' + (chantierNom || '');
+  modal.style.display = 'flex';
+
+  try {
+    const { data, error } = await sb.from('registre_transactions').select('*').eq('compte_id', compteId).order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data || !data.length) { if (contenu) contenu.innerHTML = '<div style="text-align:center;padding:20px;color:#9CA3AF;">Aucune transaction sur ce compte.</div>'; return; }
+    if (contenu) contenu.innerHTML = data.map(t => {
+      const sc = _rcStatutConfig(t.type_operation);
+      const date = new Date(t.created_at).toLocaleString('fr-FR');
+      return `<div style="border:1.5px solid #F0F0F8;border-radius:12px;padding:14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;">
+          <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;">${sc.label}</span>
+          <span style="font-size:14px;font-weight:800;color:#1A1A4E;">${formatGNF(t.montant_gnf)}</span>
+        </div>
+        <div style="font-size:12px;color:#6B7280;">${date}</div>
+        ${t.materiau ? `<div style="font-size:12px;color:#6B7280;margin-top:4px;">${t.materiau} — ${t.quantite || ''} ${t.unite || ''}</div>` : ''}
+        ${t.description ? `<div style="font-size:12px;color:#9CA3AF;margin-top:4px;font-style:italic;">"${t.description}"</div>` : ''}
+      </div>`;
+    }).join('');
+  } catch (e) {
+    if (contenu) contenu.innerHTML = '<div style="text-align:center;padding:30px;color:#DC2626;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+function _rcFourBasculerRetrait(compteId) {
+  const el = document.getElementById('rcFourRetraitZone-' + compteId);
+  if (el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+}
+
+// Retrait bloqué si des transactions existent déjà sur ce compte — vérifié
+// via COUNT avant tout DELETE, jamais de suppression à l'aveugle (même
+// garde-fou que le retrait côté client dans #espace).
+async function _rcFourConfirmerRetrait(compteId, fournisseurId) {
+  try {
+    const { count, error: errCount } = await sb.from('registre_transactions').select('id', { count: 'exact', head: true }).eq('compte_id', compteId);
+    if (errCount) throw errCount;
+    if (count > 0) {
+      const msg = document.getElementById('rcFourRetraitMsg-' + compteId);
+      if (msg) { msg.textContent = 'Impossible : des transactions existent déjà sur ce compte.'; msg.style.color = '#DC2626'; msg.style.fontWeight = '700'; }
+      return;
+    }
+    const { error } = await sb.from('comptes_materiaux').delete().eq('id', compteId);
+    if (error) throw error;
+    await _logAdminAction('retrait_fournisseur_chantier', '', '', 'compte_id: ' + compteId + ' | fournisseur_id: ' + fournisseurId);
+    if (typeof showToast === 'function') showToast('✅ Fournisseur retiré du chantier', 'success');
+    _rcLoadFournisseursListe();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+
+// Chantiers actifs (en_cours) où ce fournisseur n'est PAS encore déclaré —
+// filtrage côté client (deux requêtes simples), même esprit que le NOT IN
+// demandé, cohérent avec _espaceCliChargerSelectAjoutFournisseur (#espace).
+async function _rcFourChargerSelectAjout(fournisseurId) {
+  const sel = document.getElementById('rcFourAjoutChantierSelect-' + fournisseurId);
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Chargement...</option>';
+  try {
+    const { data: dejaLies, error: errDeja } = await sb.from('comptes_materiaux').select('chantier_id').eq('fournisseur_id', fournisseurId);
+    if (errDeja) throw errDeja;
+    const idsExclus = (dejaLies || []).map(c => c.chantier_id);
+    const { data: chantiers, error } = await sb.from('chantiers').select('id,nom').eq('statut', 'en_cours').order('nom');
+    if (error) throw error;
+    const disponibles = (chantiers || []).filter(c => !idsExclus.includes(c.id));
+    sel.innerHTML = disponibles.length
+      ? '<option value="">— Sélectionner un chantier —</option>' + disponibles.map(c => `<option value="${c.id}">${c.nom}</option>`).join('')
+      : '<option value="">Aucun chantier disponible</option>';
+  } catch (e) {
+    sel.innerHTML = '<option value="">Erreur de chargement</option>';
+  }
+}
+
+async function _rcFourConfirmerAjoutChantier(fournisseurId) {
+  const sel = document.getElementById('rcFourAjoutChantierSelect-' + fournisseurId);
+  const chantierId = sel ? sel.value : '';
+  if (!chantierId) { if (typeof showToast === 'function') showToast('Sélectionne un chantier.', 'error'); return; }
+  try {
+    const { error } = await sb.from('comptes_materiaux').insert({ chantier_id: chantierId, fournisseur_id: fournisseurId, solde_gnf: 0 });
+    if (error) throw error;
+    await _logAdminAction('ajout_fournisseur_chantier', '', '', 'chantier_id: ' + chantierId + ' | fournisseur_id: ' + fournisseurId);
+    if (typeof showToast === 'function') showToast('✅ Fournisseur ajouté au chantier', 'success');
+    _rcLoadFournisseursListe();
+    if (typeof _rcLoadChantiersListe === 'function') _rcLoadChantiersListe();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+
+// ── Modal "Gérer l'abonnement" (abonnement_fin) ──
+let _rcAbonnementFournisseurId = null;
+
+async function _rcFourOuvrirAbonnementModal(fournisseurId) {
+  _rcAbonnementFournisseurId = fournisseurId;
+  _rcCacherErreur('rcAbonnementErreur');
+  const dateInput = document.getElementById('rcAbonnementDate');
+  const fournisseur = _rcFournisseursCache.find(f => f.id === fournisseurId);
+  if (dateInput) dateInput.value = fournisseur && fournisseur.abonnement_fin ? String(fournisseur.abonnement_fin).slice(0, 10) : '';
+  document.getElementById('rcAbonnementModal').style.display = 'flex';
+}
+
+async function _rcFourSauvegarderAbonnement() {
+  const dateVal = document.getElementById('rcAbonnementDate').value;
+  _rcCacherErreur('rcAbonnementErreur');
+  if (!dateVal) { _rcAfficherErreur('rcAbonnementErreur', 'Choisis une date.'); return; }
+  const btn = document.getElementById('rcAbonnementSave');
+  btn.disabled = true; btn.textContent = 'Enregistrement...';
+  try {
+    const { error } = await sb.from('fournisseurs_materiaux').update({ abonnement_fin: dateVal }).eq('id', _rcAbonnementFournisseurId);
+    if (error) throw error;
+    await _logAdminAction('modification_abonnement_fournisseur', '', '', 'fournisseur_id: ' + _rcAbonnementFournisseurId + ' | abonnement_fin: ' + dateVal);
+    document.getElementById('rcAbonnementModal').style.display = 'none';
+    if (typeof showToast === 'function') showToast('✅ Abonnement mis à jour', 'success');
+    _rcLoadFournisseursListe();
+  } catch (e) {
+    _rcAfficherErreur('rcAbonnementErreur', 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Enregistrer';
+  }
 }
 
 // "Chantiers assignés" par superviseur = embed inverse chantiers.superviseur_id.
