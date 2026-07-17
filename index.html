@@ -8491,6 +8491,12 @@ async function chargerAvis() {
                 <input id="rcClientVille" type="text" placeholder="Conakry" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
               <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Adresse</label>
                 <input id="rcClientAdresse" type="text" placeholder="Quartier, commune..." style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Statut</label>
+                <select id="rcClientStatut" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;background:#fff;">
+                  <option value="actif">Actif</option>
+                  <option value="suspendu">Suspendu</option>
+                  <option value="en_attente">En attente</option>
+                </select></div>
               <div id="rcClientErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
             </div>
             <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
@@ -8513,6 +8519,14 @@ async function chargerAvis() {
                 <input id="rcFournisseurVille" type="text" placeholder="Conakry" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
               <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Commune</label>
                 <input id="rcFournisseurCommune" type="text" placeholder="Ratoma" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Statut</label>
+                <select id="rcFournisseurStatut" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;background:#fff;">
+                  <option value="actif">Actif</option>
+                  <option value="suspendu">Suspendu</option>
+                  <option value="en_attente">En attente</option>
+                </select></div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Fin d'abonnement</label>
+                <input id="rcFournisseurAbonnementFin" type="date" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/></div>
               <div id="rcFournisseurErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
             </div>
             <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
@@ -8554,6 +8568,12 @@ async function chargerAvis() {
                 </select>
                 <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">⚠️ Le schéma lie un superviseur à un <code>provider_id</code> (prestataire), pas à un compte admin — voir note en fin de réponse.</div>
               </div>
+              <div><label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Statut</label>
+                <select id="rcSuperviseurStatut" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;background:#fff;">
+                  <option value="actif">Actif</option>
+                  <option value="inactif">Inactif</option>
+                  <option value="en_attente">En attente</option>
+                </select></div>
               <div id="rcSuperviseurErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
             </div>
             <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
@@ -13047,6 +13067,28 @@ async function _rcSupprimerAvecVerification({ table, id, nom, verifications, ave
   return true;
 }
 
+// Suppression inline (accordéon sous la ligne), pour les boutons 🗑 des
+// tableaux Clients/Fournisseurs/Superviseurs — jamais window.confirm : la
+// confirmation est déjà affichée par l'accordéon avant que cette fonction
+// ne soit appelée. Réutilise _rcCompterReferences (même vérifications de
+// dépendances que _rcSupprimerAvecVerification, avec un message spécifique
+// par dépendance plutôt qu'un message combiné). _rcSupprimerAvecVerification
+// (avec son window.confirm) reste inchangée : elle sert encore le flux
+// "Refuser une inscription en attente", hors périmètre de cette tâche.
+async function _rcSupprimerInline({ table, id, nom, verifications, action }) {
+  const resultats = await Promise.all(verifications.map(v => _rcCompterReferences(v.table, v.colonne, id)));
+  if (resultats.some(r => r === null)) {
+    return { ok: false, message: "Impossible de vérifier les dépendances (table/RLS indisponible) — suppression annulée par précaution." };
+  }
+  const bloquant = verifications.map((v, i) => ({ ...v, count: resultats[i] })).find(v => v.count > 0);
+  if (bloquant) return { ok: false, message: bloquant.messageBlocage };
+
+  const { error } = await sb.from(table).delete().eq('id', id);
+  if (error) return { ok: false, message: 'Erreur lors de la suppression : ' + error.message };
+  await _logAdminAction(action, nom, '', table + '_id: ' + id);
+  return { ok: true };
+}
+
 async function _rcSupprimerClient(id, nom) {
   await _rcSupprimerAvecVerification({
     table: 'clients', id, nom,
@@ -13477,7 +13519,16 @@ function _rcRenderClientsListe(clients) {
       <td style="padding:10px 12px;text-align:center;font-size:12px;color:#6B7280;white-space:nowrap;">${inscription}</td>
       <td style="padding:10px 12px;text-align:center;white-space:nowrap;" onclick="event.stopPropagation()">
         <button onclick="_rcOuvrirClientModal('${c.id}')" title="Modifier" style="background:#EFF6FF;color:#2563EB;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;margin-right:4px;">✏️</button>
-        <button onclick="_rcSupprimerClient('${c.id}','${nomEchap}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
+        <button onclick="_rcCliBasculerSuppression('${c.id}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
+      </td>
+    </tr>
+    <tr id="rcCliSupprimerRow-${c.id}" style="display:none;">
+      <td colspan="7" style="padding:14px 20px;background:#FEF2F2;border-bottom:1px solid #FECACA;">
+        <div id="rcCliSupprimerMsg-${c.id}" style="font-size:12.5px;color:#7F1D1D;margin-bottom:10px;">Supprimer <strong>${nomEchap}</strong> ? Cette action est irréversible.</div>
+        <div style="display:flex;gap:8px;max-width:360px;">
+          <button onclick="_rcCliBasculerSuppression('${c.id}')" style="flex:1;background:#fff;color:#374151;border:1.5px solid #E5E7EB;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Annuler</button>
+          <button onclick="_rcCliConfirmerSuppression('${c.id}','${nomEchap}')" style="flex:1;background:#DC2626;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Confirmer la suppression</button>
+        </div>
       </td>
     </tr>
     <tr id="rcCliDetailRow-${c.id}" style="display:none;">
@@ -13488,6 +13539,39 @@ function _rcRenderClientsListe(clients) {
       </td>
     </tr>`;
   }).join('');
+}
+
+let _rcCliSuppressionOuverte = null;
+
+function _rcCliBasculerSuppression(id) {
+  const row = document.getElementById('rcCliSupprimerRow-' + id);
+  if (!row) return;
+  const dejaOuvert = row.style.display === 'table-row';
+  if (_rcCliSuppressionOuverte && _rcCliSuppressionOuverte !== id) {
+    const prev = document.getElementById('rcCliSupprimerRow-' + _rcCliSuppressionOuverte);
+    if (prev) prev.style.display = 'none';
+  }
+  row.style.display = dejaOuvert ? 'none' : 'table-row';
+  _rcCliSuppressionOuverte = dejaOuvert ? null : id;
+}
+
+async function _rcCliConfirmerSuppression(id, nom) {
+  const resultat = await _rcSupprimerInline({
+    table: 'clients', id, nom,
+    verifications: [
+      { table: 'chantiers', colonne: 'client_id', messageBlocage: "Impossible : ce client a des chantiers actifs. Clôturez d'abord ses chantiers." },
+      { table: 'registre_transactions', colonne: 'client_id', messageBlocage: 'Impossible : ce client a des transactions dans le registre.' },
+      { table: 'rapport_final_chantier', colonne: 'validation_client_id', messageBlocage: 'Impossible : ce client a validé des rapports finaux de chantier.' },
+    ],
+    action: 'suppression_client'
+  });
+  if (!resultat.ok) {
+    const msg = document.getElementById('rcCliSupprimerMsg-' + id);
+    if (msg) { msg.textContent = resultat.message; msg.style.fontWeight = '700'; }
+    return;
+  }
+  if (typeof showToast === 'function') showToast('✅ Client supprimé', 'success');
+  _rcLoadCartes(); _rcLoadClientsListe();
 }
 
 // ── Fiche détail client (accordéon) ──
@@ -13711,7 +13795,16 @@ function _rcRenderFournisseursListe(fournisseurs) {
       <td style="padding:10px 12px;text-align:center;font-size:12px;font-weight:700;color:${soldeGlobal > 0 ? '#059669' : '#9CA3AF'};">${formatGNF(soldeGlobal)}</td>
       <td style="padding:10px 12px;text-align:center;white-space:nowrap;" onclick="event.stopPropagation()">
         <button onclick="_rcOuvrirFournisseurModal('${f.id}')" title="Modifier" style="background:#FFF7F0;color:#E8650A;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;margin-right:4px;">✏️</button>
-        <button onclick="_rcSupprimerFournisseur('${f.id}','${nomEchap}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
+        <button onclick="_rcFourBasculerSuppression('${f.id}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
+      </td>
+    </tr>
+    <tr id="rcFourSupprimerRow-${f.id}" style="display:none;">
+      <td colspan="8" style="padding:14px 20px;background:#FEF2F2;border-bottom:1px solid #FECACA;">
+        <div id="rcFourSupprimerMsg-${f.id}" style="font-size:12.5px;color:#7F1D1D;margin-bottom:10px;">Supprimer <strong>${nomEchap}</strong> ? Cette action est irréversible.</div>
+        <div style="display:flex;gap:8px;max-width:360px;">
+          <button onclick="_rcFourBasculerSuppression('${f.id}')" style="flex:1;background:#fff;color:#374151;border:1.5px solid #E5E7EB;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Annuler</button>
+          <button onclick="_rcFourConfirmerSuppression('${f.id}','${nomEchap}')" style="flex:1;background:#DC2626;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Confirmer la suppression</button>
+        </div>
       </td>
     </tr>
     <tr id="rcFourDetailRow-${f.id}" style="display:none;">
@@ -13722,6 +13815,40 @@ function _rcRenderFournisseursListe(fournisseurs) {
       </td>
     </tr>`;
   }).join('');
+}
+
+let _rcFourSuppressionOuverte = null;
+
+function _rcFourBasculerSuppression(id) {
+  const row = document.getElementById('rcFourSupprimerRow-' + id);
+  if (!row) return;
+  const dejaOuvert = row.style.display === 'table-row';
+  if (_rcFourSuppressionOuverte && _rcFourSuppressionOuverte !== id) {
+    const prev = document.getElementById('rcFourSupprimerRow-' + _rcFourSuppressionOuverte);
+    if (prev) prev.style.display = 'none';
+  }
+  row.style.display = dejaOuvert ? 'none' : 'table-row';
+  _rcFourSuppressionOuverte = dejaOuvert ? null : id;
+}
+
+async function _rcFourConfirmerSuppression(id, nom) {
+  const resultat = await _rcSupprimerInline({
+    table: 'fournisseurs_materiaux', id, nom,
+    verifications: [
+      { table: 'comptes_materiaux', colonne: 'fournisseur_id', messageBlocage: "Impossible : ce fournisseur est lié à des chantiers. Retirez-le d'abord de tous les chantiers." },
+      { table: 'registre_transactions', colonne: 'fournisseur_id', messageBlocage: 'Impossible : ce fournisseur a des transactions dans le registre.' },
+      { table: 'contrats', colonne: 'fournisseur_id', messageBlocage: 'Impossible : ce fournisseur a des contrats enregistrés.' },
+      { table: 'rapport_final_chantier', colonne: 'validation_fournisseur_id', messageBlocage: 'Impossible : ce fournisseur a validé des rapports finaux de chantier.' },
+    ],
+    action: 'suppression_fournisseur'
+  });
+  if (!resultat.ok) {
+    const msg = document.getElementById('rcFourSupprimerMsg-' + id);
+    if (msg) { msg.textContent = resultat.message; msg.style.fontWeight = '700'; }
+    return;
+  }
+  if (typeof showToast === 'function') showToast('✅ Fournisseur supprimé', 'success');
+  _rcLoadCartes(); _rcLoadFournisseursListe();
 }
 
 // ── Fiche détail fournisseur (accordéon) ──
@@ -14089,7 +14216,16 @@ function _rcRenderSuperviseursListe(superviseurs) {
       <td style="padding:10px 12px;text-align:center;">${terrainBadge}</td>
       <td style="padding:10px 12px;text-align:center;white-space:nowrap;" onclick="event.stopPropagation()">
         <button onclick="_rcOuvrirSuperviseurModal('${s.id}')" title="Modifier" style="background:#F5F3FF;color:#7C3AED;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;margin-right:4px;">✏️</button>
-        <button onclick="_rcSupprimerSuperviseur('${s.id}','${nomEchap}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
+        <button onclick="_rcSupBasculerSuppression('${s.id}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
+      </td>
+    </tr>
+    <tr id="rcSupSupprimerRow-${s.id}" style="display:none;">
+      <td colspan="6" style="padding:14px 20px;background:#FEF2F2;border-bottom:1px solid #FECACA;">
+        <div id="rcSupSupprimerMsg-${s.id}" style="font-size:12.5px;color:#7F1D1D;margin-bottom:10px;">Supprimer <strong>${nomEchap}</strong> ? Cette action est irréversible.</div>
+        <div style="display:flex;gap:8px;max-width:360px;">
+          <button onclick="_rcSupBasculerSuppression('${s.id}')" style="flex:1;background:#fff;color:#374151;border:1.5px solid #E5E7EB;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Annuler</button>
+          <button onclick="_rcSupConfirmerSuppression('${s.id}','${nomEchap}')" style="flex:1;background:#DC2626;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;">Confirmer la suppression</button>
+        </div>
       </td>
     </tr>
     <tr id="rcSupDetailRow-${s.id}" style="display:none;">
@@ -14100,6 +14236,39 @@ function _rcRenderSuperviseursListe(superviseurs) {
       </td>
     </tr>`;
   }).join('');
+}
+
+let _rcSupSuppressionOuverte = null;
+
+function _rcSupBasculerSuppression(id) {
+  const row = document.getElementById('rcSupSupprimerRow-' + id);
+  if (!row) return;
+  const dejaOuvert = row.style.display === 'table-row';
+  if (_rcSupSuppressionOuverte && _rcSupSuppressionOuverte !== id) {
+    const prev = document.getElementById('rcSupSupprimerRow-' + _rcSupSuppressionOuverte);
+    if (prev) prev.style.display = 'none';
+  }
+  row.style.display = dejaOuvert ? 'none' : 'table-row';
+  _rcSupSuppressionOuverte = dejaOuvert ? null : id;
+}
+
+async function _rcSupConfirmerSuppression(id, nom) {
+  const resultat = await _rcSupprimerInline({
+    table: 'superviseurs', id, nom,
+    verifications: [
+      { table: 'chantiers', colonne: 'superviseur_id', messageBlocage: "Impossible : ce superviseur a des chantiers assignés. Réassignez-les d'abord." },
+      { table: 'registre_transactions', colonne: 'superviseur_id', messageBlocage: 'Impossible : ce superviseur a des transactions dans le registre.' },
+      { table: 'rapport_final_chantier', colonne: 'validation_superviseur_id', messageBlocage: 'Impossible : ce superviseur a validé des rapports finaux de chantier.' },
+    ],
+    action: 'suppression_superviseur'
+  });
+  if (!resultat.ok) {
+    const msg = document.getElementById('rcSupSupprimerMsg-' + id);
+    if (msg) { msg.textContent = resultat.message; msg.style.fontWeight = '700'; }
+    return;
+  }
+  if (typeof showToast === 'function') showToast('✅ Superviseur supprimé', 'success');
+  _rcLoadCartes(); _rcLoadSuperviseursListe();
 }
 
 // ── Fiche détail superviseur (accordéon) ──
@@ -14279,6 +14448,7 @@ async function _rcSupConfirmerChangement(chantierId, superviseurActuelId) {
 async function _rcOuvrirClientModal(id) {
   _rcClientEditId = id || null;
   ['rcClientNom','rcClientTelephone','rcClientEmail','rcClientVille','rcClientAdresse'].forEach(fid => { const el = document.getElementById(fid); if (el) el.value = ''; });
+  const selStatut = document.getElementById('rcClientStatut'); if (selStatut) selStatut.value = 'actif';
   _rcCacherErreur('rcClientErreur');
   const titre = document.querySelector('#rcClientModal h3');
   const btn = document.getElementById('rcClientSave');
@@ -14288,13 +14458,14 @@ async function _rcOuvrirClientModal(id) {
 
   if (_rcClientEditId) {
     try {
-      const { data, error } = await sb.from('clients').select('nom,telephone,email,ville,adresse').eq('id', _rcClientEditId).single();
+      const { data, error } = await sb.from('clients').select('nom,telephone,email,ville,adresse,statut').eq('id', _rcClientEditId).single();
       if (error) throw error;
       document.getElementById('rcClientNom').value = data.nom || '';
       document.getElementById('rcClientTelephone').value = data.telephone || '';
       document.getElementById('rcClientEmail').value = data.email || '';
       document.getElementById('rcClientVille').value = data.ville || '';
       document.getElementById('rcClientAdresse').value = data.adresse || '';
+      if (selStatut) selStatut.value = data.statut || 'actif';
     } catch (e) {
       _rcAfficherErreur('rcClientErreur', 'Erreur de chargement : ' + e.message);
     }
@@ -14307,6 +14478,7 @@ async function _rcSauvegarderClient() {
   const email = document.getElementById('rcClientEmail').value.trim();
   const ville = document.getElementById('rcClientVille').value.trim();
   const adresse = document.getElementById('rcClientAdresse').value.trim();
+  const statut = document.getElementById('rcClientStatut').value;
   _rcCacherErreur('rcClientErreur');
 
   if (!nom) { _rcAfficherErreur('rcClientErreur', 'Le nom est obligatoire.'); return; }
@@ -14316,7 +14488,7 @@ async function _rcSauvegarderClient() {
   const btn = document.getElementById('rcClientSave');
   btn.disabled = true; btn.textContent = enEdition ? 'Enregistrement...' : 'Création...';
   try {
-    const payload = { nom, telephone, email: email || null, ville: ville || null, adresse: adresse || null };
+    const payload = { nom, telephone, email: email || null, ville: ville || null, adresse: adresse || null, statut };
     const { error } = enEdition
       ? await sb.from('clients').update(payload).eq('id', _rcClientEditId)
       : await sb.from('clients').insert(payload);
@@ -14326,7 +14498,7 @@ async function _rcSauvegarderClient() {
     }
     await _logAdminAction(enEdition ? 'modification_client' : 'creation_client', nom, '', 'tel: ' + telephone);
     document.getElementById('rcClientModal').style.display = 'none';
-    if (typeof showToast === 'function') showToast(enEdition ? '✅ Client mis à jour' : '✅ Client créé — il se connecte avec son téléphone (code reçu par SMS)', 'success');
+    if (typeof showToast === 'function') showToast(enEdition ? '✅ Modifications enregistrées' : '✅ Client créé — il se connecte avec son téléphone (code reçu par SMS)', 'success');
     _rcLoadCartes();
     _rcLoadClientsListe();
   } catch (e) {
@@ -14339,7 +14511,8 @@ async function _rcSauvegarderClient() {
 // ── Création FOURNISSEUR ──
 async function _rcOuvrirFournisseurModal(id) {
   _rcFournisseurEditId = id || null;
-  ['rcFournisseurNom','rcFournisseurTelephone','rcFournisseurVille','rcFournisseurCommune'].forEach(fid => { const el = document.getElementById(fid); if (el) el.value = ''; });
+  ['rcFournisseurNom','rcFournisseurTelephone','rcFournisseurVille','rcFournisseurCommune','rcFournisseurAbonnementFin'].forEach(fid => { const el = document.getElementById(fid); if (el) el.value = ''; });
+  const selStatut = document.getElementById('rcFournisseurStatut'); if (selStatut) selStatut.value = 'actif';
   _rcCacherErreur('rcFournisseurErreur');
   const titre = document.querySelector('#rcFournisseurModal h3');
   const btn = document.getElementById('rcFournisseurSave');
@@ -14349,12 +14522,14 @@ async function _rcOuvrirFournisseurModal(id) {
 
   if (_rcFournisseurEditId) {
     try {
-      const { data, error } = await sb.from('fournisseurs_materiaux').select('nom_entreprise,telephone,ville,commune').eq('id', _rcFournisseurEditId).single();
+      const { data, error } = await sb.from('fournisseurs_materiaux').select('nom_entreprise,telephone,ville,commune,statut,abonnement_fin').eq('id', _rcFournisseurEditId).single();
       if (error) throw error;
       document.getElementById('rcFournisseurNom').value = data.nom_entreprise || '';
       document.getElementById('rcFournisseurTelephone').value = data.telephone || '';
       document.getElementById('rcFournisseurVille').value = data.ville || '';
       document.getElementById('rcFournisseurCommune').value = data.commune || '';
+      if (selStatut) selStatut.value = data.statut || 'actif';
+      document.getElementById('rcFournisseurAbonnementFin').value = data.abonnement_fin ? String(data.abonnement_fin).slice(0, 10) : '';
     } catch (e) {
       _rcAfficherErreur('rcFournisseurErreur', 'Erreur de chargement : ' + e.message);
     }
@@ -14366,6 +14541,8 @@ async function _rcSauvegarderFournisseur() {
   const telephone = document.getElementById('rcFournisseurTelephone').value.trim();
   const ville = document.getElementById('rcFournisseurVille').value.trim();
   const commune = document.getElementById('rcFournisseurCommune').value.trim();
+  const statut = document.getElementById('rcFournisseurStatut').value;
+  const abonnementFin = document.getElementById('rcFournisseurAbonnementFin').value;
   _rcCacherErreur('rcFournisseurErreur');
 
   if (!nom_entreprise) { _rcAfficherErreur('rcFournisseurErreur', "Le nom de l'entreprise est obligatoire."); return; }
@@ -14375,7 +14552,7 @@ async function _rcSauvegarderFournisseur() {
   const btn = document.getElementById('rcFournisseurSave');
   btn.disabled = true; btn.textContent = enEdition ? 'Enregistrement...' : 'Création...';
   try {
-    const payload = { nom_entreprise, telephone, ville: ville || null, commune: commune || null };
+    const payload = { nom_entreprise, telephone, ville: ville || null, commune: commune || null, statut, abonnement_fin: abonnementFin || null };
     const { error } = enEdition
       ? await sb.from('fournisseurs_materiaux').update(payload).eq('id', _rcFournisseurEditId)
       : await sb.from('fournisseurs_materiaux').insert(payload);
@@ -14385,7 +14562,7 @@ async function _rcSauvegarderFournisseur() {
     }
     await _logAdminAction(enEdition ? 'modification_fournisseur' : 'creation_fournisseur', nom_entreprise, '', 'tel: ' + telephone);
     document.getElementById('rcFournisseurModal').style.display = 'none';
-    if (typeof showToast === 'function') showToast(enEdition ? '✅ Fournisseur mis à jour' : '✅ Fournisseur créé — il se connecte avec son téléphone (code reçu par SMS). Abonnement inactif par défaut.', 'success');
+    if (typeof showToast === 'function') showToast(enEdition ? '✅ Modifications enregistrées' : '✅ Fournisseur créé — il se connecte avec son téléphone (code reçu par SMS). Abonnement inactif par défaut.', 'success');
     _rcLoadCartes();
     _rcLoadFournisseursListe();
   } catch (e) {
@@ -14404,6 +14581,7 @@ async function _rcSauvegarderFournisseur() {
 async function _rcOuvrirSuperviseurModal(id) {
   _rcSuperviseurEditId = id || null;
   ['rcSuperviseurNom','rcSuperviseurTelephone'].forEach(fid => { const el = document.getElementById(fid); if (el) el.value = ''; });
+  const selStatut = document.getElementById('rcSuperviseurStatut'); if (selStatut) selStatut.value = 'actif';
   _rcCacherErreur('rcSuperviseurErreur');
   const titre = document.querySelector('#rcSuperviseurModal h3');
   const btn = document.getElementById('rcSuperviseurSave');
@@ -14416,11 +14594,12 @@ async function _rcOuvrirSuperviseurModal(id) {
   let superviseurExistant = null;
   if (_rcSuperviseurEditId) {
     try {
-      const { data, error } = await sb.from('superviseurs').select('nom,telephone,provider_id').eq('id', _rcSuperviseurEditId).single();
+      const { data, error } = await sb.from('superviseurs').select('nom,telephone,provider_id,statut').eq('id', _rcSuperviseurEditId).single();
       if (error) throw error;
       superviseurExistant = data;
       document.getElementById('rcSuperviseurNom').value = data.nom || '';
       document.getElementById('rcSuperviseurTelephone').value = data.telephone || '';
+      if (selStatut) selStatut.value = data.statut || 'actif';
     } catch (e) {
       _rcAfficherErreur('rcSuperviseurErreur', 'Erreur de chargement : ' + e.message);
     }
@@ -14440,6 +14619,7 @@ async function _rcSauvegarderSuperviseur() {
   const nom = document.getElementById('rcSuperviseurNom').value.trim();
   const telephone = document.getElementById('rcSuperviseurTelephone').value.trim();
   const providerId = document.getElementById('rcSuperviseurProviderId').value || null;
+  const statut = document.getElementById('rcSuperviseurStatut').value;
   _rcCacherErreur('rcSuperviseurErreur');
 
   if (!nom) { _rcAfficherErreur('rcSuperviseurErreur', 'Le nom est obligatoire.'); return; }
@@ -14449,7 +14629,7 @@ async function _rcSauvegarderSuperviseur() {
   const btn = document.getElementById('rcSuperviseurSave');
   btn.disabled = true; btn.textContent = enEdition ? 'Enregistrement...' : 'Création...';
   try {
-    const payload = { nom, telephone, provider_id: providerId };
+    const payload = { nom, telephone, provider_id: providerId, statut };
     const { error } = enEdition
       ? await sb.from('superviseurs').update(payload).eq('id', _rcSuperviseurEditId)
       : await sb.from('superviseurs').insert(payload);
@@ -14459,7 +14639,7 @@ async function _rcSauvegarderSuperviseur() {
     }
     await _logAdminAction(enEdition ? 'modification_superviseur' : 'creation_superviseur', nom, '', 'tel: ' + telephone + (providerId ? ' | provider_id: ' + providerId : ''));
     document.getElementById('rcSuperviseurModal').style.display = 'none';
-    if (typeof showToast === 'function') showToast(enEdition ? '✅ Superviseur mis à jour' : '✅ Superviseur créé — il se connecte avec son téléphone (code reçu par SMS)', 'success');
+    if (typeof showToast === 'function') showToast(enEdition ? '✅ Modifications enregistrées' : '✅ Superviseur créé — il se connecte avec son téléphone (code reçu par SMS)', 'success');
     _rcLoadCartes();
     _rcLoadSuperviseursListe();
   } catch (e) {
