@@ -2657,6 +2657,31 @@ if (typeof connexionPrestataire === 'undefined') {
   #espaceWrapper{padding:24px 14px!important;align-items:center!important;}
   #espaceEtapeTel,#espaceEtapeOtp,#espaceEtapeInscription{padding:26px 20px!important;}
 }
+
+/* Tableaux de bord #espace — cartes premium + navigation par onglets */
+#espaceWrapper .esp-card{background:#fff;border-radius:12px;border:0.5px solid rgba(0,0,0,.07);padding:20px;}
+#espaceWrapper .esp-avatar{width:52px;height:52px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:17px;font-weight:800;flex-shrink:0;}
+#espaceWrapper .esp-btn-logout{display:inline-flex;align-items:center;gap:7px;background:#FEF2F2;color:#DC2626;border:none;border-radius:10px;padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer;flex-shrink:0;white-space:nowrap;}
+#espaceWrapper .esp-tabbar{display:flex;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;border-bottom:1.5px solid #ECECF5;margin-bottom:18px;scrollbar-width:none;}
+#espaceWrapper .esp-tabbar::-webkit-scrollbar{display:none;}
+#espaceWrapper .esp-tab{flex-shrink:0;background:none;border:none;border-bottom:3px solid transparent;padding:11px 14px;font-size:13px;font-weight:700;color:#9CA3AF;cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s;}
+#espaceWrapper .esp-tab i{margin-right:6px;}
+#espaceWrapper .esp-tab.active{color:var(--esp-accent);border-bottom-color:var(--esp-accent);}
+#espaceWrapper .esp-panel{animation:espFade .18s ease;}
+@keyframes espFade{from{opacity:0;}to{opacity:1;}}
+#espaceWrapper .esp-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #F7F8FC;font-size:12.5px;}
+#espaceWrapper .esp-row:last-child{border-bottom:none;}
+#espaceWrapper .esp-empty{background:#fff;border-radius:12px;padding:28px 20px;text-align:center;color:#9CA3AF;font-size:13px;border:0.5px solid rgba(0,0,0,.07);}
+#espaceWrapper .esp-badge{border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;white-space:nowrap;}
+#espaceWrapper .esp-switch{position:relative;width:44px;height:24px;border-radius:20px;background:#D1D5DB;flex-shrink:0;transition:background .18s;cursor:pointer;}
+#espaceWrapper .esp-switch::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .18s;}
+#espaceWrapper .esp-switch.on{background:var(--esp-accent,#059669);}
+#espaceWrapper .esp-switch.on::after{transform:translateX(20px);}
+#espaceWrapper .esp-btn-block{width:100%;padding:13px;border:none;border-radius:11px;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+@media (max-width:480px){
+  #espaceWrapper .esp-tab{padding:10px 11px;font-size:12.5px;}
+  #espaceWrapper .esp-card{padding:16px;}
+}
 </style>
 <div id="espaceWrapper" style="background:linear-gradient(135deg,#1A1A4E 0%,#0D0D2E 100%);height:100vh;padding:40px 20px;display:flex;align-items:flex-start;justify-content:center;">
 
@@ -2741,18 +2766,15 @@ if (typeof connexionPrestataire === 'undefined') {
 
   <!-- Tableau de bord FOURNISSEUR -->
   <div id="espaceDashFournisseur" style="display:none;width:100%;max-width:820px;">
-    <div style="background:#fff;border-radius:18px;padding:22px 24px;margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:16px;">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div id="espaceFourAvatar" style="width:56px;height:56px;border-radius:50%;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:18px;font-weight:800;flex-shrink:0;"></div>
-          <div>
-            <div style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Fournisseur YOUMMA JOBS</div>
-            <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceFourNom"></div>
-          </div>
+    <div class="esp-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+        <div id="espaceFourAvatar" class="esp-avatar" style="background:#059669;"></div>
+        <div style="min-width:0;">
+          <div style="font-size:16px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Bonjour, <span id="espaceFourPrenom"></span> 👋</div>
+          <div style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.04em;">Fournisseur YOUMMA JOBS</div>
         </div>
-        <button onclick="_espaceDeconnexion()" style="display:inline-flex;align-items:center;gap:7px;background:#FEF2F2;color:#DC2626;border:none;border-radius:10px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-right-from-bracket" style="font-size:11px;"></i> Déconnexion</button>
       </div>
-      <div style="font-size:22px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;line-height:1.25;">Bonjour <span id="espaceFourPrenom"></span> 👋</div>
+      <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Sortir</button>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
@@ -2766,101 +2788,108 @@ if (typeof connexionPrestataire === 'undefined') {
       </div>
     </div>
 
-    <div id="espaceFourBandeau" style="display:none;background:#FFFBEB;border:1.5px solid #FED7AA;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;font-weight:700;color:#9A3412;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i><span id="espaceFourBandeauTexte"></span></div>
-
-    <div id="espaceFourChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
-
-    <!-- Mon profil public -->
-    <div style="background:#fff;border-radius:18px;padding:20px;margin-top:16px;">
-      <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:16px;"><i class="fa-solid fa-id-card" style="color:#059669;margin-right:8px;"></i>Mon profil public</div>
-
-      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
-          <div id="espaceFourProfilPhotoApercu" style="width:80px;height:80px;border-radius:16px;background:#F4F6FB;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#9CA3AF;font-size:24px;flex-shrink:0;"><i class="fa-solid fa-image"></i></div>
-          <label style="font-size:11px;font-weight:700;color:#2563EB;cursor:pointer;">
-            Changer la photo
-            <input type="file" accept="image/*" id="espaceFourProfilPhotoInput" style="display:none;" onchange="_espaceFournisseurChangerPhoto(this)"/>
-          </label>
-        </div>
-        <div style="flex:1;min-width:200px;">
-          <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Description</label>
-          <textarea id="espaceFourProfilDescription" rows="3" placeholder="Présentez votre entreprise, vos matériaux, votre zone de livraison..." style="width:100%;box-sizing:border-box;margin-top:4px;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:10px;margin-bottom:14px;">
-        <div style="flex:1;">
-          <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Ville</label>
-          <input id="espaceFourProfilVille" type="text" style="width:100%;box-sizing:border-box;margin-top:4px;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
-        </div>
-        <div style="flex:1;">
-          <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Commune</label>
-          <input id="espaceFourProfilCommune" type="text" style="width:100%;box-sizing:border-box;margin-top:4px;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
-        </div>
-      </div>
-
-      <button id="espaceFourProfilPublicToggle" onclick="_espaceFournisseurBasculerPublic()" style="display:flex;align-items:center;gap:10px;width:100%;padding:12px;border-radius:10px;border:2px solid #E5E7EB;background:#fff;cursor:pointer;margin-bottom:16px;text-align:left;">
-        <span id="espaceFourProfilPublicDot" style="width:16px;height:16px;border-radius:50%;background:#D1D5DB;flex-shrink:0;"></span>
-        <span style="font-size:12.5px;font-weight:700;color:#1A1A4E;">Rendre mon profil visible sur la page Construire</span>
-      </button>
-
-      <div id="espaceFourProfilErreur" style="display:none;color:#DC2626;font-size:12.5px;margin-bottom:10px;"></div>
-      <button onclick="_espaceFournisseurEnregistrerProfil()" style="width:100%;background:#059669;color:#fff;border:none;border-radius:10px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;">Enregistrer mon profil</button>
+    <div class="esp-tabbar" style="--esp-accent:#059669;">
+      <button class="esp-tab active" data-esp-tab="four" data-esp-tab-id="chantiers" onclick="_espaceBasculerOnglet('four','chantiers')"><i class="fa-solid fa-building"></i>Mes chantiers</button>
+      <button class="esp-tab" data-esp-tab="four" data-esp-tab-id="profil" onclick="_espaceBasculerOnglet('four','profil')"><i class="fa-solid fa-id-card"></i>Mon profil</button>
+      <button class="esp-tab" data-esp-tab="four" data-esp-tab-id="catalogue" onclick="_espaceBasculerOnglet('four','catalogue')"><i class="fa-solid fa-boxes-stacked"></i>Catalogue</button>
     </div>
 
-    <!-- Mon catalogue -->
-    <div style="background:#fff;border-radius:18px;padding:20px;margin-top:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
-        <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;"><i class="fa-solid fa-boxes-stacked" style="color:#E8650A;margin-right:8px;"></i>Mon catalogue</div>
-        <button onclick="_espaceFournisseurOuvrirFormProduit()" style="background:#ECFDF5;color:#059669;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;">+ Ajouter un produit</button>
-      </div>
+    <div class="esp-panel" data-esp-panel="four" data-esp-panel-id="chantiers" style="display:block;">
+      <div id="espaceFourBandeau" style="display:none;background:#FFFBEB;border:1.5px solid #FED7AA;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;font-weight:700;color:#9A3412;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i><span id="espaceFourBandeauTexte"></span></div>
+      <div id="espaceFourChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
 
-      <div id="espaceFourProduitForm" style="display:none;background:#F9FAFB;border-radius:12px;padding:14px;margin-bottom:16px;">
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <input id="espaceFourProduitNom" type="text" placeholder="Nom du produit *" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
-          <div style="display:flex;gap:8px;">
-            <select id="espaceFourProduitUnite" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;">
-              <option value="">Unité</option>
-              <option value="sac">Sac</option>
-              <option value="kg">Kg</option>
-              <option value="m²">M²</option>
-              <option value="m³">M³</option>
-              <option value="tonne">Tonne</option>
-              <option value="unité">Unité</option>
-              <option value="litre">Litre</option>
-            </select>
-            <input id="espaceFourProduitPrix" type="number" min="0" placeholder="Prix GNF" style="flex:1;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
+    <div class="esp-panel" data-esp-panel="four" data-esp-panel-id="profil" style="display:none;">
+      <div class="esp-card">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+            <div id="espaceFourProfilPhotoApercu" style="width:80px;height:80px;border-radius:16px;background:#F4F6FB;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#9CA3AF;font-size:24px;flex-shrink:0;"><i class="fa-solid fa-image"></i></div>
+            <label style="font-size:11px;font-weight:700;color:#2563EB;cursor:pointer;">
+              Changer la photo
+              <input type="file" accept="image/*" id="espaceFourProfilPhotoInput" style="display:none;" onchange="_espaceFournisseurChangerPhoto(this)"/>
+            </label>
           </div>
-          <button id="espaceFourProduitDispoToggle" onclick="_espaceFournisseurBasculerDispoForm()" style="display:flex;align-items:center;gap:8px;padding:10px;border-radius:8px;border:1.5px solid #A7F3D0;background:#ECFDF5;cursor:pointer;">
-            <span id="espaceFourProduitDispoDot" style="width:12px;height:12px;border-radius:50%;background:#059669;flex-shrink:0;"></span>
-            <span style="font-size:12px;font-weight:700;color:#059669;">Disponible</span>
-          </button>
-          <div id="espaceFourProduitErreur" style="display:none;color:#DC2626;font-size:12px;"></div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="_espaceFournisseurFermerFormProduit()" style="flex:1;background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:10px;font-size:12.5px;font-weight:700;cursor:pointer;">Annuler</button>
-            <button onclick="_espaceFournisseurEnregistrerProduit()" style="flex:1;background:#E8650A;color:#fff;border:none;border-radius:8px;padding:10px;font-size:12.5px;font-weight:700;cursor:pointer;">Enregistrer</button>
+          <div style="flex:1;min-width:200px;">
+            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Description</label>
+            <textarea id="espaceFourProfilDescription" rows="3" placeholder="Présentez votre entreprise, vos matériaux, votre zone de livraison..." style="width:100%;box-sizing:border-box;margin-top:6px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
           </div>
         </div>
-      </div>
 
-      <div id="espaceFourProduitsListe"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+        <div style="display:flex;gap:12px;margin-bottom:18px;">
+          <div style="flex:1;">
+            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Ville</label>
+            <input id="espaceFourProfilVille" type="text" style="width:100%;box-sizing:border-box;margin-top:6px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;"/>
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;">Commune</label>
+            <input id="espaceFourProfilCommune" type="text" style="width:100%;box-sizing:border-box;margin-top:6px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;"/>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:10px;background:#F9FAFB;margin-bottom:18px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#1A1A4E;">Visible sur la page Construire</div>
+            <div style="font-size:11px;color:#9CA3AF;">Les clients pourront voir votre profil et catalogue</div>
+          </div>
+          <div id="espaceFourProfilPublicToggle" class="esp-switch" style="--esp-accent:#059669;" onclick="_espaceFournisseurBasculerPublic()"></div>
+        </div>
+
+        <div id="espaceFourProfilErreur" style="display:none;color:#DC2626;font-size:12.5px;margin-bottom:12px;"></div>
+        <button onclick="_espaceFournisseurEnregistrerProfil()" class="esp-btn-block" style="background:#059669;color:#fff;"><i class="fa-solid fa-check"></i>Enregistrer mon profil</button>
+      </div>
+    </div>
+
+    <div class="esp-panel" data-esp-panel="four" data-esp-panel-id="catalogue" style="display:none;">
+      <div class="esp-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
+          <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;"><i class="fa-solid fa-boxes-stacked" style="color:#E8650A;margin-right:8px;"></i>Mes produits</div>
+          <button onclick="_espaceFournisseurOuvrirFormProduit()" style="background:#ECFDF5;color:#059669;border:none;border-radius:9px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-plus" style="margin-right:6px;"></i>Ajouter un produit</button>
+        </div>
+
+        <div id="espaceFourProduitForm" style="display:none;background:#F9FAFB;border-radius:12px;padding:16px;margin-bottom:18px;">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <input id="espaceFourProduitNom" type="text" placeholder="Nom du produit *" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13px;"/>
+            <div style="display:flex;gap:10px;">
+              <select id="espaceFourProduitUnite" style="flex:1;box-sizing:border-box;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13px;background:#fff;">
+                <option value="">Unité</option>
+                <option value="sac">Sac</option>
+                <option value="kg">Kg</option>
+                <option value="m²">M²</option>
+                <option value="m³">M³</option>
+                <option value="tonne">Tonne</option>
+                <option value="unité">Unité</option>
+                <option value="litre">Litre</option>
+              </select>
+              <input id="espaceFourProduitPrix" type="number" min="0" placeholder="Prix GNF" style="flex:1;box-sizing:border-box;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13px;"/>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;background:#fff;border:1.5px solid #E5E7EB;">
+              <div id="espaceFourProduitDispoToggle" class="esp-switch" style="--esp-accent:#059669;" onclick="_espaceFournisseurBasculerDispoForm()"></div>
+              <span id="espaceFourProduitDispoLabel" style="font-size:12.5px;font-weight:700;color:#059669;">Disponible</span>
+            </div>
+            <div id="espaceFourProduitErreur" style="display:none;color:#DC2626;font-size:12px;"></div>
+            <div style="display:flex;gap:10px;">
+              <button onclick="_espaceFournisseurFermerFormProduit()" style="flex:1;background:#F3F4F6;color:#374151;border:none;border-radius:9px;padding:11px;font-size:12.5px;font-weight:700;cursor:pointer;">Annuler</button>
+              <button onclick="_espaceFournisseurEnregistrerProduit()" style="flex:1;background:#E8650A;color:#fff;border:none;border-radius:9px;padding:11px;font-size:12.5px;font-weight:700;cursor:pointer;">Enregistrer</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="espaceFourProduitsListe"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+      </div>
     </div>
   </div>
 
   <!-- Tableau de bord SUPERVISEUR -->
   <div id="espaceDashSuperviseur" style="display:none;width:100%;max-width:820px;">
-    <div style="background:#fff;border-radius:18px;padding:22px 24px;margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:16px;">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div id="espaceSupAvatar" style="width:56px;height:56px;border-radius:50%;background:#7C3AED;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:18px;font-weight:800;flex-shrink:0;"></div>
-          <div>
-            <div style="font-size:11px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Superviseur YOUMMA JOBS</div>
-            <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceSupNom"></div>
-          </div>
+    <div class="esp-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+        <div id="espaceSupAvatar" class="esp-avatar" style="background:#7C3AED;"></div>
+        <div style="min-width:0;">
+          <div style="font-size:16px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Bonjour, <span id="espaceSupPrenom"></span> 👋</div>
+          <div style="font-size:11px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:.04em;">Superviseur YOUMMA JOBS</div>
         </div>
-        <button onclick="_espaceDeconnexion()" style="display:inline-flex;align-items:center;gap:7px;background:#FEF2F2;color:#DC2626;border:none;border-radius:10px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-right-from-bracket" style="font-size:11px;"></i> Déconnexion</button>
       </div>
-      <div style="font-size:22px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;line-height:1.25;">Bonjour <span id="espaceSupPrenom"></span> 👋</div>
+      <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Sortir</button>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
@@ -2874,23 +2903,33 @@ if (typeof connexionPrestataire === 'undefined') {
       </div>
     </div>
 
-    <div id="espaceSupChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    <div class="esp-tabbar" style="--esp-accent:#7C3AED;">
+      <button class="esp-tab active" data-esp-tab="sup" data-esp-tab-id="chantiers" onclick="_espaceBasculerOnglet('sup','chantiers')"><i class="fa-solid fa-building"></i>Mes chantiers</button>
+      <button class="esp-tab" data-esp-tab="sup" data-esp-tab-id="transactions" onclick="_espaceBasculerOnglet('sup','transactions')"><i class="fa-solid fa-clock-rotate-left"></i>Transactions</button>
+    </div>
+
+    <div class="esp-panel" data-esp-panel="sup" data-esp-panel-id="chantiers" style="display:block;">
+      <div id="espaceSupChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
+
+    <div class="esp-panel" data-esp-panel="sup" data-esp-panel-id="transactions" style="display:none;">
+      <div class="esp-card">
+        <div id="espaceSupTransactionsGlobal"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+      </div>
+    </div>
   </div>
 
   <!-- Tableau de bord CLIENT (lecture seule) -->
   <div id="espaceDashClient" style="display:none;width:100%;max-width:820px;">
-    <div style="background:#fff;border-radius:18px;padding:22px 24px;margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:16px;">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div id="espaceCliAvatar" style="width:56px;height:56px;border-radius:50%;background:#2563EB;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:18px;font-weight:800;flex-shrink:0;"></div>
-          <div>
-            <div style="font-size:11px;font-weight:700;color:#2563EB;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Espace client YOUMMA JOBS</div>
-            <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;" id="espaceCliNom"></div>
-          </div>
+    <div class="esp-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+        <div id="espaceCliAvatar" class="esp-avatar" style="background:#2563EB;"></div>
+        <div style="min-width:0;">
+          <div style="font-size:16px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Bonjour, <span id="espaceCliPrenom"></span> 👋</div>
+          <div style="font-size:11px;font-weight:700;color:#2563EB;text-transform:uppercase;letter-spacing:.04em;">Espace client YOUMMA JOBS</div>
         </div>
-        <button onclick="_espaceDeconnexion()" style="display:inline-flex;align-items:center;gap:7px;background:#FEF2F2;color:#DC2626;border:none;border-radius:10px;padding:9px 16px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-right-from-bracket" style="font-size:11px;"></i> Déconnexion</button>
       </div>
-      <div style="font-size:22px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;line-height:1.25;">Bonjour <span id="espaceCliPrenom"></span> 👋</div>
+      <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Sortir</button>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
@@ -2904,7 +2943,25 @@ if (typeof connexionPrestataire === 'undefined') {
       </div>
     </div>
 
-    <div id="espaceCliChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    <div class="esp-tabbar" style="--esp-accent:#2563EB;">
+      <button class="esp-tab active" data-esp-tab="cli" data-esp-tab-id="chantiers" onclick="_espaceBasculerOnglet('cli','chantiers')"><i class="fa-solid fa-building"></i>Mes chantiers</button>
+      <button class="esp-tab" data-esp-tab="cli" data-esp-tab-id="versements" onclick="_espaceBasculerOnglet('cli','versements')"><i class="fa-solid fa-wallet"></i>Mes versements</button>
+      <button class="esp-tab" data-esp-tab="cli" data-esp-tab-id="fournisseur" onclick="_espaceBasculerOnglet('cli','fournisseur')"><i class="fa-solid fa-truck"></i>Mon fournisseur</button>
+    </div>
+
+    <div class="esp-panel" data-esp-panel="cli" data-esp-panel-id="chantiers" style="display:block;">
+      <div id="espaceCliChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
+
+    <div class="esp-panel" data-esp-panel="cli" data-esp-panel-id="versements" style="display:none;">
+      <div class="esp-card">
+        <div id="espaceCliVersementsListe"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+      </div>
+    </div>
+
+    <div class="esp-panel" data-esp-panel="cli" data-esp-panel-id="fournisseur" style="display:none;">
+      <div id="espaceCliFournisseurListe"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
   </div>
 
 </div>
@@ -3246,28 +3303,46 @@ function _espaceInitiales(nom) {
 
 function _espaceAfficherTableauBord() {
   ['espaceDashFournisseur', 'espaceDashSuperviseur', 'espaceDashClient'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  // Le formulaire de connexion ne doit JAMAIS rester visible en même temps
+  // qu'un tableau de bord (ex. restauration de session persistante : ces
+  // étapes n'étaient sinon jamais explicitement masquées ici).
+  ['espaceEtapeTel', 'espaceEtapeOtp', 'espaceEtapeInscription'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   if (!_espaceSession) { _espaceInit(); return; }
   const initiales = _espaceInitiales(_espaceSession.nom);
   if (_espaceSession.role === 'fournisseur') {
     document.getElementById('espaceDashFournisseur').style.display = 'block';
-    document.getElementById('espaceFourNom').textContent = _espaceSession.nom;
     document.getElementById('espaceFourPrenom').textContent = _espaceSession.nom;
     document.getElementById('espaceFourAvatar').textContent = initiales;
+    _espaceBasculerOnglet('four', 'chantiers');
     _espaceChargerFournisseur();
     _espaceFournisseurChargerProfilEtCatalogue();
   } else if (_espaceSession.role === 'superviseur') {
     document.getElementById('espaceDashSuperviseur').style.display = 'block';
-    document.getElementById('espaceSupNom').textContent = _espaceSession.nom;
     document.getElementById('espaceSupPrenom').textContent = _espaceSession.nom;
     document.getElementById('espaceSupAvatar').textContent = initiales;
+    _espaceBasculerOnglet('sup', 'chantiers');
     _espaceChargerSuperviseur();
   } else if (_espaceSession.role === 'client') {
     document.getElementById('espaceDashClient').style.display = 'block';
-    document.getElementById('espaceCliNom').textContent = _espaceSession.nom;
     document.getElementById('espaceCliPrenom').textContent = _espaceSession.nom;
     document.getElementById('espaceCliAvatar').textContent = initiales;
+    _espaceBasculerOnglet('cli', 'chantiers');
     _espaceChargerClient();
   }
+}
+
+// Navigation par onglets des 3 tableaux de bord — purement client-side
+// (affichage/masquage de divs déjà chargées), aucune donnée n'est
+// rechargée au clic. Structure extensible : ajouter un onglet = ajouter
+// un bouton [data-esp-tab] + un panneau [data-esp-panel] partageant le
+// même data-esp-tab-id / data-esp-panel-id, rien à changer ici.
+function _espaceBasculerOnglet(prefix, tabId) {
+  document.querySelectorAll('.esp-tab[data-esp-tab="' + prefix + '"]').forEach(function (btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-esp-tab-id') === tabId);
+  });
+  document.querySelectorAll('.esp-panel[data-esp-panel="' + prefix + '"]').forEach(function (panel) {
+    panel.style.display = (panel.getAttribute('data-esp-panel-id') === tabId) ? 'block' : 'none';
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -3417,10 +3492,8 @@ async function _espaceFournisseurChargerProfilEtCatalogue() {
 
 function _espaceFournisseurRendreToggleProfilPublic() {
   const btn = document.getElementById('espaceFourProfilPublicToggle');
-  const dot = document.getElementById('espaceFourProfilPublicDot');
-  if (!btn || !dot) return;
-  if (_espaceFourProfilPublicState) { btn.style.borderColor = '#A7F3D0'; btn.style.background = '#ECFDF5'; dot.style.background = '#059669'; }
-  else { btn.style.borderColor = '#E5E7EB'; btn.style.background = '#fff'; dot.style.background = '#D1D5DB'; }
+  if (!btn) return;
+  btn.classList.toggle('on', _espaceFourProfilPublicState);
 }
 
 function _espaceFournisseurBasculerPublic() {
@@ -3497,11 +3570,10 @@ async function _espaceFournisseurChargerCatalogue() {
 
 function _espaceFournisseurRendreToggleDispoForm() {
   const btn = document.getElementById('espaceFourProduitDispoToggle');
-  const dot = document.getElementById('espaceFourProduitDispoDot');
-  const label = btn ? btn.querySelector('span:last-child') : null;
-  if (!btn || !dot) return;
-  if (_espaceFourProduitDispoState) { btn.style.borderColor = '#A7F3D0'; btn.style.background = '#ECFDF5'; dot.style.background = '#059669'; if (label) { label.style.color = '#059669'; label.textContent = 'Disponible'; } }
-  else { btn.style.borderColor = '#FECACA'; btn.style.background = '#FEF2F2'; dot.style.background = '#DC2626'; if (label) { label.style.color = '#DC2626'; label.textContent = 'Indisponible'; } }
+  const label = document.getElementById('espaceFourProduitDispoLabel');
+  if (!btn) return;
+  btn.classList.toggle('on', _espaceFourProduitDispoState);
+  if (label) { label.textContent = _espaceFourProduitDispoState ? 'Disponible' : 'Indisponible'; label.style.color = _espaceFourProduitDispoState ? '#059669' : '#DC2626'; }
 }
 
 function _espaceFournisseurBasculerDispoForm() {
@@ -3705,6 +3777,42 @@ async function _espaceChargerSuperviseur() {
 
     chantiers.forEach(c => _espaceChargerSelectFournisseur(c.id));
     chantiers.forEach(c => _espaceChargerHistoriqueChantier(c.id, 5));
+
+    const nomsParId = {}; chantiers.forEach(c => { nomsParId[c.id] = c.nom; });
+    _espaceSuperviseurChargerTransactionsGlobal(chantiers.map(c => c.id), nomsParId);
+  } catch (e) {
+    zone.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+// Onglet "Transactions" — historique complet agrégé de tous les chantiers
+// du superviseur (l'onglet "Mes chantiers" garde ses 5 dernières lignes
+// par chantier + "Voir tout l'historique" individuel, sans changement).
+async function _espaceSuperviseurChargerTransactionsGlobal(chantierIds, nomsParId) {
+  const zone = document.getElementById('espaceSupTransactionsGlobal');
+  if (!zone) return;
+  if (!chantierIds.length) { zone.innerHTML = '<div class="esp-empty">Aucune transaction.</div>'; return; }
+  try {
+    const { data, error } = await sb.from('registre_transactions')
+      .select('*, comptes_materiaux(fournisseurs_materiaux(nom_entreprise))')
+      .in('chantier_id', chantierIds)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data || !data.length) { zone.innerHTML = '<div class="esp-empty">Aucune transaction.</div>'; return; }
+    zone.innerHTML = data.map(t => {
+      const sc = _rcStatutConfig(t.type_operation);
+      const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const acteur = t.client_id ? 'Client' : t.superviseur_id ? 'Superviseur' : t.fournisseur_id ? 'Fournisseur' : '—';
+      const fournisseur = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || '—';
+      const chantierNom = nomsParId[t.chantier_id] || '—';
+      return `<div class="esp-row" style="flex-wrap:wrap;">
+        <span class="esp-badge" style="background:${sc.bg};color:${sc.color};">${sc.label}</span>
+        <span style="color:#374151;font-weight:700;">${chantierNom}</span>
+        <span style="color:#6B7280;">${fournisseur} · ${acteur}</span>
+        <span style="color:#9CA3AF;">${date}</span>
+        <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
+      </div>`;
+    }).join('');
   } catch (e) {
     zone.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
   }
@@ -3859,9 +3967,11 @@ async function _espaceChargerClient() {
     const declaresParChantier = {};
     (versements || []).filter(t => t.type_operation === 'versement_declare').forEach(t => { (declaresParChantier[t.chantier_id] = declaresParChantier[t.chantier_id] || []).push(t); });
 
-    // Solde par fournisseur, groupé par chantier
+    // Solde par fournisseur, groupé par chantier — fournisseur_id ajouté au
+    // select (en plus du nom déjà utilisé) pour permettre l'agrégation par
+    // fournisseur de l'onglet "Mon fournisseur" sans requête supplémentaire.
     const { data: comptes, error: errC } = await sb.from('comptes_materiaux')
-      .select('chantier_id,solde_gnf,fournisseurs_materiaux(nom_entreprise)')
+      .select('chantier_id,fournisseur_id,solde_gnf,fournisseurs_materiaux(nom_entreprise,ville,commune)')
       .in('chantier_id', chantierIds);
     if (errC) throw errC;
     const comptesParChantier = {};
@@ -3876,54 +3986,78 @@ async function _espaceChargerClient() {
       const soldes = comptesParChantier[c.id] || [];
       const listeSoldes = soldes.length ? soldes.map(cm => {
         const solde = Number(cm.solde_gnf || 0);
-        return `<div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:7px 0;border-bottom:1px solid #F7F8FC;">
+        return `<div class="esp-row">
           <span style="color:#374151;"><i class="fa-solid fa-truck" style="width:16px;color:#9CA3AF;margin-right:6px;"></i>${cm.fournisseurs_materiaux?.nom_entreprise || '—'}</span>
           <span style="font-weight:700;color:${solde > 0 ? '#059669' : '#9CA3AF'};">${_espaceFormatGNF(solde)}</span>
         </div>`;
       }).join('') : '<div style="color:#9CA3AF;font-size:12px;">Aucun fournisseur assigné.</div>';
 
-      const declares = declaresParChantier[c.id] || [];
-      const ligneVersement = t => {
-        const traitement = traitementsParDemande[t.id];
-        const statutLabel = traitement ? (traitement.type_operation === 'versement_valide' ? 'Validé' : 'Rejeté') : 'Déclaré';
-        const statutCouleur = traitement ? (traitement.type_operation === 'versement_valide' ? '#059669' : '#DC2626') : '#D97706';
-        const statutFond = traitement ? (traitement.type_operation === 'versement_valide' ? '#ECFDF5' : '#FEF2F2') : '#FFFBEB';
-        const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        return `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;padding:7px 0;border-bottom:1px solid #F7F8FC;flex-wrap:wrap;">
-          <span style="color:#6B7280;">${date}</span>
-          <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
-          <span style="background:${statutFond};color:${statutCouleur};border-radius:20px;padding:2px 9px;font-size:10.5px;font-weight:700;">${statutLabel}</span>
-        </div>`;
-      };
-      const versementsVisibles = declares.slice(0, 3).map(ligneVersement).join('');
-      const versementsCaches = declares.length > 3 ? declares.slice(3).map(ligneVersement).join('') : '';
-      const versementsHtml = declares.length
-        ? versementsVisibles
-          + (versementsCaches ? `<div id="espaceCliVersementsPlus-${c.id}" style="display:none;">${versementsCaches}</div>
-             <button onclick="document.getElementById('espaceCliVersementsPlus-${c.id}').style.display='block';this.style.display='none';" style="background:none;border:none;color:#2563EB;font-size:11.5px;font-weight:700;cursor:pointer;padding:0;margin-top:8px;">Voir tout (${declares.length})</button>` : '')
-        : '<div style="color:#9CA3AF;font-size:12px;">Aucun versement.</div>';
-
-      return `<div style="background:#fff;border-radius:18px;padding:20px;">
+      return `<div class="esp-card">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;">
           <div>
             <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:6px;"><i class="fa-solid fa-building" style="color:#9CA3AF;margin-right:6px;font-size:13px;"></i>${c.nom}</div>
-            <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
+            <span class="esp-badge" style="background:${sc.bg};color:${sc.color};">${sc.label}</span>
           </div>
         </div>
         <div style="font-size:12.5px;color:#6B7280;margin-bottom:2px;"><i class="fa-solid fa-user" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Superviseur : ${superviseur} · Début : ${dateDebut}</div>
         ${formule ? `<div style="font-size:12.5px;color:#6B7280;margin-bottom:2px;"><i class="fa-solid fa-file-signature" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Formule : ${formule}</div>` : ''}
 
         <div style="border-top:1px solid #F0F0F8;padding-top:14px;margin-top:12px;">
-          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;"><i class="fa-solid fa-truck" style="margin-right:6px;color:#059669;"></i>Solde par fournisseur</div>
+          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;"><i class="fa-solid fa-truck" style="margin-right:6px;color:#059669;"></i>Solde par fournisseur</div>
           ${listeSoldes}
-        </div>
-
-        <div style="border-top:1px solid #F0F0F8;padding-top:14px;margin-top:14px;">
-          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;"><i class="fa-solid fa-wallet" style="margin-right:6px;color:#2563EB;"></i>Mes versements sur ce chantier</div>
-          ${versementsHtml}
         </div>
       </div>`;
     }).join('');
+
+    // Onglet "Mes versements" — agrégation de tous les versements déclarés,
+    // tous chantiers confondus, déjà triés par date (query ci-dessus).
+    const versementsZone = document.getElementById('espaceCliVersementsListe');
+    if (versementsZone) {
+      const chantierNomParId = {}; chantiers.forEach(c => { chantierNomParId[c.id] = c.nom; });
+      const declaresGlobal = (versements || []).filter(t => t.type_operation === 'versement_declare');
+      versementsZone.innerHTML = declaresGlobal.length ? declaresGlobal.map(t => {
+        const traitement = traitementsParDemande[t.id];
+        const statutLabel = traitement ? (traitement.type_operation === 'versement_valide' ? 'Validé' : 'Rejeté') : 'Déclaré';
+        const statutCouleur = traitement ? (traitement.type_operation === 'versement_valide' ? '#059669' : '#DC2626') : '#D97706';
+        const statutFond = traitement ? (traitement.type_operation === 'versement_valide' ? '#ECFDF5' : '#FEF2F2') : '#FFFBEB';
+        const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const fournisseur = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || '—';
+        const chantierNom = chantierNomParId[t.chantier_id] || '—';
+        return `<div class="esp-row" style="flex-wrap:wrap;">
+          <span style="color:#374151;font-weight:700;">${chantierNom}</span>
+          <span style="color:#6B7280;">${fournisseur}</span>
+          <span style="color:#9CA3AF;">${date}</span>
+          <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
+          <span class="esp-badge" style="background:${statutFond};color:${statutCouleur};">${statutLabel}</span>
+        </div>`;
+      }).join('') : '<div class="esp-empty">Aucun versement pour le moment.</div>';
+    }
+
+    // Onglet "Mon fournisseur" — fournisseurs distincts liés aux chantiers
+    // du client, avec le solde total cumulé sur l'ensemble de ses chantiers.
+    const fournisseurZone = document.getElementById('espaceCliFournisseurListe');
+    if (fournisseurZone) {
+      const fournisseursMap = {};
+      (comptes || []).forEach(c => {
+        if (!c.fournisseur_id) return;
+        if (!fournisseursMap[c.fournisseur_id]) {
+          fournisseursMap[c.fournisseur_id] = {
+            nom: c.fournisseurs_materiaux?.nom_entreprise || '—',
+            ville: c.fournisseurs_materiaux?.ville,
+            commune: c.fournisseurs_materiaux?.commune,
+            solde: 0
+          };
+        }
+        fournisseursMap[c.fournisseur_id].solde += Number(c.solde_gnf || 0);
+      });
+      const listeFournisseurs = Object.values(fournisseursMap);
+      fournisseurZone.innerHTML = listeFournisseurs.length ? listeFournisseurs.map(f => `
+        <div class="esp-card" style="margin-bottom:12px;">
+          <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:6px;"><i class="fa-solid fa-truck" style="color:#2563EB;margin-right:8px;"></i>${f.nom}</div>
+          ${(f.ville || f.commune) ? `<div style="font-size:12px;color:#6B7280;margin-bottom:8px;"><i class="fa-solid fa-location-dot" style="margin-right:5px;"></i>${[f.ville, f.commune].filter(Boolean).join(', ')}</div>` : ''}
+          <div style="font-size:12px;color:#6B7280;">Solde total : <strong style="color:${f.solde > 0 ? '#059669' : '#9CA3AF'};">${_espaceFormatGNF(f.solde)}</strong></div>
+        </div>`).join('') : '<div class="esp-empty"><i class="fa-solid fa-truck" style="font-size:22px;display:block;margin-bottom:8px;color:#D1D5DB;"></i>Bientôt : le profil détaillé de vos fournisseurs.</div>';
+    }
   } catch (e) {
     zone.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
   }
