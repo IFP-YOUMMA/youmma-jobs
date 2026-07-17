@@ -8181,47 +8181,69 @@ async function chargerAvis() {
 
         <!-- ═══ ONGLET : VUE D'ENSEMBLE ═══ -->
         <div class="rc-onglet-contenu" id="rcOnglet-vue_ensemble">
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px;">
-            <div class="adm-stat-card" style="border-top:3px solid #059669;">
-              <div class="adm-stat-icon" style="background:#059669;"><i class="fa-solid fa-building"></i></div>
-              <div class="adm-stat-num" id="rcVE_ChantiersEnCours">—</div>
-              <div class="adm-stat-label">Chantiers en cours</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;">
+            <div class="adm-stat-card" style="border-top:4px solid #059669;">
+              <div class="adm-stat-icon" style="background:#059669;"><i class="fa-solid fa-person-digging"></i></div>
+              <div class="adm-stat-num" id="rcVE_ChantiersEnCours" style="font-size:2rem;">—</div>
+              <div class="adm-stat-label">🏗️ Chantiers en cours</div>
             </div>
-            <div class="adm-stat-card" style="border-top:3px solid #D97706;">
-              <div class="adm-stat-icon" style="background:#D97706;"><i class="fa-solid fa-clock"></i></div>
-              <div class="adm-stat-num" id="rcVE_TransactionsEnAttente">—</div>
-              <div class="adm-stat-label">Transactions en attente</div>
+            <div class="adm-stat-card" style="border-top:4px solid #D97706;">
+              <div class="adm-stat-icon" style="background:#D97706;"><i class="fa-solid fa-hourglass-half"></i></div>
+              <div class="adm-stat-num" id="rcVE_VersementsEnAttente" style="font-size:2rem;">—</div>
+              <div class="adm-stat-label">⏳ Versements en attente</div>
             </div>
-            <div class="adm-stat-card" style="border-top:3px solid #2563EB;">
+            <div class="adm-stat-card" style="border-top:4px solid #2563EB;">
               <div class="adm-stat-icon" style="background:#2563EB;"><i class="fa-solid fa-sack-dollar"></i></div>
               <div class="adm-stat-num" id="rcVE_VolumeValide" style="font-size:19px;">—</div>
-              <div class="adm-stat-label">Volume total validé</div>
+              <div class="adm-stat-label">💰 Volume total validé</div>
             </div>
-            <div class="adm-stat-card" style="border-top:3px solid #DC2626;">
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+            <div class="adm-stat-card" style="border-top:4px solid #7C3AED;">
+              <div class="adm-stat-icon" style="background:#7C3AED;"><i class="fa-solid fa-helmet-safety"></i></div>
+              <div class="adm-stat-num" id="rcVE_SuperviseursActifs" style="font-size:2rem;">—</div>
+              <div class="adm-stat-label">👷 Superviseurs actifs</div>
+            </div>
+            <div class="adm-stat-card" style="border-top:4px solid #0D9488;">
+              <div class="adm-stat-icon" style="background:#0D9488;"><i class="fa-solid fa-truck-fast"></i></div>
+              <div class="adm-stat-num" id="rcVE_FournisseursActifs" style="font-size:2rem;">—</div>
+              <div class="adm-stat-label">🚚 Fournisseurs actifs</div>
+            </div>
+            <div class="adm-stat-card" style="border-top:4px solid #DC2626;">
               <div class="adm-stat-icon" style="background:#DC2626;"><i class="fa-solid fa-triangle-exclamation"></i></div>
-              <div class="adm-stat-num" id="rcVE_FournisseursNonAbonnes">—</div>
-              <div class="adm-stat-label">Fournisseurs non abonnés</div>
+              <div class="adm-stat-num" id="rcVE_FournisseursNonAbonnes" style="font-size:2rem;">—</div>
+              <div class="adm-stat-label">⚠️ Fournisseurs non abonnés</div>
             </div>
           </div>
 
-          <div id="rcVE_Alertes" style="display:none;background:#FFF7ED;border:1px solid #FED7AA;color:#9A3412;border-radius:10px;padding:12px 16px;font-size:12.5px;font-weight:600;margin-bottom:20px;"></div>
+          <div class="adm-section-title" style="font-size:14px;margin-bottom:10px;"><i class="fa-solid fa-bell" style="color:#DC2626;"></i> Alertes & Actions requises</div>
+          <div id="rcVE_AlertesActions" style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;"></div>
 
-          <div class="adm-section-title" style="font-size:14px;margin-bottom:10px;"><i class="fa-solid fa-list-check" style="color:#E85D04;"></i> 5 dernières transactions</div>
-          <div class="adm-table-wrap">
+          <div class="adm-section-header" style="margin-bottom:10px;align-items:center;">
+            <div class="adm-section-title" style="font-size:14px;margin:0;"><i class="fa-solid fa-list-check" style="color:#E85D04;"></i> Dernières transactions</div>
+            <a href="javascript:void(0)" onclick="_rcAfficherOnglet('registre')" style="font-size:12.5px;font-weight:700;color:#2563EB;text-decoration:none;white-space:nowrap;">Voir tout →</a>
+          </div>
+          <div class="adm-table-wrap" style="margin-bottom:24px;">
             <table class="adm-table" style="width:100%;border-collapse:collapse;">
               <thead>
                 <tr style="background:#F4F6FB;border-bottom:2px solid #E5E7EB;">
                   <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Chantier</th>
                   <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Fournisseur</th>
                   <th style="padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Type</th>
+                  <th style="padding:10px 12px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Statut</th>
                   <th style="padding:10px 12px;text-align:right;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Montant</th>
                   <th style="padding:10px 12px;text-align:center;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;">Date</th>
                 </tr>
               </thead>
               <tbody id="rcVE_DernieresTransactions">
-                <tr><td colspan="5" style="text-align:center;padding:30px;color:#9CA3AF;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</td></tr>
+                <tr><td colspan="6" style="text-align:center;padding:30px;color:#9CA3AF;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</td></tr>
               </tbody>
             </table>
+          </div>
+
+          <div class="adm-section-title" style="font-size:14px;margin-bottom:10px;"><i class="fa-solid fa-chart-column" style="color:#059669;"></i> 📈 Activité des 7 derniers jours</div>
+          <div style="background:#fff;border-radius:14px;border:1.5px solid #F0F0F8;padding:20px;">
+            <div id="rcVE_Graphique"><div style="text-align:center;padding:30px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div></div>
           </div>
         </div>
 
@@ -13151,19 +13173,22 @@ async function _rcLoadCartes() {
   }
 }
 
-// ── Onglet Vue d'ensemble ── 4 métriques globales + 5 dernières
-// transactions + alertes. "Transactions en attente" = lignes de type
-// versement_declare/sortie_demandee dont aucune autre ligne ne pointe vers
-// elles via reference_transaction_id (calculé côté JS, pas de colonne
-// statut sur registre_transactions — registre event-sourced). "Volume
-// total validé" = somme des montant_gnf en type_operation='versement_valide'
-// exclusivement (pas les sorties confirmées), comme demandé explicitement.
+// ── Onglet Vue d'ensemble ── 6 métriques globales + alertes/actions
+// requises + 10 dernières transactions + graphique 7 jours.
+// "Versements en attente" = lignes versement_declare dont aucune autre
+// ligne ne pointe vers elles via reference_transaction_id (calculé côté
+// JS, pas de colonne statut sur registre_transactions — registre
+// event-sourced). "Volume total validé" = somme des montant_gnf en
+// type_operation='versement_valide' exclusivement (pas les sorties
+// confirmées), comme demandé explicitement à l'origine — conservé.
 async function _rcLoadVueEnsemble() {
   const elChantiers = document.getElementById('rcVE_ChantiersEnCours');
-  const elAttente = document.getElementById('rcVE_TransactionsEnAttente');
+  const elVersAttente = document.getElementById('rcVE_VersementsEnAttente');
   const elVolume = document.getElementById('rcVE_VolumeValide');
+  const elSuperviseursActifs = document.getElementById('rcVE_SuperviseursActifs');
+  const elFournisseursActifs = document.getElementById('rcVE_FournisseursActifs');
   const elNonAbonnes = document.getElementById('rcVE_FournisseursNonAbonnes');
-  const elAlertes = document.getElementById('rcVE_Alertes');
+  const elAlertes = document.getElementById('rcVE_AlertesActions');
   const tbody = document.getElementById('rcVE_DernieresTransactions');
 
   try {
@@ -13171,22 +13196,33 @@ async function _rcLoadVueEnsemble() {
     elChantiers.textContent = error ? '—' : (count ?? 0);
   } catch (e) { elChantiers.textContent = '—'; }
 
+  try {
+    const { count, error } = await sb.from('superviseurs').select('id', { count: 'exact', head: true }).eq('statut', 'actif');
+    elSuperviseursActifs.textContent = error ? '—' : (count ?? 0);
+  } catch (e) { elSuperviseursActifs.textContent = '—'; }
+
+  try {
+    const { count, error } = await sb.from('fournisseurs_materiaux').select('id', { count: 'exact', head: true }).eq('statut', 'actif');
+    elFournisseursActifs.textContent = error ? '—' : (count ?? 0);
+  } catch (e) { elFournisseursActifs.textContent = '—'; }
+
   let transactions = [];
   try {
     const { data, error } = await sb.from('registre_transactions')
-      .select('*, chantiers(nom), comptes_materiaux(fournisseurs_materiaux(nom_entreprise))')
+      .select('*, chantiers(nom), comptes_materiaux(fournisseurs_materiaux(nom_entreprise)), clients(nom,prenom)')
       .order('created_at', { ascending: false })
       .limit(500);
     if (error) throw error;
     transactions = data || [];
   } catch (e) {
     console.warn('[registre_chantier] vue d\'ensemble transactions indisponible:', e.message);
-    if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#DC2626;font-size:12px;">' + _rcMessageRepli(e, 'registre_transactions') + '</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#DC2626;font-size:12px;">' + _rcMessageRepli(e, 'registre_transactions') + '</td></tr>';
   }
 
   const referencees = new Set(transactions.map(t => t.reference_transaction_id).filter(Boolean));
   const enAttente = transactions.filter(t => ['versement_declare', 'sortie_demandee'].includes(t.type_operation) && !referencees.has(t.id));
-  elAttente.textContent = enAttente.length;
+  const versementsEnAttente = enAttente.filter(t => t.type_operation === 'versement_declare');
+  elVersAttente.textContent = versementsEnAttente.length;
 
   const volumeValide = transactions.filter(t => t.type_operation === 'versement_valide').reduce((s, t) => s + Number(t.montant_gnf || 0), 0);
   elVolume.textContent = volumeValide.toLocaleString('fr-FR') + ' GNF';
@@ -13201,42 +13237,131 @@ async function _rcLoadVueEnsemble() {
     elNonAbonnes.textContent = nonAbonnes;
   } catch (e) { elNonAbonnes.textContent = '—'; }
 
-  const alertes = [];
+  // Commission YOUMMA due — total versé (validé, déjà calculé ci-dessus par
+  // transaction) groupé par chantier, comparé au seuil via _commissionCalculer
+  // (même fonction partagée que #espace et l'onglet Clients). Requête isolée :
+  // colonnes potentiellement absentes avant migration
+  // 20260717_commission_youmma.sql, même garde-fou qu'ailleurs.
+  const totalVerseParChantier = {};
+  transactions.filter(t => t.type_operation === 'versement_valide').forEach(t => {
+    totalVerseParChantier[t.chantier_id] = (totalVerseParChantier[t.chantier_id] || 0) + Number(t.montant_gnf || 0);
+  });
+  const chantierIdsAvecVersement = Object.keys(totalVerseParChantier);
+  let commissionsDues = [];
+  if (chantierIdsAvecVersement.length) {
+    try {
+      const { data: chantiersCommission, error: errCo } = await sb.from('chantiers').select('id,nom,commission_taux,commission_payee').in('id', chantierIdsAvecVersement);
+      if (errCo) throw errCo;
+      commissionsDues = (chantiersCommission || [])
+        .map(c => Object.assign({}, c, { commission: _commissionCalculer(totalVerseParChantier[c.id] || 0, c) }))
+        .filter(c => c.commission.statut === 'due');
+    } catch (e) { console.warn('[registre_chantier] commission YOUMMA indisponible (migration 20260717_commission_youmma.sql pas encore appliquée ?):', e.message); }
+  }
+
+  const alertesHtml = [];
+  versementsEnAttente.forEach(t => {
+    const client = t.clients ? ((t.clients.prenom ? t.clients.prenom + ' ' : '') + t.clients.nom) : 'un client';
+    const chantierNom = t.chantiers?.nom || '—';
+    const fournisseurNom = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || 'le fournisseur';
+    const montant = Number(t.montant_gnf || 0).toLocaleString('fr-FR') + ' GNF';
+    alertesHtml.push(`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:#FFFBEB;border:1.5px solid #FED7AA;border-radius:10px;padding:12px 14px;cursor:pointer;" onclick="_rcAfficherOnglet('registre');_rcOuvrirDetailTransaction('${t.id}')">
+      <div style="font-size:12.5px;color:#9A3412;font-weight:600;">⏳ ${montant} déclaré par ${client} pour ${chantierNom} — en attente de validation fournisseur ${fournisseurNom}</div>
+      <button onclick="event.stopPropagation();_rcAfficherOnglet('registre');_rcOuvrirDetailTransaction('${t.id}')" style="background:#fff;color:#9A3412;border:1px solid #FED7AA;border-radius:8px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Voir</button>
+    </div>`);
+  });
+  commissionsDues.forEach(c => {
+    const montant = c.commission.montant.toLocaleString('fr-FR') + ' GNF';
+    alertesHtml.push(`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:10px;padding:12px 14px;cursor:pointer;" onclick="_rcAfficherOnglet('clients')">
+      <div style="font-size:12.5px;color:#7F1D1D;font-weight:600;">🔴 Commission YOUMMA due sur ${c.nom} — ${montant}</div>
+      <button onclick="event.stopPropagation();_rcAfficherOnglet('clients')" style="background:#fff;color:#DC2626;border:1px solid #FECACA;border-radius:8px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Voir</button>
+    </div>`);
+  });
+
+  // Alertes déjà existantes avant cette refonte (backlog >24h, chantiers en
+  // étude stagnants) — données conservées, juste intégrées à la même liste.
   const enAttenteDepuis24h = enAttente.filter(t => (Date.now() - new Date(t.created_at).getTime()) > 24 * 3600 * 1000);
-  if (enAttenteDepuis24h.length) alertes.push(enAttenteDepuis24h.length + ' transaction(s) en attente depuis plus de 24h');
+  if (enAttenteDepuis24h.length) {
+    alertesHtml.push(`<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:12px 14px;font-size:12.5px;font-weight:600;color:#9A3412;">⚠️ ${enAttenteDepuis24h.length} transaction(s) en attente depuis plus de 24h</div>`);
+  }
   try {
     const { data: chantiersEtude, error } = await sb.from('chantiers').select('id,created_at').eq('statut', 'en_etude');
     if (error) throw error;
     const vieux = (chantiersEtude || []).filter(c => (Date.now() - new Date(c.created_at).getTime()) > 7 * 24 * 3600 * 1000);
-    if (vieux.length) alertes.push(vieux.length + " chantier(s) en étude depuis plus de 7 jours sans validation d'ouverture");
+    if (vieux.length) alertesHtml.push(`<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:12px 14px;font-size:12.5px;font-weight:600;color:#9A3412;">⚠️ ${vieux.length} chantier(s) en étude depuis plus de 7 jours sans validation d'ouverture</div>`);
   } catch (e) { /* non bloquant */ }
 
-  if (alertes.length) {
-    elAlertes.style.display = 'block';
-    elAlertes.innerHTML = '⚠️ ' + alertes.join(' · ');
-  } else {
-    elAlertes.style.display = 'none';
-  }
+  elAlertes.innerHTML = alertesHtml.length
+    ? alertesHtml.join('')
+    : '<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:12px 14px;font-size:12.5px;font-weight:700;color:#059669;">✅ Aucune action requise</div>';
 
-  const dernieres = transactions.slice(0, 5);
+  const dernieres = transactions.slice(0, 10);
   if (!tbody) { /* section pas encore rendue */ }
   else if (!dernieres.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#9CA3AF;">Aucune transaction</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#9CA3AF;">Aucune transaction</td></tr>';
   } else {
     tbody.innerHTML = dernieres.map(t => {
       const sc = _rcStatutConfig(t.type_operation);
+      const typeLabel = String(t.type_operation).startsWith('versement') ? '💰 Versement' : '📦 Sortie';
       const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       const montant = Number(t.montant_gnf || 0).toLocaleString('fr-FR') + ' GNF';
       const fournisseur = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || '—';
       return `<tr style="border-bottom:1px solid #F7F8FC;cursor:pointer;" onclick="_rcAfficherOnglet('registre');_rcOuvrirDetailTransaction('${t.id}')" onmouseover="this.style.background='#FAFBFF'" onmouseout="this.style.background=''">
         <td style="padding:10px 12px;font-size:12.5px;font-weight:700;color:#1A1A4E;">${t.chantiers?.nom || '—'}</td>
         <td style="padding:10px 12px;font-size:12px;color:#374151;">${fournisseur}</td>
-        <td style="padding:10px 12px;font-size:12px;color:#374151;">${sc.label}</td>
+        <td style="padding:10px 12px;font-size:12px;color:#374151;">${typeLabel}</td>
+        <td style="padding:10px 12px;text-align:center;"><span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:700;white-space:nowrap;">${sc.label}</span></td>
         <td style="padding:10px 12px;text-align:right;font-size:12.5px;font-weight:700;color:#1A1A4E;">${montant}</td>
         <td style="padding:10px 12px;text-align:center;font-size:11px;color:#6B7280;white-space:nowrap;">${date}</td>
       </tr>`;
     }).join('');
   }
+
+  _rcVEChargerGraphique(transactions);
+}
+
+// SVG pur (aucune librairie externe) — barres des versements validés des 7
+// derniers jours. Réutilise les transactions déjà chargées ci-dessus (mêmes
+// 500 dernières), aucune requête supplémentaire.
+function _rcVEChargerGraphique(transactions) {
+  const zone = document.getElementById('rcVE_Graphique');
+  if (!zone) return;
+
+  const jours = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - i);
+    jours.push(d);
+  }
+  const totauxParJour = jours.map(d => {
+    const debut = d.getTime();
+    const fin = debut + 24 * 3600 * 1000;
+    const total = transactions
+      .filter(t => t.type_operation === 'versement_valide' && new Date(t.created_at).getTime() >= debut && new Date(t.created_at).getTime() < fin)
+      .reduce((s, t) => s + Number(t.montant_gnf || 0), 0);
+    return { date: d, total };
+  });
+
+  const maxVal = Math.max.apply(null, totauxParJour.map(j => j.total).concat([0]));
+  if (maxVal === 0) {
+    zone.innerHTML = '<div style="text-align:center;padding:30px;color:#9CA3AF;font-size:13px;">Aucune activité récente</div>';
+    return;
+  }
+
+  const largeurBarre = 40, espace = 18, hauteurMax = 120, marge = 10;
+  const largeurTotale = jours.length * (largeurBarre + espace) - espace + marge * 2;
+  const barresEtLabels = totauxParJour.map((j, i) => {
+    const h = Math.max(4, Math.round((j.total / maxVal) * hauteurMax));
+    const x = marge + i * (largeurBarre + espace);
+    const y = hauteurMax - h;
+    const jourLabel = j.date.toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '');
+    const montantLabel = j.total > 0 ? j.total.toLocaleString('fr-FR') : '';
+    return `<g>
+      ${j.total > 0 ? `<text x="${x + largeurBarre / 2}" y="${y - 6}" text-anchor="middle" font-size="9" fill="#1A1A4E" font-weight="700">${montantLabel}</text>` : ''}
+      <rect x="${x}" y="${y}" width="${largeurBarre}" height="${h}" rx="4" fill="#059669"></rect>
+      <text x="${x + largeurBarre / 2}" y="${hauteurMax + 18}" text-anchor="middle" font-size="10" fill="#6B7280">${jourLabel}</text>
+    </g>`;
+  }).join('');
+
+  zone.innerHTML = `<svg viewBox="0 0 ${largeurTotale} ${hauteurMax + 34}" style="width:100%;height:170px;" preserveAspectRatio="xMidYMid meet">${barresEtLabels}</svg>`;
 }
 
 // ── Listes clients / fournisseurs / superviseurs (modifier/supprimer) ──
