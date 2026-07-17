@@ -2798,6 +2798,14 @@ if (typeof connexionPrestataire === 'undefined') {
 
     <div class="esp-panel" data-esp-panel="four" data-esp-panel-id="chantiers" style="display:block;">
       <div id="espaceFourBandeau" style="display:none;background:#FFFBEB;border:1.5px solid #FED7AA;border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:13px;font-weight:700;color:#9A3412;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i><span id="espaceFourBandeauTexte"></span></div>
+
+      <div id="espaceFourVersementsAttenteZone" style="display:none;margin-bottom:16px;">
+        <div class="esp-card">
+          <div style="font-size:14px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:14px;">💰 Versements à valider</div>
+          <div id="espaceFourVersementsAttente" style="display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+      </div>
+
       <div id="espaceFourChantiers" style="display:flex;flex-direction:column;gap:14px;"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
     </div>
 
@@ -2976,6 +2984,17 @@ if (typeof connexionPrestataire === 'undefined') {
     </div>
 
     <div class="esp-panel" data-esp-panel="cli" data-esp-panel-id="versements" style="display:none;">
+      <div class="esp-card" style="margin-bottom:16px;">
+        <div style="font-size:14px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:14px;"><i class="fa-solid fa-file-invoice-dollar" style="color:#2563EB;margin-right:8px;"></i>Déclarer un versement</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <select id="espaceCliVersChantier" onchange="_espaceCliChargerComptesVersement()" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;"><option value="">Chargement...</option></select>
+          <select id="espaceCliVersCompte" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;background:#fff;"><option value="">— Choisir un chantier d'abord —</option></select>
+          <input id="espaceCliVersMontant" type="number" min="1000" step="1" placeholder="Montant (GNF) — minimum 1000 *" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
+          <textarea id="espaceCliVersNote" rows="2" placeholder="Note (optionnel) — ex. mode de paiement, référence..." style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
+          <div id="espaceCliVersErreur" style="display:none;color:#DC2626;font-size:12.5px;"></div>
+          <button id="espaceCliVersBtn" onclick="_espaceCliDeclarerVersement()" style="background:#2563EB;color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;">Déclarer ce versement</button>
+        </div>
+      </div>
       <div class="esp-card">
         <div id="espaceCliVersementsListe"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
       </div>
@@ -3441,6 +3460,47 @@ async function _espaceChargerFournisseur() {
       bandeau.style.display = 'none';
     }
 
+    // Phase 1 étape 3 — versements déclarés par le client, en attente de
+    // validation fournisseur. Même convention "en attente" que les sorties
+    // (versement_declare non encore référencé) — ORDER BY created_at ASC
+    // (les plus anciens en premier), tel que demandé.
+    const chantiersNomParCompte = {}; comptes.forEach(c => { chantiersNomParCompte[c.id] = c.chantiers?.nom || '—'; });
+    const versementsAttente = _espaceFourTransactionsCache
+      .filter(t => t.type_operation === 'versement_declare' && !referencees.has(t.id))
+      .slice()
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+    const zoneVersAttente = document.getElementById('espaceFourVersementsAttenteZone');
+    const listeVersAttente = document.getElementById('espaceFourVersementsAttente');
+    if (versementsAttente.length) {
+      zoneVersAttente.style.display = 'block';
+      listeVersAttente.innerHTML = versementsAttente.map(t => {
+        const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        return `<div style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+            <div style="font-size:13px;font-weight:700;color:#1A1A4E;"><i class="fa-solid fa-building" style="color:#9CA3AF;margin-right:6px;font-size:12px;"></i>${chantiersNomParCompte[t.compte_id] || t.chantiers?.nom || '—'}</div>
+            <div style="font-size:15px;font-weight:800;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</div>
+          </div>
+          <div style="font-size:11px;color:#9CA3AF;margin-bottom:8px;">Déclaré le ${date}</div>
+          ${t.description ? `<div style="font-size:12px;color:#374151;font-style:italic;margin-bottom:10px;">"${t.description}"</div>` : ''}
+          <div style="display:flex;gap:8px;">
+            <button onclick="_espaceFournisseurTraiterVersement('${t.id}','valider')" style="flex:1;background:#059669;color:#fff;border:none;border-radius:8px;padding:9px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-check" style="margin-right:6px;"></i>Valider</button>
+            <button onclick="_espaceBasculerRejetVersement('${t.id}')" style="flex:1;background:#fff;color:#DC2626;border:1.5px solid #FECACA;border-radius:8px;padding:9px;font-size:12.5px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-xmark" style="margin-right:6px;"></i>Rejeter</button>
+          </div>
+          <div id="espaceVersRejetZone-${t.id}" style="display:none;margin-top:10px;background:#fff;border:1px solid #FECACA;border-radius:10px;padding:12px;">
+            <label style="display:block;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:6px;">Motif du rejet (optionnel)</label>
+            <textarea id="espaceVersRejetMotif-${t.id}" rows="2" placeholder="Ex : montant erroné, versement jamais reçu..." style="width:100%;box-sizing:border-box;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;font-family:inherit;resize:vertical;margin-bottom:10px;"></textarea>
+            <div style="display:flex;gap:8px;">
+              <button onclick="_espaceBasculerRejetVersement('${t.id}')" style="flex:1;background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;">Annuler</button>
+              <button onclick="_espaceConfirmerRejetVersement('${t.id}')" style="flex:1;background:#DC2626;color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;">Confirmer le rejet</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    } else {
+      zoneVersAttente.style.display = 'none';
+    }
+
     zone.innerHTML = comptes.map(c => {
       const sc = _rcStatutChantierConfig(c.chantiers?.statut);
       const enAttenteCompte = enAttenteTotal.filter(t => t.compte_id === c.id);
@@ -3778,6 +3838,51 @@ async function _espaceConfirmerRejetSortie(transactionId) {
   await _espaceTraiterSortie(transactionId, 'rejeter', motif || null);
 }
 
+// Valider/Rejeter un versement déclaré par le client — append-only, même
+// principe que _espaceTraiterSortie : insert seul (jamais d'UPDATE sur la
+// ligne d'origine). Le trigger fn_gerer_solde_registre (BEFORE INSERT)
+// crédite automatiquement comptes_materiaux.solde_gnf dès l'insert de
+// 'versement_valide' — aucune mise à jour manuelle du solde ici.
+async function _espaceFournisseurTraiterVersement(transactionId, decision, motif) {
+  try {
+    const { data: origine, error: errOrig } = await sb.from('registre_transactions').select('*').eq('id', transactionId).single();
+    if (errOrig) throw errOrig;
+    if (origine.type_operation !== 'versement_declare') { if (typeof showToast === 'function') showToast("Ce versement n'est plus en attente.", 'error'); return; }
+
+    const payload = {
+      chantier_id: origine.chantier_id,
+      compte_id: origine.compte_id,
+      type_operation: decision === 'valider' ? 'versement_valide' : 'versement_rejete',
+      montant_gnf: origine.montant_gnf,
+      reference_transaction_id: origine.id,
+      fournisseur_id: _espaceSession.id,
+      description: motif || null
+    };
+    const { error } = await sb.from('registre_transactions').insert(payload);
+    if (error) {
+      if (typeof showToast === 'function') showToast('Erreur : ' + error.message, 'error'); else window.alert('Erreur : ' + error.message);
+      return;
+    }
+    if (typeof showToast === 'function') showToast(decision === 'valider' ? '✅ Versement validé — solde mis à jour' : '✅ Versement rejeté', 'success');
+    _espaceChargerFournisseur();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error'); else window.alert('Erreur : ' + e.message);
+  }
+}
+
+// Rejet : champ motif inline (accordéon), jamais window.prompt/confirm —
+// même pattern que _espaceBasculerRejetSortie.
+function _espaceBasculerRejetVersement(transactionId) {
+  const el = document.getElementById('espaceVersRejetZone-' + transactionId);
+  if (el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+}
+
+async function _espaceConfirmerRejetVersement(transactionId) {
+  const motifEl = document.getElementById('espaceVersRejetMotif-' + transactionId);
+  const motif = motifEl ? motifEl.value.trim() : '';
+  await _espaceFournisseurTraiterVersement(transactionId, 'rejeter', motif || null);
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // TABLEAU DE BORD SUPERVISEUR — cartes uniquement, formulaire de demande de
 // sortie inline (accordéon par carte, pas de modale ni de zone partagée).
@@ -4029,6 +4134,10 @@ async function _espaceSauvegarderDemandeSortie(chantierId) {
 // ─────────────────────────────────────────────────────────────────────────
 // TABLEAU DE BORD CLIENT (lecture seule stricte) — cartes uniquement
 // ─────────────────────────────────────────────────────────────────────────
+// Cache des chantiers du client, réutilisé par le formulaire "Déclarer un
+// versement" (select chantier) sans requête supplémentaire.
+let _espaceCliChantiersCache = [];
+
 async function _espaceChargerClient() {
   const zone = document.getElementById('espaceCliChantiers');
 
@@ -4038,6 +4147,9 @@ async function _espaceChargerClient() {
       .eq('client_id', _espaceSession.id)
       .order('created_at', { ascending: false });
     if (error) throw error;
+
+    _espaceCliChantiersCache = chantiers || [];
+    _espaceCliInitFormVersement();
 
     document.getElementById('espaceCliNbChantiers').textContent = (chantiers || []).length;
 
@@ -4153,14 +4265,25 @@ async function _espaceChargerClient() {
       const declaresGlobal = (versements || []).filter(t => t.type_operation === 'versement_declare');
       versementsZone.innerHTML = declaresGlobal.length ? declaresGlobal.map(t => {
         const traitement = traitementsParDemande[t.id];
-        const statutLabel = traitement ? (traitement.type_operation === 'versement_valide' ? 'Validé' : 'Rejeté') : 'Déclaré';
-        const statutCouleur = traitement ? (traitement.type_operation === 'versement_valide' ? '#059669' : '#DC2626') : '#D97706';
-        const statutFond = traitement ? (traitement.type_operation === 'versement_valide' ? '#ECFDF5' : '#FEF2F2') : '#FFFBEB';
-        const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        // "En attente" = ligne versement_declare qu'aucune autre ligne ne
+        // référence encore (même convention que partout ailleurs dans le
+        // registre — pas de colonne statut séparée).
+        const statutLabel = !traitement ? '⏳ En attente' : (traitement.type_operation === 'versement_valide' ? '✅ Validé' : '❌ Rejeté');
+        const statutCouleur = !traitement ? '#D97706' : (traitement.type_operation === 'versement_valide' ? '#059669' : '#DC2626');
+        const statutFond = !traitement ? '#FFFBEB' : (traitement.type_operation === 'versement_valide' ? '#ECFDF5' : '#FEF2F2');
+        const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         const fournisseur = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || '—';
         const chantierNom = chantierNomParId[t.chantier_id] || '—';
-        return `<div class="esp-row" style="flex-wrap:wrap;">
-          <span style="color:#374151;font-weight:700;">${chantierNom}</span>
+        // Motif de rejet : stocké dans la description de LA LIGNE DE REJET
+        // (pas celle du versement_declare d'origine, qui reste inchangée —
+        // append-only), même convention que le rejet d'une sortie.
+        const motifRejet = (traitement && traitement.type_operation === 'versement_rejete' && traitement.description) ? traitement.description : null;
+        return `<div class="esp-row" style="flex-wrap:wrap;align-items:flex-start;">
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <span style="color:#374151;font-weight:700;">${chantierNom}</span>
+            ${t.description ? `<span style="font-size:11px;color:#9CA3AF;font-style:italic;">Note : ${t.description}</span>` : ''}
+            ${motifRejet ? `<span style="font-size:11px;color:#DC2626;font-style:italic;">Motif du rejet : ${motifRejet}</span>` : ''}
+          </div>
           <span style="color:#6B7280;">${fournisseur}</span>
           <span style="color:#9CA3AF;">${date}</span>
           <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
@@ -4225,6 +4348,72 @@ async function _espaceChargerClient() {
     _espaceCliGererDeclarationEnAttente(chantiers);
   } catch (e) {
     zone.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+// ── Phase 1 étape 3 — Déclarer un versement (onglet "Mes versements") ──
+// Réutilise le modèle append-only déjà en place pour les versements
+// (type_operation='versement_declare', chk_registre_acteur_coherent impose
+// client_id seul) — aucune nouvelle colonne, aucun nouveau type_operation.
+// "Note" = description (même colonne que partout ailleurs dans le registre).
+function _espaceCliInitFormVersement() {
+  const sel = document.getElementById('espaceCliVersChantier');
+  if (!sel) return;
+  sel.innerHTML = _espaceCliChantiersCache.length
+    ? '<option value="">— Sélectionner —</option>' + _espaceCliChantiersCache.map(c => `<option value="${c.id}">${c.nom}</option>`).join('')
+    : '<option value="">Aucun chantier</option>';
+  const selCompte = document.getElementById('espaceCliVersCompte');
+  if (selCompte) selCompte.innerHTML = '<option value="">— Choisir un chantier d\'abord —</option>';
+}
+
+async function _espaceCliChargerComptesVersement() {
+  const chantierId = document.getElementById('espaceCliVersChantier').value;
+  const sel = document.getElementById('espaceCliVersCompte');
+  if (!sel) return;
+  if (!chantierId) { sel.innerHTML = '<option value="">— Choisir un chantier d\'abord —</option>'; return; }
+  sel.innerHTML = '<option value="">Chargement...</option>';
+  try {
+    const { data, error } = await sb.from('comptes_materiaux').select('id,fournisseurs_materiaux(nom_entreprise)').eq('chantier_id', chantierId);
+    if (error) throw error;
+    sel.innerHTML = (data && data.length)
+      ? '<option value="">— Sélectionner un fournisseur —</option>' + data.map(c => `<option value="${c.id}">${c.fournisseurs_materiaux?.nom_entreprise || '—'}</option>`).join('')
+      : '<option value="">Aucun fournisseur sur ce chantier</option>';
+  } catch (e) {
+    sel.innerHTML = '<option value="">Erreur de chargement</option>';
+  }
+}
+
+async function _espaceCliDeclarerVersement() {
+  const chantierId = document.getElementById('espaceCliVersChantier').value;
+  const compteId = document.getElementById('espaceCliVersCompte').value;
+  const montant = parseInt(document.getElementById('espaceCliVersMontant').value, 10);
+  const note = document.getElementById('espaceCliVersNote').value.trim();
+  _espaceCacherErreur('espaceCliVersErreur');
+
+  if (!chantierId) { _espaceAfficherErreur('espaceCliVersErreur', 'Sélectionnez un chantier.'); return; }
+  if (!compteId) { _espaceAfficherErreur('espaceCliVersErreur', 'Sélectionnez un fournisseur.'); return; }
+  if (!montant || montant < 1000) { _espaceAfficherErreur('espaceCliVersErreur', 'Le montant doit être d\'au moins 1000 GNF.'); return; }
+
+  const btn = document.getElementById('espaceCliVersBtn');
+  btn.disabled = true; btn.textContent = 'Envoi...';
+  try {
+    const { error } = await sb.from('registre_transactions').insert({
+      chantier_id: chantierId,
+      compte_id: compteId,
+      type_operation: 'versement_declare',
+      montant_gnf: montant,
+      description: note || null,
+      client_id: _espaceSession.id
+    });
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('✅ Versement déclaré — en attente de validation du fournisseur', 'success');
+    document.getElementById('espaceCliVersMontant').value = '';
+    document.getElementById('espaceCliVersNote').value = '';
+    _espaceChargerClient();
+  } catch (e) {
+    _espaceAfficherErreur('espaceCliVersErreur', 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Déclarer ce versement';
   }
 }
 
@@ -14494,7 +14683,7 @@ async function _rcLoadTransactions() {
 
   try {
     let q = sb.from('registre_transactions')
-      .select('*, chantiers(nom), comptes_materiaux(fournisseurs_materiaux(nom_entreprise))')
+      .select('*, chantiers(nom), comptes_materiaux(fournisseurs_materiaux(nom_entreprise)), clients(nom,prenom)')
       .order('created_at', { ascending: false }).limit(300);
     if (chantierId) q = q.eq('chantier_id', chantierId);
     const { data, error } = await q;
@@ -14577,13 +14766,17 @@ async function _rcRenderTransactionsTable() {
       const montant = t.montant_gnf != null ? Number(t.montant_gnf).toLocaleString('fr-FR') + ' GNF' : '—';
       const chantierNom = t.chantiers?.nom || '—';
       const fournisseur = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || '—';
+      // Nom du déclarant (client) pour les versements — affiché en sous-ligne
+      // du chantier plutôt qu'en colonne dédiée, pour ne pas restructurer un
+      // tableau déjà à 7 colonnes (colspan des lignes vide/erreur inchangés).
+      const declarant = (t._categorie === 'versement' && t.clients) ? ((t.clients.prenom ? t.clients.prenom + ' ' : '') + t.clients.nom) : null;
       const actions = t._enAttente
         ? `<button onclick="_rcTraiterTransaction('${t.id}','valider')" title="Valider" style="background:#ECFDF5;color:#059669;border:none;border-radius:6px;padding:5px 9px;font-size:12px;cursor:pointer;margin-right:4px;">✓ Valider</button>
            <button onclick="_rcTraiterTransaction('${t.id}','rejeter')" title="Rejeter" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 9px;font-size:12px;cursor:pointer;">✗ Rejeter</button>`
         : `<button onclick="_rcOuvrirDetailTransaction('${t.id}')" title="Voir détail" style="background:#EFF6FF;color:#2563EB;border:none;border-radius:6px;padding:5px 9px;font-size:12px;cursor:pointer;">👁 Détail</button>`;
       return `<tr style="border-bottom:1px solid #F7F8FC;">
         <td style="padding:12px 14px;font-size:12px;color:#6B7280;white-space:nowrap;">${date}</td>
-        <td style="padding:12px 14px;font-size:13px;font-weight:700;color:#1A1A4E;">${chantierNom}</td>
+        <td style="padding:12px 14px;font-size:13px;font-weight:700;color:#1A1A4E;">${chantierNom}${declarant ? `<div style="font-size:10.5px;font-weight:400;color:#9CA3AF;">Déclaré par ${declarant}</div>` : ''}</td>
         <td style="padding:12px 14px;font-size:12.5px;color:#374151;">${fournisseur}</td>
         <td style="padding:12px 14px;font-size:12.5px;color:#374151;">${typeLabel}</td>
         <td style="padding:12px 14px;text-align:right;font-size:13px;font-weight:700;color:#1A1A4E;">${montant}</td>
