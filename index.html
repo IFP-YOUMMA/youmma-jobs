@@ -3375,6 +3375,30 @@ let _espaceFourTransactionsCache = [];
 // GNF : même formatage que partout ailleurs dans le site (toLocaleString('fr-FR') + ' GNF').
 function _espaceFormatGNF(n) { return Number(n || 0).toLocaleString('fr-FR') + ' GNF'; }
 
+// ── Commission YOUMMA (15% par défaut) ──────────────────────────────────
+// Colonnes chantiers.commission_taux/commission_payee/commission_payee_le
+// — migration 20260717_commission_youmma.sql, pas exécutée par défaut :
+// si absentes (colonne inconnue → l'appelant reçoit chantier=null/objet
+// sans ces clés), les valeurs par défaut (taux 15%, non payée) sont
+// utilisées, jamais de crash. Le calcul se fait toujours ici, côté JS, en
+// sommant des registre_transactions déjà récupérées — jamais en base.
+// Fonction PARTAGÉE : réutilisée telle quelle par le panel admin (onglet
+// Clients) plus loin dans ce fichier — définie ici car ce script
+// (#espace) s'exécute en premier dans l'ordre du document, donc la
+// fonction existe déjà (portée globale) quand le panel admin la référence.
+const YOUMMA_COMMISSION_SEUIL_GNF = 50000000;
+const YOUMMA_COMMISSION_TAUX_DEFAUT = 15;
+
+function _commissionCalculer(totalVerse, chantier) {
+  const taux = (chantier && chantier.commission_taux != null && !isNaN(Number(chantier.commission_taux)))
+    ? Number(chantier.commission_taux) : YOUMMA_COMMISSION_TAUX_DEFAUT;
+  const montant = Math.round(Number(totalVerse || 0) * taux / 100);
+  const payee = !!(chantier && chantier.commission_payee);
+  if (payee) return { montant, taux, payee, statut: 'payee', label: '✅ Commission réglée', bg: '#ECFDF5', color: '#059669' };
+  if (Number(totalVerse || 0) >= YOUMMA_COMMISSION_SEUIL_GNF) return { montant, taux, payee, statut: 'due', label: '⚠️ Due immédiatement', bg: '#FEF2F2', color: '#DC2626' };
+  return { montant, taux, payee, statut: 'cumul', label: 'ℹ️ En cumul — payable à la fin', bg: '#FFFBEB', color: '#D97706' };
+}
+
 async function _espaceChargerFournisseur() {
   const zone = document.getElementById('espaceFourChantiers');
   const bandeau = document.getElementById('espaceFourBandeau');
@@ -3776,12 +3800,35 @@ async function _espaceChargerSuperviseur() {
       return;
     }
 
+    const chantierIdsSup = chantiers.map(c => c.id);
+
+    // Commission YOUMMA — lecture seule ici, aucune action superviseur.
+    // Requêtes isolées (mêmes garde-fous que côté client) : si les colonnes
+    // commission_taux/commission_payee n'existent pas encore, ou si la
+    // requête des versements échoue, _commissionCalculer() retombe sur ses
+    // valeurs par défaut sans casser le reste du tableau de bord.
+    let commissionParChantierSup = {};
+    try {
+      const { data: commissionData, error: errCo } = await sb.from('chantiers').select('id,commission_taux,commission_payee').in('id', chantierIdsSup);
+      if (errCo) throw errCo;
+      (commissionData || []).forEach(c => { commissionParChantierSup[c.id] = c; });
+    } catch (e) { console.warn('[espace] commission YOUMMA indisponible (migration 20260717_commission_youmma.sql pas encore appliquée ?):', e.message); }
+
+    let totalVerseParChantierSup = {};
+    try {
+      const { data: versementsSup, error: errVSup } = await sb.from('registre_transactions').select('chantier_id,montant_gnf').in('chantier_id', chantierIdsSup).eq('type_operation', 'versement_valide');
+      if (errVSup) throw errVSup;
+      (versementsSup || []).forEach(t => { totalVerseParChantierSup[t.chantier_id] = (totalVerseParChantierSup[t.chantier_id] || 0) + Number(t.montant_gnf || 0); });
+    } catch (e) { console.warn('[espace] versements chantiers (commission) indisponibles:', e.message); }
+
     zone.innerHTML = chantiers.map(c => {
       const sc = _rcStatutChantierConfig(c.statut);
       const client = c.clients ? ((c.clients.prenom ? c.clients.prenom + ' ' : '') + c.clients.nom) : '—';
       const nbFournisseurs = (c.comptes_materiaux || []).length;
       const soldeTotal = (c.comptes_materiaux || []).reduce((s, cm) => s + Number(cm.solde_gnf || 0), 0);
       const dateDebut = c.date_debut ? new Date(c.date_debut).toLocaleDateString('fr-FR') : '—';
+      const totalVerseChantierSup = totalVerseParChantierSup[c.id] || 0;
+      const commissionSup = _commissionCalculer(totalVerseChantierSup, commissionParChantierSup[c.id] || null);
       return `<div style="background:#fff;border-radius:18px;padding:20px;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;">
           <div>
@@ -3794,6 +3841,12 @@ async function _espaceChargerSuperviseur() {
           </div>
         </div>
         <div style="font-size:12.5px;color:#6B7280;margin-bottom:16px;"><i class="fa-solid fa-user" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Client : ${client} · <i class="fa-solid fa-truck" style="width:14px;color:#9CA3AF;margin-left:6px;margin-right:4px;"></i>${nbFournisseurs} fournisseur${nbFournisseurs > 1 ? 's' : ''}</div>
+
+        <div style="background:${commissionSup.bg};border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;">💰 Commission YOUMMA (lecture seule)</div>
+          <div style="font-size:12px;color:#374151;margin-bottom:2px;">Total versé : <strong>${_espaceFormatGNF(totalVerseChantierSup)}</strong> · Commission (${commissionSup.taux}%) : <strong style="color:${commissionSup.color};">${_espaceFormatGNF(commissionSup.montant)}</strong></div>
+          <div style="font-size:12px;font-weight:700;color:${commissionSup.color};margin-top:4px;">${commissionSup.label}</div>
+        </div>
 
         <button onclick="_espaceBasculerFormulaireSortie('${c.id}')" style="width:100%;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;"><i class="fa-solid fa-truck-fast" style="margin-right:8px;"></i>Demander une sortie de matériaux</button>
 
@@ -4031,6 +4084,18 @@ async function _espaceChargerClient() {
     const comptesParChantier = {};
     (comptes || []).forEach(c => { (comptesParChantier[c.chantier_id] = comptesParChantier[c.chantier_id] || []).push(c); });
 
+    // Commission YOUMMA : requête isolée, pas ajoutée au select principal
+    // des chantiers — si les colonnes commission_taux/commission_payee
+    // n'existent pas encore (migration pas exécutée), cette requête échoue
+    // seule et _commissionCalculer() retombe sur ses valeurs par défaut,
+    // sans jamais casser le reste du tableau de bord.
+    let commissionParChantier = {};
+    try {
+      const { data: commissionData, error: errCo } = await sb.from('chantiers').select('id,commission_taux,commission_payee').in('id', chantierIds);
+      if (errCo) throw errCo;
+      (commissionData || []).forEach(c => { commissionParChantier[c.id] = c; });
+    } catch (e) { console.warn('[espace] commission YOUMMA indisponible (migration 20260717_commission_youmma.sql pas encore appliquée ?):', e.message); }
+
     zone.innerHTML = chantiers.map(c => {
       const sc = _rcStatutChantierConfig(c.statut);
       const superviseur = c.superviseurs ? ((c.superviseurs.prenom ? c.superviseurs.prenom + ' ' : '') + c.superviseurs.nom) : '—';
@@ -4046,6 +4111,14 @@ async function _espaceChargerClient() {
         </div>`;
       }).join('') : '<div style="color:#9CA3AF;font-size:12px;">Aucun fournisseur assigné.</div>';
 
+      const totalVerseChantier = (versements || []).filter(t => t.chantier_id === c.id && t.type_operation === 'versement_valide').reduce((s, t) => s + Number(t.montant_gnf || 0), 0);
+      const commission = _commissionCalculer(totalVerseChantier, commissionParChantier[c.id] || null);
+      const messageCommission = commission.statut === 'payee'
+        ? '✅ Commission réglée'
+        : commission.statut === 'due'
+          ? `⚠️ Commission due : ${_espaceFormatGNF(commission.montant)} — Veuillez contacter YOUMMA pour régularisation`
+          : `ℹ️ Commission en cours de cumul : ${_espaceFormatGNF(commission.montant)} — sera exigible à la fin du contrat`;
+
       return `<div class="esp-card">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;">
           <div>
@@ -4059,6 +4132,15 @@ async function _espaceChargerClient() {
         <div style="border-top:1px solid #F0F0F8;padding-top:14px;margin-top:12px;">
           <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;"><i class="fa-solid fa-truck" style="margin-right:6px;color:#059669;"></i>Solde par fournisseur</div>
           ${listeSoldes}
+        </div>
+
+        <div style="border-top:1px solid #F0F0F8;padding-top:14px;margin-top:14px;">
+          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">💰 Commission de service YOUMMA</div>
+          <div style="background:${commission.bg};border-radius:10px;padding:12px 14px;">
+            <div style="font-size:12px;color:#374151;margin-bottom:4px;">Total versé à ce jour : <strong>${_espaceFormatGNF(totalVerseChantier)}</strong></div>
+            <div style="font-size:12px;color:#374151;margin-bottom:8px;">Commission (${commission.taux}%) : <strong style="color:${commission.color};">${_espaceFormatGNF(commission.montant)}</strong></div>
+            <div style="font-size:12px;font-weight:700;color:${commission.color};">${messageCommission}</div>
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -13045,6 +13127,23 @@ function _rcFiltrerClients() {
   _rcRenderClientsListe(filtres);
 }
 
+// Accordéon inline : un seul client ouvert à la fois (même pattern que
+// _rcSupBasculerDetail / _rcFourBasculerDetail).
+let _rcCliDetailOuvert = null;
+
+function _rcCliBasculerDetail(id) {
+  const row = document.getElementById('rcCliDetailRow-' + id);
+  if (!row) return;
+  const dejaOuvert = row.style.display === 'table-row';
+  if (_rcCliDetailOuvert && _rcCliDetailOuvert !== id) {
+    const prev = document.getElementById('rcCliDetailRow-' + _rcCliDetailOuvert);
+    if (prev) prev.style.display = 'none';
+  }
+  row.style.display = dejaOuvert ? 'none' : 'table-row';
+  _rcCliDetailOuvert = dejaOuvert ? null : id;
+  if (!dejaOuvert) _rcCliChargerDetail(id);
+}
+
 function _rcRenderClientsListe(clients) {
   const tbody = document.getElementById('rcClientsListe');
   if (!tbody) return;
@@ -13052,19 +13151,152 @@ function _rcRenderClientsListe(clients) {
   tbody.innerHTML = clients.map(c => {
     const nomEchap = String(c.nom || '').replace(/'/g, "\\'");
     const inscription = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
-    return `<tr style="border-bottom:1px solid #F7F8FC;">
+    return `<tr style="border-bottom:1px solid #F7F8FC;cursor:pointer;" onclick="_rcCliBasculerDetail('${c.id}')" onmouseover="this.style.background='#FAFBFF'" onmouseout="this.style.background=''">
       <td style="padding:10px 12px;font-size:12.5px;font-weight:700;color:#1A1A4E;">${c.nom}</td>
       <td style="padding:10px 12px;font-size:12px;color:#374151;">${c.telephone || '—'}</td>
       <td style="padding:10px 12px;font-size:12px;color:#374151;">${c.email || '—'}</td>
       <td style="padding:10px 12px;font-size:12px;color:#374151;">${c.ville || '—'}</td>
       <td style="padding:10px 12px;text-align:center;font-size:11px;color:${c.statut === 'actif' ? '#059669' : '#DC2626'};font-weight:700;">${c.statut}</td>
       <td style="padding:10px 12px;text-align:center;font-size:12px;color:#6B7280;white-space:nowrap;">${inscription}</td>
-      <td style="padding:10px 12px;text-align:center;white-space:nowrap;">
+      <td style="padding:10px 12px;text-align:center;white-space:nowrap;" onclick="event.stopPropagation()">
         <button onclick="_rcOuvrirClientModal('${c.id}')" title="Modifier" style="background:#EFF6FF;color:#2563EB;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;margin-right:4px;">✏️</button>
         <button onclick="_rcSupprimerClient('${c.id}','${nomEchap}')" title="Supprimer" style="background:#FEF2F2;color:#DC2626;border:none;border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;">🗑</button>
       </td>
+    </tr>
+    <tr id="rcCliDetailRow-${c.id}" style="display:none;">
+      <td colspan="7" style="padding:0;background:#FAFBFF;border-bottom:1px solid #F7F8FC;">
+        <div id="rcCliDetailContenu-${c.id}" style="padding:20px;">
+          <div style="text-align:center;color:#9CA3AF;font-size:12px;padding:20px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>
+        </div>
+      </td>
     </tr>`;
   }).join('');
+}
+
+// ── Fiche détail client (accordéon) ──
+// Bloc métriques (4 cartes standard + 5ème "Commission YOUMMA" agrégée,
+// demandée) + liste des chantiers avec commission par ligne.
+async function _rcCliChargerDetail(clientId) {
+  const zone = document.getElementById('rcCliDetailContenu-' + clientId);
+  if (!zone) return;
+  try {
+    const { data: chantiers, error } = await sb.from('chantiers').select('id,nom,statut').eq('client_id', clientId).order('created_at', { ascending: false });
+    if (error) throw error;
+
+    const chantierIds = (chantiers || []).map(c => c.id);
+    const totalChantiers = (chantiers || []).length;
+    const enCours = (chantiers || []).filter(c => c.statut === 'en_cours').length;
+
+    let soldeTotal = 0;
+    if (chantierIds.length) {
+      try {
+        const { data: comptes, error: errCpt } = await sb.from('comptes_materiaux').select('chantier_id,solde_gnf').in('chantier_id', chantierIds);
+        if (errCpt) throw errCpt;
+        soldeTotal = (comptes || []).reduce((s, c) => s + Number(c.solde_gnf || 0), 0);
+      } catch (e) { console.warn('[registre_chantier] comptes_materiaux client indisponibles:', e.message); }
+    }
+
+    let versementsParChantier = {};
+    let totalVerseGlobal = 0;
+    if (chantierIds.length) {
+      try {
+        const { data: versements, error: errV } = await sb.from('registre_transactions').select('chantier_id,montant_gnf').in('chantier_id', chantierIds).eq('type_operation', 'versement_valide');
+        if (errV) throw errV;
+        (versements || []).forEach(t => {
+          versementsParChantier[t.chantier_id] = (versementsParChantier[t.chantier_id] || 0) + Number(t.montant_gnf || 0);
+          totalVerseGlobal += Number(t.montant_gnf || 0);
+        });
+      } catch (e) { console.warn('[registre_chantier] versements client indisponibles:', e.message); }
+    }
+
+    // Commission YOUMMA — requête isolée (colonnes potentiellement absentes
+    // avant migration 20260717_commission_youmma.sql, sans crash).
+    let commissionParChantier = {};
+    if (chantierIds.length) {
+      try {
+        const { data: commissionData, error: errCo } = await sb.from('chantiers').select('id,commission_taux,commission_payee').in('id', chantierIds);
+        if (errCo) throw errCo;
+        (commissionData || []).forEach(c => { commissionParChantier[c.id] = c; });
+      } catch (e) { console.warn('[registre_chantier] commission YOUMMA indisponible (migration 20260717_commission_youmma.sql pas encore appliquée ?):', e.message); }
+    }
+
+    const ordrePire = { payee: 0, cumul: 1, due: 2 };
+    let pireStatut = 'payee';
+    let commissionTotal = 0;
+    const chantiersAvecCommission = (chantiers || []).map(c => {
+      const totalVerseChantier = versementsParChantier[c.id] || 0;
+      const commission = _commissionCalculer(totalVerseChantier, commissionParChantier[c.id] || null);
+      commissionTotal += commission.montant;
+      if (ordrePire[commission.statut] > ordrePire[pireStatut]) pireStatut = commission.statut;
+      return Object.assign({}, c, { totalVerseChantier, commission });
+    });
+
+    const badgeAgrege = pireStatut === 'due' ? { label: '⚠️ Due immédiatement', color: '#DC2626', bg: '#FEF2F2' }
+      : pireStatut === 'cumul' ? { label: 'ℹ️ En cumul', color: '#D97706', bg: '#FFFBEB' }
+      : { label: '✅ Payée', color: '#059669', bg: '#ECFDF5' };
+    const chantiersAPayer = chantiersAvecCommission.filter(c => !c.commission.payee && c.commission.montant > 0).map(c => c.id);
+
+    let html = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;">
+        <div class="adm-stat-card" style="border-top:3px solid #2563EB;"><div class="adm-stat-num">${totalChantiers}</div><div class="adm-stat-label">Total chantiers</div></div>
+        <div class="adm-stat-card" style="border-top:3px solid #D97706;"><div class="adm-stat-num">${enCours}</div><div class="adm-stat-label">Chantiers en cours</div></div>
+        <div class="adm-stat-card" style="border-top:3px solid #059669;"><div class="adm-stat-num" style="font-size:15px;">${formatGNF(totalVerseGlobal)}</div><div class="adm-stat-label">Total versé</div></div>
+        <div class="adm-stat-card" style="border-top:3px solid #7C3AED;"><div class="adm-stat-num" style="font-size:15px;">${formatGNF(soldeTotal)}</div><div class="adm-stat-label">Solde total</div></div>
+        <div class="adm-stat-card" style="border-top:3px solid ${badgeAgrege.color};">
+          <div class="adm-stat-num" style="font-size:15px;">${formatGNF(commissionTotal)}</div>
+          <div class="adm-stat-label">💰 Commission YOUMMA</div>
+          <div style="margin-top:6px;"><span style="background:${badgeAgrege.bg};color:${badgeAgrege.color};border-radius:20px;padding:3px 10px;font-size:10.5px;font-weight:700;">${badgeAgrege.label}</span></div>
+          ${chantiersAPayer.length ? `<button onclick="_rcCommissionMarquerPayee('${chantiersAPayer.join(',')}','${clientId}')" style="margin-top:8px;width:100%;background:#059669;color:#fff;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:700;cursor:pointer;">Marquer tout comme payé</button>` : ''}
+        </div>
+      </div>
+    `;
+
+    if (!chantiersAvecCommission.length) {
+      html += '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:12.5px;">Aucun chantier pour ce client.</div>';
+    } else {
+      html += '<div style="display:flex;flex-direction:column;gap:12px;">' + chantiersAvecCommission.map(c => {
+        const sc = _rcStatutChantierConfig(c.statut);
+        return `<div style="background:#fff;border:1.5px solid #F0F0F8;border-radius:12px;padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:13.5px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">${c.nom}</div>
+              <span style="background:${sc.bg};color:${sc.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${sc.label}</span>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:14px;font-weight:800;color:${c.commission.color};">${formatGNF(c.commission.montant)}</div>
+              <div style="font-size:10px;color:#9CA3AF;">commission (${c.commission.taux}%)</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+            <span style="background:${c.commission.bg};color:${c.commission.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">${c.commission.label}</span>
+            ${(!c.commission.payee && c.commission.montant > 0) ? `<button onclick="_rcCommissionMarquerPayee('${c.id}','${clientId}')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:11.5px;font-weight:700;cursor:pointer;">Marquer comme payée</button>` : ''}
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+    }
+
+    zone.innerHTML = html;
+  } catch (e) {
+    zone.innerHTML = '<div style="text-align:center;padding:20px;color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+// Marque la commission payée pour un ou plusieurs chantiers (CSV d'ids —
+// évite de sérialiser un tableau dans un attribut onclick). Utilisée à la
+// fois par le bouton "Marquer comme payée" par ligne (WHERE id=CHANTIER_ID,
+// un seul id) et par "Marquer tout comme payé" (bulk, plusieurs ids).
+async function _rcCommissionMarquerPayee(chantierIdsCsv, clientId) {
+  const ids = String(chantierIdsCsv).split(',').filter(Boolean);
+  if (!ids.length) return;
+  try {
+    const { error } = await sb.from('chantiers').update({ commission_payee: true, commission_payee_le: new Date().toISOString() }).in('id', ids);
+    if (error) throw error;
+    await _logAdminAction('paiement_commission_youmma', '', '', 'chantier_ids: ' + ids.join(','));
+    if (typeof showToast === 'function') showToast('✅ Commission enregistrée', 'success');
+    if (clientId) _rcCliChargerDetail(clientId);
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
 }
 
 // "Chantiers actifs" par fournisseur = comptes_materiaux dont le chantier
