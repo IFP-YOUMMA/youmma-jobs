@@ -8730,6 +8730,30 @@ async function chargerAvis() {
           </div>
         </div>
 
+        <!-- ══ CRÉATION RAPIDE DE COMPTES (sans SMS) ══ -->
+        <div class="adm-table-wrap" style="margin-bottom:28px;">
+          <div style="padding:18px 20px;border-bottom:1px solid #F0F0F8;">
+            <div class="adm-section-title" style="font-size:14px;"><i class="fa-solid fa-user-plus" style="color:#E85D04;"></i> Créer un compte rapidement</div>
+            <div style="font-size:12px;color:#9CA3AF;margin-top:3px;">Créer un compte prestataire ou client directement, sans passer par le SMS d'inscription.</div>
+          </div>
+          <div style="padding:18px 20px;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;">
+              <button onclick="_admCreerPrestataireOuvrir()" style="flex:1;min-width:200px;padding:14px;background:#E85D04;color:#fff;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;">+ Créer un prestataire</button>
+              <button onclick="_admCreerClientOuvrir()" style="flex:1;min-width:200px;padding:14px;background:#1A1A4E;color:#fff;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;">+ Créer un client</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+              <div>
+                <div style="font-size:12.5px;font-weight:700;color:#1A1A4E;margin-bottom:8px;">10 derniers prestataires créés</div>
+                <div id="admDernPrestataires"><div style="text-align:center;padding:16px;color:#9CA3AF;font-size:12.5px;">Chargement...</div></div>
+              </div>
+              <div>
+                <div style="font-size:12.5px;font-weight:700;color:#1A1A4E;margin-bottom:8px;">10 derniers clients créés</div>
+                <div id="admDernClients"><div style="text-align:center;padding:16px;color:#9CA3AF;font-size:12.5px;">Chargement...</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Alertes prioritaires -->
         <div id="dashAlertes" style="margin-bottom:28px;"></div>
 
@@ -8941,6 +8965,74 @@ async function chargerAvis() {
         <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
           <button onclick="document.getElementById('equipeModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
           <button id="equipeModalSave" onclick="_adminEquipeSauvegarder()" style="background:#E8650A;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Créer un prestataire (compte direct, sans SMS) -->
+    <div id="admCreerPrestataireModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+      <div style="background:#fff;border-radius:16px;padding:28px;width:min(460px,92vw);max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.25);">
+        <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 20px;font-size:17px;"><i class="fa-solid fa-user-plus" style="color:#E8650A;margin-right:8px;"></i>Créer un prestataire</h3>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom complet *</label>
+            <input id="admProvNom" type="text" placeholder="Ex: Mamadou Bah" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Téléphone *</label>
+            <input id="admProvTel" type="text" placeholder="224620000000" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Catégorie *</label>
+            <select id="admProvCategorie" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;background:#fff;">
+              <option value="">Choisir une catégorie</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Métier *</label>
+            <input id="admProvMetier" type="text" placeholder="Ex: Électricien" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Ville</label>
+              <input id="admProvVille" type="text" placeholder="Conakry" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Commune</label>
+              <input id="admProvCommune" type="text" placeholder="Ratoma" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+            </div>
+          </div>
+          <div id="admProvErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
+          <button onclick="document.getElementById('admCreerPrestataireModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
+          <button id="admProvSaveBtn" onclick="_admCreerPrestataireValider()" style="background:#E8650A;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer le compte</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Créer un client (compte direct, sans SMS) -->
+    <div id="admCreerClientModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
+      <div style="background:#fff;border-radius:16px;padding:28px;width:min(420px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.25);">
+        <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 20px;font-size:17px;"><i class="fa-solid fa-user-plus" style="color:#1A1A4E;margin-right:8px;"></i>Créer un client</h3>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom complet *</label>
+            <input id="admCliNom" type="text" placeholder="Ex: Fatoumata Diallo" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Téléphone *</label>
+            <input id="admCliTel" type="text" placeholder="224620000000" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Ville</label>
+            <input id="admCliVille" type="text" placeholder="Conakry" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+          </div>
+          <div id="admCliErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
+          <button onclick="document.getElementById('admCreerClientModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
+          <button id="admCliSaveBtn" onclick="_admCreerClientValider()" style="background:#1A1A4E;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer le compte</button>
         </div>
       </div>
     </div>
@@ -23038,6 +23130,211 @@ function _missionVoirTelephone(missionId) {
   });
 }
 window._missionVoirTelephone = _missionVoirTelephone;
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// PANEL ADMIN — CRÉATION DE COMPTES DIRECTE (sans SMS)
+// ══════════════════════════════════════════════════════════════
+// providers utilise prenom/nom/telephone/metier/categorie/statut
+// (valide/en_attente/rejete/suspendu) + password_hash (PIN, SHA-256 via
+// hashPassword() déjà défini plus haut dans le fichier) — PAS "name/phone/
+// category/verified" comme des noms génériques auraient pu le laisser
+// penser : colonnes vérifiées contre inscrirePrestataire()/connexionPrestataire()
+// déjà existants dans ce fichier. clients (table du Registre Chantier,
+// seule table clients du projet — vérifié via grep, aucune autre table
+// users/customers n'existe) utilise nom/telephone/ville/statut
+// ('actif'/'suspendu' uniquement, CHECK contrainte) sans password : le
+// login client se fait par OTP SMS envoyé au moment de la connexion, donc
+// aucun PIN n'est nécessaire à la création.
+
+function _admAfficherErreurCompte(elId, msg) {
+  const el = document.getElementById(elId);
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+
+// ── Créer un prestataire ──
+function _admCreerPrestataireOuvrir() {
+  ['admProvNom','admProvTel','admProvMetier','admProvVille','admProvCommune'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const errEl = document.getElementById('admProvErreur');
+  if (errEl) errEl.style.display = 'none';
+  if (typeof renderCategoriesSelect === 'function') renderCategoriesSelect('admProvCategorie');
+  const modal = document.getElementById('admCreerPrestataireModal');
+  if (modal) modal.style.display = 'flex';
+}
+window._admCreerPrestataireOuvrir = _admCreerPrestataireOuvrir;
+
+async function _admCreerPrestataireValider() {
+  const nomComplet = (document.getElementById('admProvNom').value || '').trim();
+  const tel = (document.getElementById('admProvTel').value || '').trim();
+  const categorie = document.getElementById('admProvCategorie').value || '';
+  const metier = (document.getElementById('admProvMetier').value || '').trim();
+  const ville = (document.getElementById('admProvVille').value || '').trim();
+  const commune = (document.getElementById('admProvCommune').value || '').trim();
+  const errEl = document.getElementById('admProvErreur');
+  if (errEl) errEl.style.display = 'none';
+
+  if (!nomComplet || !tel || !categorie || !metier) { _admAfficherErreurCompte('admProvErreur', 'Remplissez tous les champs obligatoires (*).'); return; }
+  if (!_rcTelephoneValide(tel)) { _admAfficherErreurCompte('admProvErreur', 'Téléphone au format 224XXXXXXXXX.'); return; }
+
+  const btn = document.getElementById('admProvSaveBtn');
+  const btnLabel = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Création...'; }
+
+  try {
+    const { count, error: errCount } = await sb.from('providers').select('id', { count: 'exact', head: true }).eq('telephone', tel);
+    if (errCount) throw errCount;
+    if (count > 0) { _admAfficherErreurCompte('admProvErreur', 'Ce numéro est déjà enregistré'); return; }
+
+    const parts = nomComplet.split(/\s+/);
+    const prenom = parts[0] || '';
+    const nom = parts.slice(1).join(' ') || parts[0] || '';
+
+    // PIN de connexion par défaut = 4 derniers chiffres du téléphone
+    // (aucun champ mot de passe demandé dans le formulaire ; providers
+    // exige un password_hash pour se connecter — voir connexionPrestataire()
+    // — donc un PIN par défaut est indispensable pour que le compte créé
+    // soit réellement utilisable).
+    const pin = tel.slice(-4);
+    const password_hash = await hashPassword(pin);
+
+    const { error } = await sb.from('providers').insert({
+      prenom, nom, telephone: tel, password_hash,
+      metier, categorie, ville: ville || null, commune: commune || null,
+      statut: 'valide', badge_verifie: true,
+      abonnement_actif: false, essai_actif: false
+    });
+    if (error) { if (error.code === '23505') { _admAfficherErreurCompte('admProvErreur', 'Ce numéro est déjà enregistré'); return; } throw error; }
+
+    showToast('✅ Prestataire créé — il peut se connecter avec son numéro ' + tel + ' (code PIN par défaut : ' + pin + ')', 'success');
+    const modal = document.getElementById('admCreerPrestataireModal');
+    if (modal) modal.style.display = 'none';
+    if (typeof _admChargerDerniersComptes === 'function') _admChargerDerniersComptes();
+    if (typeof _adminLoadAll === 'function') _adminLoadAll();
+  } catch (e) {
+    _admAfficherErreurCompte('admProvErreur', e.message || 'Erreur lors de la création');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = btnLabel || 'Créer le compte'; }
+  }
+}
+window._admCreerPrestataireValider = _admCreerPrestataireValider;
+
+// ── Créer un client ──
+function _admCreerClientOuvrir() {
+  ['admCliNom','admCliTel','admCliVille'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const errEl = document.getElementById('admCliErreur');
+  if (errEl) errEl.style.display = 'none';
+  const modal = document.getElementById('admCreerClientModal');
+  if (modal) modal.style.display = 'flex';
+}
+window._admCreerClientOuvrir = _admCreerClientOuvrir;
+
+async function _admCreerClientValider() {
+  const nomComplet = (document.getElementById('admCliNom').value || '').trim();
+  const tel = (document.getElementById('admCliTel').value || '').trim();
+  const ville = (document.getElementById('admCliVille').value || '').trim();
+  const errEl = document.getElementById('admCliErreur');
+  if (errEl) errEl.style.display = 'none';
+
+  if (!nomComplet || !tel) { _admAfficherErreurCompte('admCliErreur', 'Remplissez tous les champs obligatoires (*).'); return; }
+  if (!_rcTelephoneValide(tel)) { _admAfficherErreurCompte('admCliErreur', 'Téléphone au format 224XXXXXXXXX.'); return; }
+
+  const btn = document.getElementById('admCliSaveBtn');
+  const btnLabel = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Création...'; }
+
+  try {
+    const { count, error: errCount } = await sb.from('clients').select('id', { count: 'exact', head: true }).eq('telephone', tel);
+    if (errCount) throw errCount;
+    if (count > 0) { _admAfficherErreurCompte('admCliErreur', 'Ce numéro est déjà enregistré'); return; }
+
+    const { error } = await sb.from('clients').insert({
+      nom: nomComplet, telephone: tel, ville: ville || null, statut: 'actif'
+    });
+    if (error) { if (error.code === '23505') { _admAfficherErreurCompte('admCliErreur', 'Ce numéro est déjà enregistré'); return; } throw error; }
+
+    showToast('✅ Client créé — il peut se connecter avec son numéro ' + tel, 'success');
+    const modal = document.getElementById('admCreerClientModal');
+    if (modal) modal.style.display = 'none';
+    if (typeof _admChargerDerniersComptes === 'function') _admChargerDerniersComptes();
+  } catch (e) {
+    _admAfficherErreurCompte('admCliErreur', e.message || 'Erreur lors de la création');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = btnLabel || 'Créer le compte'; }
+  }
+}
+window._admCreerClientValider = _admCreerClientValider;
+
+// ── Liste rapide : 10 derniers comptes créés (prestataires + clients) ──
+function _admRenderDerniersComptesTable(rows) {
+  if (!rows || !rows.length) {
+    return '<div style="text-align:center;padding:16px;color:#9CA3AF;font-size:12.5px;">Aucun compte pour le moment</div>';
+  }
+  const statutBg = { valide: '#ECFDF5', actif: '#ECFDF5', en_attente: '#FFFBEB', rejete: '#FEF2F2', suspendu: '#F5F3FF' };
+  const statutFg = { valide: '#059669', actif: '#059669', en_attente: '#D97706', rejete: '#DC2626', suspendu: '#7C3AED' };
+  return rows.map(r => {
+    const nom = ((r.prenom || '') + ' ' + (r.nom || '')).trim() || '—';
+    const dateStr = r.created_at ? new Date(r.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+    const tel = r.telephone || '';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid #F3F4F6;">'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div style="font-size:12.5px;font-weight:700;color:#1A1A4E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + nom + '</div>'
+      + '<div style="font-size:11px;color:#9CA3AF;">' + tel + ' · ' + dateStr + '</div>'
+      + '</div>'
+      + '<span style="flex-shrink:0;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:' + (statutBg[r.statut] || '#F3F4F6') + ';color:' + (statutFg[r.statut] || '#6B7280') + ';">' + (r.statut || '—') + '</span>'
+      + '<button onclick="_admCopierNumero(this,\'' + tel + '\')" title="Copier le numéro" style="flex-shrink:0;padding:5px 9px;background:#F4F6FB;border:none;border-radius:7px;cursor:pointer;font-size:11.5px;color:#1A1A4E;">📋</button>'
+      + '</div>';
+  }).join('');
+}
+
+async function _admChargerDerniersComptes() {
+  const elProv = document.getElementById('admDernPrestataires');
+  const elCli = document.getElementById('admDernClients');
+
+  if (elProv) {
+    try {
+      const { data, error } = await sb.from('providers').select('id,prenom,nom,telephone,statut,created_at').order('created_at', { ascending: false }).limit(10);
+      if (error) throw error;
+      elProv.innerHTML = _admRenderDerniersComptesTable(data);
+    } catch (e) {
+      elProv.innerHTML = '<div style="text-align:center;padding:16px;color:#DC2626;font-size:12px;">Erreur : ' + (e.message || e) + '</div>';
+    }
+  }
+
+  if (elCli) {
+    try {
+      const { data, error } = await sb.from('clients').select('id,nom,prenom,telephone,statut,created_at').order('created_at', { ascending: false }).limit(10);
+      if (error) throw error;
+      elCli.innerHTML = _admRenderDerniersComptesTable(data);
+    } catch (e) {
+      elCli.innerHTML = '<div style="text-align:center;padding:16px;color:#DC2626;font-size:12px;">Erreur : ' + (e.message || e) + '</div>';
+    }
+  }
+}
+window._admChargerDerniersComptes = _admChargerDerniersComptes;
+
+function _admCopierNumero(btn, tel) {
+  if (!tel) return;
+  navigator.clipboard.writeText(tel).then(() => {
+    if (typeof showToast === 'function') showToast('📋 Numéro copié : ' + tel, 'success');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✅'; setTimeout(() => { btn.textContent = orig; }, 1200); }
+  }).catch(() => { if (typeof showToast === 'function') showToast('Impossible de copier le numéro', 'error'); });
+}
+window._admCopierNumero = _admCopierNumero;
+
+// Rafraîchit automatiquement la liste rapide à chaque chargement du
+// dashboard admin (_adminLoadAll est déjà appelée au login et via le
+// bouton "Actualiser" existant — enveloppée ici sans toucher à son corps).
+(function() {
+  const _origAdminLoadAll = window._adminLoadAll;
+  if (typeof _origAdminLoadAll === 'function') {
+    window._adminLoadAll = function() {
+      const r = _origAdminLoadAll.apply(this, arguments);
+      if (typeof _admChargerDerniersComptes === 'function') _admChargerDerniersComptes();
+      return r;
+    };
+  }
+})();
 </script>
 
 <!-- ══ SERVICE WORKER REGISTRATION ══ -->
