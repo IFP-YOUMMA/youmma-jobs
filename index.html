@@ -7858,9 +7858,42 @@ document.addEventListener('keydown', e => {
           </div>
         </div>
       </div>
+
+      <!-- ══ MON ABONNEMENT & CRÉDITS ══ -->
+      <div class="abo-card" style="background:#fff;border-radius:16px;padding:20px;border:1.5px solid var(--bordure);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="width:40px;height:40px;background:#1A1A4E;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">💳</div>
+          <div>
+            <div style="font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:var(--bleu);">Mon abonnement & crédits</div>
+            <div style="font-size:12px;color:var(--gris);">Missions, devis vocaux, badges, téléphone client</div>
+          </div>
+        </div>
+
+        <div style="text-align:center;margin-bottom:18px;">
+          <span id="creditsStatusBadge" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;background:#F3F4F6;color:#6B7280;">Chargement...</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+          <button onclick="_abonnementRenouveler()" style="width:100%;padding:14px;background:var(--orange);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">🔄 Renouveler l'abonnement — 50 000 GNF</button>
+
+          <div style="background:var(--fond);border-radius:12px;padding:14px;">
+            <div style="font-size:12.5px;color:var(--gris);margin-bottom:8px;font-weight:600;">Acheter des crédits — 5 000 GNF/crédit</div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <input id="creditsNbInput" type="number" min="1" max="10" value="1" oninput="_creditsMajMontant()" style="width:70px;padding:10px;border-radius:10px;border:1.5px solid var(--bordure);font-size:14px;text-align:center;">
+              <div style="flex:1;text-align:center;font-weight:700;color:var(--bleu);" id="creditsMontantCalcule">5 000 GNF</div>
+            </div>
+            <button onclick="_creditsAcheter()" style="width:100%;margin-top:10px;padding:12px;background:#1A1A4E;color:#fff;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;">Acheter des crédits</button>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#1A1A4E;margin-bottom:10px;">Historique des paiements</div>
+          <div id="creditsHistorique"><div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+        </div>
+      </div>
     </div>
 
-    
+
     <div class="section" id="section-avis">
       <div style="margin-bottom:16px;">
         <button onclick="showSection('dashboard')" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;background:#F4F6FB;border:none;border-radius:10px;color:#1A1A4E;font-size:13px;font-weight:600;cursor:pointer;" onmouseover="this.style.background='#E8ECF5'" onmouseout="this.style.background='#F4F6FB'">
@@ -8088,11 +8121,13 @@ async function declarerMission() {
 async function chargerMissions(pid) {
   const list = document.getElementById('missionsList');
   if (!list) return;
-  const { data } = await sb.from('missions').select('id,description,client_nom,date_mission,montant,statut,created_at').eq('prestataire_id',pid).order('created_at',{ascending:false});
+  const { data } = await sb.from('missions').select('id,description,client_nom,client_telephone,date_mission,montant,statut,created_at').eq('prestataire_id',pid).order('created_at',{ascending:false});
   if (!data||data.length===0) {
     list.innerHTML = '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;background:#F9FAFB;border-radius:12px;"><i class="fa-solid fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;opacity:.4;"></i>Aucune mission déclarée</div>';
     return;
   }
+  window._missionsTelMap = {};
+  data.forEach(m => { window._missionsTelMap[m.id] = m.client_telephone || ''; });
   const colors = {valide:'#F0FDF4',en_attente:'#FEF9C3',rejete:'#FEF2F2'};
   const textColors = {valide:'#16A34A',en_attente:'#854D0E',rejete:'#DC2626'};
   const labels = {valide:'✅ Validée',en_attente:'⏳ En attente',rejete:'❌ Rejetée'};
@@ -8101,10 +8136,11 @@ async function chargerMissions(pid) {
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;color:#1A1A4E;font-size:13.5px;margin-bottom:3px;">${m.description}</div>
         <div style="font-size:11.5px;color:#6B7280;">
-          ${m.client_nom?`<span><i class="fa-solid fa-user" style="margin-right:3px;"></i>${m.client_nom}</span> · `:''} 
+          ${m.client_nom?`<span><i class="fa-solid fa-user" style="margin-right:3px;"></i>${m.client_nom}</span> · `:''}
           <span><i class="fa-regular fa-calendar" style="margin-right:3px;"></i>${m.date_mission||'—'}</span>
           ${m.montant?` · <span><i class="fa-solid fa-coins" style="margin-right:3px;color:var(--orange);"></i>${m.montant}</span>`:''}
         </div>
+        ${m.client_telephone ? `<div style="margin-top:6px;" id="missionTel_${m.id}"><button onclick="_missionVoirTelephone('${m.id}')" style="background:#F0F4FF;border:none;color:#1A1A4E;font-weight:700;padding:4px 10px;border-radius:8px;font-size:11.5px;cursor:pointer;"><i class="fa-solid fa-phone" style="margin-right:4px;"></i>Voir le téléphone</button></div>` : ''}
       </div>
       <span style="flex-shrink:0;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${colors[m.statut]||'#F9FAFB'};color:${textColors[m.statut]||'#6B7280'};">${labels[m.statut]||m.statut}</span>
     </div>`).join('');
@@ -8312,6 +8348,7 @@ function showSection(name) {
   if (name === 'documents') { const pid = providerId || _dashProviderId; if (pid) chargerDocuments(pid); }
   if (name === 'missions') { const pid = providerId || _dashProviderId; if (pid) chargerMissions(pid); }
   if (name === 'rapports') { if (typeof _provRapports === 'function') _provRapports(); }
+  if (name === 'abonnement') { if (typeof _creditsChargerDashboard === 'function') _creditsChargerDashboard(); }
   // Mobile bottom nav
   var mbn = document.getElementById('mobileBottomNav');
   if (mbn) {
@@ -9899,6 +9936,7 @@ function showSection(name) {
   if (name === 'documents') { const pid = providerId || _dashProviderId; if (pid) chargerDocuments(pid); }
   if (name === 'missions') { const pid = providerId || _dashProviderId; if (pid) chargerMissions(pid); }
   if (name === 'rapports') { if (typeof _provRapports === 'function') _provRapports(); }
+  if (name === 'abonnement') { if (typeof _creditsChargerDashboard === 'function') _creditsChargerDashboard(); }
   // Mobile bottom nav
   var mbn = document.getElementById('mobileBottomNav');
   if (mbn) {
@@ -11303,7 +11341,7 @@ function _dashUpdateUI() {
   if (_badgeDlBtn) {
     if (p.statut === 'valide' && p.matricule) {
       _badgeDlBtn.style.display = 'block';
-      _badgeDlBtn.innerHTML = '<button onclick="_genererBadgePDF(window.providerData)" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B2A4A,#E8650A);color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;font-family:\'DM Sans\',sans-serif;">🎫 Télécharger mon badge PDF</button>';
+      _badgeDlBtn.innerHTML = '<button onclick="checkAcces(\'Télécharger mon badge PDF\', function(){ _genererBadgePDF(window.providerData); })" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B2A4A,#E8650A);color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;font-family:\'DM Sans\',sans-serif;">🎫 Télécharger mon badge PDF</button>';
     } else {
       _badgeDlBtn.style.display = 'none';
     }
@@ -21904,7 +21942,21 @@ window.ouvrirDevis = function(missionId, missionTitre, missionAudioUrl) {
     }, 0);
   }
 
-  setTimeout(function() { _creerChoixSaisie('dvChoix', 'dvMessage', 'Présentez-vous et expliquez votre approche...', function(b) { _dvAudioBlob = b; }); }, 0);
+  setTimeout(function() {
+    _creerChoixSaisie('dvChoix', 'dvMessage', 'Présentez-vous et expliquez votre approche...', function(b) { _dvAudioBlob = b; });
+    // Gate d'accès sur le bouton "Je parle" (devis vocal) — la saisie texte reste libre.
+    var _dvBtnVocal = document.getElementById('dvChoixBV');
+    if (_dvBtnVocal) {
+      var _dvOrigClick = _dvBtnVocal.onclick;
+      _dvBtnVocal.onclick = function(e) {
+        e.preventDefault();
+        var _self = this;
+        if (typeof checkAcces === 'function') {
+          checkAcces('Faire un devis vocal', function() { if (_dvOrigClick) _dvOrigClick.call(_self, e); });
+        } else if (_dvOrigClick) { _dvOrigClick.call(_self, e); }
+      };
+    }
+  }, 0);
 };
 
 window.fermerDevis = function() {
@@ -22651,6 +22703,364 @@ function afficherModalAbonnement() {
   if (typeof showSection === 'function') showSection('abonnement');
 }
 window.afficherModalAbonnement = afficherModalAbonnement;
+</script>
+
+<!-- ══ ABONNEMENT & CRÉDITS — MODAL DÉBLOQUER ══ -->
+<div class="modal-overlay" id="modalDebloquerOverlay" onclick="_fermerModalDebloquer()" style="z-index:999997;">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:540px;">
+    <div class="modal-header">
+      <div class="modal-title">🔒 Fonctionnalité réservée aux membres actifs</div>
+      <button class="modal-close" onclick="_fermerModalDebloquer()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="modalDebloquerAction" style="font-size:13.5px;color:#6B7280;margin-bottom:18px;line-height:1.6;"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;background:#FFF7F0;border:1.5px solid #E85D04;border-radius:14px;padding:16px;">
+          <div style="font-size:13.5px;font-weight:700;color:#1A1A4E;margin-bottom:6px;">✅ Accès illimité 30 jours</div>
+          <div style="font-size:20px;font-weight:800;color:#E85D04;margin-bottom:12px;">50 000 GNF</div>
+          <button onclick="_debloquerChoisirAbonnement()" style="width:100%;padding:12px;background:#E85D04;color:#fff;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;">S'abonner maintenant</button>
+        </div>
+        <div style="flex:1;min-width:200px;background:#F0F4FF;border:1.5px solid #1A1A4E;border-radius:14px;padding:16px;">
+          <div style="font-size:13.5px;font-weight:700;color:#1A1A4E;margin-bottom:6px;">⚡ 1 crédit pour cette action</div>
+          <div style="font-size:20px;font-weight:800;color:#1A1A4E;margin-bottom:12px;">5 000 GNF</div>
+          <button onclick="_debloquerChoisirCredit()" style="width:100%;padding:12px;background:#1A1A4E;color:#fff;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;">Acheter 1 crédit</button>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:16px;">
+        <a href="javascript:void(0)" onclick="_fermerModalDebloquer();showSection('abonnement');" style="font-size:12px;color:#9CA3AF;text-decoration:underline;">En savoir plus sur les offres</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ABONNEMENT & CRÉDITS — MODAL PAIEMENT MANUEL (fallback si Chap Chap Pay indisponible) ══ -->
+<div class="modal-overlay" id="modalPaiementManuelOverlay" onclick="_fermerPaiementManuel()" style="z-index:999999;">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:460px;">
+    <div class="modal-header">
+      <div class="modal-title">📱 Paiement manuel</div>
+      <button class="modal-close" onclick="_fermerPaiementManuel()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="modalPaiementManuelBody"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// ABONNEMENT & CRÉDITS PRESTATAIRES — CHAP CHAP PAY
+// ══════════════════════════════════════════════════════════════
+// Système additif, indépendant de l'ancien abonnement_actif/abonnement_fin/
+// essai_actif déjà en place (voir 20260718_abonnement_credits_providers.sql
+// pour le détail). subscription_end/credits n'existent pas tant que la
+// migration n'est pas exécutée : checkAcces() laisse alors passer sans
+// bloquer (constrainte explicite de la demande).
+
+const YOUMMA_ABO_MONTANT = 50000;
+const YOUMMA_CREDIT_MONTANT = 5000;
+const YOUMMA_WHATSAPP_NUM = '22461252510';
+
+function _accesProviderId() {
+  const s = (typeof getSession === 'function') ? getSession() : null;
+  return (s && s.provider_id) || (typeof providerId !== 'undefined' && providerId) || (typeof _dashProviderId !== 'undefined' && _dashProviderId) || null;
+}
+
+// ── ÉTAPE 4 : vérification d'accès avant une action payante ──
+async function checkAcces(actionLabel, callback) {
+  const pid = _accesProviderId();
+  if (!pid) { if (typeof callback === 'function') callback(); return; }
+  try {
+    const { data, error } = await sb.from('providers').select('subscription_end, credits').eq('id', pid).single();
+    if (error || !data) { if (typeof callback === 'function') callback(); return; } // colonnes absentes (migration non exécutée) : laisse passer
+    const now = new Date();
+    const aAbo = data.subscription_end && new Date(data.subscription_end) > now;
+    if (aAbo) { if (typeof callback === 'function') callback(); return; }
+    if ((data.credits || 0) > 0) {
+      await sb.from('providers').update({ credits: data.credits - 1 }).eq('id', pid);
+      if (typeof callback === 'function') callback();
+      return;
+    }
+    _ouvrirModalDebloquer(actionLabel);
+  } catch(e) {
+    console.log('[checkAcces] erreur, accès laissé libre:', e.message);
+    if (typeof callback === 'function') callback();
+  }
+}
+window.checkAcces = checkAcces;
+
+// ── ÉTAPE 1 : modal "Débloquer cette fonctionnalité" ──
+function _ouvrirModalDebloquer(actionLabel) {
+  const el = document.getElementById('modalDebloquerAction');
+  if (el) el.textContent = 'Pour "' + (actionLabel || 'cette action') + '", débloquez l\'accès :';
+  const overlay = document.getElementById('modalDebloquerOverlay');
+  if (overlay) overlay.classList.add('open');
+}
+window._ouvrirModalDebloquer = _ouvrirModalDebloquer;
+
+function _fermerModalDebloquer() {
+  const overlay = document.getElementById('modalDebloquerOverlay');
+  if (overlay) overlay.classList.remove('open');
+}
+window._fermerModalDebloquer = _fermerModalDebloquer;
+
+function _debloquerChoisirAbonnement() {
+  const pid = _accesProviderId();
+  _fermerModalDebloquer();
+  if (!pid) { showToast('Session expirée, reconnectez-vous', 'error'); return; }
+  lancerPaiementChapChap('abonnement', YOUMMA_ABO_MONTANT, pid, null);
+}
+window._debloquerChoisirAbonnement = _debloquerChoisirAbonnement;
+
+function _debloquerChoisirCredit() {
+  const pid = _accesProviderId();
+  _fermerModalDebloquer();
+  if (!pid) { showToast('Session expirée, reconnectez-vous', 'error'); return; }
+  lancerPaiementChapChap('credit', YOUMMA_CREDIT_MONTANT, pid, null);
+}
+window._debloquerChoisirCredit = _debloquerChoisirCredit;
+
+// ── ÉTAPE 2 : intégration Chap Chap Pay ──
+// L'API est déjà intégrée (CHAPCHAP_PROXY_URL, proxy Supabase Edge Function
+// chapchap-proxy). Le proxy a été étendu (amount/description/order_id/
+// return_url désormais surchargeables, valeurs par défaut inchangées) pour
+// accepter les montants variables (5 000 GNF crédit / 50 000 GNF abonnement)
+// — voir supabase/functions/chapchap-proxy/index.ts. En cas d'échec réseau
+// ou d'absence de payment_url, bascule automatique sur le paiement manuel
+// (Orange Money / MTN MoMo + notification WhatsApp).
+async function lancerPaiementChapChap(type, montant, providerId2, actionApres) {
+  var paiementId = null;
+  try {
+    const creditsAchetes = type === 'credit' ? Math.max(1, Math.round(montant / YOUMMA_CREDIT_MONTANT)) : 0;
+    const dureeJours = type === 'abonnement' ? 30 : 0;
+
+    const { data: paiement, error: errInsert } = await sb.from('paiements_youmma').insert({
+      provider_id: providerId2, type: type, montant_gnf: montant,
+      credits_achetes: creditsAchetes, duree_jours: dureeJours, statut: 'en_attente'
+    }).select().single();
+    if (errInsert || !paiement) throw new Error(errInsert ? errInsert.message : 'Impossible de créer le paiement');
+    paiementId = paiement.id;
+
+    const description = type === 'abonnement'
+      ? 'Abonnement YOUMMA JOBS 30 jours'
+      : 'Achat de ' + creditsAchetes + ' crédit' + (creditsAchetes > 1 ? 's' : '') + ' YOUMMA JOBS';
+    const callbackUrl = 'https://yoummajobs.com/#dashboard?paiement=SUCCESS&ref=' + paiementId;
+    const providerNom = (window.providerData && ((providerData.prenom||'')+' '+(providerData.nom||'')).trim())
+      || (window._dashData && ((_dashData.prenom||'')+' '+(_dashData.nom||'')).trim()) || 'Artisan';
+
+    const response = await fetch(CHAPCHAP_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+      body: JSON.stringify({
+        providerId: providerId2, providerNom: providerNom,
+        amount: montant, description: description,
+        order_id: paiementId, return_url: callbackUrl
+      })
+    });
+    if (!response.ok) throw new Error('Erreur ' + response.status);
+    const data = await response.json();
+
+    if (data && data.payment_url) {
+      showToast('✅ Redirection vers le paiement...', 'success');
+      setTimeout(() => { window.location.href = data.payment_url; }, 900);
+    } else {
+      throw new Error((data && (data.message || data.error)) || 'Aucune URL de paiement reçue');
+    }
+  } catch(e) {
+    console.log('[lancerPaiementChapChap] Chap Chap Pay indisponible, bascule paiement manuel:', e.message);
+    _ouvrirPaiementManuel(type, montant, paiementId);
+  }
+}
+window.lancerPaiementChapChap = lancerPaiementChapChap;
+
+// ── Fallback paiement manuel (Orange Money / MTN MoMo + WhatsApp) ──
+function _ouvrirPaiementManuel(type, montant, paiementId) {
+  const label = type === 'abonnement' ? 'votre abonnement (30 jours)' : 'votre achat de crédit(s)';
+  const refTxt = paiementId ? (' Référence : ' + paiementId + '.') : '';
+  const msgWa = encodeURIComponent(
+    'Bonjour YOUMMA JOBS, j\'ai effectué le paiement de ' + Number(montant).toLocaleString('fr-FR') + ' GNF pour ' + label + '.' + refTxt + ' Merci de valider mon accès.'
+  );
+  const waLink = 'https://wa.me/' + YOUMMA_WHATSAPP_NUM + '?text=' + msgWa;
+  const body = document.getElementById('modalPaiementManuelBody');
+  if (body) {
+    body.innerHTML =
+      '<div style="font-size:13.5px;color:#374151;line-height:1.7;margin-bottom:16px;">'
+      + 'Envoyez <strong>' + Number(montant).toLocaleString('fr-FR') + ' GNF</strong> par Orange Money ou MTN MoMo'
+      + (paiementId ? ' en indiquant la référence <strong>' + paiementId + '</strong>,' : ',')
+      + ' puis contactez YOUMMA JOBS sur WhatsApp pour recevoir le numéro de réception et confirmer votre paiement.'
+      + '</div>'
+      + '<a href="' + waLink + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#25D366;color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;">'
+      + '<i class="fa-brands fa-whatsapp"></i> J\'ai payé → notifier YOUMMA'
+      + '</a>';
+  }
+  const overlay = document.getElementById('modalPaiementManuelOverlay');
+  if (overlay) overlay.classList.add('open');
+}
+window._ouvrirPaiementManuel = _ouvrirPaiementManuel;
+
+function _fermerPaiementManuel() {
+  const overlay = document.getElementById('modalPaiementManuelOverlay');
+  if (overlay) overlay.classList.remove('open');
+}
+window._fermerPaiementManuel = _fermerPaiementManuel;
+
+// ── ÉTAPE 3 : callback retour de paiement ──
+function _nettoyerUrlPaiement() {
+  try {
+    var newSearch = (location.search || '').replace(/[?&](paiement|ref)=[^&]*/g, '').replace(/^&/, '?');
+    if (newSearch === '?') newSearch = '';
+    var hashBase = (location.hash || '').split('?')[0];
+    if (history.replaceState) history.replaceState({}, '', location.pathname + newSearch + hashBase);
+  } catch(e) {}
+}
+
+async function _verifierRetourPaiementCredits() {
+  const combined = (location.search || '') + ' ' + (location.hash || '');
+  const mStatut = /paiement=(SUCCESS|success)/.exec(combined);
+  const mRef = /[?&#]ref=([a-zA-Z0-9-]+)/.exec(combined);
+  if (!mStatut || !mRef) return;
+  const ref = mRef[1];
+  try {
+    const { data: p, error } = await sb.from('paiements_youmma').select('*').eq('id', ref).single();
+    if (error || !p) return;
+    if (p.statut === 'valide') return; // déjà traité, évite un double crédit
+
+    await sb.from('paiements_youmma').update({ statut: 'valide', valide_le: new Date().toISOString() }).eq('id', ref);
+
+    if (p.type === 'abonnement') {
+      const fin = new Date();
+      fin.setDate(fin.getDate() + 30);
+      const { data: prov } = await sb.from('providers').select('total_depense_gnf').eq('id', p.provider_id).single();
+      await sb.from('providers').update({
+        subscription_end: fin.toISOString(),
+        total_depense_gnf: (prov && prov.total_depense_gnf || 0) + p.montant_gnf
+      }).eq('id', p.provider_id);
+    } else {
+      const { data: prov } = await sb.from('providers').select('credits, total_depense_gnf').eq('id', p.provider_id).single();
+      await sb.from('providers').update({
+        credits: (prov && prov.credits || 0) + (p.credits_achetes || 1),
+        total_depense_gnf: (prov && prov.total_depense_gnf || 0) + p.montant_gnf
+      }).eq('id', p.provider_id);
+    }
+
+    showToast('✅ Paiement validé ! Votre accès est activé.', 'success');
+    if (typeof _creditsChargerDashboard === 'function') _creditsChargerDashboard();
+    const pid = _accesProviderId();
+    if (pid && typeof chargerDashboard === 'function') chargerDashboard(pid);
+  } catch(e) {
+    console.log('[_verifierRetourPaiementCredits] erreur:', e.message);
+  } finally {
+    _nettoyerUrlPaiement();
+  }
+}
+window._verifierRetourPaiementCredits = _verifierRetourPaiementCredits;
+
+document.addEventListener('DOMContentLoaded', function() { _verifierRetourPaiementCredits(); });
+
+// ── ÉTAPE 5 : dashboard "Mon abonnement & crédits" ──
+async function _creditsChargerDashboard() {
+  const pid = _accesProviderId();
+  const statusEl = document.getElementById('creditsStatusBadge');
+  const histEl = document.getElementById('creditsHistorique');
+  if (!pid) return;
+
+  if (statusEl) {
+    try {
+      const { data: p, error } = await sb.from('providers').select('subscription_end, credits').eq('id', pid).single();
+      if (error || !p) throw error || new Error('introuvable');
+      const now = new Date();
+      const aAbo = p.subscription_end && new Date(p.subscription_end) > now;
+      if (aAbo) {
+        statusEl.innerHTML = '✅ Abonné jusqu\'au ' + new Date(p.subscription_end).toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'});
+        statusEl.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;background:#F0FDF4;color:#16A34A;';
+      } else if ((p.credits||0) > 0) {
+        statusEl.innerHTML = '⚡ ' + p.credits + ' crédit' + (p.credits>1?'s':'') + ' restant' + (p.credits>1?'s':'');
+        statusEl.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;background:#FFF7ED;color:#E85D04;';
+      } else {
+        statusEl.innerHTML = '❌ Aucun accès actif';
+        statusEl.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;background:#FEF2F2;color:#DC2626;';
+      }
+    } catch(e) {
+      statusEl.textContent = '—';
+      statusEl.style.cssText = 'display:inline-flex;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;background:#F3F4F6;color:#6B7280;';
+    }
+  }
+
+  if (histEl) {
+    try {
+      const { data: hist } = await sb.from('paiements_youmma').select('*').eq('provider_id', pid).order('created_at',{ascending:false}).limit(10);
+      if (!hist || !hist.length) {
+        histEl.innerHTML = '<div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;">Aucun paiement pour le moment</div>';
+      } else {
+        const statutBg = {valide:'#F0FDF4',en_attente:'#FEF9C3',echoue:'#FEF2F2'};
+        const statutFg = {valide:'#16A34A',en_attente:'#854D0E',echoue:'#DC2626'};
+        const statutLbl= {valide:'Validé',en_attente:'En attente',echoue:'Échoué'};
+        histEl.innerHTML = hist.map(function(h) {
+          const d = new Date(h.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});
+          const typeLbl = h.type === 'abonnement' ? 'Abonnement 30j' : ('Crédit x' + (h.credits_achetes||1));
+          return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #F3F4F6;">'
+            + '<div><div style="font-size:13px;font-weight:600;color:#1A1A4E;">' + typeLbl + '</div>'
+            + '<div style="font-size:11px;color:#9CA3AF;">' + d + '</div></div>'
+            + '<div style="text-align:right;"><div style="font-size:13px;font-weight:700;color:#374151;">' + Number(h.montant_gnf||0).toLocaleString('fr-FR') + ' GNF</div>'
+            + '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:'+(statutBg[h.statut]||'#F3F4F6')+';color:'+(statutFg[h.statut]||'#6B7280')+';">'+(statutLbl[h.statut]||h.statut)+'</span></div>'
+            + '</div>';
+        }).join('');
+      }
+    } catch(e) {
+      histEl.innerHTML = '<div style="text-align:center;padding:16px;color:#9CA3AF;font-size:12.5px;">Historique indisponible</div>';
+    }
+  }
+}
+window._creditsChargerDashboard = _creditsChargerDashboard;
+
+function _creditsMajMontant() {
+  const input = document.getElementById('creditsNbInput');
+  const out = document.getElementById('creditsMontantCalcule');
+  if (!input || !out) return;
+  let n = parseInt(input.value, 10);
+  if (!n || n < 1) n = 1;
+  if (n > 10) n = 10;
+  input.value = n;
+  out.textContent = (n * YOUMMA_CREDIT_MONTANT).toLocaleString('fr-FR') + ' GNF';
+}
+window._creditsMajMontant = _creditsMajMontant;
+
+function _creditsAcheter() {
+  const pid = _accesProviderId();
+  if (!pid) { showToast('Session expirée, reconnectez-vous', 'error'); return; }
+  const input = document.getElementById('creditsNbInput');
+  let n = parseInt(input && input.value, 10) || 1;
+  if (n < 1) n = 1;
+  if (n > 10) n = 10;
+  lancerPaiementChapChap('credit', n * YOUMMA_CREDIT_MONTANT, pid, null);
+}
+window._creditsAcheter = _creditsAcheter;
+
+function _abonnementRenouveler() {
+  const pid = _accesProviderId();
+  if (!pid) { showToast('Session expirée, reconnectez-vous', 'error'); return; }
+  lancerPaiementChapChap('abonnement', YOUMMA_ABO_MONTANT, pid, null);
+}
+window._abonnementRenouveler = _abonnementRenouveler;
+
+// ── ÉTAPE 4 (suite) : gate sur "Voir les travaux" (recevoir/consulter les missions) ──
+(function() {
+  const _origOuvrirVoirProjets = window.ouvrirVoirProjets;
+  window.ouvrirVoirProjets = function() {
+    checkAcces('Recevoir et consulter les missions disponibles', function() {
+      if (typeof _origOuvrirVoirProjets === 'function') _origOuvrirVoirProjets();
+    });
+  };
+})();
+
+// ── ÉTAPE 4 (suite) : gate sur l'affichage du téléphone client dans une mission ──
+// (bouton injecté par chargerMissions() dans #section-missions)
+function _missionVoirTelephone(missionId) {
+  const tel = (window._missionsTelMap || {})[missionId];
+  const wrap = document.getElementById('missionTel_' + missionId);
+  if (!wrap || !tel) return;
+  checkAcces('Voir le téléphone du client', function() {
+    wrap.innerHTML = '<a href="tel:' + tel + '" style="background:#F0FDF4;color:#16A34A;font-weight:700;padding:4px 10px;border-radius:8px;font-size:11.5px;text-decoration:none;"><i class="fa-solid fa-phone" style="margin-right:4px;"></i>' + tel + '</a>';
+  });
+}
+window._missionVoirTelephone = _missionVoirTelephone;
 </script>
 
 <!-- ══ SERVICE WORKER REGISTRATION ══ -->

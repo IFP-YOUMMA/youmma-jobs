@@ -37,14 +37,25 @@ serve(async (req: Request) => {
       });
     }
 
-    const orderId = 'YOUMMA-' + String(providerId).slice(0, 8).toUpperCase() + '-' + Date.now();
+    // orderId : utilise la référence fournie par l'appelant (ex. l'id de la
+    // ligne paiements_youmma déjà créée côté client) si présente, sinon
+    // génère un identifiant par défaut — comportement historique inchangé
+    // pour les appels qui ne fournissent pas order_id (creerPaiementAbonnement,
+    // lancerPaiementAbonnement).
+    const orderId: string = payload.order_id || payload.orderId ||
+      ('YOUMMA-' + String(providerId).slice(0, 8).toUpperCase() + '-' + Date.now());
 
+    // amount/description/return_url : surchageables par l'appelant (utilisé
+    // par lancerPaiementChapChap pour les achats de crédits à 5 000 GNF et
+    // les renouvellements d'abonnement à 50 000 GNF) — valeurs par défaut
+    // identiques à avant si non fournies, pour ne rien casser côté appels
+    // existants.
     const body = {
-      amount: 50000,
-      description: 'Abonnement YOUMMA JOBS 30 jours - ' + providerNom,
+      amount: payload.amount || 50000,
+      description: payload.description || ('Abonnement YOUMMA JOBS 30 jours - ' + providerNom),
       order_id: orderId,
-      return_url: 'https://yoummajobs.com/?paiement=success&order=' + orderId,
-      cancel_url: 'https://yoummajobs.com/?paiement=cancel',
+      return_url: payload.return_url || ('https://yoummajobs.com/?paiement=success&order=' + orderId),
+      cancel_url: payload.cancel_url || 'https://yoummajobs.com/?paiement=cancel',
       fee_handling: 'deduct'
     };
 
