@@ -2682,6 +2682,53 @@ if (typeof connexionPrestataire === 'undefined') {
   #espaceWrapper .esp-tab{padding:10px 11px;font-size:12.5px;}
   #espaceWrapper .esp-card{padding:16px;}
 }
+
+/* ── Navigation mobile en bas, style app native (≤768px) ── */
+.esp-bottomnav{display:none;}
+.esp-header-statut{display:none;}
+.esp-mobile-only-btn{display:none;}
+
+@media (max-width:768px){
+  /* Onglets horizontaux du haut remplacés par la barre du bas */
+  #espaceWrapper .esp-tabbar{display:none;}
+  #espaceWrapper .esp-bottomnav{
+    display:flex;
+    position:fixed;bottom:0;left:0;right:0;z-index:1000;
+    background:#0f172a;height:64px;
+    padding-bottom:env(safe-area-inset-bottom,0);
+    box-shadow:0 -2px 14px rgba(0,0,0,.25);
+  }
+  #espaceWrapper .esp-bottomnav .esp-tab{
+    position:relative;flex:1;min-width:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    background:none;border:none;border-bottom:none;padding:6px 2px;
+    font-size:10px;font-weight:700;color:#94A3B8;cursor:pointer;
+  }
+  #espaceWrapper .esp-bottomnav .esp-tab i{margin-right:0;font-size:17px;}
+  #espaceWrapper .esp-bottomnav .esp-tab span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+  #espaceWrapper .esp-bottomnav .esp-tab.active{color:#16A34A;}
+
+  /* Espace pour ne pas masquer le contenu derrière la barre fixe */
+  #espaceDashClient,#espaceDashFournisseur,#espaceDashSuperviseur{padding-bottom:80px;}
+
+  /* En-tête plus compact */
+  #espaceWrapper .esp-card{padding:14px;}
+  #espaceWrapper .esp-avatar{width:42px;height:42px;font-size:14px;}
+  #espaceWrapper .esp-header-statut{display:block;font-size:10.5px;font-weight:700;margin-top:3px;}
+  #espaceWrapper .esp-logout-label{display:none;}
+  #espaceWrapper .esp-btn-logout{padding:9px 11px;}
+  #espaceWrapper .esp-mobile-only-btn{display:flex;}
+
+  /* Cartes métriques empilées en colonne, plus compactes */
+  #espaceWrapper .esp-metrics-grid{grid-template-columns:1fr!important;gap:8px!important;}
+  #espaceWrapper .esp-metrics-grid .adm-stat-card{padding:12px!important;}
+  #espaceWrapper .esp-metrics-grid .adm-stat-num{font-size:1.5rem!important;}
+}
+
+/* Desktop : aucun changement visuel — barre du bas explicitement cachée */
+@media (min-width:769px){
+  #espaceWrapper .esp-bottomnav{display:none!important;}
+}
 </style>
 <div id="espaceWrapper" style="background:linear-gradient(135deg,#1A1A4E 0%,#0D0D2E 100%);height:100vh;padding:40px 20px;display:flex;align-items:flex-start;justify-content:center;">
 
@@ -2774,12 +2821,13 @@ if (typeof connexionPrestataire === 'undefined') {
           <div style="font-size:16px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Bonjour, <span id="espaceFourPrenom"></span> 👋</div>
           <div style="font-size:11px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.04em;margin-top:1px;">Fournisseur YOUMMA JOBS</div>
           <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;line-height:1.35;">Vous êtes connecté à votre espace professionnel YOUMMA JOBS</div>
+          <div id="espaceFourStatutLigne" class="esp-header-statut"></div>
         </div>
       </div>
-      <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Sortir</button>
+      <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> <span class="esp-logout-label">Sortir</span></button>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+    <div class="esp-metrics-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
       <div class="adm-stat-card" style="border-top:3px solid #7C3AED;">
         <div class="adm-stat-num" id="espaceFourNbChantiersTotal" style="font-size:20px;">—</div>
         <div class="adm-stat-label">Chantiers liés</div>
@@ -2857,6 +2905,8 @@ if (typeof connexionPrestataire === 'undefined') {
           <div style="font-size:17px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:2px;" id="espaceFourProfilNomAffiche"></div>
           <div style="font-size:12.5px;color:#6B7280;margin-bottom:12px;" id="espaceFourProfilZoneAffiche"></div>
           <span class="esp-badge" style="background:#F0FDF4;color:#16A34A;display:inline-flex;align-items:center;gap:5px;margin-bottom:16px;">✅ Fournisseur certifié YOUMMA JOBS</span>
+
+          <button onclick="_espaceBasculerOnglet('four','catalogue')" class="esp-mobile-only-btn" style="width:100%;align-items:center;justify-content:center;gap:8px;background:#F0FDF4;color:#059669;border:1.5px solid #A7F3D0;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px;"><i class="fa-solid fa-boxes-stacked"></i>Voir mon catalogue</button>
 
           <div id="espaceFourAbonnementInfo" style="margin-bottom:20px;"></div>
 
@@ -2939,6 +2989,13 @@ if (typeof connexionPrestataire === 'undefined') {
         <div id="espaceFourProduitsListe"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
       </div>
     </div>
+
+    <div class="esp-bottomnav">
+      <button class="esp-tab active" data-esp-tab="four" data-esp-tab-id="chantiers" onclick="_espaceBasculerOnglet('four','chantiers')"><i class="fa-solid fa-building"></i><span>Chantiers</span></button>
+      <button class="esp-tab" data-esp-tab="four" data-esp-tab-id="versements" onclick="_espaceBasculerOnglet('four','versements')"><i class="fa-solid fa-check"></i><span>Valider</span><span id="espaceFourVersementsBadgeMobile" style="display:none;background:#DC2626;color:#fff;border-radius:20px;min-width:14px;height:14px;padding:0 4px;font-size:9px;font-weight:800;align-items:center;justify-content:center;position:absolute;top:2px;margin-left:14px;"></span></button>
+      <button class="esp-tab" data-esp-tab="four" data-esp-tab-id="historique" onclick="_espaceBasculerOnglet('four','historique')"><i class="fa-solid fa-clock-rotate-left"></i><span>Historique</span></button>
+      <button class="esp-tab" data-esp-tab="four" data-esp-tab-id="profil" onclick="_espaceBasculerOnglet('four','profil')"><i class="fa-solid fa-user"></i><span>Profil</span></button>
+    </div>
   </div>
 
   <!-- Tableau de bord SUPERVISEUR -->
@@ -2951,12 +3008,13 @@ if (typeof connexionPrestataire === 'undefined') {
           <div style="font-size:16px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Bonjour, <span id="espaceSupPrenom"></span> 👋</div>
           <div style="font-size:11px;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:.04em;margin-top:1px;">Superviseur YOUMMA JOBS</div>
           <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;line-height:1.35;">Vous êtes connecté à votre espace professionnel YOUMMA JOBS</div>
+          <div class="esp-header-statut" style="color:#059669;">✅ Compte actif</div>
         </div>
       </div>
-      <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Sortir</button>
+      <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> <span class="esp-logout-label">Sortir</span></button>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+    <div class="esp-metrics-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
       <div class="adm-stat-card" style="border-top:3px solid #7C3AED;">
         <div class="adm-stat-num" id="espaceSupNbChantiers">—</div>
         <div class="adm-stat-label">Chantiers assignés</div>
@@ -3021,6 +3079,13 @@ if (typeof connexionPrestataire === 'undefined') {
         <div style="font-size:12.5px;color:#6B7280;">Les rapports de fin de chantier avec photos arrivent prochainement.</div>
       </div>
     </div>
+
+    <div class="esp-bottomnav">
+      <button class="esp-tab active" data-esp-tab="sup" data-esp-tab-id="chantiers" onclick="_espaceBasculerOnglet('sup','chantiers')"><i class="fa-solid fa-building"></i><span>Chantiers</span></button>
+      <button class="esp-tab" data-esp-tab="sup" data-esp-tab-id="sorties" onclick="_espaceBasculerOnglet('sup','sorties')"><i class="fa-solid fa-truck-fast"></i><span>Sorties</span></button>
+      <button class="esp-tab" data-esp-tab="sup" data-esp-tab-id="registre" onclick="_espaceBasculerOnglet('sup','registre')"><i class="fa-solid fa-clock-rotate-left"></i><span>Registre</span></button>
+      <button class="esp-tab" data-esp-tab="sup" data-esp-tab-id="rapports" onclick="_espaceBasculerOnglet('sup','rapports')"><i class="fa-solid fa-file-lines"></i><span>Rapports</span></button>
+    </div>
   </div>
 
   <!-- Tableau de bord CLIENT (lecture seule) -->
@@ -3033,12 +3098,13 @@ if (typeof connexionPrestataire === 'undefined') {
           <div style="font-size:16px;font-weight:800;color:#1A1A4E;font-family:'Libre Baskerville',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Bonjour, <span id="espaceCliPrenom"></span> 👋</div>
           <div style="font-size:11px;font-weight:700;color:#2563EB;text-transform:uppercase;letter-spacing:.04em;margin-top:1px;">Espace client YOUMMA JOBS</div>
           <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;line-height:1.35;">Vous êtes connecté à votre espace professionnel YOUMMA JOBS</div>
+          <div class="esp-header-statut" style="color:#059669;">✅ Compte actif</div>
         </div>
       </div>
-      <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Sortir</button>
+      <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> <span class="esp-logout-label">Sortir</span></button>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+    <div class="esp-metrics-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
       <div class="adm-stat-card" style="border-top:3px solid #2563EB;">
         <div class="adm-stat-num" id="espaceCliNbChantiers">—</div>
         <div class="adm-stat-label">Chantiers</div>
@@ -3078,6 +3144,12 @@ if (typeof connexionPrestataire === 'undefined') {
 
     <div class="esp-panel" data-esp-panel="cli" data-esp-panel-id="fournisseur" style="display:none;">
       <div id="espaceCliFournisseurListe"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+    </div>
+
+    <div class="esp-bottomnav">
+      <button class="esp-tab active" data-esp-tab="cli" data-esp-tab-id="chantiers" onclick="_espaceBasculerOnglet('cli','chantiers')"><i class="fa-solid fa-building"></i><span>Chantiers</span></button>
+      <button class="esp-tab" data-esp-tab="cli" data-esp-tab-id="versements" onclick="_espaceBasculerOnglet('cli','versements')"><i class="fa-solid fa-wallet"></i><span>Versements</span></button>
+      <button class="esp-tab" data-esp-tab="cli" data-esp-tab-id="fournisseur" onclick="_espaceBasculerOnglet('cli','fournisseur')"><i class="fa-solid fa-truck"></i><span>Fournisseur</span></button>
     </div>
   </div>
 
@@ -3515,7 +3587,7 @@ async function _espaceChargerFournisseur() {
       bandeau.style.display = 'none';
       const zoneVersVide = document.getElementById('espaceFourVersementsAttente');
       if (zoneVersVide) zoneVersVide.innerHTML = '<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:14px;text-align:center;font-size:13px;font-weight:700;color:#059669;">✅ Aucun versement en attente</div>';
-      const badgeVide = document.getElementById('espaceFourVersementsBadge'); if (badgeVide) badgeVide.style.display = 'none';
+      ['espaceFourVersementsBadge','espaceFourVersementsBadgeMobile'].forEach(id => { const b = document.getElementById(id); if (b) b.style.display = 'none'; });
       _espaceFourInitHistorique([]);
       return;
     }
@@ -3552,11 +3624,15 @@ async function _espaceChargerFournisseur() {
       .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
     const listeVersAttente = document.getElementById('espaceFourVersementsAttente');
-    const badgeVersAttente = document.getElementById('espaceFourVersementsBadge');
-    if (badgeVersAttente) {
-      if (versementsAttente.length) { badgeVersAttente.textContent = versementsAttente.length; badgeVersAttente.style.display = 'inline-flex'; }
-      else { badgeVersAttente.style.display = 'none'; }
-    }
+    // Badge répété (top tab desktop + icône barre du bas mobile) — même
+    // logique appliquée aux deux éléments, l'un des deux est toujours
+    // absent du DOM selon la largeur d'écran (aucun risque si manquant).
+    ['espaceFourVersementsBadge','espaceFourVersementsBadgeMobile'].forEach(id => {
+      const b = document.getElementById(id);
+      if (!b) return;
+      if (versementsAttente.length) { b.textContent = versementsAttente.length; b.style.display = 'inline-flex'; }
+      else { b.style.display = 'none'; }
+    });
     if (versementsAttente.length) {
       listeVersAttente.innerHTML = versementsAttente.map(t => {
         const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -3775,6 +3851,15 @@ async function _espaceFournisseurChargerProfilEtCatalogue() {
             <div style="font-size:12px;color:#7F1D1D;margin:8px 0 10px;">Contactez YOUMMA JOBS pour activer votre abonnement.</div>
             <a href="https://wa.me/22461252510?text=Bonjour%20YOUMMA%20JOBS%2C%20je%20veux%20activer%20mon%20abonnement%20fournisseur" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;padding:8px 14px;border-radius:8px;font-weight:700;font-size:12px;text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Contacter sur WhatsApp</a>
           </div>`;
+
+      // Ligne de statut compacte sous le nom, dans l'en-tête (visible en
+      // mobile uniquement, via CSS) — réutilise abonneOk déjà calculé,
+      // aucune requête supplémentaire.
+      const statutLigne = document.getElementById('espaceFourStatutLigne');
+      if (statutLigne) {
+        statutLigne.style.color = abonneOk ? '#059669' : '#D97706';
+        statutLigne.textContent = abonneOk ? '✅ Abonné jusqu\'au ' + dateAbo : '⚠️ Non abonné';
+      }
     }
   } catch (e) {
     console.warn('[espace] profil fournisseur indisponible (migration 20260716_fournisseur_profil_catalogue.sql / 20260717_fournisseur_photo_couverture.sql pas encore appliquées ?):', e.message);
