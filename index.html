@@ -3073,11 +3073,7 @@ if (typeof connexionPrestataire === 'undefined') {
     </div>
 
     <div class="esp-panel" data-esp-panel="sup" data-esp-panel-id="rapports" style="display:none;">
-      <div class="esp-card" style="text-align:center;padding:32px 20px;">
-        <i class="fa-solid fa-file-circle-plus" style="font-size:28px;color:#D1D5DB;display:block;margin-bottom:12px;"></i>
-        <div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:6px;">Fonctionnalité bientôt disponible</div>
-        <div style="font-size:12.5px;color:#6B7280;">Les rapports de fin de chantier avec photos arrivent prochainement.</div>
-      </div>
+      <div id="espaceSupRapportsListe"><div style="color:#9CA3AF;font-size:13px;">Chargement...</div></div>
     </div>
 
     <div class="esp-bottomnav">
@@ -3101,7 +3097,10 @@ if (typeof connexionPrestataire === 'undefined') {
           <div class="esp-header-statut" style="color:#059669;">✅ Compte actif</div>
         </div>
       </div>
-      <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> <span class="esp-logout-label">Sortir</span></button>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <div id="espaceCliNotifBadge" style="display:none;align-items:center;gap:4px;background:#FEF2F2;color:#DC2626;border-radius:20px;padding:6px 10px;font-size:12px;font-weight:800;white-space:nowrap;">🔔</div>
+        <button onclick="_espaceDeconnexion()" class="esp-btn-logout"><i class="fa-solid fa-right-from-bracket"></i> <span class="esp-logout-label">Sortir</span></button>
+      </div>
     </div>
 
     <div class="esp-metrics-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
@@ -4179,8 +4178,11 @@ async function _espaceChargerSuperviseur() {
     // pour la nouvelle section dépliable "Fournisseurs & Soldes" et
     // l'affichage du téléphone client — même requête groupée, pas de
     // requête supplémentaire.
+    // client_id ajouté (colonne brute, pas seulement via l'embed clients())
+    // pour la notification client des rapports journaliers (Partie 1) —
+    // même requête groupée, pas de requête supplémentaire.
     const { data: chantiers, error } = await sb.from('chantiers')
-      .select('id,nom,statut,date_debut,clients(nom,prenom,telephone),comptes_materiaux(id,solde_gnf,fournisseurs_materiaux(nom_entreprise,telephone))')
+      .select('id,nom,statut,date_debut,client_id,clients(nom,prenom,telephone),comptes_materiaux(id,solde_gnf,fournisseurs_materiaux(nom_entreprise,telephone))')
       .eq('superviseur_id', _espaceSession.id)
       .order('date_debut', { ascending: false });
     if (error) throw error;
@@ -4188,6 +4190,7 @@ async function _espaceChargerSuperviseur() {
     _espaceSupChantiersCache = chantiers || [];
     _espaceSupInitFormSortie();
     _espaceSupInitFiltreRegistre();
+    _espaceSupChargerRapports();
 
     document.getElementById('espaceSupNbChantiers').textContent = (chantiers || []).length;
     const soldeGlobal = (chantiers || []).reduce((s, c) => s + (c.comptes_materiaux || []).reduce((s2, cm) => s2 + Number(cm.solde_gnf || 0), 0), 0);
@@ -4448,6 +4451,142 @@ function _espaceSupRenderRegistre(filtreChantierId) {
   }).join('');
 }
 
+// ── Onglet "Rapports" — clôture de journée (rapports_journaliers +
+// rapport_journalier_photos), notifie le client (notifications_client).
+// Tables nouvelles (migration 20260718_rapports_journaliers.sql, pas
+// exécutée) : si absentes, repli "Fonctionnalité bientôt disponible" sans
+// crasher le reste du tableau de bord.
+let _espaceSupRapportsCache = [];
+
+async function _espaceSupChargerRapports() {
+  const zone = document.getElementById('espaceSupRapportsListe');
+  if (!zone) return;
+  if (!_espaceSupChantiersCache.length) {
+    zone.innerHTML = '<div style="background:#fff;border-radius:18px;padding:24px;text-align:center;color:#9CA3AF;font-size:13px;">Aucun chantier assigné pour le moment.</div>';
+    return;
+  }
+  try {
+    const chantierIds = _espaceSupChantiersCache.map(c => c.id);
+    const { data: rapports, error } = await sb.from('rapports_journaliers')
+      .select('*, rapport_journalier_photos(photo_url)')
+      .in('chantier_id', chantierIds)
+      .order('date_rapport', { ascending: false })
+      .limit(500);
+    if (error) throw error;
+    _espaceSupRapportsCache = rapports || [];
+    zone.innerHTML = _espaceSupChantiersCache.map(c => _espaceSupRenderRapportsChantier(c)).join('');
+  } catch (e) {
+    console.warn('[espace] rapports journaliers indisponibles (migration 20260718_rapports_journaliers.sql pas encore appliquée ?):', e.message);
+    zone.innerHTML = '<div style="background:#fff;border-radius:18px;padding:32px 20px;text-align:center;"><i class="fa-solid fa-file-circle-plus" style="font-size:28px;color:#D1D5DB;display:block;margin-bottom:12px;"></i><div style="font-size:14px;font-weight:700;color:#1A1A4E;margin-bottom:6px;">Fonctionnalité bientôt disponible</div><div style="font-size:12.5px;color:#6B7280;">Les rapports journaliers arrivent prochainement.</div></div>';
+  }
+}
+
+function _espaceSupRenderRapportsChantier(c) {
+  const today = new Date().toISOString().slice(0, 10);
+  const rapportsChantier = _espaceSupRapportsCache.filter(r => r.chantier_id === c.id).slice(0, 5);
+  const rapportsHtml = rapportsChantier.length ? rapportsChantier.map(r => {
+    const date = new Date(r.date_rapport).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const photos = (r.rapport_journalier_photos || []).map(p => p.photo_url).filter(Boolean);
+    return `<div style="border-top:1px solid #F0F0F8;padding-top:10px;margin-top:10px;">
+      <div style="font-size:12px;font-weight:700;color:#1A1A4E;margin-bottom:4px;">${date}</div>
+      ${r.commentaire ? `<div style="font-size:12px;color:#374151;margin-bottom:8px;">${r.commentaire}</div>` : ''}
+      ${photos.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;">${photos.map(u => `<img src="${u}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;cursor:pointer;" onclick="window.open('${u}','_blank')"/>`).join('')}</div>` : ''}
+    </div>`;
+  }).join('') : '<div style="font-size:12px;color:#9CA3AF;padding-top:10px;">Aucun rapport pour ce chantier.</div>';
+
+  return `<div class="esp-card" style="margin-bottom:16px;">
+    <div style="font-size:14px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:14px;"><i class="fa-solid fa-building" style="color:#9CA3AF;margin-right:6px;font-size:13px;"></i>${c.nom}</div>
+    <div style="font-size:12.5px;font-weight:700;color:#374151;margin-bottom:10px;">📦 Clôturer la journée</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <input id="espaceSupRapportDate-${c.id}" type="date" value="${today}" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;"/>
+      <input id="espaceSupRapportPhotos-${c.id}" type="file" accept="image/*" multiple style="width:100%;box-sizing:border-box;font-size:12.5px;"/>
+      <textarea id="espaceSupRapportCommentaire-${c.id}" rows="3" placeholder="Commentaire de la journée *" style="width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
+      <div id="espaceSupRapportErreur-${c.id}" style="display:none;color:#DC2626;font-size:12px;"></div>
+      <button id="espaceSupRapportBtn-${c.id}" onclick="_espaceSupCloturerJournee('${c.id}')" style="background:#7C3AED;color:#fff;border:none;border-radius:9px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;">Clôturer la journée</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.04em;margin-top:16px;">Derniers rapports</div>
+    ${rapportsHtml}
+  </div>`;
+}
+
+// Upload photos best-effort : une photo qui échoue n'annule pas le rapport
+// (déjà créé avant la boucle d'upload) — juste un avertissement dans le
+// toast final, conformément à la consigne.
+async function _espaceSupCloturerJournee(chantierId) {
+  const dateEl = document.getElementById('espaceSupRapportDate-' + chantierId);
+  const filesEl = document.getElementById('espaceSupRapportPhotos-' + chantierId);
+  const commentaireEl = document.getElementById('espaceSupRapportCommentaire-' + chantierId);
+  const erreurId = 'espaceSupRapportErreur-' + chantierId;
+  _espaceCacherErreur(erreurId);
+
+  const dateRapport = dateEl.value;
+  const commentaire = commentaireEl.value.trim();
+  if (!dateRapport) { _espaceAfficherErreur(erreurId, 'La date est obligatoire.'); return; }
+  if (!commentaire) { _espaceAfficherErreur(erreurId, 'Le commentaire est obligatoire.'); return; }
+
+  const btn = document.getElementById('espaceSupRapportBtn-' + chantierId);
+  btn.disabled = true; btn.textContent = 'Envoi...';
+  try {
+    const { data: rapport, error: errRapport } = await sb.from('rapports_journaliers').insert({
+      chantier_id: chantierId,
+      superviseur_id: _espaceSession.id,
+      date_rapport: dateRapport,
+      commentaire
+    }).select('id').single();
+    if (errRapport) throw errRapport;
+
+    const fichiers = filesEl.files ? Array.from(filesEl.files) : [];
+    let photosEchouees = 0;
+    for (let i = 0; i < fichiers.length; i++) {
+      try {
+        let fileToUpload = fichiers[i];
+        try { fileToUpload = await resizeImage(fichiers[i], 'realisation'); } catch (e) { fileToUpload = fichiers[i]; }
+        const chemin = `rapports-journaliers/${chantierId}/${dateRapport}/${Date.now()}_${i}.jpg`;
+        const { error: errUpload } = await sb.storage.from('Photos').upload(chemin, fileToUpload, { cacheControl: '3600', upsert: false, contentType: 'image/jpeg' });
+        if (errUpload) throw errUpload;
+        const { data: urlData } = sb.storage.from('Photos').getPublicUrl(chemin);
+        const { error: errPhotoRow } = await sb.from('rapport_journalier_photos').insert({ rapport_id: rapport.id, photo_url: urlData.publicUrl });
+        if (errPhotoRow) throw errPhotoRow;
+      } catch (e) {
+        photosEchouees++;
+        console.warn('[espace] upload photo rapport journalier échoué:', e.message);
+      }
+    }
+
+    // Notification client — best-effort : si la table n'existe pas encore
+    // ou que le chantier n'a pas de client_id, le rapport reste créé.
+    try {
+      const chantier = _espaceSupChantiersCache.find(c => c.id === chantierId);
+      if (chantier && chantier.client_id) {
+        const dateLabel = new Date(dateRapport).toLocaleDateString('fr-FR');
+        const { error: errNotif } = await sb.from('notifications_client').insert({
+          client_id: chantier.client_id,
+          type: 'rapport_journalier',
+          titre: '📦 Rapport du jour disponible',
+          message: 'Votre superviseur a clôturé la journée du ' + dateLabel,
+          rapport_id: rapport.id
+        });
+        if (errNotif) throw errNotif;
+      }
+    } catch (e) {
+      console.warn('[espace] notification client (rapport journalier) indisponible:', e.message);
+    }
+
+    if (typeof showToast === 'function') {
+      showToast(photosEchouees > 0
+        ? '✅ Journée clôturée — client notifié (⚠️ ' + photosEchouees + ' photo(s) non envoyée(s))'
+        : '✅ Journée clôturée — client notifié', 'success');
+    }
+    filesEl.value = '';
+    commentaireEl.value = '';
+    _espaceSupChargerRapports();
+  } catch (e) {
+    _espaceAfficherErreur(erreurId, 'Erreur : ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Clôturer la journée';
+  }
+}
+
 async function _espaceChargerSelectFournisseur(chantierId) {
   const sel = document.getElementById('espaceSupFournisseur-' + chantierId);
   if (!sel) return;
@@ -4626,6 +4765,35 @@ async function _espaceChargerClient() {
       (commissionData || []).forEach(c => { commissionParChantier[c.id] = c; });
     } catch (e) { console.warn('[espace] commission YOUMMA indisponible (migration 20260717_commission_youmma.sql pas encore appliquée ?):', e.message); }
 
+    // Notifications non lues (rapports journaliers) — 2 requêtes au total,
+    // jamais 1 par chantier : d'abord les notifications non lues du client,
+    // puis les chantiers correspondants via rapports_journaliers. Table
+    // nouvelle (migration 20260718_rapports_journaliers.sql, pas exécutée) :
+    // si absente, repli silencieux, aucun badge affiché.
+    let notifsParChantier = {};
+    let totalNonLues = 0;
+    try {
+      const { data: notifs, error: errN } = await sb.from('notifications_client').select('id,rapport_id').eq('client_id', _espaceSession.id).eq('lu', false);
+      if (errN) throw errN;
+      totalNonLues = (notifs || []).length;
+      const rapportIds = (notifs || []).map(n => n.rapport_id).filter(Boolean);
+      if (rapportIds.length) {
+        const { data: rapportsMap, error: errRM } = await sb.from('rapports_journaliers').select('id,chantier_id').in('id', rapportIds);
+        if (errRM) throw errRM;
+        const chantierParRapport = {}; (rapportsMap || []).forEach(r => { chantierParRapport[r.id] = r.chantier_id; });
+        (notifs || []).forEach(n => {
+          const chId = chantierParRapport[n.rapport_id];
+          if (chId) notifsParChantier[chId] = (notifsParChantier[chId] || 0) + 1;
+        });
+      }
+    } catch (e) { console.warn('[espace] notifications client indisponibles (migration 20260718_rapports_journaliers.sql pas encore appliquée ?):', e.message); }
+
+    const notifBadgeHeader = document.getElementById('espaceCliNotifBadge');
+    if (notifBadgeHeader) {
+      if (totalNonLues > 0) { notifBadgeHeader.textContent = '🔔 ' + totalNonLues; notifBadgeHeader.style.display = 'inline-flex'; }
+      else { notifBadgeHeader.style.display = 'none'; }
+    }
+
     zone.innerHTML = chantiers.map(c => {
       const sc = _rcStatutChantierConfig(c.statut);
       const superviseur = c.superviseurs ? ((c.superviseurs.prenom ? c.superviseurs.prenom + ' ' : '') + c.superviseurs.nom) : '—';
@@ -4640,6 +4808,7 @@ async function _espaceChargerClient() {
           <span style="font-weight:700;color:${solde > 0 ? '#059669' : '#9CA3AF'};">${_espaceFormatGNF(solde)}</span>
         </div>`;
       }).join('') : '<div style="color:#9CA3AF;font-size:12px;">Aucun fournisseur assigné.</div>';
+      const soldeChantier = soldes.reduce((s, cm) => s + Number(cm.solde_gnf || 0), 0);
 
       const totalVerseChantier = (versements || []).filter(t => t.chantier_id === c.id && t.type_operation === 'versement_valide').reduce((s, t) => s + Number(t.montant_gnf || 0), 0);
       const commission = _commissionCalculer(totalVerseChantier, commissionParChantier[c.id] || null);
@@ -4648,29 +4817,64 @@ async function _espaceChargerClient() {
         : commission.statut === 'due'
           ? `⚠️ Commission due : ${_espaceFormatGNF(commission.montant)} — Veuillez contacter YOUMMA pour régularisation`
           : `ℹ️ Commission en cours de cumul : ${_espaceFormatGNF(commission.montant)} — sera exigible à la fin du contrat`;
+      const notifChantier = notifsParChantier[c.id] || 0;
 
       return `<div class="esp-card">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;">
           <div>
             <div style="font-size:15px;font-weight:700;color:#1A1A4E;font-family:'Libre Baskerville',serif;margin-bottom:6px;"><i class="fa-solid fa-building" style="color:#9CA3AF;margin-right:6px;font-size:13px;"></i>${c.nom}</div>
             <span class="esp-badge" style="background:${sc.bg};color:${sc.color};">${sc.label}</span>
           </div>
-        </div>
-        <div style="font-size:12.5px;color:#6B7280;margin-bottom:2px;"><i class="fa-solid fa-user" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Superviseur : ${superviseur} · Début : ${dateDebut}</div>
-        ${formule ? `<div style="font-size:12.5px;color:#6B7280;margin-bottom:2px;"><i class="fa-solid fa-file-signature" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Formule : ${formule}</div>` : ''}
-
-        <div style="border-top:1px solid #F0F0F8;padding-top:14px;margin-top:12px;">
-          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;"><i class="fa-solid fa-truck" style="margin-right:6px;color:#059669;"></i>Solde par fournisseur</div>
-          ${listeSoldes}
+          <span id="espaceCliChantierNotif-${c.id}" style="display:${notifChantier > 0 ? 'inline-flex' : 'none'};background:#FEF2F2;color:#DC2626;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:800;white-space:nowrap;">🔔 ${notifChantier || ''}</span>
         </div>
 
-        <div style="border-top:1px solid #F0F0F8;padding-top:14px;margin-top:14px;">
-          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">💰 Commission de service YOUMMA</div>
-          <div style="background:${commission.bg};border-radius:10px;padding:12px 14px;">
-            <div style="font-size:12px;color:#374151;margin-bottom:4px;">Total versé à ce jour : <strong>${_espaceFormatGNF(totalVerseChantier)}</strong></div>
-            <div style="font-size:12px;color:#374151;margin-bottom:8px;">Commission (${commission.taux}%) : <strong style="color:${commission.color};">${_espaceFormatGNF(commission.montant)}</strong></div>
-            <div style="font-size:12px;font-weight:700;color:${commission.color};">${messageCommission}</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+          <div style="background:#F9FAFB;border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:12.5px;font-weight:800;color:#1A1A4E;">${_espaceFormatGNF(totalVerseChantier)}</div>
+            <div style="font-size:9.5px;color:#9CA3AF;text-transform:uppercase;margin-top:2px;">Total versé</div>
           </div>
+          <div style="background:#F9FAFB;border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:12.5px;font-weight:800;color:${soldeChantier > 0 ? '#059669' : '#9CA3AF'};">${_espaceFormatGNF(soldeChantier)}</div>
+            <div style="font-size:9.5px;color:#9CA3AF;text-transform:uppercase;margin-top:2px;">Solde restant</div>
+          </div>
+          <div style="background:${commission.bg};border-radius:10px;padding:10px;text-align:center;">
+            <div style="font-size:12.5px;font-weight:800;color:${commission.color};">${_espaceFormatGNF(commission.montant)}</div>
+            <div style="font-size:9.5px;color:${commission.color};text-transform:uppercase;margin-top:2px;">Commission</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button onclick="_espaceCliBasculerVoirChantier('${c.id}')" style="flex:1;background:#EFF6FF;color:#2563EB;border:none;border-radius:9px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-building" style="margin-right:6px;"></i>Voir mon chantier</button>
+          <button onclick="_espaceCliBasculerRegistreChantier('${c.id}')" style="flex:1;background:#F5F3FF;color:#7C3AED;border:none;border-radius:9px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;"><i class="fa-solid fa-clipboard-list" style="margin-right:6px;"></i>Mon registre</button>
+        </div>
+
+        <div id="espaceCliVoirChantier-${c.id}" style="display:none;border-top:1px solid #F0F0F8;padding-top:14px;margin-top:14px;">
+          <div style="font-size:12.5px;color:#6B7280;margin-bottom:2px;"><i class="fa-solid fa-user" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Superviseur : ${superviseur} · Début : ${dateDebut}</div>
+          ${formule ? `<div style="font-size:12.5px;color:#6B7280;margin-bottom:2px;"><i class="fa-solid fa-file-signature" style="width:14px;color:#9CA3AF;margin-right:4px;"></i>Formule : ${formule}</div>` : ''}
+
+          <div style="margin-top:12px;">
+            <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;"><i class="fa-solid fa-truck" style="margin-right:6px;color:#059669;"></i>Solde par fournisseur</div>
+            ${listeSoldes}
+          </div>
+
+          <div style="margin-top:14px;">
+            <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">💰 Commission de service YOUMMA</div>
+            <div style="background:${commission.bg};border-radius:10px;padding:12px 14px;">
+              <div style="font-size:12px;color:#374151;margin-bottom:4px;">Total versé à ce jour : <strong>${_espaceFormatGNF(totalVerseChantier)}</strong></div>
+              <div style="font-size:12px;color:#374151;margin-bottom:8px;">Commission (${commission.taux}%) : <strong style="color:${commission.color};">${_espaceFormatGNF(commission.montant)}</strong></div>
+              <div style="font-size:12px;font-weight:700;color:${commission.color};">${messageCommission}</div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;">
+            <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">📦 Rapports journaliers</div>
+            <div id="espaceCliRapportsListe-${c.id}"><div style="font-size:12px;color:#9CA3AF;">Chargement...</div></div>
+          </div>
+        </div>
+
+        <div id="espaceCliRegistreChantier-${c.id}" style="display:none;border-top:1px solid #F0F0F8;padding-top:14px;margin-top:14px;">
+          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">📋 Mon registre</div>
+          <div id="espaceCliRegistreListe-${c.id}"><div style="font-size:12px;color:#9CA3AF;">Chargement...</div></div>
         </div>
       </div>`;
     }).join('');
@@ -4766,6 +4970,168 @@ async function _espaceChargerClient() {
     _espaceCliGererDeclarationEnAttente(chantiers);
   } catch (e) {
     zone.innerHTML = '<div style="color:#DC2626;font-size:12.5px;">Erreur : ' + e.message + '</div>';
+  }
+}
+
+// ── "Voir mon chantier" — dépliant, chargé à la première ouverture
+// seulement (dataset.charge évite un rechargement à chaque clic). Table
+// nouvelle (rapports_journaliers, migration 20260718 pas exécutée) : repli
+// "Fonctionnalité bientôt disponible" sans casser le reste de la carte.
+async function _espaceCliBasculerVoirChantier(chantierId) {
+  const el = document.getElementById('espaceCliVoirChantier-' + chantierId);
+  if (!el) return;
+  const ouverture = (el.style.display === 'none' || !el.style.display);
+  el.style.display = ouverture ? 'block' : 'none';
+  if (ouverture && !el.dataset.charge) {
+    el.dataset.charge = '1';
+    await _espaceCliChargerRapportsChantier(chantierId);
+  }
+}
+
+async function _espaceCliChargerRapportsChantier(chantierId) {
+  const zone = document.getElementById('espaceCliRapportsListe-' + chantierId);
+  if (!zone) return;
+  try {
+    const { data: rapports, error } = await sb.from('rapports_journaliers')
+      .select('*, rapport_journalier_photos(photo_url)')
+      .eq('chantier_id', chantierId)
+      .order('date_rapport', { ascending: false });
+    if (error) throw error;
+    if (!rapports || !rapports.length) { zone.innerHTML = '<div style="font-size:12px;color:#9CA3AF;">Aucun rapport journalier pour le moment.</div>'; return; }
+    zone.innerHTML = rapports.map(r => _espaceCliRenderRapportCard(r, chantierId)).join('');
+    rapports.forEach(r => _espaceCliChargerCommentaires(r.id));
+    _espaceCliMarquerNotifsLues(rapports.map(r => r.id));
+  } catch (e) {
+    zone.innerHTML = '<div style="text-align:center;padding:16px;color:#9CA3AF;font-size:12px;"><i class="fa-solid fa-file-circle-plus" style="font-size:20px;display:block;margin-bottom:6px;color:#D1D5DB;"></i>Fonctionnalité bientôt disponible</div>';
+  }
+}
+
+function _espaceCliRenderRapportCard(r, chantierId) {
+  const date = new Date(r.date_rapport).toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+  const photos = (r.rapport_journalier_photos || []).map(p => p.photo_url).filter(Boolean);
+  return `<div style="border:1.5px solid #F0F0F8;border-radius:12px;padding:14px;margin-bottom:12px;">
+    <div style="font-size:12.5px;font-weight:700;color:#1A1A4E;margin-bottom:6px;text-transform:capitalize;">${date}</div>
+    ${r.commentaire ? `<div style="font-size:12.5px;color:#374151;margin-bottom:10px;">${r.commentaire}</div>` : ''}
+    ${photos.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">${photos.map(u => `<img src="${u}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;cursor:pointer;" onclick="window.open('${u}','_blank')"/>`).join('')}</div>` : ''}
+    <div style="border-top:1px solid #F7F8FC;padding-top:10px;margin-top:6px;">
+      <div id="espaceCliCommentaires-${r.id}" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"><div style="font-size:11px;color:#9CA3AF;">Chargement...</div></div>
+      <div style="display:flex;gap:6px;">
+        <input id="espaceCliReponse-${r.id}" type="text" placeholder="Répondre au superviseur..." style="flex:1;box-sizing:border-box;padding:8px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;"/>
+        <button onclick="_espaceCliEnvoyerCommentaire('${r.id}')" style="background:#2563EB;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;">Envoyer</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function _espaceCliChargerCommentaires(rapportId) {
+  const zone = document.getElementById('espaceCliCommentaires-' + rapportId);
+  if (!zone) return;
+  try {
+    const { data, error } = await sb.from('rapport_journalier_commentaires').select('*').eq('rapport_id', rapportId).order('created_at', { ascending: true });
+    if (error) throw error;
+    if (!data || !data.length) { zone.innerHTML = '<div style="font-size:11px;color:#9CA3AF;">Aucun commentaire.</div>'; return; }
+    zone.innerHTML = data.map(m => `<div style="background:#F9FAFB;border-radius:8px;padding:8px 10px;font-size:12px;">
+      <span style="font-weight:700;color:${m.auteur === 'client' ? '#2563EB' : '#7C3AED'};">${m.auteur === 'client' ? 'Vous' : 'Superviseur'}</span>
+      <span style="color:#374151;"> — ${m.message}</span>
+    </div>`).join('');
+  } catch (e) {
+    zone.innerHTML = '';
+  }
+}
+
+async function _espaceCliEnvoyerCommentaire(rapportId) {
+  const input = document.getElementById('espaceCliReponse-' + rapportId);
+  const message = input ? input.value.trim() : '';
+  if (!message) return;
+  try {
+    const { error } = await sb.from('rapport_journalier_commentaires').insert({ rapport_id: rapportId, auteur: 'client', auteur_id: _espaceSession.id, message });
+    if (error) throw error;
+    if (input) input.value = '';
+    _espaceCliChargerCommentaires(rapportId);
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+
+// Marque comme lues les notifications de CE client pour les rapports
+// affichés, puis rafraîchit les badges (header + cartes) sans re-rendre
+// tout le tableau de bord (pour ne pas refermer les dépliants ouverts).
+async function _espaceCliMarquerNotifsLues(rapportIds) {
+  if (!rapportIds || !rapportIds.length) return;
+  try {
+    const { error } = await sb.from('notifications_client').update({ lu: true }).eq('client_id', _espaceSession.id).in('rapport_id', rapportIds).eq('lu', false);
+    if (error) throw error;
+    _espaceCliRafraichirBadgesNotif();
+  } catch (e) { /* non bloquant */ }
+}
+
+async function _espaceCliRafraichirBadgesNotif() {
+  try {
+    const { data: notifs, error } = await sb.from('notifications_client').select('id,rapport_id').eq('client_id', _espaceSession.id).eq('lu', false);
+    if (error) throw error;
+    const headerBadge = document.getElementById('espaceCliNotifBadge');
+    if (headerBadge) {
+      if (notifs && notifs.length) { headerBadge.textContent = '🔔 ' + notifs.length; headerBadge.style.display = 'inline-flex'; }
+      else { headerBadge.style.display = 'none'; }
+    }
+    let chantiersAvecNotif = new Set();
+    if (notifs && notifs.length) {
+      const rapportIds = notifs.map(n => n.rapport_id).filter(Boolean);
+      if (rapportIds.length) {
+        const { data: rapportsMap } = await sb.from('rapports_journaliers').select('id,chantier_id').in('id', rapportIds);
+        const chantierParRapport = {}; (rapportsMap || []).forEach(r => { chantierParRapport[r.id] = r.chantier_id; });
+        notifs.forEach(n => { const chId = chantierParRapport[n.rapport_id]; if (chId) chantiersAvecNotif.add(chId); });
+      }
+    }
+    (_espaceCliChantiersCache || []).forEach(c => {
+      const badge = document.getElementById('espaceCliChantierNotif-' + c.id);
+      if (badge) badge.style.display = chantiersAvecNotif.has(c.id) ? 'inline-flex' : 'none';
+    });
+  } catch (e) { /* non bloquant, migration probablement pas appliquée */ }
+}
+
+// ── "Mon registre" — dépliant, lecture seule stricte, chargé à la
+// première ouverture seulement.
+async function _espaceCliBasculerRegistreChantier(chantierId) {
+  const el = document.getElementById('espaceCliRegistreChantier-' + chantierId);
+  if (!el) return;
+  const ouverture = (el.style.display === 'none' || !el.style.display);
+  el.style.display = ouverture ? 'block' : 'none';
+  if (ouverture && !el.dataset.charge) {
+    el.dataset.charge = '1';
+    await _espaceCliChargerRegistreChantier(chantierId);
+  }
+}
+
+async function _espaceCliChargerRegistreChantier(chantierId) {
+  const zone = document.getElementById('espaceCliRegistreListe-' + chantierId);
+  if (!zone) return;
+  try {
+    const { data: comptes, error: errC } = await sb.from('comptes_materiaux').select('id').eq('chantier_id', chantierId);
+    if (errC) throw errC;
+    const compteIds = (comptes || []).map(c => c.id);
+    if (!compteIds.length) { zone.innerHTML = '<div class="esp-empty">Aucun fournisseur assigné.</div>'; return; }
+    const { data, error } = await sb.from('registre_transactions')
+      .select('*, comptes_materiaux(fournisseurs_materiaux(nom_entreprise))')
+      .in('compte_id', compteIds)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data || !data.length) { zone.innerHTML = '<div class="esp-empty">Aucune transaction.</div>'; return; }
+    zone.innerHTML = data.map(t => {
+      const sc = _rcStatutConfig(t.type_operation);
+      const typeLabel = String(t.type_operation).startsWith('versement') ? '💰 Versement' : '📦 Sortie';
+      const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const fournisseur = t.comptes_materiaux?.fournisseurs_materiaux?.nom_entreprise || '—';
+      return `<div class="esp-row" style="flex-wrap:wrap;">
+        <span style="color:#374151;font-weight:700;">${fournisseur}</span>
+        <span style="color:#6B7280;">${typeLabel}</span>
+        <span style="color:#9CA3AF;">${date}</span>
+        <span style="font-weight:700;color:#1A1A4E;">${_espaceFormatGNF(t.montant_gnf)}</span>
+        <span class="esp-badge" style="background:${sc.bg};color:${sc.color};">${sc.label}</span>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    zone.innerHTML = '<div style="color:#DC2626;font-size:12px;">Erreur : ' + e.message + '</div>';
   }
 }
 
