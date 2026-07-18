@@ -6775,7 +6775,7 @@ function renderProviders() {
           ${noteDisplay}
         </div>
         <div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">
-          <div style="font-size:18px;font-weight:700;color:#111;">${p.experience || '—'}</div>
+          <div style="font-size:${(p.experience>0) ? '11' : '18'}px;font-weight:700;color:#111;line-height:1.25;">${(p.experience>0) ? p.experience+' an'+(p.experience>1?'s':'')+' d\'expérience' : '—'}</div>
           <div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Expérience</div>
         </div>
       </div>
@@ -8749,6 +8749,16 @@ async function chargerAvis() {
     <div class="admin-section active" id="admin-dashboard">
       <div class="admin-section-inner">
 
+        <div style="position:relative;height:0;">
+          <div style="position:absolute;top:0;right:0;z-index:50;">
+            <button id="admInscrireBtn" onclick="_admToggleMenuInscrire(event)" style="padding:6px 12px;font-size:0.8rem;background:#fff;color:#1A1A4E;border:1.5px solid #1A1A4E;border-radius:8px;cursor:pointer;font-weight:700;display:flex;align-items:center;gap:6px;">📝 Inscrire <i class="fa-solid fa-chevron-down" style="font-size:9px;"></i></button>
+            <div id="admInscrireMenu" style="display:none;position:absolute;top:100%;right:0;margin-top:6px;background:#fff;border:1px solid #E5E7EB;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:160px;overflow:hidden;z-index:60;">
+              <button onclick="_admInscrireChoisir('prestataire')" style="width:100%;text-align:left;padding:10px 14px;background:none;border:none;cursor:pointer;font-size:13px;color:#374151;display:flex;align-items:center;gap:8px;">👷 Prestataire</button>
+              <button onclick="_admInscrireChoisir('client')" style="width:100%;text-align:left;padding:10px 14px;background:none;border:none;cursor:pointer;font-size:13px;color:#374151;display:flex;align-items:center;gap:8px;border-top:1px solid #F3F4F6;">👤 Client</button>
+            </div>
+          </div>
+        </div>
+
         <div id="dashRoleHeader" style="margin-bottom:24px;"></div>
         <div id="dashAgentUrgence" style="display:none;margin-bottom:20px;"></div>
 
@@ -9046,6 +9056,10 @@ async function chargerAvis() {
           <div>
             <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Métier *</label>
             <input id="admProvMetier" type="text" placeholder="Ex: Électricien" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Années d'expérience</label>
+            <input id="admProvExperience" type="number" min="0" max="50" placeholder="ex: 5" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <div>
@@ -23217,9 +23231,34 @@ function _admAfficherErreurCompte(elId, msg) {
   if (el) { el.textContent = msg; el.style.display = 'block'; }
 }
 
+// ── Bouton flottant "📝 Inscrire" (admin-dashboard) ──
+function _admToggleMenuInscrire(e) {
+  if (e) e.stopPropagation();
+  const menu = document.getElementById('admInscrireMenu');
+  if (!menu) return;
+  menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+}
+window._admToggleMenuInscrire = _admToggleMenuInscrire;
+
+function _admInscrireChoisir(type) {
+  const menu = document.getElementById('admInscrireMenu');
+  if (menu) menu.style.display = 'none';
+  if (type === 'prestataire' && typeof _admCreerPrestataireOuvrir === 'function') _admCreerPrestataireOuvrir();
+  else if (type === 'client' && typeof _admCreerClientOuvrir === 'function') _admCreerClientOuvrir();
+}
+window._admInscrireChoisir = _admInscrireChoisir;
+
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('admInscrireMenu');
+  const btn = document.getElementById('admInscrireBtn');
+  if (menu && menu.style.display === 'block' && e.target !== btn && !(btn && btn.contains(e.target)) && !menu.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
+
 // ── Créer un prestataire ──
 function _admCreerPrestataireOuvrir() {
-  ['admProvNom','admProvTel','admProvMetier','admProvVille','admProvCommune'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['admProvNom','admProvTel','admProvMetier','admProvExperience','admProvVille','admProvCommune'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const errEl = document.getElementById('admProvErreur');
   if (errEl) errEl.style.display = 'none';
   if (typeof renderCategoriesSelect === 'function') renderCategoriesSelect('admProvCategorie');
@@ -23233,6 +23272,8 @@ async function _admCreerPrestataireValider() {
   const tel = (document.getElementById('admProvTel').value || '').trim();
   const categorie = document.getElementById('admProvCategorie').value || '';
   const metier = (document.getElementById('admProvMetier').value || '').trim();
+  const experienceRaw = (document.getElementById('admProvExperience').value || '').trim();
+  const experience = experienceRaw ? Math.max(0, Math.min(50, parseInt(experienceRaw, 10) || 0)) : null;
   const ville = (document.getElementById('admProvVille').value || '').trim();
   const commune = (document.getElementById('admProvCommune').value || '').trim();
   const errEl = document.getElementById('admProvErreur');
@@ -23264,7 +23305,7 @@ async function _admCreerPrestataireValider() {
 
     const { error } = await sb.from('providers').insert({
       prenom, nom, telephone: tel, password_hash,
-      metier, categorie, ville: ville || null, commune: commune || null,
+      metier, categorie, experience, ville: ville || null, commune: commune || null,
       statut: 'valide', badge_verifie: true,
       abonnement_actif: false, essai_actif: false
     });
