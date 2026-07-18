@@ -6675,7 +6675,7 @@ function renderProviders() {
       <div class="pc2-top" style="background:#1B2A6B;border-radius:20px 20px 0 0;padding:18px 16px;gap:14px;">
         <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
           ${p.photo_url
-            ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:62px;height:62px;border-radius:12px;object-fit:cover;border:2px solid #E8521A;" alt="${p.nom}"/>`
+            ? `<div style="width:62px;height:62px;border-radius:12px;border:2px solid #E8521A;overflow:hidden;flex-shrink:0;"><img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}"/></div>`
             : `<div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;width:62px;height:62px;border-radius:12px;border:2px solid #E8521A;">${p.ini}</div>`}
           ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="font-size:8px;color:#a5b4fc;text-align:center;margin-top:4px;letter-spacing:0.05em;font-weight:600;background:rgba(255,255,255,0.1);border-radius:4px;padding:1px 5px;">${p.matricule}</div>` : ''}
         </div>
@@ -6843,7 +6843,7 @@ function openModal(id) {
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div class="mp2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;margin:0 auto;width:80px;height:80px;border-radius:16px;border:3px solid #E8521A;">
           ${p.photo_url
-            ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block;" alt="${p.nom}"/>`
+            ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}"/>`
             : p.ini}
         </div>
         ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="margin-top:6px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.5px;font-weight:500;">Matricule</div><div style="font-size:15px;color:#E8650A;font-weight:700;letter-spacing:1px;">${p.matricule}</div></div>` : ''}
