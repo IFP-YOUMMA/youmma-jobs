@@ -7795,103 +7795,70 @@ document.addEventListener('keydown', e => {
       </div>
     </div>
 
+    <style>
+      .mc-card{background:#fff;border-radius:16px;padding:18px;border:1.5px solid var(--bordure);}
+      .mc-actions-row{display:flex;gap:8px;margin-bottom:14px;}
+      .mc-actions-row button{flex:1;padding:12px 6px;border:none;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;line-height:1.35;}
+      .mc-pay-row{display:flex;gap:6px;margin-bottom:12px;}
+      .mc-pay-row > div{flex:1;background:var(--fond);border-radius:8px;padding:6px 2px;text-align:center;}
+      .mc-pay-row .mc-pay-icon{font-size:15px;}
+      .mc-pay-row .mc-pay-label{font-size:8px;color:var(--gris);font-weight:600;margin-top:2px;}
+      @media (max-width:768px){
+        .mc-card{padding:14px;border-radius:14px;}
+        .mc-actions-row button{padding:10px 6px;font-size:11.5px;}
+      }
+    </style>
+
     <div class="section" id="section-abonnement">
       <div style="margin-bottom:16px;">
         <button onclick="showSection('dashboard')" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;background:#F4F6FB;border:none;border-radius:10px;color:#1A1A4E;font-size:13px;font-weight:600;cursor:pointer;" onmouseover="this.style.background='#E8ECF5'" onmouseout="this.style.background='#F4F6FB'">
           <i class="fa-solid fa-arrow-left" style="font-size:11px;"></i> Tableau de bord
         </button>
       </div>
-      <div class="abo-card">
-        <div class="abo-header">
-          <div class="abo-title"><i class="fa-solid fa-credit-card"></i> État de mon abonnement</div>
-          <div id="aboStatusBadge2" class="abo-status-expired">—</div>
-        </div>
-        <div class="abo-info">
-          <div class="abo-info-item"><div class="abo-info-label">Type</div><div class="abo-info-val" id="aboType2">—</div></div>
-          <div class="abo-info-item"><div class="abo-info-label">Expiration</div><div class="abo-info-val" id="aboFin2">—</div></div>
-          <div class="abo-info-item"><div class="abo-info-label">Jours restants</div><div class="abo-info-val" id="aboJours2">—</div></div>
-        </div>
-        <div class="progress-bar"><div class="progress-fill" id="aboProgress2" style="width:0%"></div></div>
-      </div>
 
-      
-      <div class="abo-card">
-        <div style="margin-top:0;">
-          <div style="background:#fff;border-radius:16px;padding:20px;border:1.5px solid var(--bordure);margin-bottom:16px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-              <div style="width:40px;height:40px;background:var(--orange);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">💳</div>
-              <div>
-                <div style="font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:var(--bleu);">Payer mon abonnement</div>
-                <div style="font-size:12px;color:var(--gris);">Via Orange Money, MTN MoMo, PayCard, Visa</div>
-              </div>
-            </div>
-            <div style="background:linear-gradient(135deg,var(--bleu),var(--bleu-mid));border-radius:14px;padding:18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
-              <div>
-                <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;">Montant abonnement</div>
-                <div style="font-family:'Libre Baskerville',serif;font-size:28px;font-weight:700;color:#F5C842;">50 000 GNF</div>
-                <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;">Valable 30 jours</div>
-              </div>
-              <div style="font-size:40px;">🏅</div>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
-              <div style="background:var(--fond);border-radius:10px;padding:8px;text-align:center;">
-                <div style="font-size:18px;">📱</div>
-                <div style="font-size:9px;color:var(--gris);font-weight:600;margin-top:3px;">Orange Money</div>
-              </div>
-              <div style="background:var(--fond);border-radius:10px;padding:8px;text-align:center;">
-                <div style="font-size:18px;">📲</div>
-                <div style="font-size:9px;color:var(--gris);font-weight:600;margin-top:3px;">MTN MoMo</div>
-              </div>
-              <div style="background:var(--fond);border-radius:10px;padding:8px;text-align:center;">
-                <div style="font-size:18px;">💳</div>
-                <div style="font-size:9px;color:var(--gris);font-weight:600;margin-top:3px;">PayCard</div>
-              </div>
-              <div style="background:var(--fond);border-radius:10px;padding:8px;text-align:center;">
-                <div style="font-size:18px;">🏦</div>
-                <div style="font-size:9px;color:var(--gris);font-weight:600;margin-top:3px;">Visa/Card</div>
-              </div>
-            </div>
-            <button onclick="lancerPaiementAbonnement()" style="width:100%;padding:15px;background:var(--orange);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;">
-              💳 Payer maintenant — 50 000 GNF
-            </button>
-            <div id="paiementStatus" style="display:none;border-radius:10px;padding:12px 14px;font-size:13px;font-weight:600;text-align:center;margin-top:12px;"></div>
-            <div style="text-align:center;font-size:11px;color:var(--gris);margin-top:10px;line-height:1.6;">
-              🔒 Paiement sécurisé par Chap Chap Pay<br>Vous serez redirigé vers la page de paiement
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ MON ABONNEMENT & CRÉDITS ══ -->
-      <div class="abo-card" style="background:#fff;border-radius:16px;padding:20px;border:1.5px solid var(--bordure);">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-          <div style="width:40px;height:40px;background:#1A1A4E;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;">💳</div>
-          <div>
-            <div style="font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:var(--bleu);">Mon abonnement & crédits</div>
-            <div style="font-size:12px;color:var(--gris);">Missions, devis vocaux, badges, téléphone client</div>
-          </div>
+      <div class="mc-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <div style="width:36px;height:36px;background:#1A1A4E;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">💳</div>
+          <div style="font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:var(--bleu);">Mon abonnement &amp; crédits</div>
         </div>
 
-        <div style="text-align:center;margin-bottom:18px;">
+        <div style="text-align:center;margin-bottom:16px;">
           <span id="creditsStatusBadge" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;background:#F3F4F6;color:#6B7280;">Chargement...</span>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
-          <button onclick="_abonnementRenouveler()" style="width:100%;padding:14px;background:var(--orange);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">🔄 Renouveler l'abonnement — 50 000 GNF</button>
+        <div class="mc-actions-row">
+          <button onclick="_abonnementRenouveler()" style="background:var(--orange);color:#fff;">🔄 Renouveler<br>50 000 GNF</button>
+          <button onclick="document.getElementById('creditsNbInput').scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('creditsNbInput').focus();" style="background:#1A1A4E;color:#fff;">⚡ Acheter<br>des crédits</button>
+        </div>
 
-          <div style="background:var(--fond);border-radius:12px;padding:14px;">
-            <div style="font-size:12.5px;color:var(--gris);margin-bottom:8px;font-weight:600;">Acheter des crédits — 5 000 GNF/crédit</div>
-            <div style="display:flex;gap:10px;align-items:center;">
-              <input id="creditsNbInput" type="number" min="1" max="10" value="1" oninput="_creditsMajMontant()" style="width:70px;padding:10px;border-radius:10px;border:1.5px solid var(--bordure);font-size:14px;text-align:center;">
-              <div style="flex:1;text-align:center;font-weight:700;color:var(--bleu);" id="creditsMontantCalcule">5 000 GNF</div>
-            </div>
-            <button onclick="_creditsAcheter()" style="width:100%;margin-top:10px;padding:12px;background:#1A1A4E;color:#fff;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;">Acheter des crédits</button>
+        <div class="mc-pay-row">
+          <div><div class="mc-pay-icon">📱</div><div class="mc-pay-label">Orange Money</div></div>
+          <div><div class="mc-pay-icon">📲</div><div class="mc-pay-label">MTN MoMo</div></div>
+          <div><div class="mc-pay-icon">💳</div><div class="mc-pay-label">PayCard</div></div>
+          <div><div class="mc-pay-icon">🏦</div><div class="mc-pay-label">Visa/Card</div></div>
+        </div>
+
+        <button onclick="lancerPaiementAbonnement()" style="width:100%;padding:14px;background:var(--orange);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;">
+          💳 Payer maintenant — 50 000 GNF
+        </button>
+        <div id="paiementStatus" style="display:none;border-radius:10px;padding:10px 12px;font-size:12.5px;font-weight:600;text-align:center;margin-bottom:14px;"></div>
+
+        <div style="background:var(--fond);border-radius:12px;padding:12px;margin-bottom:16px;">
+          <div style="font-size:12px;color:var(--gris);margin-bottom:8px;font-weight:600;">Acheter des crédits — 5 000 GNF/crédit</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input id="creditsNbInput" type="number" min="1" max="10" value="1" oninput="_creditsMajMontant()" style="width:62px;padding:9px;border-radius:10px;border:1.5px solid var(--bordure);font-size:13.5px;text-align:center;">
+            <div style="flex:1;text-align:center;font-weight:700;color:var(--bleu);font-size:13.5px;" id="creditsMontantCalcule">5 000 GNF</div>
           </div>
+          <button onclick="_creditsAcheter()" style="width:100%;margin-top:8px;padding:11px;background:#1A1A4E;color:#fff;border:none;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;">Acheter des crédits</button>
         </div>
 
         <div>
-          <div style="font-size:13px;font-weight:700;color:#1A1A4E;margin-bottom:10px;">Historique des paiements</div>
-          <div id="creditsHistorique"><div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;">Chargement...</div></div>
+          <div style="font-size:12.5px;font-weight:700;color:#1A1A4E;margin-bottom:8px;">Historique des paiements</div>
+          <div id="creditsHistorique"><div style="text-align:center;padding:16px;color:#9CA3AF;font-size:12.5px;">Chargement...</div></div>
+        </div>
+
+        <div style="text-align:center;font-size:10.5px;color:var(--gris);margin-top:12px;line-height:1.5;">
+          🔒 Paiement sécurisé par Chap Chap Pay
         </div>
       </div>
     </div>
