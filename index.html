@@ -2745,12 +2745,36 @@ if (typeof connexionPrestataire === 'undefined') {
     </div>
     <h1 style="font-family:'Libre Baskerville',serif;font-size:20px;font-weight:700;color:#1A1A4E;text-align:center;margin-bottom:6px;">Accès espace professionnel</h1>
     <p style="font-size:13px;color:#6B7280;text-align:center;margin-bottom:22px;">Fournisseurs · Clients · Superviseurs</p>
+    <div style="display:flex;gap:6px;margin-bottom:18px;background:#F4F6FB;border-radius:12px;padding:4px;">
+      <button type="button" style="flex:1;padding:8px 4px;border:none;border-radius:9px;background:#fff;color:#1A1A4E;font-size:12.5px;font-weight:700;cursor:default;box-shadow:0 1px 4px rgba(0,0,0,.08);">📱 Code SMS</button>
+      <button type="button" onclick="_espaceOuvrirModePwd()" style="flex:1;padding:8px 4px;border:none;border-radius:9px;background:transparent;color:#6B7280;font-size:12.5px;font-weight:700;cursor:pointer;">🔑 Mot de passe</button>
+    </div>
     <div id="espaceErreurTel" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 14px;font-size:13px;color:#DC2626;margin-bottom:16px;"></div>
     <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:7px;">Numéro de téléphone</label>
     <input id="espaceTelephone" type="tel" placeholder="224XXXXXXXXX" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid #E5E7EB;border-radius:11px;font-size:14px;outline:none;margin-bottom:20px;" onkeydown="if(event.key==='Enter')_espaceEnvoyerCode()"/>
     <button id="espaceBtnEnvoyer" onclick="_espaceEnvoyerCode()" style="width:100%;padding:14px;background:linear-gradient(135deg,#E85D04,#C74B00);border:none;border-radius:12px;color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(232,93,4,.35);">Recevoir mon code</button>
     <div style="text-align:center;margin-top:16px;">
       <button onclick="_espaceOuvrirInscription()" style="background:none;border:none;color:#9CA3AF;font-size:12.5px;cursor:pointer;padding:0;">Première visite ? <span style="color:#E85D04;font-weight:700;">Créez votre compte</span></button>
+    </div>
+  </div>
+
+  <!-- Étape 1ter : connexion par mot de passe (comptes clients créés directement par l'admin) -->
+  <div id="espaceEtapePwd" style="display:none;background:#fff;border-radius:24px;padding:36px 32px;width:100%;max-width:440px;box-shadow:0 32px 80px rgba(0,0,0,.3);">
+    <button onclick="goHome()" style="background:none;border:none;color:#9CA3AF;font-size:12.5px;cursor:pointer;padding:0;margin-bottom:16px;"><i class="fa-solid fa-arrow-left" style="font-size:10px;"></i> Accueil</button>
+    <h1 style="font-family:'Libre Baskerville',serif;font-size:20px;font-weight:700;color:#1A1A4E;text-align:center;margin-bottom:6px;">Accès espace professionnel</h1>
+    <p style="font-size:13px;color:#6B7280;text-align:center;margin-bottom:22px;">Fournisseurs · Clients · Superviseurs</p>
+    <div style="display:flex;gap:6px;margin-bottom:18px;background:#F4F6FB;border-radius:12px;padding:4px;">
+      <button type="button" onclick="_espaceRetourTel()" style="flex:1;padding:8px 4px;border:none;border-radius:9px;background:transparent;color:#6B7280;font-size:12.5px;font-weight:700;cursor:pointer;">📱 Code SMS</button>
+      <button type="button" style="flex:1;padding:8px 4px;border:none;border-radius:9px;background:#fff;color:#1A1A4E;font-size:12.5px;font-weight:700;cursor:default;box-shadow:0 1px 4px rgba(0,0,0,.08);">🔑 Mot de passe</button>
+    </div>
+    <div id="espaceErreurPwd" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 14px;font-size:13px;color:#DC2626;margin-bottom:16px;"></div>
+    <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:7px;">Numéro de téléphone</label>
+    <input id="espacePwdTelephone" type="tel" placeholder="224XXXXXXXXX" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid #E5E7EB;border-radius:11px;font-size:14px;outline:none;margin-bottom:14px;"/>
+    <label style="display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:7px;">Mot de passe</label>
+    <input id="espacePwdMotDePasse" type="password" placeholder="••••" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid #E5E7EB;border-radius:11px;font-size:14px;outline:none;margin-bottom:20px;" onkeydown="if(event.key==='Enter')_espaceConnexionMotDePasse()"/>
+    <button id="espaceBtnConnexionPwd" onclick="_espaceConnexionMotDePasse()" style="width:100%;padding:14px;background:linear-gradient(135deg,#E85D04,#C74B00);border:none;border-radius:12px;color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(232,93,4,.35);">Se connecter</button>
+    <div style="text-align:center;margin-top:16px;">
+      <button onclick="_espaceRetourTel()" style="background:none;border:none;color:#9CA3AF;font-size:12.5px;cursor:pointer;padding:0;">‹ Retour</button>
     </div>
   </div>
 
@@ -3107,6 +3131,34 @@ if (typeof connexionPrestataire === 'undefined') {
       </div>
     </div>
 
+    <!-- Bannière premier accès : mot de passe par défaut (comptes créés par l'admin) -->
+    <div id="espaceCliBanniereMdp" style="display:none;background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border:1.5px solid #FDBA74;border-radius:14px;padding:16px 18px;margin-bottom:14px;">
+      <div style="font-size:13.5px;font-weight:700;color:#9A3412;margin-bottom:10px;">⚠️ Sécurisez votre compte — changez votre mot de passe par défaut</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input id="espaceCliNouveauMdp" type="password" placeholder="Nouveau mot de passe (min. 4 caractères)" style="flex:1;min-width:180px;padding:9px 12px;border:1.5px solid #FDBA74;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;"/>
+        <input id="espaceCliConfirmerMdp" type="password" placeholder="Confirmer" style="flex:1;min-width:140px;padding:9px 12px;border:1.5px solid #FDBA74;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;"/>
+        <button onclick="_espaceCliChangerMdp()" style="padding:9px 16px;background:#EA580C;color:#fff;border:none;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;">Valider</button>
+      </div>
+      <div id="espaceCliMdpErreur" style="display:none;color:#B91C1C;font-size:12px;margin-top:8px;"></div>
+    </div>
+
+    <!-- Bannière complétion profil (ville/commune/email — clients n'ont pas de photo en base) -->
+    <div id="espaceCliBanniereProfil" style="display:none;background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:14px;padding:14px 18px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div style="font-size:13px;color:#1E40AF;font-weight:600;">📋 Complétez votre profil — ajoutez votre ville et vos coordonnées</div>
+        <button onclick="_espaceCliToggleProfilRapide()" style="padding:8px 14px;background:#2563EB;color:#fff;border:none;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;">Compléter</button>
+      </div>
+      <div id="espaceCliProfilRapideZone" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid #BFDBFE;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+          <input id="espaceCliProfilVille" type="text" placeholder="Ville" style="flex:1;min-width:120px;padding:9px 12px;border:1.5px solid #BFDBFE;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;"/>
+          <input id="espaceCliProfilCommune" type="text" placeholder="Commune" style="flex:1;min-width:120px;padding:9px 12px;border:1.5px solid #BFDBFE;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;"/>
+        </div>
+        <input id="espaceCliProfilEmail" type="email" placeholder="Email (optionnel)" style="width:100%;box-sizing:border-box;padding:9px 12px;border:1.5px solid #BFDBFE;border-radius:8px;font-size:13px;outline:none;margin-bottom:8px;"/>
+        <button onclick="_espaceCliSauvegarderProfilRapide()" style="width:100%;padding:10px;background:#2563EB;color:#fff;border:none;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;">Enregistrer</button>
+        <div id="espaceCliProfilErreur" style="display:none;color:#B91C1C;font-size:12px;margin-top:8px;"></div>
+      </div>
+    </div>
+
     <div class="esp-metrics-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
       <div class="adm-stat-card" style="border-top:3px solid #2563EB;">
         <div class="adm-stat-num" id="espaceCliNbChantiers">—</div>
@@ -3257,6 +3309,7 @@ async function _espaceInit() {
   document.getElementById('espaceEtapeTel').style.display = 'block';
   document.getElementById('espaceEtapeOtp').style.display = 'none';
   document.getElementById('espaceEtapeInscription').style.display = 'none';
+  const pwdStep = document.getElementById('espaceEtapePwd'); if (pwdStep) pwdStep.style.display = 'none';
   ['espaceDashFournisseur', 'espaceDashSuperviseur', 'espaceDashClient'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   const tel = document.getElementById('espaceTelephone'); if (tel) tel.value = '';
   if (resultat.message) { _espaceAfficherErreur('espaceErreurTel', resultat.message); }
@@ -3266,6 +3319,7 @@ async function _espaceInit() {
 function _espaceRetourTel() {
   document.getElementById('espaceEtapeOtp').style.display = 'none';
   document.getElementById('espaceEtapeInscription').style.display = 'none';
+  const pwdStep = document.getElementById('espaceEtapePwd'); if (pwdStep) pwdStep.style.display = 'none';
   document.getElementById('espaceEtapeTel').style.display = 'block';
   _espaceContexte = null;
 }
@@ -3498,7 +3552,7 @@ function _espaceAfficherTableauBord() {
   // Le formulaire de connexion ne doit JAMAIS rester visible en même temps
   // qu'un tableau de bord (ex. restauration de session persistante : ces
   // étapes n'étaient sinon jamais explicitement masquées ici).
-  ['espaceEtapeTel', 'espaceEtapeOtp', 'espaceEtapeInscription'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  ['espaceEtapeTel', 'espaceEtapeOtp', 'espaceEtapeInscription', 'espaceEtapePwd'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   if (!_espaceSession) { _espaceInit(); return; }
   const initiales = _espaceInitiales(_espaceSession.nom);
   if (_espaceSession.role === 'fournisseur') {
@@ -3520,6 +3574,7 @@ function _espaceAfficherTableauBord() {
     document.getElementById('espaceCliAvatar').textContent = initiales;
     _espaceBasculerOnglet('cli', 'chantiers');
     _espaceChargerClient();
+    if (typeof _espaceCliVerifierPremierAcces === 'function') _espaceCliVerifierPremierAcces();
   }
 }
 
@@ -9015,24 +9070,33 @@ async function chargerAvis() {
     <div id="admCreerClientModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
       <div style="background:#fff;border-radius:16px;padding:28px;width:min(420px,92vw);box-shadow:0 8px 40px rgba(0,0,0,.25);">
         <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 20px;font-size:17px;"><i class="fa-solid fa-user-plus" style="color:#1A1A4E;margin-right:8px;"></i>Créer un client</h3>
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom complet *</label>
-            <input id="admCliNom" type="text" placeholder="Ex: Fatoumata Diallo" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+        <div id="admCliFormZone">
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom complet *</label>
+              <input id="admCliNom" type="text" placeholder="Ex: Fatoumata Diallo" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Téléphone *</label>
+              <input id="admCliTel" type="text" placeholder="224620000000" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Ville</label>
+              <input id="admCliVille" type="text" placeholder="Conakry" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+            </div>
+            <div id="admCliErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
           </div>
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Téléphone *</label>
-            <input id="admCliTel" type="text" placeholder="224620000000" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+          <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
+            <button onclick="document.getElementById('admCreerClientModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
+            <button id="admCliSaveBtn" onclick="_admCreerClientValider()" style="background:#1A1A4E;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer le compte</button>
           </div>
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Ville</label>
-            <input id="admCliVille" type="text" placeholder="Conakry" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
-          </div>
-          <div id="admCliErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
         </div>
-        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
-          <button onclick="document.getElementById('admCreerClientModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
-          <button id="admCliSaveBtn" onclick="_admCreerClientValider()" style="background:#1A1A4E;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer le compte</button>
+        <div id="admCliSuccesZone" style="display:none;">
+          <div style="background:#ECFDF5;border:1.5px solid #A7F3D0;border-radius:12px;padding:16px;font-size:13.5px;color:#065F46;line-height:1.6;margin-bottom:16px;" id="admCliSuccesMsg"></div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button onclick="document.getElementById('admCreerClientModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Fermer</button>
+            <button id="admCliCopierBtn" onclick="_admCreerClientCopierMessage()" style="background:#1A1A4E;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">📋 Copier ce message</button>
+          </div>
         </div>
       </div>
     </div>
@@ -23220,10 +23284,16 @@ async function _admCreerPrestataireValider() {
 window._admCreerPrestataireValider = _admCreerPrestataireValider;
 
 // ── Créer un client ──
+let _admCliDernierMessage = '';
+
 function _admCreerClientOuvrir() {
   ['admCliNom','admCliTel','admCliVille'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const errEl = document.getElementById('admCliErreur');
   if (errEl) errEl.style.display = 'none';
+  const formZone = document.getElementById('admCliFormZone');
+  const succesZone = document.getElementById('admCliSuccesZone');
+  if (formZone) formZone.style.display = 'block';
+  if (succesZone) succesZone.style.display = 'none';
   const modal = document.getElementById('admCreerClientModal');
   if (modal) modal.style.display = 'flex';
 }
@@ -23248,14 +23318,22 @@ async function _admCreerClientValider() {
     if (errCount) throw errCount;
     if (count > 0) { _admAfficherErreurCompte('admCliErreur', 'Ce numéro est déjà enregistré'); return; }
 
+    // mot_de_passe fixé explicitement ici (jamais via un DEFAULT colonne —
+    // voir 20260719_clients_mdp_admin.sql) : seuls les comptes créés par
+    // l'admin obtiennent un mot de passe, jamais les clients inscrits OTP.
     const { error } = await sb.from('clients').insert({
-      nom: nomComplet, telephone: tel, ville: ville || null, statut: 'actif'
+      nom: nomComplet, telephone: tel, ville: ville || null, statut: 'actif',
+      mot_de_passe: '0000', created_by_admin: true, doit_changer_mdp: true
     });
     if (error) { if (error.code === '23505') { _admAfficherErreurCompte('admCliErreur', 'Ce numéro est déjà enregistré'); return; } throw error; }
 
-    showToast('✅ Client créé — il peut se connecter avec son numéro ' + tel, 'success');
-    const modal = document.getElementById('admCreerClientModal');
-    if (modal) modal.style.display = 'none';
+    _admCliDernierMessage = '✅ Compte créé ! Dites au client de se connecter sur yoummajobs.com avec son numéro ' + tel + ' et le mot de passe 0000';
+    const msgEl = document.getElementById('admCliSuccesMsg');
+    if (msgEl) msgEl.textContent = _admCliDernierMessage;
+    const formZone = document.getElementById('admCliFormZone');
+    const succesZone = document.getElementById('admCliSuccesZone');
+    if (formZone) formZone.style.display = 'none';
+    if (succesZone) succesZone.style.display = 'block';
     if (typeof _admChargerDerniersComptes === 'function') _admChargerDerniersComptes();
   } catch (e) {
     _admAfficherErreurCompte('admCliErreur', e.message || 'Erreur lors de la création');
@@ -23264,6 +23342,16 @@ async function _admCreerClientValider() {
   }
 }
 window._admCreerClientValider = _admCreerClientValider;
+
+function _admCreerClientCopierMessage() {
+  if (!_admCliDernierMessage) return;
+  navigator.clipboard.writeText(_admCliDernierMessage).then(() => {
+    if (typeof showToast === 'function') showToast('📋 Message copié', 'success');
+    const btn = document.getElementById('admCliCopierBtn');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✅ Copié'; setTimeout(() => { btn.textContent = orig; }, 1500); }
+  }).catch(() => { if (typeof showToast === 'function') showToast('Impossible de copier le message', 'error'); });
+}
+window._admCreerClientCopierMessage = _admCreerClientCopierMessage;
 
 // ── Liste rapide : 10 derniers comptes créés (prestataires + clients) ──
 function _admRenderDerniersComptesTable(rows) {
@@ -23335,6 +23423,124 @@ window._admCopierNumero = _admCopierNumero;
     };
   }
 })();
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// #ESPACE CLIENT — CONNEXION PAR MOT DE PASSE (comptes créés par l'admin)
+// ══════════════════════════════════════════════════════════════
+// Flux additif, en parallèle du flux OTP SMS existant (_espaceEnvoyerCode /
+// _espaceValiderCode) qui reste entièrement inchangé. mot_de_passe est
+// NULL pour tout client inscrit via OTP (voir 20260719_clients_mdp_admin.sql
+// — pas de DEFAULT '0000' au niveau colonne, pour raison de sécurité) donc
+// "WHERE mot_de_passe = MDP" ne peut jamais matcher un compte OTP existant.
+
+function _espaceOuvrirModePwd() {
+  document.getElementById('espaceEtapeTel').style.display = 'none';
+  document.getElementById('espaceEtapeOtp').style.display = 'none';
+  document.getElementById('espaceEtapeInscription').style.display = 'none';
+  document.getElementById('espaceEtapePwd').style.display = 'block';
+  const telEl = document.getElementById('espacePwdTelephone'); if (telEl) telEl.value = '';
+  const mdpEl = document.getElementById('espacePwdMotDePasse'); if (mdpEl) mdpEl.value = '';
+  _espaceCacherErreur('espaceErreurPwd');
+}
+window._espaceOuvrirModePwd = _espaceOuvrirModePwd;
+
+async function _espaceConnexionMotDePasse() {
+  const tel = (document.getElementById('espacePwdTelephone').value || '').trim();
+  const mdp = document.getElementById('espacePwdMotDePasse').value || '';
+  _espaceCacherErreur('espaceErreurPwd');
+
+  if (!_rcTelephoneValide(tel)) { _espaceAfficherErreur('espaceErreurPwd', 'Téléphone au format 224XXXXXXXXX.'); return; }
+  if (!mdp) { _espaceAfficherErreur('espaceErreurPwd', 'Entrez votre mot de passe.'); return; }
+
+  const btn = document.getElementById('espaceBtnConnexionPwd');
+  if (btn) { btn.disabled = true; btn.textContent = 'Connexion...'; }
+  try {
+    const { data, error } = await sb.from('clients')
+      .select('id,nom,prenom,telephone,statut,mot_de_passe')
+      .eq('telephone', tel).eq('mot_de_passe', mdp).eq('statut', 'actif')
+      .maybeSingle();
+    if (error || !data) { _espaceAfficherErreur('espaceErreurPwd', 'Numéro ou mot de passe incorrect'); return; }
+
+    const nomAffiche = ((data.prenom || '') + ' ' + (data.nom || '')).trim() || data.nom || '';
+    _espaceSession = { role: 'client', id: data.id, nom: nomAffiche, telephone: data.telephone };
+    _espaceSauvegarderSessionLocale(_espaceSession);
+    document.getElementById('espaceEtapePwd').style.display = 'none';
+    _espaceAfficherTableauBord();
+  } catch (e) {
+    _espaceAfficherErreur('espaceErreurPwd', 'Erreur : ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Se connecter'; }
+  }
+}
+window._espaceConnexionMotDePasse = _espaceConnexionMotDePasse;
+
+// ── Dashboard client, premier accès : bannière mot de passe + complétion profil ──
+async function _espaceCliVerifierPremierAcces() {
+  const banniereMdp = document.getElementById('espaceCliBanniereMdp');
+  const banniereProfil = document.getElementById('espaceCliBanniereProfil');
+  if (!_espaceSession || _espaceSession.role !== 'client') return;
+  try {
+    const { data, error } = await sb.from('clients').select('doit_changer_mdp,ville,commune').eq('id', _espaceSession.id).single();
+    if (error || !data) { if (banniereMdp) banniereMdp.style.display = 'none'; if (banniereProfil) banniereProfil.style.display = 'none'; return; }
+    if (banniereMdp) banniereMdp.style.display = data.doit_changer_mdp ? 'block' : 'none';
+    if (banniereProfil) banniereProfil.style.display = (!data.ville && !data.commune) ? 'block' : 'none';
+  } catch (e) {
+    // colonnes absentes (migration non exécutée) : ne bloque jamais l'affichage du dashboard
+    if (banniereMdp) banniereMdp.style.display = 'none';
+    if (banniereProfil) banniereProfil.style.display = 'none';
+  }
+}
+window._espaceCliVerifierPremierAcces = _espaceCliVerifierPremierAcces;
+
+async function _espaceCliChangerMdp() {
+  const mdp1 = document.getElementById('espaceCliNouveauMdp').value || '';
+  const mdp2 = document.getElementById('espaceCliConfirmerMdp').value || '';
+  const errEl = document.getElementById('espaceCliMdpErreur');
+  if (errEl) errEl.style.display = 'none';
+
+  if (mdp1.length < 4) { if (errEl) { errEl.textContent = 'Le mot de passe doit contenir au moins 4 caractères.'; errEl.style.display = 'block'; } return; }
+  if (mdp1 !== mdp2) { if (errEl) { errEl.textContent = 'Les mots de passe ne correspondent pas.'; errEl.style.display = 'block'; } return; }
+
+  try {
+    const { error } = await sb.from('clients').update({ mot_de_passe: mdp1, doit_changer_mdp: false }).eq('id', _espaceSession.id);
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('✅ Mot de passe mis à jour', 'success');
+    const banniere = document.getElementById('espaceCliBanniereMdp');
+    if (banniere) banniere.style.display = 'none';
+  } catch (e) {
+    if (errEl) { errEl.textContent = 'Erreur : ' + e.message; errEl.style.display = 'block'; }
+  }
+}
+window._espaceCliChangerMdp = _espaceCliChangerMdp;
+
+function _espaceCliToggleProfilRapide() {
+  const zone = document.getElementById('espaceCliProfilRapideZone');
+  if (zone) zone.style.display = (zone.style.display === 'none' || !zone.style.display) ? 'block' : 'none';
+}
+window._espaceCliToggleProfilRapide = _espaceCliToggleProfilRapide;
+
+async function _espaceCliSauvegarderProfilRapide() {
+  const ville = (document.getElementById('espaceCliProfilVille').value || '').trim();
+  const commune = (document.getElementById('espaceCliProfilCommune').value || '').trim();
+  const email = (document.getElementById('espaceCliProfilEmail').value || '').trim();
+  const errEl = document.getElementById('espaceCliProfilErreur');
+  if (errEl) errEl.style.display = 'none';
+
+  if (!ville && !commune) { if (errEl) { errEl.textContent = 'Renseignez au moins la ville ou la commune.'; errEl.style.display = 'block'; } return; }
+
+  try {
+    const { error } = await sb.from('clients').update({ ville: ville || null, commune: commune || null, email: email || null }).eq('id', _espaceSession.id);
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('✅ Profil mis à jour', 'success');
+    const banniere = document.getElementById('espaceCliBanniereProfil');
+    if (banniere) banniere.style.display = 'none';
+  } catch (e) {
+    if (errEl) { errEl.textContent = 'Erreur : ' + e.message; errEl.style.display = 'block'; }
+  }
+}
+window._espaceCliSauvegarderProfilRapide = _espaceCliSauvegarderProfilRapide;
 </script>
 
 <!-- ══ SERVICE WORKER REGISTRATION ══ -->
