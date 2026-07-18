@@ -22772,11 +22772,16 @@ async function checkAcces(actionLabel, callback) {
   const pid = _accesProviderId();
   if (!pid) { if (typeof callback === 'function') callback(); return; }
   try {
-    const { data, error } = await sb.from('providers').select('subscription_end, credits').eq('id', pid).single();
+    // Sélectionne à la fois l'ancien système (abonnement_actif/abonnement_fin)
+    // et le nouveau (subscription_end/credits) : un prestataire peut avoir un
+    // abonnement encore actif côté ancien système sans jamais être passé par
+    // le nouveau flux de paiement (subscription_end resterait alors NULL).
+    const { data, error } = await sb.from('providers').select('subscription_end, credits, abonnement_actif, abonnement_fin').eq('id', pid).single();
     if (error || !data) { if (typeof callback === 'function') callback(); return; } // colonnes absentes (migration non exécutée) : laisse passer
     const now = new Date();
-    const aAbo = data.subscription_end && new Date(data.subscription_end) > now;
-    if (aAbo) { if (typeof callback === 'function') callback(); return; }
+    const aAboAncien = data.abonnement_actif === true && data.abonnement_fin && new Date(data.abonnement_fin) > now;
+    const aAboNouveau = data.subscription_end && new Date(data.subscription_end) > now;
+    if (aAboAncien || aAboNouveau) { if (typeof callback === 'function') callback(); return; }
     if ((data.credits || 0) > 0) {
       await sb.from('providers').update({ credits: data.credits - 1 }).eq('id', pid);
       if (typeof callback === 'function') callback();
