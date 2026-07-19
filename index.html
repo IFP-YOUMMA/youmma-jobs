@@ -10204,6 +10204,7 @@ function renderTableHTML(statut, data) {
       p.statut !== 'valide'   ? `<button class="adm-btn valider"   onclick="event.stopPropagation();_adminAction('valider','${p.id}')"><i class="fa-solid fa-check"></i> Valider</button>` : '',
       p.statut !== 'rejete'   ? `<button class="adm-btn rejeter"   onclick="event.stopPropagation();_adminAction('rejeter','${p.id}')">Rejeter</button>` : '',
       p.statut !== 'suspendu' ? `<button class="adm-btn suspendre super-admin-only btn-suspendre" data-super-only="true" onclick="event.stopPropagation();_adminAction('suspendre','${p.id}')"><i class="fa-solid fa-ban"></i></button>` : '',
+      `<button class="adm-btn" style="background:#FEF3C7;color:#92400E;" onclick="event.stopPropagation();_admResetPinDefaut('${p.id}')" title="Réinitialiser le code PIN à 0000">🔑 Réinitialiser PIN → 0000</button>`,
       `<button class="adm-btn supprimer super-admin-only btn-supprimer" data-super-only="true" onclick="event.stopPropagation();_adminAction('supprimer','${p.id}')"><i class="fa-solid fa-trash"></i></button>`
     ].filter(Boolean).join('');
 
@@ -23306,6 +23307,7 @@ async function _admCreerPrestataireValider() {
     // prestataire sur son tableau de bord.
     const pin = '0000';
     const password_hash = await hashPassword(pin);
+    console.log('[_admCreerPrestataireValider] hash généré pour PIN 0000 :', password_hash);
 
     const { error } = await sb.from('providers').insert({
       prenom, nom, telephone: tel, password_hash,
@@ -23341,6 +23343,24 @@ function _admCreerPrestataireCopierMessage() {
   }).catch(() => { if (typeof showToast === 'function') showToast('Impossible de copier le message', 'error'); });
 }
 window._admCreerPrestataireCopierMessage = _admCreerPrestataireCopierMessage;
+
+// ── Réinitialiser le PIN d'un prestataire à 0000 (liste admin) ──
+// Même fonction hashPassword() que _admCreerPrestataireValider() et
+// connexionPrestataire() — même hash produit pour la même chaîne '0000'.
+async function _admResetPinDefaut(id) {
+  if (!window.confirm('Réinitialiser le code PIN de ce prestataire à 0000 ?')) return;
+  try {
+    const password_hash = await hashPassword('0000');
+    const { error } = await sb.from('providers').update({ password_hash, doit_changer_mdp: true }).eq('id', id);
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('✅ Code PIN réinitialisé à 0000', 'success');
+    else window.alert('Code PIN réinitialisé à 0000');
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + (e.message || e), 'error');
+    else window.alert('Erreur : ' + (e.message || e));
+  }
+}
+window._admResetPinDefaut = _admResetPinDefaut;
 
 // ── Créer un client ──
 let _admCliDernierMessage = '';
