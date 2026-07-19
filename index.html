@@ -7666,9 +7666,25 @@ document.addEventListener('keydown', e => {
         <div class="upload-progress" id="progressReal"><div class="upload-progress-bar"></div></div>
         <div style="font-size:12px;color:#7A7F9A;margin-top:10px;">Montrez vos meilleures réalisations pour attirer plus de clients.</div>
       </div>
+
+      <div class="photos-section">
+        <div class="photos-header">
+          <div class="photos-title">🌟 Mes photos à la une</div>
+        </div>
+        <div style="font-size:12px;color:#7A7F9A;margin-bottom:12px;">Proposez une photo pour le carrousel de la page d'accueil.</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:flex-end;margin-bottom:14px;">
+          <input id="dashUneTitre" type="text" placeholder="Titre de la photo (optionnel)" maxlength="80" style="padding:10px 14px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;color:#374151;outline:none;width:100%;box-sizing:border-box;"/>
+          <label id="dashUneBtn" style="cursor:pointer;background:#E85D04;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;white-space:nowrap;">
+            📸 Ajouter à la une
+            <input type="file" accept="image/*" style="display:none;" onchange="_dashAjouterUne(this)"/>
+          </label>
+        </div>
+        <div class="upload-progress" id="progressUne"><div class="upload-progress-bar"></div></div>
+        <div id="dashUneListe"><div style="text-align:center;padding:16px;color:#9CA3AF;font-size:12.5px;">Chargement...</div></div>
+      </div>
     </div>
 
-    
+
     <div class="section" id="section-documents">
       <div style="margin-bottom:16px;">
         <button onclick="showSection('dashboard')" style="display:inline-flex;align-items:center;gap:7px;padding:8px 14px;background:#F4F6FB;border:none;border-radius:10px;color:#1A1A4E;font-size:13px;font-weight:600;cursor:pointer;">
@@ -8425,7 +8441,7 @@ function showSection(name) {
   const mainEl = document.querySelector('#page-dashboard .main');
   if (mainEl) { mainEl.scrollTop = 0; mainEl.scrollLeft = 0; }
   // Charger les données si besoin
-  if (name === 'photos') { if (typeof chargerPhotos === 'function') chargerPhotos(); }
+  if (name === 'photos') { if (typeof chargerPhotos === 'function') chargerPhotos(); if (typeof _dashChargerUne === 'function') _dashChargerUne(); }
   if (name === 'documents') { const pid = providerId || _dashProviderId; if (pid) chargerDocuments(pid); }
   if (name === 'missions') { const pid = providerId || _dashProviderId; if (pid) chargerMissions(pid); }
   if (name === 'rapports') { if (typeof _provRapports === 'function') _provRapports(); }
@@ -9961,6 +9977,19 @@ async function chargerAvis() {
           </div>
         </div>
 
+        <div style="margin-top:32px;">
+          <div class="adm-section-header" style="margin-bottom:16px;">
+            <div class="adm-section-title">
+              <i class="fa-solid fa-user-group" style="color:#2563EB;"></i> Photos ajoutées par les prestataires
+            </div>
+          </div>
+          <div id="carouselProvAdminList">
+            <div style="text-align:center;padding:30px;color:#9CA3AF;font-size:13px;">
+              <i class="fa-solid fa-spinner fa-spin"></i> Chargement...
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -10138,7 +10167,7 @@ function showSection(name) {
   const mainEl = document.querySelector('#page-dashboard .main');
   if (mainEl) { mainEl.scrollTop = 0; mainEl.scrollLeft = 0; }
   // Charger les données si besoin
-  if (name === 'photos') { if (typeof chargerPhotos === 'function') chargerPhotos(); }
+  if (name === 'photos') { if (typeof chargerPhotos === 'function') chargerPhotos(); if (typeof _dashChargerUne === 'function') _dashChargerUne(); }
   if (name === 'documents') { const pid = providerId || _dashProviderId; if (pid) chargerDocuments(pid); }
   if (name === 'missions') { const pid = providerId || _dashProviderId; if (pid) chargerMissions(pid); }
   if (name === 'rapports') { if (typeof _provRapports === 'function') _provRapports(); }
@@ -13904,7 +13933,7 @@ function showAdmin(name) {
     }
     el.style.cssText = s===name ? ACTIVE : NORMAL;
   });
-  if (name==='carousel') { if(typeof _carouselLoadAdmin==='function') _carouselLoadAdmin(); }
+  if (name==='carousel') { if(typeof _carouselLoadAdmin==='function') _carouselLoadAdmin(); if(typeof _carouselLoadProvAdmin==='function') _carouselLoadProvAdmin(); }
   else if (name==='missions') { renderAdminMissions(); }
   else if (name==='projets_clients') { _adminChargerProjets(); }
   else if (name==='campagne') { _campagneInit(); }
@@ -20590,6 +20619,63 @@ function _carouselCopySQL() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════
+// CARROUSEL — photos "à la une" ajoutées par les prestataires
+// ══════════════════════════════════════════════════════════════════
+// Réutilise carousel_images (table réelle du carrousel — pas de table
+// "featured_images", introuvable dans le fichier). provider_id est une
+// colonne ajoutée par 20260719_carousel_images_provider_id.sql ; "sans
+// validation, statut='actif'" se traduit avec la colonne réelle actif
+// (BOOLEAN, déjà utilisée par tout le système carrousel existant) plutôt
+// qu'une colonne statut TEXT redondante.
+async function _carouselLoadProvAdmin() {
+  const list = document.getElementById('carouselProvAdminList');
+  if (!list) return;
+  try {
+    const { data, error } = await sb.from('carousel_images')
+      .select('*, providers(prenom,nom)')
+      .not('provider_id', 'is', null)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data || !data.length) {
+      list.innerHTML = '<div style="text-align:center;padding:24px;color:#9CA3AF;font-size:13px;">Aucune photo soumise par un prestataire pour le moment.</div>';
+      return;
+    }
+    list.innerHTML = data.map(img => {
+      const nomProv = img.providers ? ((img.providers.prenom || '') + ' ' + (img.providers.nom || '')).trim() : '';
+      const dateStr = img.created_at ? new Date(img.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+      return `
+      <div style="display:flex;align-items:center;gap:14px;background:#fff;border:1.5px solid #E5E7EB;border-radius:14px;padding:12px 16px;margin-bottom:10px;">
+        <div style="width:80px;height:56px;border-radius:8px;overflow:hidden;background:#F1F5F9;flex-shrink:0;">
+          <img src="${img.url}" style="width:100%;height:100%;object-fit:cover;"/>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13.5px;font-weight:700;color:#1A1A4E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${img.titre || '(sans titre)'}</div>
+          <div style="font-size:11px;color:#9CA3AF;margin-top:2px;">${nomProv || 'Prestataire'} · ${dateStr} · ${img.actif ? '<span style="color:#059669;">✓ Actif</span>' : '<span style="color:#9CA3AF;">Inactif</span>'}</div>
+        </div>
+        <button onclick="_carouselProvDelete('${img.id}')" title="Supprimer" style="width:30px;height:30px;border-radius:7px;border:1px solid #FEE2E2;background:#FFF5F5;color:#DC2626;cursor:pointer;font-size:12px;flex-shrink:0;"><i class="fa-solid fa-trash"></i></button>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    list.innerHTML = `<div style="text-align:center;padding:24px;color:#9CA3AF;font-size:13px;">Indisponible : ${e.message}</div>`;
+  }
+}
+window._carouselLoadProvAdmin = _carouselLoadProvAdmin;
+
+async function _carouselProvDelete(id) {
+  if (!window.confirm('Supprimer cette photo à la une ?')) return;
+  try {
+    const { error } = await sb.from('carousel_images').delete().eq('id', id);
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('Photo supprimée', 'success');
+    _carouselLoadProvAdmin();
+    if (typeof _carouselLoadAdmin === 'function') _carouselLoadAdmin();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+window._carouselProvDelete = _carouselProvDelete;
+
 
 // ══════════════════════════════════════════════════
 // DEEP-LINK — Ouvrir un profil depuis ?profil=ID
@@ -23807,6 +23893,95 @@ async function _dashUploadCouverture(input) {
   }
 }
 window._dashUploadCouverture = _dashUploadCouverture;
+
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD PRESTATAIRE — "Mes photos à la une" (carousel_images)
+// ══════════════════════════════════════════════════════════════
+// Table réelle carousel_images (pas de table "featured_images" dans ce
+// fichier — grep vérifié). Bucket 'photos' en minuscule, même bucket que
+// le carrousel admin (voir _carouselUpload : "Bucket 'photos' (minuscule)
+// = carousel uniquement"), chemin une/{providerId}/{timestamp}.jpg pour ne
+// pas entrer en collision avec les fichiers carousel_TIMESTAMP.jpg de
+// l'admin. "Sans validation, statut='actif'" = actif:true (colonne réelle
+// déjà utilisée par tout le système existant), pas de colonne statut TEXT
+// redondante ajoutée.
+async function _dashAjouterUne(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const pid = (typeof _dashProviderId !== 'undefined' && _dashProviderId) || (typeof providerId !== 'undefined' && providerId);
+  if (!pid) { if (typeof showToast === 'function') showToast('Session expirée', 'error'); return; }
+  if (file.size > 5 * 1024 * 1024) { if (typeof showToast === 'function') showToast('Fichier trop volumineux (max 5 Mo)', 'error'); return; }
+
+  const titreEl = document.getElementById('dashUneTitre');
+  const titre = titreEl ? titreEl.value.trim() : '';
+  const prog = document.getElementById('progressUne');
+  if (prog) prog.style.display = 'block';
+
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const filename = `une/${pid}/${Date.now()}.${ext}`;
+    const { error: uploadError } = await sb.storage.from('photos').upload(filename, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+    if (uploadError) throw uploadError;
+    const { data: urlData } = sb.storage.from('photos').getPublicUrl(filename);
+
+    const { error } = await sb.from('carousel_images').insert({
+      url: urlData.publicUrl, titre: titre || null, actif: true, ordre: 99, provider_id: pid
+    });
+    if (error) throw error;
+
+    if (typeof showToast === 'function') showToast('✅ Photo ajoutée à la une !', 'success');
+    if (titreEl) titreEl.value = '';
+    input.value = '';
+    _dashChargerUne();
+  } catch (e) {
+    console.warn('[_dashAjouterUne]', e.message || e);
+    if (typeof showToast === 'function') showToast('Erreur : ' + (e.message || e), 'error');
+    else window.alert('Erreur : ' + (e.message || e));
+  } finally {
+    if (prog) prog.style.display = 'none';
+  }
+}
+window._dashAjouterUne = _dashAjouterUne;
+
+async function _dashChargerUne() {
+  const list = document.getElementById('dashUneListe');
+  if (!list) return;
+  const pid = (typeof _dashProviderId !== 'undefined' && _dashProviderId) || (typeof providerId !== 'undefined' && providerId);
+  if (!pid) return;
+  try {
+    const { data, error } = await sb.from('carousel_images').select('*').eq('provider_id', pid).order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data || !data.length) {
+      list.innerHTML = '<div style="text-align:center;padding:16px;color:#9CA3AF;font-size:12.5px;">Aucune photo soumise pour le moment.</div>';
+      return;
+    }
+    list.innerHTML = data.map(img => `
+      <div style="display:flex;align-items:center;gap:12px;background:#F4F6FB;border-radius:12px;padding:10px 14px;margin-bottom:8px;">
+        <div style="width:60px;height:44px;border-radius:8px;overflow:hidden;background:#E4E8F5;flex-shrink:0;">
+          <img src="${img.url}" style="width:100%;height:100%;object-fit:cover;"/>
+        </div>
+        <div style="flex:1;min-width:0;font-size:13px;font-weight:600;color:#1A1A4E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${img.titre || '(sans titre)'}</div>
+        <button onclick="_dashSupprimerUne('${img.id}')" style="padding:6px 12px;background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🗑️ Supprimer</button>
+      </div>`).join('');
+  } catch (e) {
+    list.innerHTML = `<div style="text-align:center;padding:16px;color:#9CA3AF;font-size:12.5px;">Indisponible : ${e.message}</div>`;
+  }
+}
+window._dashChargerUne = _dashChargerUne;
+
+async function _dashSupprimerUne(id) {
+  const pid = (typeof _dashProviderId !== 'undefined' && _dashProviderId) || (typeof providerId !== 'undefined' && providerId);
+  if (!pid) return;
+  try {
+    const { error } = await sb.from('carousel_images').delete().eq('id', id).eq('provider_id', pid);
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('Photo supprimée', 'success');
+    _dashChargerUne();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+window._dashSupprimerUne = _dashSupprimerUne;
 </script>
 
 <!-- ══ SERVICE WORKER REGISTRATION ══ -->
