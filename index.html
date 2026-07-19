@@ -9026,6 +9026,31 @@ async function chargerAvis() {
         <div id="admProvFormZone">
           <div style="display:flex;flex-direction:column;gap:14px;">
             <div>
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:8px;">Type de compte *</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <label id="admProvType-particulier-label" onclick="_admSetTypeCompte('particulier')" style="display:flex;align-items:center;gap:10px;padding:13px 14px;border:2px solid #E85D04;border-radius:12px;cursor:pointer;background:#FFF7F0;transition:all .2s;">
+                  <div style="width:36px;height:36px;border-radius:9px;background:#FDE8D8;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;">👤</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:#1A1A4E;">Particulier</div>
+                    <div style="font-size:10.5px;color:#9CA3AF;">Artisan indépendant</div>
+                  </div>
+                  <div id="admProvType-check-particulier" style="margin-left:auto;width:18px;height:18px;border-radius:50%;background:#E85D04;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="fa-solid fa-check" style="color:#fff;font-size:9px;"></i>
+                  </div>
+                </label>
+                <label id="admProvType-entreprise-label" onclick="_admSetTypeCompte('entreprise')" style="display:flex;align-items:center;gap:10px;padding:13px 14px;border:2px solid #E5E7EB;border-radius:12px;cursor:pointer;background:#fff;transition:all .2s;">
+                  <div style="width:36px;height:36px;border-radius:9px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;">🏢</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:#1A1A4E;">Entreprise</div>
+                    <div style="font-size:10.5px;color:#9CA3AF;">Société, cabinet, agence</div>
+                  </div>
+                  <div id="admProvType-check-entreprise" style="margin-left:auto;width:18px;height:18px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:.3;">
+                    <i class="fa-solid fa-check" style="color:#fff;font-size:9px;"></i>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div>
               <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom complet *</label>
               <input id="admProvNom" type="text" placeholder="Ex: Mamadou Bah" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
             </div>
@@ -23256,11 +23281,39 @@ document.addEventListener('click', function(e) {
 
 // ── Créer un prestataire ──
 let _admProvDernierMessage = '';
+let _admProvTypeCompte = 'particulier';
+
+// Même style de cards cliquables que le formulaire d'inscription normal
+// (labels/checks id="type-particulier-label" etc.) mais IDs distincts
+// ("admProvType-...") pour ne pas entrer en conflit avec ce formulaire —
+// et fonction dédiée plutôt que de réutiliser setTypeCompte(), qui pilote
+// aussi l'affichage conditionnel des champs nom_entreprise propres au
+// formulaire d'inscription public, absents de ce modal admin.
+function _admSetTypeCompte(type) {
+  _admProvTypeCompte = type;
+  const labPart = document.getElementById('admProvType-particulier-label');
+  const labEntr = document.getElementById('admProvType-entreprise-label');
+  const chkPart = document.getElementById('admProvType-check-particulier');
+  const chkEntr = document.getElementById('admProvType-check-entreprise');
+  if (type === 'particulier') {
+    if (labPart) { labPart.style.borderColor = '#E85D04'; labPart.style.background = '#FFF7F0'; }
+    if (labEntr) { labEntr.style.borderColor = '#E5E7EB'; labEntr.style.background = '#fff'; }
+    if (chkPart) { chkPart.style.background = '#E85D04'; chkPart.style.opacity = '1'; }
+    if (chkEntr) { chkEntr.style.background = '#E5E7EB'; chkEntr.style.opacity = '.3'; }
+  } else {
+    if (labEntr) { labEntr.style.borderColor = '#E85D04'; labEntr.style.background = '#FFF7F0'; }
+    if (labPart) { labPart.style.borderColor = '#E5E7EB'; labPart.style.background = '#fff'; }
+    if (chkEntr) { chkEntr.style.background = '#E85D04'; chkEntr.style.opacity = '1'; }
+    if (chkPart) { chkPart.style.background = '#E5E7EB'; chkPart.style.opacity = '.3'; }
+  }
+}
+window._admSetTypeCompte = _admSetTypeCompte;
 
 function _admCreerPrestataireOuvrir() {
   ['admProvNom','admProvTel','admProvMetier','admProvExperience','admProvVille','admProvCommune'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const errEl = document.getElementById('admProvErreur');
   if (errEl) errEl.style.display = 'none';
+  _admSetTypeCompte('particulier');
   if (typeof renderCategoriesSelect === 'function') renderCategoriesSelect('admProvCategorie');
   const formZone = document.getElementById('admProvFormZone');
   const succesZone = document.getElementById('admProvSuccesZone');
@@ -23312,6 +23365,7 @@ async function _admCreerPrestataireValider() {
     const { error } = await sb.from('providers').insert({
       prenom, nom, telephone: tel, password_hash,
       metier, categorie, experience, ville: ville || null, commune: commune || null,
+      type_compte: _admProvTypeCompte,
       statut: 'valide', doit_changer_mdp: true,
       abonnement_actif: false, essai_actif: false
     });
