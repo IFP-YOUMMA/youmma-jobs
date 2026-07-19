@@ -7626,7 +7626,7 @@ document.addEventListener('keydown', e => {
           <div class="photos-title"><i class="fa-solid fa-camera"></i> Photo de profil</div>
           <label style="cursor:pointer;background:#E85D04;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
             <i class="fa-solid fa-camera"></i> Changer la photo
-            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="uploadPhoto(this,'profil')"/>
+            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){uploadPhoto(inp,'profil');})"/>
           </label>
         </div>
         <div style="display:flex;align-items:center;gap:20px;padding:16px;background:#F4F6FB;border-radius:14px;">
@@ -7641,7 +7641,7 @@ document.addEventListener('keydown', e => {
           <div class="photos-title"><i class="fa-solid fa-image"></i> Photo de couverture</div>
           <label style="cursor:pointer;background:#1A1A4E;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
             📷 Changer la couverture
-            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_dashUploadCouverture(this)"/>
+            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'bandeau',function(inp){_dashUploadCouverture(inp);})"/>
           </label>
         </div>
         <div id="dashCouverturePreview" style="width:100%;height:100px;border-radius:14px;background:#E4E8F5;background-size:cover;background-position:center;"></div>
@@ -7654,7 +7654,7 @@ document.addEventListener('keydown', e => {
           <div class="photos-title">🖼️ Réalisations <span id="realsCountDisplay" style="font-size:12px;color:#7A7F9A;font-weight:400;">(max 5 photos)</span></div>
           <label id="addRealLabel" style="cursor:pointer;background:#1A1A4E;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
             + Ajouter une réalisation
-            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="uploadPhoto(this,'realisation')"/>
+            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){uploadPhoto(inp,'realisation');})"/>
           </label>
         </div>
         <div class="photos-grid" id="realisationsGrid">
@@ -7676,7 +7676,7 @@ document.addEventListener('keydown', e => {
           <input id="dashUneTitre" type="text" placeholder="Titre de la photo (optionnel)" maxlength="80" style="padding:10px 14px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;color:#374151;outline:none;width:100%;box-sizing:border-box;"/>
           <label id="dashUneBtn" style="cursor:pointer;background:#E85D04;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;white-space:nowrap;">
             📸 Ajouter à la une
-            <input type="file" accept="image/*" style="display:none;" onchange="_dashAjouterUne(this)"/>
+            <input type="file" accept="image/*" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){_dashAjouterUne(inp);})"/>
           </label>
         </div>
         <div class="upload-progress" id="progressUne"><div class="upload-progress-bar"></div></div>
@@ -8497,7 +8497,7 @@ function renderPhotos() {
       <label class="photo-slot" style="cursor:pointer;">
         <div style="font-size:28px;"><i class="fa-solid fa-camera"></i></div>
         <div class="add-text">Ajouter</div>
-        <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="uploadPhoto(this,'realisation')"/>
+        <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){uploadPhoto(inp,'realisation');})"/>
       </label>
     `);
   }
@@ -17356,6 +17356,10 @@ function _adminRenderVue(p, photos) {
       + '<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Compétences</div><div style="display:flex;flex-wrap:wrap;gap:6px;">'+skillsHTML+'</div></div>'
       + '<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Documents ('+docs.length+')</div><div style="background:#F9FAFB;border-radius:12px;padding:10px 14px;">'+docsHTML+'</div></div>'
       + '<div><div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Photos de réalisations ('+(photos||[]).length+')</div>'+photosHTML+'</div>'
+      + '<div style="margin-top:18px;">'
+        + '<button onclick="_adminTogglePhotosGestion()" style="width:100%;padding:12px;background:#F0F4FF;color:#3B5BDB;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">🖼️ Voir les photos</button>'
+        + '<div id="adminPhotosGestion" style="display:none;margin-top:14px;"></div>'
+      + '</div>'
     + '</div>'
     // Footer
     + '<div style="padding:16px 28px;border-top:1px solid #F0F0F8;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">'
@@ -17366,6 +17370,123 @@ function _adminRenderVue(p, photos) {
     + '</div>'
     + '</div>';
 }
+
+// ══════════════════════════════════════════════════════════
+// ADMIN — GESTION DES PHOTOS D'UN PRESTATAIRE (fiche profil)
+// ══════════════════════════════════════════════════════════
+// Réutilise providers.photo_url/cover_url, provider_photos (déjà chargé
+// dans _adminProfilPhotos, pas de table "realisations" séparée — vérifié
+// par grep, uploadProviderPhoto() insère déjà dans provider_photos avec
+// type='realisation') et carousel_images (photos à la une, même table que
+// le carrousel admin/prestataire déjà en place).
+function _adminTogglePhotosGestion() {
+  const zone = document.getElementById('adminPhotosGestion');
+  if (!zone) return;
+  if (zone.style.display === 'none' || !zone.style.display) {
+    zone.style.display = 'block';
+    _adminRenderPhotosGestion();
+  } else {
+    zone.style.display = 'none';
+  }
+}
+window._adminTogglePhotosGestion = _adminTogglePhotosGestion;
+
+async function _adminRenderPhotosGestion() {
+  const zone = document.getElementById('adminPhotosGestion');
+  const p = _adminProfilData;
+  if (!zone || !p) return;
+
+  const realisations = (_adminProfilPhotos || []).filter(ph => ph.type === 'realisation');
+  const miniGrid = items => items.length
+    ? '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">' + items.map(it =>
+        '<div style="position:relative;"><img src="' + it.url + '" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid #E5E7EB;">'
+        + '<button onclick="' + it.delOnclick + '" title="Supprimer" style="position:absolute;top:3px;right:3px;background:rgba(220,38,38,.9);color:#fff;border:none;border-radius:6px;font-size:10px;padding:2px 5px;cursor:pointer;">🗑️</button></div>'
+      ).join('') + '</div>'
+    : '<div style="text-align:center;padding:10px;color:#9CA3AF;font-size:12px;">Aucune</div>';
+
+  zone.innerHTML =
+    '<div style="background:#F9FAFB;border-radius:12px;padding:14px;margin-bottom:12px;">'
+      + '<div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Photo de profil</div>'
+      + '<div style="display:flex;align-items:center;gap:12px;">'
+        + '<div style="width:56px;height:56px;border-radius:10px;overflow:hidden;background:#E5E7EB;flex-shrink:0;">' + (p.photo_url ? '<img src="' + p.photo_url + '" style="width:100%;height:100%;object-fit:cover;">' : '') + '</div>'
+        + '<label style="cursor:pointer;padding:8px 14px;background:#1A1A4E;color:#fff;border-radius:8px;font-size:12px;font-weight:700;">Modifier<input type="file" accept="image/*" style="display:none;" onchange="_adminChangerPhotoProvider(this,\'photo_url\')"></label>'
+      + '</div>'
+    + '</div>'
+    + '<div style="background:#F9FAFB;border-radius:12px;padding:14px;margin-bottom:12px;">'
+      + '<div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Photo de couverture</div>'
+      + '<div style="display:flex;align-items:center;gap:12px;">'
+        + '<div style="width:96px;height:36px;border-radius:8px;overflow:hidden;background:#E5E7EB;flex-shrink:0;">' + (p.cover_url ? '<img src="' + p.cover_url + '" style="width:100%;height:100%;object-fit:cover;">' : '') + '</div>'
+        + '<label style="cursor:pointer;padding:8px 14px;background:#1A1A4E;color:#fff;border-radius:8px;font-size:12px;font-weight:700;">Modifier<input type="file" accept="image/*" style="display:none;" onchange="_adminChangerPhotoProvider(this,\'cover_url\')"></label>'
+      + '</div>'
+    + '</div>'
+    + '<div style="background:#F9FAFB;border-radius:12px;padding:14px;margin-bottom:12px;">'
+      + '<div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Réalisations (' + realisations.length + ')</div>'
+      + miniGrid(realisations.map(ph => ({ url: ph.url, delOnclick: "_adminSupprimerRealisation('" + ph.id + "')" })))
+    + '</div>'
+    + '<div style="background:#F9FAFB;border-radius:12px;padding:14px;">'
+      + '<div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Photos à la une</div>'
+      + '<div id="adminProvUneListe"><div style="text-align:center;padding:10px;color:#9CA3AF;font-size:12px;">Chargement...</div></div>'
+    + '</div>';
+
+  const uneListEl = document.getElementById('adminProvUneListe');
+  try {
+    const { data, error } = await sb.from('carousel_images').select('*').eq('provider_id', p.id).order('created_at', { ascending: false });
+    if (error) throw error;
+    if (uneListEl) uneListEl.innerHTML = miniGrid((data || []).map(img => ({ url: img.url, delOnclick: "_adminSupprimerUneProvider('" + img.id + "')" })));
+  } catch (e) {
+    if (uneListEl) uneListEl.innerHTML = '<div style="text-align:center;padding:10px;color:#9CA3AF;font-size:12px;">Indisponible</div>';
+  }
+}
+window._adminRenderPhotosGestion = _adminRenderPhotosGestion;
+
+async function _adminChangerPhotoProvider(input, field) {
+  const file = input.files[0];
+  if (!file || !_adminProfilData) return;
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const filename = (field === 'cover_url' ? 'providers-couvertures/' : 'profils/') + _adminProfilData.id + '/admin-' + Date.now() + '.' + ext;
+    const { error: uploadError } = await sb.storage.from('Photos').upload(filename, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+    if (uploadError) throw uploadError;
+    const { data: urlData } = sb.storage.from('Photos').getPublicUrl(filename);
+    const { error } = await sb.from('providers').update({ [field]: urlData.publicUrl }).eq('id', _adminProfilData.id);
+    if (error) throw error;
+    _adminProfilData[field] = urlData.publicUrl;
+    if (typeof showToast === 'function') showToast('✅ Photo mise à jour', 'success');
+    _adminRenderPhotosGestion();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+window._adminChangerPhotoProvider = _adminChangerPhotoProvider;
+
+async function _adminSupprimerRealisation(id) {
+  if (!window.confirm('Supprimer cette photo de réalisation ?')) return;
+  try {
+    const { error } = await sb.from('provider_photos').delete().eq('id', id);
+    if (error) throw error;
+    _adminProfilPhotos = (_adminProfilPhotos || []).filter(ph => ph.id !== id);
+    if (typeof showToast === 'function') showToast('Photo supprimée', 'success');
+    _adminRenderPhotosGestion();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+window._adminSupprimerRealisation = _adminSupprimerRealisation;
+
+async function _adminSupprimerUneProvider(id) {
+  if (!window.confirm('Supprimer cette photo à la une ?')) return;
+  try {
+    const { error } = await sb.from('carousel_images').delete().eq('id', id);
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('Photo supprimée', 'success');
+    _adminRenderPhotosGestion();
+    if (typeof _carouselLoadProvAdmin === 'function') _carouselLoadProvAdmin();
+    if (typeof _carouselLoadAdmin === 'function') _carouselLoadAdmin();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+window._adminSupprimerUneProvider = _adminSupprimerUneProvider;
 
 function _adminModeEdit() {
   const p = _adminProfilData;
@@ -23918,9 +24039,11 @@ async function _dashAjouterUne(input) {
   if (prog) prog.style.display = 'block';
 
   try {
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    let fileToUpload = file;
+    try { fileToUpload = await resizeImage(file, 'une'); } catch (e) { fileToUpload = file; }
+    const ext = (fileToUpload.name ? fileToUpload.name.split('.').pop() : (file.name.split('.').pop() || 'jpg')).toLowerCase();
     const filename = `une/${pid}/${Date.now()}.${ext}`;
-    const { error: uploadError } = await sb.storage.from('photos').upload(filename, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+    const { error: uploadError } = await sb.storage.from('photos').upload(filename, fileToUpload, { cacheControl: '3600', upsert: false, contentType: 'image/jpeg' });
     if (uploadError) throw uploadError;
     const { data: urlData } = sb.storage.from('photos').getPublicUrl(filename);
 
@@ -23982,6 +24105,189 @@ async function _dashSupprimerUne(id) {
   }
 }
 window._dashSupprimerUne = _dashSupprimerUne;
+</script>
+
+<!-- ══ ÉDITEUR PHOTO — CROP / ZOOM / REPOSITIONNEMENT (Canvas API) ══ -->
+<div id="modalPhotoCrop" style="display:none;position:fixed;inset:0;z-index:9999999;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:18px;padding:24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+    <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 16px;font-size:16px;">✂️ Ajuster votre photo</h3>
+    <div style="display:flex;justify-content:center;margin-bottom:14px;background:#F3F4F6;border-radius:10px;padding:10px;">
+      <canvas id="cropCanvas" style="max-width:100%;touch-action:none;cursor:grab;border-radius:6px;display:block;"></canvas>
+    </div>
+    <div style="margin-bottom:6px;font-size:12px;font-weight:700;color:#6B7280;">🔍 Zoom</div>
+    <input id="cropZoomSlider" type="range" min="1" max="3" step="0.01" value="1" oninput="_cropOnZoomChange()" style="width:100%;margin-bottom:16px;"/>
+    <div style="font-size:11.5px;color:#9CA3AF;margin-bottom:16px;text-align:center;">Glissez l'image pour la repositionner</div>
+    <div style="display:flex;gap:10px;">
+      <button id="cropAnnulerBtn" onclick="_cropAnnuler()" style="flex:1;padding:12px;background:#F3F4F6;color:#374151;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;">Annuler</button>
+      <button id="cropValiderBtn" onclick="_cropValider()" style="flex:2;padding:12px;background:#E85D04;color:#fff;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;">✅ Valider cette photo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// ÉDITEUR PHOTO — CROP / ZOOM / REPOSITIONNEMENT (Canvas API pure,
+// aucune librairie externe)
+// ══════════════════════════════════════════════════════════════
+// Réutilisable : ouvert avant chaque upload (profil, couverture,
+// réalisation, à la une) via _cropEtUpload(), qui remplace ensuite
+// input.files par le blob recadré (DataTransfer) et appelle la fonction
+// d'upload existante inchangée — resizeImage() s'applique donc APRÈS le
+// crop, exactement comme demandé.
+var _cropState = null;
+
+function _ouvrirCropEditor(file, aspectType, onDone) {
+  if (!file) return;
+  const canvasW = aspectType === 'bandeau' ? 600 : 300;
+  const canvasH = aspectType === 'bandeau' ? 200 : 300;
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = function() {
+    _cropState = { img: img, zoom: 1, offsetX: 0, offsetY: 0, canvasW: canvasW, canvasH: canvasH, onDone: onDone, dragging: false, lastX: 0, lastY: 0, objectUrl: url };
+    const canvas = document.getElementById('cropCanvas');
+    if (canvas) {
+      canvas.width = canvasW;
+      canvas.height = canvasH;
+      const displayW = Math.min(canvasW, 340);
+      canvas.style.width = displayW + 'px';
+      canvas.style.height = (displayW * canvasH / canvasW) + 'px';
+    }
+    const slider = document.getElementById('cropZoomSlider');
+    if (slider) slider.value = 1;
+    _cropRedraw();
+    const modal = document.getElementById('modalPhotoCrop');
+    if (modal) modal.style.display = 'flex';
+  };
+  img.onerror = function() {
+    URL.revokeObjectURL(url);
+    if (typeof showToast === 'function') showToast('Image invalide', 'error');
+  };
+  img.src = url;
+}
+window._ouvrirCropEditor = _ouvrirCropEditor;
+
+function _cropRedraw() {
+  if (!_cropState) return;
+  const canvas = document.getElementById('cropCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const s = _cropState;
+  ctx.clearRect(0, 0, s.canvasW, s.canvasH);
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, s.canvasW, s.canvasH);
+  // Cover-fit de base (remplit tout le canvas) puis zoom additionnel du slider
+  const baseScale = Math.max(s.canvasW / s.img.width, s.canvasH / s.img.height);
+  const scale = baseScale * s.zoom;
+  const drawW = s.img.width * scale;
+  const drawH = s.img.height * scale;
+  const cx = s.canvasW / 2 + s.offsetX;
+  const cy = s.canvasH / 2 + s.offsetY;
+  ctx.drawImage(s.img, cx - drawW / 2, cy - drawH / 2, drawW, drawH);
+}
+
+function _cropClampOffsets() {
+  if (!_cropState) return;
+  const s = _cropState;
+  const baseScale = Math.max(s.canvasW / s.img.width, s.canvasH / s.img.height);
+  const scale = baseScale * s.zoom;
+  const drawW = s.img.width * scale;
+  const drawH = s.img.height * scale;
+  const maxOffsetX = Math.max(0, (drawW - s.canvasW) / 2);
+  const maxOffsetY = Math.max(0, (drawH - s.canvasH) / 2);
+  s.offsetX = Math.max(-maxOffsetX, Math.min(maxOffsetX, s.offsetX));
+  s.offsetY = Math.max(-maxOffsetY, Math.min(maxOffsetY, s.offsetY));
+}
+
+function _cropOnZoomChange() {
+  if (!_cropState) return;
+  const slider = document.getElementById('cropZoomSlider');
+  _cropState.zoom = parseFloat(slider.value) || 1;
+  _cropClampOffsets();
+  _cropRedraw();
+}
+window._cropOnZoomChange = _cropOnZoomChange;
+
+function _cropDragStart(clientX, clientY) {
+  if (!_cropState) return;
+  _cropState.dragging = true;
+  _cropState.lastX = clientX;
+  _cropState.lastY = clientY;
+}
+function _cropDragMove(clientX, clientY) {
+  if (!_cropState || !_cropState.dragging) return;
+  const canvas = document.getElementById('cropCanvas');
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = _cropState.canvasW / rect.width;
+  const scaleY = _cropState.canvasH / rect.height;
+  _cropState.offsetX += (clientX - _cropState.lastX) * scaleX;
+  _cropState.offsetY += (clientY - _cropState.lastY) * scaleY;
+  _cropState.lastX = clientX;
+  _cropState.lastY = clientY;
+  _cropClampOffsets();
+  _cropRedraw();
+}
+function _cropDragEnd() {
+  if (_cropState) _cropState.dragging = false;
+}
+
+(function _cropAttacherEvenements() {
+  const canvas = document.getElementById('cropCanvas');
+  if (!canvas) return;
+  canvas.addEventListener('mousedown', function(e) { _cropDragStart(e.clientX, e.clientY); });
+  window.addEventListener('mousemove', function(e) { if (_cropState && _cropState.dragging) _cropDragMove(e.clientX, e.clientY); });
+  window.addEventListener('mouseup', _cropDragEnd);
+  canvas.addEventListener('touchstart', function(e) { if (e.touches && e.touches[0]) { _cropDragStart(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); } }, { passive: false });
+  canvas.addEventListener('touchmove', function(e) { if (e.touches && e.touches[0]) { _cropDragMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); } }, { passive: false });
+  canvas.addEventListener('touchend', _cropDragEnd);
+})();
+
+function _cropFermer() {
+  const modal = document.getElementById('modalPhotoCrop');
+  if (modal) modal.style.display = 'none';
+  if (_cropState && _cropState.objectUrl) { try { URL.revokeObjectURL(_cropState.objectUrl); } catch (e) {} }
+  _cropState = null;
+}
+
+function _cropAnnuler() {
+  _cropFermer();
+}
+window._cropAnnuler = _cropAnnuler;
+
+function _cropValider() {
+  if (!_cropState) return;
+  const canvas = document.getElementById('cropCanvas');
+  if (!canvas) return;
+  canvas.toBlob(function(blob) {
+    if (!blob) { if (typeof showToast === 'function') showToast('Erreur de recadrage', 'error'); return; }
+    const croppedFile = new File([blob], 'crop-' + Date.now() + '.jpg', { type: 'image/jpeg' });
+    const onDone = _cropState.onDone;
+    _cropFermer();
+    if (typeof onDone === 'function') onDone(croppedFile);
+  }, 'image/jpeg', 0.92);
+}
+window._cropValider = _cropValider;
+
+// Intercepteur générique : ouvre l'éditeur de crop sur le fichier choisi
+// dans <input>, puis (si validé) remplace input.files par le résultat
+// recadré via DataTransfer et appelle enfin la fonction d'upload réelle,
+// inchangée — aucune régression sur uploadPhoto()/_dashUploadCouverture()/
+// _dashAjouterUne(), qui continuent de lire input.files[0] normalement.
+function _cropEtUpload(input, aspectType, realCallback) {
+  const file = input.files[0];
+  if (!file) return;
+  _ouvrirCropEditor(file, aspectType, function(croppedFile) {
+    try {
+      const dt = new DataTransfer();
+      dt.items.add(croppedFile);
+      input.files = dt.files;
+    } catch (e) {
+      console.warn('[_cropEtUpload] DataTransfer indisponible, upload du fichier original:', e.message);
+    }
+    realCallback(input);
+  });
+}
+window._cropEtUpload = _cropEtUpload;
 </script>
 
 <!-- ══ SERVICE WORKER REGISTRATION ══ -->
