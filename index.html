@@ -6561,7 +6561,7 @@ function ouvrirProfil(id) {
       note:parseFloat(data.note_moyenne)>0?parseFloat(data.note_moyenne):4.0,
       vues:data.nb_vues||0, missions:data.nb_missions||0,
       bg:_c.bg, color:_c.color, desc:data.description||'', skills:data.skills||[],
-      pb:'pb-artisan', photo_url:data.photo_url||null,
+      pb:'pb-artisan', photo_url:data.photo_url||null, cover_url:data.cover_url||null,
       latitude:data.latitude||null, longitude:data.longitude||null,
       badge_verifie:data.statut==='valide'||data.doc_cni_statut==='valide',
       badge_top:data.doc_diplome_statut==='valide'||(data.note_moyenne||0)>=4.8,
@@ -10623,7 +10623,7 @@ async function getProviders({ categorie='', recherche='', limite=20, offset=0 }=
   // Colonnes de base garanties dans le schéma providers
   const COLS_BASE = 'id,nom,prenom,matricule,metier,categorie,ville,commune,quartier,photo_url,note_moyenne,nb_vues,telephone,skills,description,statut,disponibilite,doc_cni_statut,doc_diplome_statut,created_at';
   // Colonnes optionnelles (peuvent manquer selon version du schéma) — tentée séparément
-  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,latitude,longitude,tarif,experience,type_compte,nom_entreprise,badge_ambassadeur,badge_ambassadeur_fin,abonnement_actif,abonnement_fin';
+  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,latitude,longitude,tarif,experience,type_compte,nom_entreprise,badge_ambassadeur,badge_ambassadeur_fin,abonnement_actif,abonnement_fin,cover_url';
 
   try {
     let query = sb.from('providers')
@@ -11207,6 +11207,7 @@ async function loadProvidersFromSupabase() {
       skills: p.skills||[],
       pb: 'pb-'+(catClass[p.categorie]||'artisan'),
       photo_url: p.photo_url||null,
+      cover_url: p.cover_url||null,
       latitude: p.latitude || null,
       longitude: p.longitude || null,
       // Champs requis par openModal
@@ -11669,7 +11670,7 @@ function _dashRenderPhotos() {
       <img src="${photo.url}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;cursor:zoom-in;" alt="Réalisation" onerror="this.style.display='none'" onclick="_yjLightbox('${photo.url}')"/>
       <button onclick="_dashSupprimerPhoto('${photo.id}')" style="position:absolute;top:6px;right:6px;width:34px;height:34px;background:rgba(220,38,38,.85);color:#fff;border:none;border-radius:50%;font-size:14px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;" title="Supprimer">🗑️</button>
     </div>`);
-  if (reals.length<5) slots.push(`<label class="photo-slot" style="cursor:pointer;"><div style="font-size:28px;"><i class="fa-solid fa-camera"></i></div><div class="add-text">Ajouter</div><input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_dashUploadPhoto(this,'realisation')"/></label>`);
+  if (reals.length<5) slots.push(`<label class="photo-slot" style="cursor:pointer;"><div style="font-size:28px;"><i class="fa-solid fa-camera"></i></div><div class="add-text">Ajouter</div><input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){_dashUploadPhoto(inp,'realisation');})"/></label>`);
   grid.innerHTML = slots.join('');
   const _lbl = document.getElementById('addRealLabel');
   if (_lbl) _lbl.style.display = reals.length >= 5 ? 'none' : 'block';
