@@ -98,6 +98,14 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ── PÉRIODE DE LANCEMENT — accès gratuit pour tout prestataire validé,
+//    aucune colonne DB, uniquement une condition de date. Après le
+//    30/09/2026 23:59:59, la logique abonnement/crédits normale reprend
+//    automatiquement, sans aucune autre modification de code. ──
+const LANCEMENT_DEBUT = new Date('2026-09-04T00:00:00');
+const LANCEMENT_FIN = new Date('2026-09-30T23:59:59');
+const estEnPeriodeLancement = () => new Date() <= LANCEMENT_FIN;
+
 // ── CHAP CHAP PAY — proxy via Supabase Edge Function ──
 const CHAPCHAP_PROXY_URL = SUPABASE_URL + '/functions/v1/chapchap-proxy';
 
@@ -7541,6 +7549,19 @@ document.addEventListener('keydown', e => {
       </div>
       <div id="dashDispoRestrictionMsg" style="display:none;font-size:12px;color:#DC2626;text-align:center;margin:-10px 0 18px;">Activez votre compte pour apparaître disponible aux clients</div>
 
+      <!-- ═══ COMPLÉTUDE DE PROFIL ═══ -->
+      <div id="dashCompletudeCard" style="background:#fff;border-radius:18px;padding:18px;border:1.5px solid #E5E7EB;margin-bottom:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:14px;font-weight:800;color:#1A1A4E;">📋 Complétude de mon profil</div>
+          <div id="dashCompletudePct" style="font-size:18px;font-weight:800;color:#1A1A4E;">—%</div>
+        </div>
+        <div style="width:100%;height:10px;background:#F3F4F6;border-radius:6px;overflow:hidden;margin-bottom:10px;">
+          <div id="dashCompletudeBar" style="height:100%;width:0%;background:#DC2626;border-radius:6px;transition:width .4s;"></div>
+        </div>
+        <div id="dashCompletudeMsg" style="font-size:12.5px;color:#6B7280;line-height:1.5;margin-bottom:10px;"></div>
+        <button id="dashCompletudeBtn" onclick="showSection('profil')" style="display:none;width:100%;padding:11px;background:#1A1A4E;color:#fff;border:none;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;">Compléter mon profil</button>
+      </div>
+
       <!-- ═══ AIDE WHATSAPP ═══ -->
       <a href="https://wa.me/22461252510?text=Bonjour%2C%20j%27ai%20besoin%20d%27aide%20avec%20mon%20compte%20YOUMMA%20JOBS"
         target="_blank"
@@ -10186,9 +10207,21 @@ function showSection(name) {
 
 // ── LOAD DATA ──
 async function getProvidersAdmin({ statut='',limite=100 }={}) {
-  let q = sb.from('providers').select('id,prenom,nom,matricule,metier,categorie,ville,commune,telephone,statut,note_moyenne,nb_vues,photo_url,created_at,essai_actif,essai_fin,abonnement_actif,abonnement_fin,disponibilite,doc_cni_url,doc_cni_statut,doc_diplome_url,doc_diplome_statut').order('created_at',{ascending:false}).limit(limite);
+  // COLS_BASE : colonnes garanties (jamais gated par une migration cette
+  // session). cover_url séparée en COLS_OPT et retentée sans elle si la
+  // migration 20260719_providers_cover_url.sql n'a pas encore été exécutée
+  // — sinon toute la liste admin casserait silencieusement pour une seule
+  // colonne optionnelle manquante.
+  const COLS_BASE = 'id,prenom,nom,matricule,metier,categorie,ville,commune,telephone,statut,note_moyenne,nb_vues,photo_url,description,tarif,created_at,essai_actif,essai_fin,abonnement_actif,abonnement_fin,disponibilite,doc_cni_url,doc_cni_statut,doc_diplome_url,doc_diplome_statut';
+  const COLS_OPT = 'cover_url';
+  let q = sb.from('providers').select(COLS_BASE + ',' + COLS_OPT).order('created_at',{ascending:false}).limit(limite);
   if (statut) q = q.eq('statut',statut);
-  const { data } = await q;
+  let { data, error } = await q;
+  if (error) {
+    let q2 = sb.from('providers').select(COLS_BASE).order('created_at',{ascending:false}).limit(limite);
+    if (statut) q2 = q2.eq('statut',statut);
+    ({ data } = await q2);
+  }
   return data||[];
 }
 
@@ -10328,6 +10361,7 @@ function renderTableHTML(statut, data) {
       <td><a href="tel:${p.telephone}" class="adm-tel">${p.telephone||'—'}</a></td>
       <td><span style="font-size:12px;color:#9CA3AF;">${fd(p.created_at)}</span></td>
       <td>${aboBadge(p)}</td>
+      <td>${(function(){ const _pct=_completudeProfilAdmin(p); const _c=_pct<50?'#DC2626':_pct<80?'#F59E0B':'#16A34A'; return '<span style="font-weight:700;color:'+_c+';">'+_pct+'%</span>'; })()}</td>
       <td>${docCol}</td>
       <td><div class="adm-actions-wrap">${actionBtns}</div></td>
     </tr>`;
@@ -10343,6 +10377,7 @@ function renderTableHTML(statut, data) {
           <th>Téléphone</th>
           <th>Inscrit le</th>
           <th>Abonnement</th>
+          <th>Profil %</th>
           <th>Documents</th>
           <th>Actions</th>
         </tr>
@@ -11385,6 +11420,7 @@ async function chargerDashboard(pid) {
   _dashLoadTravauxCount();
   _dashPhotos = await getProviderPhotos(pid);
   _dashRenderPhotos();
+  _dashUpdateCompletude();
   _dashChargerAvis();
   // Synchroniser l'ancien système (boutons HTML : sauvegarderProfil, activerCode, etc.)
   providerData = _dashData;
@@ -11453,6 +11489,7 @@ document.addEventListener('click', function(e) {
 // volontairement exclu ici (règle 1 : seuls abonnement_actif/subscription_end/
 // credits comptent pour le droit d'apparaître "disponible").
 function _dashAccesActif(p) {
+  if (estEnPeriodeLancement()) return true; // période lancement — accès libre
   if (!p) return false;
   const now = new Date();
   const aAboAncien = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > now;
@@ -11492,6 +11529,70 @@ function _dashAppliquerRestrictionDispo(p) {
   }
 }
 window._dashAppliquerRestrictionDispo = _dashAppliquerRestrictionDispo;
+
+// ── Complétude de profil ──
+// "zone" (demandé) n'existe pas comme colonne dédiée — utilise ville, le
+// champ réel le plus proche. "réalisation via carousel_images" (demandé)
+// est une confusion : carousel_images est le carrousel marketing de la
+// page d'accueil, sans rapport avec le portfolio d'un prestataire. Les
+// vraies réalisations vivent dans provider_photos (type='realisation'),
+// déjà chargées côté dashboard dans _dashPhotos — aucune requête en plus.
+function _calculerCompletudeProfil(p, hasRealisation) {
+  if (!p) return 0;
+  let score = 0;
+  if (p.photo_url) score += 15;
+  if (p.cover_url) score += 10;
+  if (p.description && p.description.trim()) score += 15;
+  if (p.categorie) score += 15;
+  if (p.ville) score += 10;
+  if (p.telephone) score += 10;
+  if (hasRealisation) score += 15;
+  if (p.tarif) score += 10;
+  return Math.round(score);
+}
+window._calculerCompletudeProfil = _calculerCompletudeProfil;
+
+// Version admin : mêmes poids, mais sans le critère "réalisation" (pour ne
+// pas multiplier les requêtes sur la liste). Le score est recalculé sur
+// une base de 85 points (100 - les 15 de la réalisation non vérifiée) pour
+// qu'un profil complet à tous les critères vérifiables affiche 100%,
+// plutôt que d'être plafonné artificiellement à 85%.
+function _completudeProfilAdmin(p) {
+  if (!p) return 0;
+  let score = 0;
+  if (p.photo_url) score += 15;
+  if (p.cover_url) score += 10;
+  if (p.description && p.description.trim()) score += 15;
+  if (p.categorie) score += 15;
+  if (p.ville) score += 10;
+  if (p.telephone) score += 10;
+  if (p.tarif) score += 10;
+  return Math.round((score / 85) * 100);
+}
+window._completudeProfilAdmin = _completudeProfilAdmin;
+
+function _dashUpdateCompletude() {
+  const p = _dashData;
+  if (!p) return;
+  const hasRealisation = Array.isArray(_dashPhotos) && _dashPhotos.some(function (ph) { return ph.type === 'realisation'; });
+  const pct = _calculerCompletudeProfil(p, hasRealisation);
+  const bar = document.getElementById('dashCompletudeBar');
+  const pctEl = document.getElementById('dashCompletudePct');
+  const msgEl = document.getElementById('dashCompletudeMsg');
+  const btn = document.getElementById('dashCompletudeBtn');
+  if (!bar || !pctEl || !msgEl) return;
+  const color = pct < 50 ? '#DC2626' : pct < 80 ? '#F59E0B' : '#16A34A';
+  bar.style.width = pct + '%';
+  bar.style.background = color;
+  pctEl.textContent = pct + '%';
+  pctEl.style.color = color;
+  if (pct < 50) msgEl.textContent = '⚠️ Profil complet à ' + pct + '% — Les clients ne vous trouveront pas facilement.';
+  else if (pct < 80) msgEl.textContent = '🔶 Profil complet à ' + pct + '% — Encore quelques étapes pour le lancement.';
+  else msgEl.textContent = '✅ Profil complet à ' + pct + '% — Vous êtes prêt pour le lancement !';
+  msgEl.style.color = color;
+  if (btn) btn.style.display = pct < 80 ? 'block' : 'none';
+}
+window._dashUpdateCompletude = _dashUpdateCompletude;
 
 async function _dashSetDispo(state) {
   const menu = document.getElementById('dashDispoMenu');
@@ -11539,30 +11640,45 @@ function _dashUpdateUI() {
   // Alerte statut simplifiée
   const statAlert = document.getElementById('dashStatutAlert');
   if (statAlert) {
-    if (p.statut==='en_attente')  { statAlert.style.display='block'; statAlert.style.background='#FEF3C7'; statAlert.style.color='#92400E'; statAlert.textContent='⏳ Votre profil est en cours de validation. Vous serez contacté(e) sous 24h.'; }
-    else if (p.statut==='rejete') { statAlert.style.display='block'; statAlert.style.background='#FEF2F2'; statAlert.style.color='#DC2626'; statAlert.textContent='❌ Votre profil a été rejeté. Contactez-nous sur WhatsApp.'; }
-    else if (p.statut==='suspendu') { statAlert.style.display='block'; statAlert.style.background='#FEF2F2'; statAlert.style.color='#DC2626'; statAlert.textContent='🚫 Votre profil est suspendu. Contactez le support.'; }
+    if (p.statut==='en_attente') {
+      statAlert.style.display='block'; statAlert.style.background='transparent'; statAlert.style.color=''; statAlert.style.padding='0';
+      statAlert.innerHTML = `<div style="background:#FFF8E1;border:1.5px solid #F59E0B;border-radius:12px;padding:16px 18px;">
+        <div style="font-size:15px;font-weight:800;color:#92400E;margin-bottom:8px;">🎉 Bienvenue dans la famille YOUMMA !</div>
+        <div style="font-size:13px;color:#92400E;line-height:1.6;margin-bottom:10px;">Votre profil est en cours de validation. Vous ferez partie des <strong>Prestataires Fondateurs</strong> de YOUMMA JOBS.</div>
+        <div style="font-size:12.5px;color:#92400E;line-height:1.8;margin-bottom:10px;">📅 Lancement officiel : <strong>4 Septembre 2026</strong><br>✅ Accès gratuit jusqu'au <strong>30 Septembre 2026</strong></div>
+        <div style="font-size:12.5px;color:#92400E;line-height:1.8;">D'ici là :<br>• Complétez votre profil<br>• Participez aux formations à YOUMMA<br>• Partagez l'info autour de vous</div>
+      </div>`;
+    }
+    else if (p.statut==='rejete') { statAlert.style.display='block'; statAlert.style.background='#FEF2F2'; statAlert.style.color='#DC2626'; statAlert.style.padding='11px 14px'; statAlert.textContent='❌ Votre profil a été rejeté. Contactez-nous sur WhatsApp.'; }
+    else if (p.statut==='suspendu') { statAlert.style.display='block'; statAlert.style.background='#FEF2F2'; statAlert.style.color='#DC2626'; statAlert.style.padding='11px 14px'; statAlert.textContent='🚫 Votre profil est suspendu. Contactez le support.'; }
     else statAlert.style.display='none';
   }
 
-  // ── Bandeau essai / abonnement ──
+  // ── Bandeau essai / abonnement / lancement ──
   const _bandeauEl = document.getElementById('dashBandeauEssai');
   if (_bandeauEl && p.statut === 'valide') {
-    const _abonne = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
-    const _essaiActif = p.essai_actif && p.essai_fin && new Date(p.essai_fin) > new Date();
-    const _joursRestants = _essaiActif ? Math.min(3, Math.max(0, Math.ceil((new Date(p.essai_fin) - new Date()) / (1000*60*60*24)))) : 0;
     _bandeauEl.style.display = 'block';
-    if (_abonne) {
-      _bandeauEl.innerHTML = `<div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;"><span style="font-size:18px;flex-shrink:0;">✅</span><div style="font-size:13px;font-weight:600;color:#1e40af;">Abonnement actif</div></div>`;
-    } else if (_essaiActif) {
-      _bandeauEl.innerHTML = `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div style="font-size:13px;font-weight:600;color:#065f46;">🎉 Période d'essai active — Profitez-en !</div><button onclick="showSection('abonnement')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">S'abonner</button></div>`;
-    } else {
-      _bandeauEl.innerHTML = `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:#065f46;margin-bottom:6px;">🌟 Activez votre compte pour recevoir vos premières missions !</div>
-        <div style="font-size:12.5px;color:#047857;margin-bottom:12px;line-height:1.5;">Rejoignez les prestataires actifs sur YOUMMA JOBS et développez votre activité en Guinée.</div>
-        <button onclick="showSection('abonnement')" style="width:100%;background:#059669;color:#fff;border:none;border-radius:8px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;">✅ Activer mon compte — 50 000 GNF/mois</button>
-        <div style="font-size:11.5px;color:#065f46;margin-top:8px;text-align:center;">💡 Ou achetez un crédit à 5 000 GNF pour commencer doucement</div>
+    if (estEnPeriodeLancement()) {
+      _bandeauEl.innerHTML = `<div style="background:#FFF8E1;border-left:4px solid #F59E0B;padding:12px 16px;border-radius:8px;color:#92400E;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div>🚀 Accès gratuit jusqu'au 30 Septembre 2026 — Lancement officiel le 4 Septembre</div>
+        <button onclick="showSection('profil')" style="background:#F59E0B;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Compléter mon profil</button>
       </div>`;
+    } else {
+      const _abonne = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
+      const _essaiActif = p.essai_actif && p.essai_fin && new Date(p.essai_fin) > new Date();
+      const _joursRestants = _essaiActif ? Math.min(3, Math.max(0, Math.ceil((new Date(p.essai_fin) - new Date()) / (1000*60*60*24)))) : 0;
+      if (_abonne) {
+        _bandeauEl.innerHTML = `<div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;"><span style="font-size:18px;flex-shrink:0;">✅</span><div style="font-size:13px;font-weight:600;color:#1e40af;">Abonnement actif</div></div>`;
+      } else if (_essaiActif) {
+        _bandeauEl.innerHTML = `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div style="font-size:13px;font-weight:600;color:#065f46;">🎉 Période d'essai active — Profitez-en !</div><button onclick="showSection('abonnement')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">S'abonner</button></div>`;
+      } else {
+        _bandeauEl.innerHTML = `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:16px;">
+          <div style="font-size:14px;font-weight:700;color:#065f46;margin-bottom:6px;">🌟 Activez votre compte pour recevoir vos premières missions !</div>
+          <div style="font-size:12.5px;color:#047857;margin-bottom:12px;line-height:1.5;">Rejoignez les prestataires actifs sur YOUMMA JOBS et développez votre activité en Guinée.</div>
+          <button onclick="showSection('abonnement')" style="width:100%;background:#059669;color:#fff;border:none;border-radius:8px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;">✅ Activer mon compte — 50 000 GNF/mois</button>
+          <div style="font-size:11.5px;color:#065f46;margin-top:8px;text-align:center;">💡 Ou achetez un crédit à 5 000 GNF pour commencer doucement</div>
+        </div>`;
+      }
     }
   }
 
@@ -11570,6 +11686,7 @@ function _dashUpdateUI() {
   set('chipJob', p.metier||'—');
   _dashUpdateDispoBtn(p.disponibilite);
   _dashAppliquerRestrictionDispo(p);
+  _dashUpdateCompletude();
   set('pbName', nomComplet);
   set('pbJob', (p.metier||'') + ' · ' + (p.categorie||''));
   set('pbVille', p.ville||'—');
@@ -23223,6 +23340,7 @@ function _accesProviderId() {
 
 // ── ÉTAPE 4 : vérification d'accès avant une action payante ──
 async function checkAcces(actionLabel, callback) {
+  if (estEnPeriodeLancement()) { if (typeof callback === 'function') callback(); return; } // période lancement — accès libre
   const pid = _accesProviderId();
   if (!pid) { if (typeof callback === 'function') callback(); return; }
   try {
