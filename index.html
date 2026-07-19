@@ -7547,6 +7547,7 @@ document.addEventListener('keydown', e => {
           <div style="font-size:15px;font-weight:800;color:#1A1A4E;">Mon compte</div>
         </div>
       </div>
+      <div id="dashDispoRestrictionMsg" style="display:none;font-size:12px;color:#DC2626;text-align:center;margin:-10px 0 18px;">Activez votre compte pour apparaître disponible aux clients</div>
 
       <!-- ═══ AIDE WHATSAPP ═══ -->
       <a href="https://wa.me/22461252510?text=Bonjour%2C%20j%27ai%20besoin%20d%27aide%20avec%20mon%20compte%20YOUMMA%20JOBS"
@@ -7554,6 +7555,9 @@ document.addEventListener('keydown', e => {
         style="display:flex;align-items:center;gap:10px;padding:14px 18px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:14px;text-decoration:none;color:#166534;font-size:14px;font-weight:700;touch-action:manipulation;margin-bottom:6px;">
         ❓ Besoin d'aide ? Écrivez-nous sur WhatsApp
       </a>
+      <button onclick="_dashPartagerProfil()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 18px;background:#fff;border:1.5px solid #16A34A;border-radius:14px;color:#16A34A;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;box-sizing:border-box;">
+        🔗 Partager mon profil à des amis
+      </button>
     </div>
 
     
@@ -11452,11 +11456,60 @@ document.addEventListener('click', function(e) {
   }
 });
 
+// Abonnement (ancien ou nouveau système) actif, OU crédits > 0 — n'utilise
+// que _dashData déjà chargé, aucune requête Supabase. essai_actif est
+// volontairement exclu ici (règle 1 : seuls abonnement_actif/subscription_end/
+// credits comptent pour le droit d'apparaître "disponible").
+function _dashAccesActif(p) {
+  if (!p) return false;
+  const now = new Date();
+  const aAboAncien = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > now;
+  const aAboNouveau = p.subscription_end && new Date(p.subscription_end) > now;
+  const aCredits = (p.credits || 0) > 0;
+  return aAboAncien || aAboNouveau || aCredits;
+}
+window._dashAccesActif = _dashAccesActif;
+
+function _dashAppliquerRestrictionDispo(p) {
+  const actif = _dashAccesActif(p);
+  const card = document.getElementById('dashDispoCard');
+  const cardDot = document.getElementById('dashDispoCardDot');
+  const cardTitle = document.getElementById('dashDispoCardTitle');
+  const cardSub = document.getElementById('dashDispoCardSub');
+  const msg = document.getElementById('dashDispoRestrictionMsg');
+  const topBtn = document.getElementById('dashDispoBtn');
+  const topDot = document.getElementById('dashDispoDot');
+  const topLabel = document.getElementById('dashDispoLabel');
+
+  if (!actif) {
+    if (card) { card.style.borderColor = '#D1D5DB'; card.style.background = '#F3F4F6'; card.style.pointerEvents = 'none'; card.style.cursor = 'default'; }
+    if (cardDot) { cardDot.style.background = '#9CA3AF'; cardDot.style.animationName = 'none'; }
+    if (cardTitle) cardTitle.textContent = '😴 Occupé — Abonnez-vous pour activer';
+    if (cardSub) { cardSub.textContent = 'Compte inactif'; cardSub.style.color = '#9CA3AF'; }
+    if (msg) msg.style.display = 'block';
+    if (topBtn) { topBtn.style.background = '#F3F4F6'; topBtn.style.borderColor = '#D1D5DB'; topBtn.style.color = '#6B7280'; topBtn.style.pointerEvents = 'none'; }
+    if (topDot) topDot.style.background = '#9CA3AF';
+    if (topLabel) topLabel.textContent = 'Occupé — Inactif';
+  } else {
+    if (card) { card.style.pointerEvents = 'auto'; card.style.cursor = 'pointer'; }
+    if (msg) msg.style.display = 'none';
+    if (topBtn) topBtn.style.pointerEvents = 'auto';
+    // Les couleurs normales (dashDispoCard/dashDispoBtn) viennent d'être
+    // recalculées par _dashUpdateDispoBtn() juste avant cet appel — rien
+    // d'autre à restaurer ici.
+  }
+}
+window._dashAppliquerRestrictionDispo = _dashAppliquerRestrictionDispo;
+
 async function _dashSetDispo(state) {
   const menu = document.getElementById('dashDispoMenu');
   if (menu) menu.style.display = 'none';
   const pid = _dashProviderId || providerId;
   if (!pid) return;
+  if (state === 'Disponible' && !_dashAccesActif(_dashData)) {
+    showToast('Activez votre compte pour apparaître disponible aux clients', 'error');
+    return;
+  }
   const btn = document.getElementById('dashDispoBtn');
   if (btn) { btn.style.opacity = '0.6'; btn.style.pointerEvents = 'none'; }
   const { error } = await sb.from('providers').update({ disponibilite: state }).eq('id', pid);
@@ -11510,15 +11563,21 @@ function _dashUpdateUI() {
     if (_abonne) {
       _bandeauEl.innerHTML = `<div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:10px;"><span style="font-size:18px;flex-shrink:0;">✅</span><div style="font-size:13px;font-weight:600;color:#1e40af;">Abonnement actif</div></div>`;
     } else if (_essaiActif) {
-      _bandeauEl.innerHTML = `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div style="font-size:13px;font-weight:600;color:#065f46;">🎉 Période gratuite — ${_joursRestants} jour(s) restant(s)</div><button onclick="showSection('abonnement')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">S'abonner</button></div>`;
+      _bandeauEl.innerHTML = `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;"><div style="font-size:13px;font-weight:600;color:#065f46;">🎉 Période d'essai active — Profitez-en !</div><button onclick="showSection('abonnement')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">S'abonner</button></div>`;
     } else {
-      _bandeauEl.innerHTML = `<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:12px 16px;"><div style="font-size:13px;font-weight:600;color:#991b1b;margin-bottom:8px;">⚠️ Période expirée — Abonnez-vous pour rester visible</div><button onclick="showSection('abonnement')" style="width:100%;background:#dc2626;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">S'abonner maintenant</button></div>`;
+      _bandeauEl.innerHTML = `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:16px;">
+        <div style="font-size:14px;font-weight:700;color:#065f46;margin-bottom:6px;">🌟 Activez votre compte pour recevoir vos premières missions !</div>
+        <div style="font-size:12.5px;color:#047857;margin-bottom:12px;line-height:1.5;">Rejoignez les prestataires actifs sur YOUMMA JOBS et développez votre activité en Guinée.</div>
+        <button onclick="showSection('abonnement')" style="width:100%;background:#059669;color:#fff;border:none;border-radius:8px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;">✅ Activer mon compte — 50 000 GNF/mois</button>
+        <div style="font-size:11.5px;color:#065f46;margin-top:8px;text-align:center;">💡 Ou achetez un crédit à 5 000 GNF pour commencer doucement</div>
+      </div>`;
     }
   }
 
   set('chipName', nomComplet);
   set('chipJob', p.metier||'—');
   _dashUpdateDispoBtn(p.disponibilite);
+  _dashAppliquerRestrictionDispo(p);
   set('pbName', nomComplet);
   set('pbJob', (p.metier||'') + ' · ' + (p.categorie||''));
   set('pbVille', p.ville||'—');
@@ -11625,13 +11684,16 @@ function _dashUpdateAbonnement(p) {
       aboSimpleText.textContent = '✅ Compte actif — ' + jours + ' jours restants';
       if (aboRenewBtn) aboRenewBtn.style.display = 'none';
     } else if (_essaiActifNow) {
-      aboSimpleBadge.style.background = '#FEF3C7'; aboSimpleBadge.style.color = '#92400E';
-      aboSimpleText.textContent = '🕐 Essai gratuit — ' + joursRestants + ' jour(s) restant(s)';
+      aboSimpleBadge.style.background = '#F0FDF4'; aboSimpleBadge.style.color = '#065F46';
+      aboSimpleText.textContent = '🎉 Période d\'essai active — Profitez-en !';
       if (aboRenewBtn) aboRenewBtn.style.display = 'none';
     } else {
-      aboSimpleBadge.style.background = '#FEF2F2'; aboSimpleBadge.style.color = '#DC2626';
-      aboSimpleText.textContent = '❌ Compte inactif — Renouveler';
-      if (aboRenewBtn) aboRenewBtn.style.display = 'block';
+      aboSimpleBadge.style.background = '#F0FDF4'; aboSimpleBadge.style.color = '#065F46';
+      aboSimpleText.textContent = '🌟 Activez votre compte';
+      if (aboRenewBtn) {
+        aboRenewBtn.style.display = 'block';
+        aboRenewBtn.innerHTML = '<button onclick="showSection(\'abonnement\')" style="width:100%;padding:16px;background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:56px;font-family:\'DM Sans\',sans-serif;">✅ Activer mon compte — 50 000 GNF/mois</button><div style="font-size:11.5px;color:#065F46;margin-top:8px;text-align:center;">💡 Ou achetez un crédit à 5 000 GNF pour commencer doucement</div>';
+      }
     }
   }
 }
@@ -22306,6 +22368,12 @@ window.ouvrirDevis = function(missionId, missionTitre, missionAudioUrl) {
   var hasAudio = !!(missionAudioUrl && missionAudioUrl.trim());
   var lockStyle = hasAudio ? 'pointer-events:none;opacity:0.5;user-select:none;' : '';
   window._dvVocalClientPresent = hasAudio;
+  // Règle 2 : le vocal entrant reste toujours écoutable (audio non gaté
+  // plus haut) mais répondre à un client qui a envoyé un vocal passe par
+  // checkAcces() — même garde que le reste du système abonnement/crédits.
+  var submitOnclick = hasAudio
+    ? "checkAcces('répondre à ce client (vocal)', function(){ window._envoyerDevis('"+String(missionId)+"'); })"
+    : "window._envoyerDevis('"+String(missionId)+"')";
 
   modal.innerHTML =
     '<div style="background:#fff;border-radius:20px;width:100%;max-width:520px;margin:auto;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.2);">'
@@ -22334,7 +22402,7 @@ window.ouvrirDevis = function(missionId, missionTitre, missionAudioUrl) {
     +'</div>'
     +'<div style="padding:14px 26px;border-top:1px solid #F0F0F8;">'
       +'<div id="dvErreur" style="color:#DC2626;font-size:12.5px;margin-bottom:9px;display:none;background:#FEF2F2;border-radius:8px;padding:8px 12px;"></div>'
-      +'<button id="dvSubmitBtn" onclick="window._envoyerDevis(\''+String(missionId)+'\')" style="width:100%;padding:13px;background:linear-gradient(135deg,#E85D04,#C74B00);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;'+lockStyle+'">📤 Envoyer mon devis</button>'
+      +'<button id="dvSubmitBtn" onclick="'+submitOnclick+'" style="width:100%;padding:13px;background:linear-gradient(135deg,#E85D04,#C74B00);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;'+lockStyle+'">📤 Envoyer mon devis</button>'
     +'</div>'
     +'</div>';
   _dvAudioBlob = null;
@@ -24016,6 +24084,32 @@ async function _dashUploadCouverture(input) {
   }
 }
 window._dashUploadCouverture = _dashUploadCouverture;
+
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD PRESTATAIRE — Partager mon profil
+// ══════════════════════════════════════════════════════════════
+function _dashPartagerProfil() {
+  const p = _dashData || providerData;
+  const pid = (typeof _dashProviderId !== 'undefined' && _dashProviderId) || (typeof providerId !== 'undefined' && providerId) || (p && p.id);
+  if (!p || !pid) { if (typeof showToast === 'function') showToast('Session expirée', 'error'); return; }
+
+  const nomComplet = ((p.prenom || '') + ' ' + (p.nom || '')).trim() || 'ce prestataire';
+  const metier = p.metier || '';
+  const ville = p.ville || 'Conakry';
+  const url = 'https://yoummajobs.com/#construire?id=' + pid;
+  const text = 'Je suis ' + nomComplet + (metier ? ', ' + metier : '') + ' à ' + ville + '. Contactez-moi sur YOUMMA JOBS !';
+
+  if (navigator.share) {
+    navigator.share({ title: 'Découvrez mon profil sur YOUMMA JOBS', text: text, url: url }).catch(function() { /* annulé par l'utilisateur, non bloquant */ });
+  } else {
+    navigator.clipboard.writeText(url).then(function() {
+      if (typeof showToast === 'function') showToast('✅ Lien copié !', 'success');
+    }).catch(function() {
+      if (typeof showToast === 'function') showToast('Impossible de copier le lien', 'error');
+    });
+  }
+}
+window._dashPartagerProfil = _dashPartagerProfil;
 
 // ══════════════════════════════════════════════════════════════
 // DASHBOARD PRESTATAIRE — "Mes photos à la une" (carousel_images)
