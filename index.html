@@ -6677,7 +6677,12 @@ const PROVIDER_COVER_DEFAULT = 'https://images.unsplash.com/photo-1486312338219-
 
 function _providerCoverUrl(p) {
   if (p && p.cover_url) return p.cover_url;
-  const haystack = (((p && p.categorie) || '') + ' ' + ((p && p.metier) || '')).toLowerCase();
+  // p vient de PRESTATAIRES (objet "mapped" de loadProvidersFromSupabase()/
+  // ouvrirProfil()), où la catégorie est stockée sous la clé "cat" — jamais
+  // "categorie" (ça, c'est le nom de la colonne brute côté Supabase, avant
+  // le mapping). Vérifier les deux pour rester robuste si _providerCoverUrl
+  // est un jour appelé avec un objet brut.
+  const haystack = (((p && (p.cat || p.categorie)) || '') + ' ' + ((p && p.metier) || '')).toLowerCase();
   for (const key in PROVIDER_COVER_DEFAULTS) {
     if (haystack.indexOf(key) !== -1) return PROVIDER_COVER_DEFAULTS[key];
   }
@@ -6750,10 +6755,6 @@ function renderProviders() {
     const noteDisplay = _note > 0
       ? `<div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${window._renderStars(_note,11,'#f59e0b','#e5e7eb')}</div><div style="font-size:18px;font-weight:700;color:#111;">${_note.toFixed(1)}</div>`
       : '<div style="display:flex;justify-content:center;gap:1px;margin-bottom:3px;"><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span></div><div style="font-size:11px;font-weight:500;color:#9ca3af;margin-top:2px;">Pas encore noté</div>';
-    console.log('DEBUG matricule:', p.matricule, 'created_at:', p.created_at, 'id:', p.id);
-    const matriculeHtml = (p.matricule && p.matricule !== 'YMJ-000000')
-      ? `<div style="text-align:center;font-size:11px;color:#6b7280;padding:7px 0;margin:0 0 8px 0;border-top:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;">Membre vérifié · N°&nbsp;<span style="color:#1B2A6B;font-weight:700;letter-spacing:0.05em;">${p.matricule}</span></div>`
-      : '';
     const coverUrl = _providerCoverUrl(p);
 
     return `
@@ -6781,7 +6782,7 @@ function renderProviders() {
         <div style="position:absolute;left:12px;bottom:10px;">
           <div style="width:56px;height:56px;border-radius:10px;border:3px solid #fff;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.25);">
             ${p.photo_url
-              ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}"/>`
+              ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"/><div style="width:100%;height:100%;display:none;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;background:${p.bg};color:${p.color};">${p.ini}</div>`
               : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;background:${p.bg};color:${p.color};">${p.ini}</div>`}
           </div>
           ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="font-size:10px;color:#fff;opacity:0.85;margin-top:3px;text-shadow:0 1px 3px rgba(0,0,0,0.8);">${p.matricule}</div>` : ''}
