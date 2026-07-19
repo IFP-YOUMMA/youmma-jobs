@@ -371,8 +371,6 @@ body.admin-mode #page-admin.logged #adminWrap{
 @media(max-width:480px){.hide-mobile{display:none!important;}}
 
 @media(max-width:768px){
-/* A) Renouveler maintenant */
-#dashAboRenewBtn button{height:48px!important;font-size:14px!important;border-radius:12px!important;min-height:unset!important;}
 /* B) Bandeau essai → colonne + bouton pleine largeur */
 #dashBandeauEssai>div{flex-direction:column!important;gap:8px!important;}
 #dashBandeauEssai button{width:100%!important;}
@@ -7496,12 +7494,6 @@ document.addEventListener('keydown', e => {
           </div>
           <div id="dashPinErreur" style="display:none;color:#B91C1C;font-size:12px;margin-top:8px;"></div>
         </div>
-        <div id="dashAboSimpleBadge" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;background:#F3F4F6;color:#6B7280;">
-          <span id="dashAboSimpleText">Vérification...</span>
-        </div>
-        <div id="dashAboRenewBtn" style="display:none;margin-top:10px;">
-          <button onclick="showSection('abonnement')" style="width:100%;padding:16px;background:linear-gradient(135deg,#E85D04,#C74B00);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:56px;font-family:'DM Sans',sans-serif;">Renouveler maintenant →</button>
-        </div>
         <div id="dashStatutAlert" style="display:none;margin-top:9px;padding:11px 14px;border-radius:12px;font-size:13.5px;font-weight:600;"></div>
         <div id="dashBandeauEssai" style="display:none;margin-top:10px;"></div>
         <div id="dashBadgeDlBtn" style="display:none;margin-top:12px;"></div>
@@ -11671,31 +11663,6 @@ function _dashUpdateAbonnement(p) {
     if(j) j.textContent=jours>0?jours+' jours':'Expiré';
     if(pr) pr.style.width=pct+'%';
   });
-  // Badge abonnement simplifié — calcul par date (3j depuis création/validation)
-  const aboSimpleText  = document.getElementById('dashAboSimpleText');
-  const aboSimpleBadge = document.getElementById('dashAboSimpleBadge');
-  const aboRenewBtn    = document.getElementById('dashAboRenewBtn');
-  const _abonneActif = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
-  const _essaiActifNow = p.essai_actif && p.essai_fin && new Date(p.essai_fin) > new Date();
-  const joursRestants = _essaiActifNow ? Math.min(3, Math.max(0, Math.ceil((new Date(p.essai_fin) - new Date()) / (1000*60*60*24)))) : 0;
-  if (aboSimpleText && aboSimpleBadge) {
-    if (_abonneActif) {
-      aboSimpleBadge.style.background = '#F0FDF4'; aboSimpleBadge.style.color = '#166534';
-      aboSimpleText.textContent = '✅ Compte actif — ' + jours + ' jours restants';
-      if (aboRenewBtn) aboRenewBtn.style.display = 'none';
-    } else if (_essaiActifNow) {
-      aboSimpleBadge.style.background = '#F0FDF4'; aboSimpleBadge.style.color = '#065F46';
-      aboSimpleText.textContent = '🎉 Période d\'essai active — Profitez-en !';
-      if (aboRenewBtn) aboRenewBtn.style.display = 'none';
-    } else {
-      aboSimpleBadge.style.background = '#F0FDF4'; aboSimpleBadge.style.color = '#065F46';
-      aboSimpleText.textContent = '🌟 Activez votre compte';
-      if (aboRenewBtn) {
-        aboRenewBtn.style.display = 'block';
-        aboRenewBtn.innerHTML = '<button onclick="showSection(\'abonnement\')" style="width:100%;padding:16px;background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation;min-height:56px;font-family:\'DM Sans\',sans-serif;">✅ Activer mon compte — 50 000 GNF/mois</button><div style="font-size:11.5px;color:#065F46;margin-top:8px;text-align:center;">💡 Ou achetez un crédit à 5 000 GNF pour commencer doucement</div>';
-      }
-    }
-  }
 }
 
 async function _dashLoadTravauxCount() {
