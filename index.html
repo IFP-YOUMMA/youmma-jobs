@@ -10883,8 +10883,10 @@ function getJoursRestants(p) {
   return 0;
 }
 async function getAvis(providerId) {
+  if (typeof _reviewsTableIndisponible !== 'undefined' && _reviewsTableIndisponible) return [];
   try {
-    const { data } = await sb.from('reviews').select('id,note,commentaire,client_nom,created_at').eq('provider_id',providerId).eq('valide',true).order('created_at',{ascending:false});
+    const { data, error } = await sb.from('reviews').select('id,note,commentaire,client_nom,created_at').eq('provider_id',providerId).eq('valide',true).order('created_at',{ascending:false});
+    if (error) { if (typeof _reviewsTableIndisponible !== 'undefined') _reviewsTableIndisponible = true; return []; }
     return data||[];
   } catch(e) { return []; }
 }
@@ -18621,8 +18623,16 @@ async function _notifLoadPanel() {
   _notifRenderList();
 }
 
+// Tables notifications/reviews confirmées absentes ou en erreur (400/404) —
+// stoppe les tentatives répétées une fois l'échec constaté, plutôt que de
+// retenter à chaque poll (toutes les 30s, indéfiniment). Réinitialisé
+// uniquement au rechargement complet de la page.
+var _notifTableIndisponible = false;
+var _reviewsTableIndisponible = false;
+
 // Requête directe sur la table notifications — retourne null si table absente
 async function _notifFetchFromTable() {
+  if (_notifTableIndisponible) return null;
   try {
     let query = sb.from('notifications')
       .select('*')
@@ -18640,17 +18650,19 @@ async function _notifFetchFromTable() {
     const { data, error } = await query;
 
     if (error) {
+      _notifTableIndisponible = true; // ne plus retenter tant que la page n'est pas rechargée
       // Table manquante → afficher SQL de création
       if (error.code === '42P01' || (error.message||'').includes('does not exist')) {
         _notifShowCreateTableSQL();
         return null;
       }
-      // Autre erreur (RLS, etc.) → fallback dynamique silencieux
+      // Autre erreur (400, RLS, etc.) → fallback dynamique silencieux
       console.warn('notifications table:', error.message);
       return null;
     }
     return data || [];
   } catch(e) {
+    _notifTableIndisponible = true;
     return null;
   }
 }
@@ -18820,14 +18832,19 @@ async function _notifGenerateDynamic() {
         }
       }
       
-      // Avis reçus
-      const { data: avis } = await sb.from('reviews')
-        .select('id,note,client_nom,created_at')
-        .eq('provider_id', pid)
-        .eq('valide', true)
-        .order('created_at', { ascending: false })
-        .limit(5);
-      
+      // Avis reçus — sauter si la table a déjà échoué une fois cette session
+      let avis = [];
+      if (!_reviewsTableIndisponible) {
+        const { data: avisData, error: avisErr } = await sb.from('reviews')
+          .select('id,note,client_nom,created_at')
+          .eq('provider_id', pid)
+          .eq('valide', true)
+          .order('created_at', { ascending: false })
+          .limit(5);
+        if (avisErr) _reviewsTableIndisponible = true;
+        avis = avisData || [];
+      }
+
       (avis || []).forEach(a => {
         notifs.push({
           id: 'avis_' + a.id,
