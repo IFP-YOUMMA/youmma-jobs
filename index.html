@@ -7453,6 +7453,15 @@ document.addEventListener('keydown', e => {
       <!-- ═══ SALUTATION ═══ -->
       <div style="margin-bottom:18px;">
         <div style="font-size:26px;font-weight:800;color:#1A1A4E;line-height:1.25;margin-bottom:9px;">Bonjour <span id="dashGreetPrenom">...</span> 👋</div>
+        <div id="dashBanniereMdp" style="display:none;background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border:1.5px solid #FDBA74;border-radius:14px;padding:16px 18px;margin-bottom:12px;">
+          <div style="font-size:13.5px;font-weight:700;color:#9A3412;margin-bottom:10px;">⚠️ Changez votre code PIN par défaut</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input id="dashNouveauPin" type="password" inputmode="numeric" maxlength="4" placeholder="Nouveau PIN (4 chiffres)" style="flex:1;min-width:150px;padding:9px 12px;border:1.5px solid #FDBA74;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;"/>
+            <input id="dashConfirmerPin" type="password" inputmode="numeric" maxlength="4" placeholder="Confirmer" style="flex:1;min-width:120px;padding:9px 12px;border:1.5px solid #FDBA74;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;"/>
+            <button onclick="_dashChangerPin()" style="padding:9px 16px;background:#EA580C;color:#fff;border:none;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;">Valider</button>
+          </div>
+          <div id="dashPinErreur" style="display:none;color:#B91C1C;font-size:12px;margin-top:8px;"></div>
+        </div>
         <div id="dashAboSimpleBadge" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;background:#F3F4F6;color:#6B7280;">
           <span id="dashAboSimpleText">Vérification...</span>
         </div>
@@ -9014,44 +9023,53 @@ async function chargerAvis() {
     <div id="admCreerPrestataireModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;">
       <div style="background:#fff;border-radius:16px;padding:28px;width:min(460px,92vw);max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.25);">
         <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 20px;font-size:17px;"><i class="fa-solid fa-user-plus" style="color:#E8650A;margin-right:8px;"></i>Créer un prestataire</h3>
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom complet *</label>
-            <input id="admProvNom" type="text" placeholder="Ex: Mamadou Bah" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Téléphone *</label>
-            <input id="admProvTel" type="text" placeholder="224620000000" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Catégorie *</label>
-            <select id="admProvCategorie" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;background:#fff;">
-              <option value="">Choisir une catégorie</option>
-            </select>
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Métier *</label>
-            <input id="admProvMetier" type="text" placeholder="Ex: Électricien" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Années d'expérience</label>
-            <input id="admProvExperience" type="number" min="0" max="50" placeholder="ex: 5" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div id="admProvFormZone">
+          <div style="display:flex;flex-direction:column;gap:14px;">
             <div>
-              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Ville</label>
-              <input id="admProvVille" type="text" placeholder="Conakry" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Nom complet *</label>
+              <input id="admProvNom" type="text" placeholder="Ex: Mamadou Bah" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
             </div>
             <div>
-              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Commune</label>
-              <input id="admProvCommune" type="text" placeholder="Ratoma" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Téléphone *</label>
+              <input id="admProvTel" type="text" placeholder="224620000000" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
             </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Catégorie *</label>
+              <select id="admProvCategorie" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;background:#fff;">
+                <option value="">Choisir une catégorie</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Métier *</label>
+              <input id="admProvMetier" type="text" placeholder="Ex: Électricien" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Années d'expérience</label>
+              <input id="admProvExperience" type="number" min="0" max="50" placeholder="ex: 5" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Ville</label>
+                <input id="admProvVille" type="text" placeholder="Conakry" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;">Commune</label>
+                <input id="admProvCommune" type="text" placeholder="Ratoma" style="width:100%;box-sizing:border-box;margin-top:4px;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:14px;outline:none;"/>
+              </div>
+            </div>
+            <div id="admProvErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
           </div>
-          <div id="admProvErreur" style="color:#DC2626;font-size:13px;display:none;"></div>
+          <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
+            <button onclick="document.getElementById('admCreerPrestataireModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
+            <button id="admProvSaveBtn" onclick="_admCreerPrestataireValider()" style="background:#E8650A;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer le compte</button>
+          </div>
         </div>
-        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end;">
-          <button onclick="document.getElementById('admCreerPrestataireModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Annuler</button>
-          <button id="admProvSaveBtn" onclick="_admCreerPrestataireValider()" style="background:#E8650A;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">Créer le compte</button>
+        <div id="admProvSuccesZone" style="display:none;">
+          <div style="background:#ECFDF5;border:1.5px solid #A7F3D0;border-radius:12px;padding:16px;font-size:13.5px;color:#065F46;line-height:1.6;margin-bottom:16px;" id="admProvSuccesMsg"></div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button onclick="document.getElementById('admCreerPrestataireModal').style.display='none'" style="background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;">Fermer</button>
+            <button id="admProvCopierBtn" onclick="_admCreerPrestataireCopierMessage()" style="background:#E8650A;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;">📋 Copier ce message</button>
+          </div>
         </div>
       </div>
     </div>
@@ -10545,7 +10563,7 @@ async function getProviders({ categorie='', recherche='', limite=20, offset=0 }=
 
 async function getDashboardData(providerId) {
   const COLS_BASE = 'id,prenom,nom,matricule,metier,categorie,ville,commune,quartier,telephone,photo_url,description,skills,statut,note_moyenne,nb_vues,essai_actif,essai_fin,abonnement_actif,abonnement_fin,created_at,disponibilite';
-  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,nb_partages,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise,badge_ambassadeur,badge_ambassadeur_fin';
+  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,nb_partages,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise,badge_ambassadeur,badge_ambassadeur_fin,doit_changer_mdp';
   try {
     let res = await sb.from('providers')
       .select(COLS_BASE + ',' + COLS_OPT)
@@ -11364,6 +11382,9 @@ function _dashUpdateUI() {
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
   // Salutation simplifiée
   set('dashGreetPrenom', p.prenom || '...');
+  // Bannière changement de PIN (compte créé par l'admin, PIN par défaut 0000)
+  const _banniereMdp = document.getElementById('dashBanniereMdp');
+  if (_banniereMdp) _banniereMdp.style.display = p.doit_changer_mdp ? 'block' : 'none';
   // Alerte statut simplifiée
   const statAlert = document.getElementById('dashStatutAlert');
   if (statAlert) {
@@ -23233,11 +23254,17 @@ document.addEventListener('click', function(e) {
 });
 
 // ── Créer un prestataire ──
+let _admProvDernierMessage = '';
+
 function _admCreerPrestataireOuvrir() {
   ['admProvNom','admProvTel','admProvMetier','admProvExperience','admProvVille','admProvCommune'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   const errEl = document.getElementById('admProvErreur');
   if (errEl) errEl.style.display = 'none';
   if (typeof renderCategoriesSelect === 'function') renderCategoriesSelect('admProvCategorie');
+  const formZone = document.getElementById('admProvFormZone');
+  const succesZone = document.getElementById('admProvSuccesZone');
+  if (formZone) formZone.style.display = 'block';
+  if (succesZone) succesZone.style.display = 'none';
   const modal = document.getElementById('admCreerPrestataireModal');
   if (modal) modal.style.display = 'flex';
 }
@@ -23271,25 +23298,30 @@ async function _admCreerPrestataireValider() {
     const prenom = parts[0] || '';
     const nom = parts.slice(1).join(' ') || parts[0] || '';
 
-    // PIN de connexion par défaut = 4 derniers chiffres du téléphone
-    // (aucun champ mot de passe demandé dans le formulaire ; providers
-    // exige un password_hash pour se connecter — voir connexionPrestataire()
-    // — donc un PIN par défaut est indispensable pour que le compte créé
-    // soit réellement utilisable).
-    const pin = tel.slice(-4);
+    // PIN de connexion par défaut = 0000, exactement le même système que
+    // l'inscription normale (même colonne password_hash, même fonction de
+    // hachage hashPassword() — SHA-256 — utilisée par inscrirePrestataire()
+    // et vérifiée par connexionPrestataire()). doit_changer_mdp=true force
+    // la bannière "Changez votre code PIN par défaut" au premier accès du
+    // prestataire sur son tableau de bord.
+    const pin = '0000';
     const password_hash = await hashPassword(pin);
 
     const { error } = await sb.from('providers').insert({
       prenom, nom, telephone: tel, password_hash,
       metier, categorie, experience, ville: ville || null, commune: commune || null,
-      statut: 'valide',
+      statut: 'valide', doit_changer_mdp: true,
       abonnement_actif: false, essai_actif: false
     });
     if (error) { if (error.code === '23505') { _admAfficherErreurCompte('admProvErreur', 'Ce numéro est déjà enregistré'); return; } throw error; }
 
-    showToast('✅ Prestataire créé — il peut se connecter avec son numéro ' + tel + ' (code PIN par défaut : ' + pin + ')', 'success');
-    const modal = document.getElementById('admCreerPrestataireModal');
-    if (modal) modal.style.display = 'none';
+    _admProvDernierMessage = '✅ Compte créé ! Dites au prestataire de se connecter sur yoummajobs.com avec son numéro ' + tel + ' et le code PIN ' + pin;
+    const msgEl = document.getElementById('admProvSuccesMsg');
+    if (msgEl) msgEl.textContent = _admProvDernierMessage;
+    const formZone = document.getElementById('admProvFormZone');
+    const succesZone = document.getElementById('admProvSuccesZone');
+    if (formZone) formZone.style.display = 'none';
+    if (succesZone) succesZone.style.display = 'block';
     if (typeof _admChargerDerniersComptes === 'function') _admChargerDerniersComptes();
     if (typeof _adminLoadAll === 'function') _adminLoadAll();
   } catch (e) {
@@ -23299,6 +23331,16 @@ async function _admCreerPrestataireValider() {
   }
 }
 window._admCreerPrestataireValider = _admCreerPrestataireValider;
+
+function _admCreerPrestataireCopierMessage() {
+  if (!_admProvDernierMessage) return;
+  navigator.clipboard.writeText(_admProvDernierMessage).then(() => {
+    if (typeof showToast === 'function') showToast('📋 Message copié', 'success');
+    const btn = document.getElementById('admProvCopierBtn');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✅ Copié'; setTimeout(() => { btn.textContent = orig; }, 1500); }
+  }).catch(() => { if (typeof showToast === 'function') showToast('Impossible de copier le message', 'error'); });
+}
+window._admCreerPrestataireCopierMessage = _admCreerPrestataireCopierMessage;
 
 // ── Créer un client ──
 let _admCliDernierMessage = '';
@@ -23558,6 +23600,42 @@ async function _espaceCliSauvegarderProfilRapide() {
   }
 }
 window._espaceCliSauvegarderProfilRapide = _espaceCliSauvegarderProfilRapide;
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD PRESTATAIRE — changement du code PIN par défaut
+// ══════════════════════════════════════════════════════════════
+// Compte créé par l'admin (PIN par défaut 0000, doit_changer_mdp=TRUE —
+// voir 20260719_providers_doit_changer_mdp.sql). Réutilise hashPassword()
+// (SHA-256), exactement la même fonction que inscrirePrestataire() /
+// connexionPrestataire() pour générer/vérifier password_hash.
+async function _dashChangerPin() {
+  const pin1 = (document.getElementById('dashNouveauPin').value || '').trim();
+  const pin2 = (document.getElementById('dashConfirmerPin').value || '').trim();
+  const errEl = document.getElementById('dashPinErreur');
+  if (errEl) errEl.style.display = 'none';
+
+  if (!/^\d{4}$/.test(pin1)) { if (errEl) { errEl.textContent = 'Le code PIN doit contenir exactement 4 chiffres.'; errEl.style.display = 'block'; } return; }
+  if (pin1 !== pin2) { if (errEl) { errEl.textContent = 'Les codes PIN ne correspondent pas.'; errEl.style.display = 'block'; } return; }
+
+  const pid = (typeof _dashProviderId !== 'undefined' && _dashProviderId) || (typeof providerId !== 'undefined' && providerId);
+  if (!pid) { if (errEl) { errEl.textContent = 'Session expirée, reconnectez-vous.'; errEl.style.display = 'block'; } return; }
+
+  try {
+    const password_hash = await hashPassword(pin1);
+    const { error } = await sb.from('providers').update({ password_hash, doit_changer_mdp: false }).eq('id', pid);
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('✅ Code PIN mis à jour', 'success');
+    const banniere = document.getElementById('dashBanniereMdp');
+    if (banniere) banniere.style.display = 'none';
+    if (typeof _dashData !== 'undefined' && _dashData) _dashData.doit_changer_mdp = false;
+    if (typeof providerData !== 'undefined' && providerData) providerData.doit_changer_mdp = false;
+  } catch (e) {
+    if (errEl) { errEl.textContent = 'Erreur : ' + e.message; errEl.style.display = 'block'; }
+  }
+}
+window._dashChangerPin = _dashChangerPin;
 </script>
 
 <!-- ══ SERVICE WORKER REGISTRATION ══ -->
