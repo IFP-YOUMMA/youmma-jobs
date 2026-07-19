@@ -6657,6 +6657,34 @@ function renderArtisans() {
   observeFadeIn();
 }
 
+// ── PHOTO DE COUVERTURE — cover_url si renseigné, sinon image par défaut
+//    selon la catégorie/le métier (URLs Unsplash gratuites) ──
+const PROVIDER_COVER_DEFAULTS = {
+  'btp': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80',
+  'construction': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80',
+  'électricité': 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80',
+  'électricien': 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80',
+  'plomberie': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+  'plombier': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+  'menuiserie': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80',
+  'menuisier': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80',
+  'peinture': 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800&q=80',
+  'peintre': 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800&q=80',
+  'jardinage': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80',
+  'jardinier': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80',
+};
+const PROVIDER_COVER_DEFAULT = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
+
+function _providerCoverUrl(p) {
+  if (p && p.cover_url) return p.cover_url;
+  const haystack = (((p && p.categorie) || '') + ' ' + ((p && p.metier) || '')).toLowerCase();
+  for (const key in PROVIDER_COVER_DEFAULTS) {
+    if (haystack.indexOf(key) !== -1) return PROVIDER_COVER_DEFAULTS[key];
+  }
+  return PROVIDER_COVER_DEFAULT;
+}
+window._providerCoverUrl = _providerCoverUrl;
+
 // ── RENDER PROVIDERS GRID ──
 function renderProviders() {
   const grid = document.getElementById('providersGrid');
@@ -6726,40 +6754,37 @@ function renderProviders() {
     const matriculeHtml = (p.matricule && p.matricule !== 'YMJ-000000')
       ? `<div style="text-align:center;font-size:11px;color:#6b7280;padding:7px 0;margin:0 0 8px 0;border-top:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;">Membre vérifié · N°&nbsp;<span style="color:#1B2A6B;font-weight:700;letter-spacing:0.05em;">${p.matricule}</span></div>`
       : '';
+    const coverUrl = _providerCoverUrl(p);
 
     return `
     <div class="pc2-card fade-in" style="overflow:hidden;border-radius:20px;border:1px solid #e8ecf0;box-shadow:0 2px 12px rgba(0,0,0,0.06);" onclick="openModal('${p.id}')">
 
 
-      <div class="pc2-top" style="background:#1B2A6B;border-radius:20px 20px 0 0;padding:18px 16px;gap:14px;">
-        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-          ${p.photo_url
-            ? `<div style="width:62px;height:62px;border-radius:12px;border:2px solid #E8521A;overflow:hidden;flex-shrink:0;"><img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}"/></div>`
-            : `<div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;width:62px;height:62px;border-radius:12px;border:2px solid #E8521A;">${p.ini}</div>`}
-          ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="font-size:8px;color:#a5b4fc;text-align:center;margin-top:4px;letter-spacing:0.05em;font-weight:600;background:rgba(255,255,255,0.1);border-radius:4px;padding:1px 5px;">${p.matricule}</div>` : ''}
-        </div>
-        <div class="pc2-info" style="flex:1;min-width:0;">
-          <div style="margin-bottom:2px;">
-            <div class="pc2-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font-size:17px;font-weight:700;">
+      <div style="margin:0 0 10px;">
+        <div style="height:80px;background-image:url('${coverUrl}');background-size:cover;background-position:center;border-radius:12px 12px 0 0;position:relative;">
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);border-radius:12px 12px 0 0;"></div>
+          <div style="position:absolute;inset:0;padding:10px 14px 6px;display:flex;flex-direction:column;justify-content:flex-end;">
+            <div class="pc2-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font-size:15px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.45);">
               ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom_entreprise : p.nom}
             </div>
-          </div>
-
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">
-            <div class="pc2-metier" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f97316;font-size:12px;font-weight:600;">
-              ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom + ' · ' + p.metier : p.metier}
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:1px;">
+              <div class="pc2-metier" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fb923c;font-size:11.5px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.45);">
+                ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom + ' · ' + p.metier : p.metier}
+              </div>
+              <span style="flex-shrink:0;font-size:9.5px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.3);">
+                ${p.type_compte === 'entreprise' ? 'Entreprise' : 'Particulier'}
+              </span>
             </div>
-            ${(p.missions||0) > 0 ? `<div style="flex-shrink:0;font-size:11px;font-weight:600;color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.12);padding:2px 7px;border-radius:20px;white-space:nowrap;border:1px solid rgba(255,255,255,0.15);"><i class="fa-solid fa-bullseye" style="font-size:9px;"></i> ${p.missions} mission${p.missions>1?'s':''}</div>` : ''}
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:3px;">
-            <span style="font-size:11px;color:#a5b4fc;display:flex;align-items:center;gap:3px;">
+            <div style="font-size:10px;color:#fff;margin-top:2px;text-shadow:0 1px 3px rgba(0,0,0,.45);">
               📍 ${p.commune && p.commune !== p.ville ? p.commune + ', ' + (p.ville||'Conakry') : (p.ville||'Conakry')}
-            </span>
-            <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,0.12);color:#e2e8f0;border:1px solid rgba(255,255,255,0.2);">
-              ${p.type_compte === 'entreprise' ? 'Entreprise' : 'Particulier'}
-            </span>
+            </div>
           </div>
-
+        </div>
+        <div style="padding:0 2px;margin-top:-24px;">
+          ${p.photo_url
+            ? `<div style="width:62px;height:62px;border-radius:12px;border:3px solid #fff;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.25);"><img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}"/></div>`
+            : `<div class="pc2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;width:62px;height:62px;border-radius:12px;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);">${p.ini}</div>`}
+          ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="font-size:8px;color:#6b7280;margin-top:4px;letter-spacing:0.05em;font-weight:600;background:#f3f4f6;border-radius:4px;padding:1px 5px;display:inline-block;">${p.matricule}</div>` : ''}
         </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:0 4px;margin-bottom:12px;overflow:hidden;">
@@ -6895,20 +6920,28 @@ function openModal(id) {
   const lieuAffiche = (_ville && _commune && _ville !== _commune)
     ? `${_commune}, ${_ville}`
     : _ville || _commune || 'Conakry';
+  const coverUrl = _providerCoverUrl(p);
 
   document.getElementById('modalContent').innerHTML = `
-    
-    <div style="background:#1B2A6B;border-radius:18px;padding:22px;margin-bottom:16px;">
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <div class="mp2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;margin:0 auto;width:80px;height:80px;border-radius:16px;border:3px solid #E8521A;">
-          ${p.photo_url
-            ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}"/>`
-            : p.ini}
+
+    <div style="border-radius:18px;overflow:hidden;margin-bottom:16px;">
+      <div style="height:140px;background-image:url('${coverUrl}');background-size:cover;background-position:center;position:relative;">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);"></div>
+        <div style="position:absolute;inset:0;padding:14px 18px;display:flex;flex-direction:column;justify-content:flex-end;text-align:left;">
+          <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-shadow:0 1px 4px rgba(0,0,0,.5);">${p.nom}</div>
+          <div style="font-size:13px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);">${p.metier} · <i class="fa-solid fa-location-dot"></i> ${lieuAffiche}</div>
         </div>
-        ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="margin-top:6px;text-align:center;"><div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.5px;font-weight:500;">Matricule</div><div style="font-size:15px;color:#E8650A;font-weight:700;letter-spacing:1px;">${p.matricule}</div></div>` : ''}
+      </div>
+      <div style="background:#1B2A6B;padding:0 22px 22px;">
+        <div style="margin-top:-32px;">
+          <div class="mp2-avatar" style="background:${p.bg};color:${p.color};overflow:hidden;padding:0;width:80px;height:80px;border-radius:16px;border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.3);">
+            ${p.photo_url
+              ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}"/>`
+              : p.ini}
+          </div>
+        </div>
         <div style="text-align:center;width:100%;margin-top:10px;">
-          <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;">${p.nom}</div>
-          <div style="font-size:13px;color:#a5b4fc;margin-bottom:4px;">${p.metier} · <i class="fa-solid fa-location-dot"></i> ${lieuAffiche}</div>
+          ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="margin-bottom:8px;"><div style="font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.5px;font-weight:500;">Matricule</div><div style="font-size:15px;color:#E8650A;font-weight:700;letter-spacing:1px;">${p.matricule}</div></div>` : ''}
           <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;">${badgesHtml}</div>
           ${badgeAmbValide ? `
           <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#F5C518,#E85D04);color:#fff;border-radius:25px;padding:5px 14px;font-size:13px;font-weight:800;letter-spacing:.04em;box-shadow:0 4px 16px rgba(232,93,4,.4);margin:8px 0;width:fit-content;">
@@ -7601,6 +7634,19 @@ document.addEventListener('keydown', e => {
           <div style="font-size:13px;color:#7A7F9A;line-height:1.7;">Photo de profil visible par tous les clients.<br>Format : JPG, PNG, WebP — Max 5 Mo</div>
         </div>
         <div class="upload-progress" id="progressProfil"><div class="upload-progress-bar"></div></div>
+      </div>
+
+      <div class="photos-section">
+        <div class="photos-header">
+          <div class="photos-title"><i class="fa-solid fa-image"></i> Photo de couverture</div>
+          <label style="cursor:pointer;background:#1A1A4E;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
+            📷 Changer la couverture
+            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_dashUploadCouverture(this)"/>
+          </label>
+        </div>
+        <div id="dashCouverturePreview" style="width:100%;height:100px;border-radius:14px;background:#E4E8F5;background-size:cover;background-position:center;"></div>
+        <div style="font-size:13px;color:#7A7F9A;line-height:1.7;margin-top:10px;">Bandeau affiché en haut de votre carte et de votre profil.<br>Format : JPG, PNG, WebP — Max 5 Mo</div>
+        <div class="upload-progress" id="progressCouverture"><div class="upload-progress-bar"></div></div>
       </div>
 
       <div class="photos-section">
@@ -10589,7 +10635,7 @@ async function getProviders({ categorie='', recherche='', limite=20, offset=0 }=
 
 async function getDashboardData(providerId) {
   const COLS_BASE = 'id,prenom,nom,matricule,metier,categorie,ville,commune,quartier,telephone,photo_url,description,skills,statut,note_moyenne,nb_vues,essai_actif,essai_fin,abonnement_actif,abonnement_fin,created_at,disponibilite';
-  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,nb_partages,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise,badge_ambassadeur,badge_ambassadeur_fin,doit_changer_mdp';
+  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,nb_partages,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise,badge_ambassadeur,badge_ambassadeur_fin,doit_changer_mdp,cover_url';
   try {
     let res = await sb.from('providers')
       .select(COLS_BASE + ',' + COLS_OPT)
@@ -11411,6 +11457,9 @@ function _dashUpdateUI() {
   // Bannière changement de PIN (compte créé par l'admin, PIN par défaut 0000)
   const _banniereMdp = document.getElementById('dashBanniereMdp');
   if (_banniereMdp) _banniereMdp.style.display = p.doit_changer_mdp ? 'block' : 'none';
+  // Aperçu photo de couverture (onglet Mes photos)
+  const _covPreview = document.getElementById('dashCouverturePreview');
+  if (_covPreview) _covPreview.style.backgroundImage = p.cover_url ? `url('${p.cover_url}')` : '';
   // Alerte statut simplifiée
   const statAlert = document.getElementById('dashStatutAlert');
   if (statAlert) {
@@ -23710,6 +23759,54 @@ async function _dashChangerPin() {
   }
 }
 window._dashChangerPin = _dashChangerPin;
+
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD PRESTATAIRE — upload photo de couverture (cover_url)
+// ══════════════════════════════════════════════════════════════
+// Même bucket/pattern que toutes les autres photos prestataire
+// (uploadProviderPhoto, ligne ~10674 : sb.storage.from('Photos'),
+// resizeImage()) — pas de bucket dédié 'providers-covers' inventé, ce
+// bucket n'existe nulle part ailleurs dans le fichier et créer un nouveau
+// bucket Supabase Storage n'est pas quelque chose que je peux faire depuis
+// ce fichier JS. Le message d'erreur sans crash demandé s'applique si le
+// bucket 'Photos' ou la colonne cover_url ne sont pas disponibles.
+async function _dashUploadCouverture(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const pid = (typeof _dashProviderId !== 'undefined' && _dashProviderId) || (typeof providerId !== 'undefined' && providerId);
+  if (!pid) { if (typeof showToast === 'function') showToast('Session expirée', 'error'); return; }
+  if (file.size > 5 * 1024 * 1024) { if (typeof showToast === 'function') showToast('Fichier trop volumineux (max 5 Mo)', 'error'); return; }
+
+  const prog = document.getElementById('progressCouverture');
+  if (prog) prog.style.display = 'block';
+
+  try {
+    let fileToUpload = file;
+    try { fileToUpload = await resizeImage(file, 'couverture'); } catch (e) { fileToUpload = file; }
+
+    const filename = `providers/${pid}/couverture-${Date.now()}.jpg`;
+    const { error: uploadError } = await sb.storage.from('Photos').upload(filename, fileToUpload, { cacheControl: '3600', upsert: false, contentType: 'image/jpeg' });
+    if (uploadError) throw uploadError;
+    const { data: urlData } = sb.storage.from('Photos').getPublicUrl(filename);
+
+    const { error } = await sb.from('providers').update({ cover_url: urlData.publicUrl }).eq('id', pid);
+    if (error) throw error;
+
+    const preview = document.getElementById('dashCouverturePreview');
+    if (preview) preview.style.backgroundImage = `url('${urlData.publicUrl}')`;
+    if (typeof _dashData !== 'undefined' && _dashData) _dashData.cover_url = urlData.publicUrl;
+    if (typeof providerData !== 'undefined' && providerData) providerData.cover_url = urlData.publicUrl;
+    if (typeof showToast === 'function') showToast('✅ Couverture mise à jour', 'success');
+  } catch (e) {
+    console.warn('[_dashUploadCouverture]', e.message || e);
+    if (typeof showToast === 'function') showToast('Erreur upload couverture : ' + (e.message || e), 'error');
+    else window.alert('Erreur upload couverture : ' + (e.message || e));
+  } finally {
+    if (prog) prog.style.display = 'none';
+    input.value = '';
+  }
+}
+window._dashUploadCouverture = _dashUploadCouverture;
 </script>
 
 <!-- ══ SERVICE WORKER REGISTRATION ══ -->
