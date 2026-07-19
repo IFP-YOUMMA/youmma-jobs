@@ -7496,6 +7496,7 @@ document.addEventListener('keydown', e => {
 
       <!-- ═══ SALUTATION ═══ -->
       <div style="margin-bottom:18px;">
+        <div id="dashBandeauMessage" style="display:none;margin-bottom:12px;"></div>
         <div style="font-size:26px;font-weight:800;color:#1A1A4E;line-height:1.25;margin-bottom:9px;">Bonjour <span id="dashGreetPrenom">...</span> 👋</div>
         <div id="dashBanniereMdp" style="display:none;background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border:1.5px solid #FDBA74;border-radius:14px;padding:16px 18px;margin-bottom:12px;">
           <div style="font-size:13.5px;font-weight:700;color:#9A3412;margin-bottom:10px;">⚠️ Changez votre code PIN par défaut</div>
@@ -8789,6 +8790,7 @@ async function chargerAvis() {
     <div onclick="showAdmin('campagne');_campagneInit();" id="amenu-campagne" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullhorn" style="width:16px;"></i> Campagne SMS</div>
     <div style="border-top:1px solid rgba(255,255,255,.12);margin:8px 0 6px;"></div>
     <div onclick="showAdmin('carousel')" id="amenu-carousel" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-photo-film" style="width:16px;"></i> Images à la une</div>
+    <div onclick="showAdmin('app_message');_appMsgLoadAdmin();" id="amenu-app_message" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullhorn" style="width:16px;"></i> Message prestataires</div>
     <div onclick="showAdmin('missions')" id="amenu-missions" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullseye" style="width:16px;"></i> Missions</div>
     <div onclick="showAdmin('projets_clients')" id="amenu-projets_clients" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-clipboard-list" style="width:16px;flex-shrink:0;"></i> Projets clients<span id="adminPcBadge" style="display:none;margin-left:auto;background:#E53E3E;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center;line-height:1.4;animation:yjBadgePulse 2s ease-in-out infinite;"></span></div>
     <div onclick="showAdmin('ambassadeurs');chargerClassementAdmin();" id="amenu-ambassadeurs" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-trophy" style="width:16px;"></i> Ambassadeurs</div>
@@ -10009,6 +10011,49 @@ async function chargerAvis() {
             <div style="text-align:center;padding:30px;color:#9CA3AF;font-size:13px;">
               <i class="fa-solid fa-spinner fa-spin"></i> Chargement...
             </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ ADMIN MESSAGE PRESTATAIRES ══ -->
+    <div class="admin-section" id="admin-app_message">
+      <div class="admin-section-inner">
+
+        <div class="adm-section-header" style="margin-bottom:20px;">
+          <div class="adm-section-title">
+            <i class="fa-solid fa-bullhorn" style="color:#E85D04;"></i> Message aux prestataires
+          </div>
+        </div>
+
+        <div style="background:#EFF6FF;border-radius:12px;padding:14px 18px;margin-bottom:24px;display:flex;gap:12px;align-items:flex-start;">
+          <i class="fa-solid fa-circle-info" style="color:#2563EB;font-size:16px;flex-shrink:0;margin-top:1px;"></i>
+          <div style="font-size:13px;color:#1E40AF;line-height:1.6;">
+            Ce message s'affiche en bandeau en haut du tableau de bord de <strong>tous les prestataires</strong>. Un seul message actif à la fois — publier un nouveau message remplace l'ancien.
+          </div>
+        </div>
+
+        <div style="margin-bottom:24px;">
+          <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:10px;">Message actif actuel</div>
+          <div id="appMsgActuelBox" style="background:#F9FAFB;border:1.5px solid #E5E7EB;border-radius:12px;padding:16px 18px;font-size:13px;color:#374151;line-height:1.6;">
+            <i class="fa-solid fa-spinner fa-spin"></i> Chargement...
+          </div>
+        </div>
+
+        <div style="background:#F9FAFB;border:1.5px dashed #D1D5DB;border-radius:14px;padding:20px;">
+          <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:12px;"><i class="fa-solid fa-pen" style="color:#E85D04;"></i> Publier un nouveau message</div>
+          <textarea id="appMsgTextarea" rows="3" placeholder="Ex : Bienvenue dans la famille YOUMMA JOBS ! Complétez votre profil pour être prêt au lancement du 4 Septembre."
+            style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;color:#374151;outline:none;resize:vertical;font-family:inherit;margin-bottom:12px;"></textarea>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button id="appMsgPublierBtn" onclick="_appMsgPublier()"
+              style="padding:10px 18px;background:#E85D04;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;">
+              <i class="fa-solid fa-paper-plane"></i> Publier
+            </button>
+            <button onclick="_appMsgSupprimer()"
+              style="padding:10px 18px;background:rgba(239,68,68,.08);color:#DC2626;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;">
+              <i class="fa-solid fa-trash"></i> Supprimer le message
+            </button>
           </div>
         </div>
 
@@ -11424,6 +11469,7 @@ async function chargerDashboard(pid) {
     }
   }
   _dashUpdateUI();
+  _dashLoadMessageBanner();
   _dashLoadTravauxCount();
   _dashPhotos = await getProviderPhotos(pid);
   _dashRenderPhotos();
@@ -11630,6 +11676,31 @@ function _dashToggleDispo() {
   _dashSetDispo(cur === 'Occupé' ? 'Disponible' : 'Occupé');
 }
 
+// ── Bandeau message dynamique (app_messages, géré depuis le panel admin) ──
+async function _dashLoadMessageBanner() {
+  const el = document.getElementById('dashBandeauMessage');
+  if (!el) return;
+  try {
+    const { data, error } = await sb.from('app_messages').select('*').eq('actif', true).order('created_at', {ascending:false}).limit(1);
+    const msg = (!error && data) ? data[0] : null;
+    if (!msg) { el.style.display = 'none'; return; }
+    if (localStorage.getItem('msg_dismissed_' + msg.id)) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.innerHTML = `<div style="background:#E8F4FD;border-left:4px solid #2196F3;padding:14px 16px;border-radius:8px;color:#0D47A1;font-size:0.9rem;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div style="flex:1;">${msg.contenu.replace(/</g,'&lt;')}</div>
+      <button onclick="_dashFermerMessageBanner('${msg.id}')" style="background:none;border:none;color:#0D47A1;font-size:18px;cursor:pointer;line-height:1;flex-shrink:0;padding:0 4px;">✕</button>
+    </div>`;
+  } catch(e) {
+    el.style.display = 'none';
+  }
+}
+
+function _dashFermerMessageBanner(id) {
+  try { localStorage.setItem('msg_dismissed_' + id, '1'); } catch(e) {}
+  const el = document.getElementById('dashBandeauMessage');
+  if (el) el.style.display = 'none';
+}
+
 function _dashUpdateUI() {
   const p = _dashData;
   if (!p) return;
@@ -11664,13 +11735,10 @@ function _dashUpdateUI() {
   // ── Bandeau essai / abonnement / lancement ──
   const _bandeauEl = document.getElementById('dashBandeauEssai');
   if (_bandeauEl && p.statut === 'valide') {
-    _bandeauEl.style.display = 'block';
     if (estEnPeriodeLancement()) {
-      _bandeauEl.innerHTML = `<div style="background:#FFF8E1;border-left:4px solid #F59E0B;padding:12px 16px;border-radius:8px;color:#92400E;font-size:0.85rem;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-        <div>🚀 Accès gratuit jusqu'au 30 Septembre 2026 — Lancement officiel le 4 Septembre</div>
-        <button onclick="showSection('profil')" style="background:#F59E0B;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">Compléter mon profil</button>
-      </div>`;
+      _bandeauEl.style.display = 'none';
     } else {
+      _bandeauEl.style.display = 'block';
       const _abonne = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
       const _essaiActif = p.essai_actif && p.essai_fin && new Date(p.essai_fin) > new Date();
       const _joursRestants = _essaiActif ? Math.min(3, Math.max(0, Math.ceil((new Date(p.essai_fin) - new Date()) / (1000*60*60*24)))) : 0;
@@ -14064,6 +14132,7 @@ function showAdmin(name) {
     rejete: '<i class="fa-solid fa-circle-xmark" style="color:#DC2626;margin-right:6px;"></i>Prestataires rejetés',
     suspendu: '<i class="fa-solid fa-ban" style="color:#7C3AED;margin-right:6px;"></i>Suspendus',
     carousel: '<i class="fa-solid fa-photo-film" style="color:#E85D04;margin-right:6px;"></i>Images à la une',
+    app_message: '<i class="fa-solid fa-bullhorn" style="color:#E85D04;margin-right:6px;"></i>Message prestataires',
     missions: '<i class="fa-solid fa-bullseye" style="color:#E85D04;margin-right:6px;"></i>Missions',
     projets_clients: '<i class="fa-solid fa-clipboard-list" style="color:#E85D04;margin-right:6px;"></i>Projets clients',
     ambassadeurs: '<i class="fa-solid fa-trophy" style="color:#F5C842;margin-right:6px;"></i>Ambassadeurs',
@@ -14078,7 +14147,7 @@ function showAdmin(name) {
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','missions','projets_clients','ambassadeurs','rapports','activite','notifications','equipe','registre_chantier'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','app_message','missions','projets_clients','ambassadeurs','rapports','activite','notifications','equipe','registre_chantier'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (!el) return;
     // Ne pas réafficher un élément restreint à l'agent
@@ -20725,6 +20794,54 @@ if (document.readyState === 'complete') {
 // ══════════════════════════════════════════════════════════════════
 
 var _carouselItems = [];
+
+// ── ADMIN : MESSAGE AUX PRESTATAIRES (app_messages) ──
+async function _appMsgLoadAdmin() {
+  const box = document.getElementById('appMsgActuelBox');
+  if (!box) return;
+  box.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Chargement...';
+  try {
+    const { data, error } = await sb.from('app_messages').select('*').eq('actif', true).order('created_at', {ascending:false}).limit(1);
+    if (error) { box.innerHTML = `<span style="color:#DC2626;">Erreur: ${error.message}</span>`; return; }
+    const msg = data && data[0];
+    if (!msg) { box.innerHTML = '<span style="color:#9CA3AF;">Aucun message actif.</span>'; return; }
+    box.innerHTML = `<div style="white-space:pre-wrap;">${msg.contenu.replace(/</g,'&lt;')}</div><div style="font-size:11px;color:#9CA3AF;margin-top:8px;">Publié le ${new Date(msg.created_at).toLocaleDateString('fr-FR')}</div>`;
+  } catch(e) {
+    box.innerHTML = `<span style="color:#DC2626;">Erreur: ${e.message}</span>`;
+  }
+}
+
+async function _appMsgPublier() {
+  const ta = document.getElementById('appMsgTextarea');
+  const contenu = ta ? ta.value.trim() : '';
+  if (!contenu) { showToast('Écrivez un message avant de publier', 'error'); return; }
+  const btn = document.getElementById('appMsgPublierBtn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '.6'; }
+  try {
+    await sb.from('app_messages').update({ actif: false }).eq('actif', true);
+    const { error } = await sb.from('app_messages').insert({ contenu, actif: true });
+    if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
+    showToast('✅ Message publié', 'success');
+    if (ta) ta.value = '';
+    _appMsgLoadAdmin();
+  } catch(e) {
+    showToast('Erreur: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+  }
+}
+
+async function _appMsgSupprimer() {
+  if (!confirm('Supprimer le message actif ? Il ne sera plus visible par les prestataires.')) return;
+  try {
+    const { error } = await sb.from('app_messages').update({ actif: false }).eq('actif', true);
+    if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
+    showToast('Message supprimé', 'success');
+    _appMsgLoadAdmin();
+  } catch(e) {
+    showToast('Erreur: ' + e.message, 'error');
+  }
+}
 
 async function _carouselLoadAdmin() {
   const list = document.getElementById('carouselAdminList');
