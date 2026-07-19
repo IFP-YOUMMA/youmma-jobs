@@ -96,6 +96,10 @@ function openSoonHub() {
 const SUPABASE_URL = 'https://slawwbhlakilnviwzyrb.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsYXd3YmhsYWtpbG52aXd6eXJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MjQxODAsImV4cCI6MjA5NjAwMDE4MH0.XgZRkUrkjCUzSlB0Nyp0QdJf4xZjMcTO5V1bKSDUHNg';
 const { createClient } = supabase;
+// Client Supabase unique de toute l'app : variable `sb` (ci-dessous). Tous les
+// appels .from()/.storage./.rpc() dans ce fichier passent par `sb` — pas de
+// second client, pas de service_role côté front (anon key uniquement, RLS
+// désactivée sur le projet, sécurité gérée au niveau applicatif).
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── PÉRIODE DE LANCEMENT — accès gratuit pour tout prestataire validé,
@@ -7642,7 +7646,7 @@ document.addEventListener('keydown', e => {
       <div class="photos-section">
         <div class="photos-header">
           <div class="photos-title"><i class="fa-solid fa-camera"></i> Photo de profil</div>
-          <label style="cursor:pointer;background:#E85D04;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
+          <label onclick="event.preventDefault();console.log('[UploadPhoto] clic Changer la photo, providerData.id:',providerData&&providerData.id);this.querySelector('input[type=file]').click();" style="cursor:pointer;background:#E85D04;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
             <i class="fa-solid fa-camera"></i> Changer la photo
             <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){uploadPhoto(inp,'profil');})"/>
           </label>
@@ -7657,7 +7661,7 @@ document.addEventListener('keydown', e => {
       <div class="photos-section">
         <div class="photos-header">
           <div class="photos-title"><i class="fa-solid fa-image"></i> Photo de couverture</div>
-          <label style="cursor:pointer;background:#1A1A4E;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
+          <label onclick="event.preventDefault();console.log('[UploadPhoto] clic Changer la couverture, providerData.id:',providerData&&providerData.id);this.querySelector('input[type=file]').click();" style="cursor:pointer;background:#1A1A4E;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
             📷 Changer la couverture
             <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'bandeau',function(inp){_dashUploadCouverture(inp);})"/>
           </label>
@@ -7670,7 +7674,7 @@ document.addEventListener('keydown', e => {
       <div class="photos-section">
         <div class="photos-header">
           <div class="photos-title">🖼️ Réalisations <span id="realsCountDisplay" style="font-size:12px;color:#7A7F9A;font-weight:400;">(max 5 photos)</span></div>
-          <label id="addRealLabel" style="cursor:pointer;background:#1A1A4E;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
+          <label id="addRealLabel" onclick="event.preventDefault();console.log('[UploadPhoto] clic Ajouter une réalisation, providerData.id:',providerData&&providerData.id);this.querySelector('input[type=file]').click();" style="cursor:pointer;background:#1A1A4E;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
             + Ajouter une réalisation
             <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){uploadPhoto(inp,'realisation');})"/>
           </label>
@@ -7692,7 +7696,7 @@ document.addEventListener('keydown', e => {
         <div style="font-size:12px;color:#7A7F9A;margin-bottom:12px;">Proposez une photo pour le carrousel de la page d'accueil.</div>
         <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:flex-end;margin-bottom:14px;">
           <input id="dashUneTitre" type="text" placeholder="Titre de la photo (optionnel)" maxlength="80" style="padding:10px 14px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;color:#374151;outline:none;width:100%;box-sizing:border-box;"/>
-          <label id="dashUneBtn" style="cursor:pointer;background:#E85D04;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;white-space:nowrap;">
+          <label id="dashUneBtn" onclick="event.preventDefault();console.log('[UploadPhoto] clic Ajouter à la une, providerData.id:',providerData&&providerData.id);this.querySelector('input[type=file]').click();" style="cursor:pointer;background:#E85D04;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;white-space:nowrap;">
             📸 Ajouter à la une
             <input type="file" accept="image/*" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){_dashAjouterUne(inp);})"/>
           </label>
@@ -10779,6 +10783,7 @@ async function resizeImage(file, type='realisation') {
 
 // Bucket 'Photos' (majuscule) = profils / réalisations / documents / logos
 async function uploadProviderPhoto(providerId, file, type='realisation') {
+  console.log('[uploadProviderPhoto] fichier:', file && file.name, '|', file && (file.size/1024).toFixed(1), 'Ko | bucket cible: Photos | type:', type, '| providerId:', providerId);
   const photos = await getProviderPhotos(providerId);
   const reals = photos.filter(p => p.type==='realisation');
   if (type==='realisation' && reals.length>=5) return { success:false, message:'Maximum 5 photos atteint' };
@@ -11819,7 +11824,7 @@ function _dashRenderPhotos() {
       <img src="${photo.url}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;cursor:zoom-in;" alt="Réalisation" onerror="this.style.display='none'" onclick="_yjLightbox('${photo.url}')"/>
       <button onclick="_dashSupprimerPhoto('${photo.id}')" style="position:absolute;top:6px;right:6px;width:34px;height:34px;background:rgba(220,38,38,.85);color:#fff;border:none;border-radius:50%;font-size:14px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;" title="Supprimer">🗑️</button>
     </div>`);
-  if (reals.length<5) slots.push(`<label class="photo-slot" style="cursor:pointer;"><div style="font-size:28px;"><i class="fa-solid fa-camera"></i></div><div class="add-text">Ajouter</div><input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){_dashUploadPhoto(inp,'realisation');})"/></label>`);
+  if (reals.length<5) slots.push(`<label class="photo-slot" onclick="event.preventDefault();console.log('[UploadPhoto] clic Ajouter (réalisation grid), providerData.id:',providerData&&providerData.id);this.querySelector('input[type=file]').click();" style="cursor:pointer;"><div style="font-size:28px;"><i class="fa-solid fa-camera"></i></div><div class="add-text">Ajouter</div><input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){_dashUploadPhoto(inp,'realisation');})"/></label>`);
   grid.innerHTML = slots.join('');
   const _lbl = document.getElementById('addRealLabel');
   if (_lbl) _lbl.style.display = reals.length >= 5 ? 'none' : 'block';
@@ -24153,6 +24158,7 @@ async function _dashUploadCouverture(input) {
   const file = input.files[0];
   if (!file) return;
   const pid = (typeof _dashProviderId !== 'undefined' && _dashProviderId) || (typeof providerId !== 'undefined' && providerId);
+  console.log('[_dashUploadCouverture] fichier:', file.name, '|', (file.size/1024).toFixed(1), 'Ko | bucket cible: Photos | providerId:', pid);
   if (!pid) { if (typeof showToast === 'function') showToast('Session expirée', 'error'); return; }
   if (file.size > 5 * 1024 * 1024) { if (typeof showToast === 'function') showToast('Fichier trop volumineux (max 5 Mo)', 'error'); return; }
 
@@ -24228,6 +24234,7 @@ async function _dashAjouterUne(input) {
   const file = input.files[0];
   if (!file) return;
   const pid = (typeof _dashProviderId !== 'undefined' && _dashProviderId) || (typeof providerId !== 'undefined' && providerId);
+  console.log('[_dashAjouterUne] fichier:', file.name, '|', (file.size/1024).toFixed(1), 'Ko | bucket cible: photos | providerId:', pid);
   if (!pid) { if (typeof showToast === 'function') showToast('Session expirée', 'error'); return; }
   if (file.size > 5 * 1024 * 1024) { if (typeof showToast === 'function') showToast('Fichier trop volumineux (max 5 Mo)', 'error'); return; }
 
