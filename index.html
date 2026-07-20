@@ -10745,7 +10745,7 @@ async function getProviders({ categorie='', recherche='', limite=20, offset=0 }=
 
 async function getDashboardData(providerId) {
   const COLS_BASE = 'id,prenom,nom,matricule,metier,categorie,ville,commune,quartier,telephone,photo_url,description,skills,statut,note_moyenne,nb_vues,essai_actif,essai_fin,abonnement_actif,abonnement_fin,created_at,disponibilite';
-  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,nb_partages,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise,badge_ambassadeur,badge_ambassadeur_fin,doit_changer_mdp,cover_url';
+  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,nb_partages,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise,badge_ambassadeur,badge_ambassadeur_fin,doit_changer_mdp,cover_url,badge_remis';
   try {
     let res = await sb.from('providers')
       .select(COLS_BASE + ',' + COLS_OPT)
@@ -11826,7 +11826,7 @@ function _dashUpdateUI() {
   // Badge PDF téléchargeable
   const _badgeDlBtn = document.getElementById('dashBadgeDlBtn');
   if (_badgeDlBtn) {
-    if (p.statut === 'valide' && p.matricule) {
+    if (p.statut === 'valide' && p.matricule && p.badge_remis === true) {
       _badgeDlBtn.style.display = 'block';
       _badgeDlBtn.innerHTML = '<button onclick="checkAcces(\'Télécharger mon badge PDF\', function(){ _genererBadgePDF(window.providerData); })" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B2A4A,#E8650A);color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;font-family:\'DM Sans\',sans-serif;">🎫 Télécharger mon badge PDF</button>';
     } else {
@@ -17584,6 +17584,15 @@ function _adminRenderVue(p, photos) {
         + '<button onclick="_adminTogglePhotosGestion()" style="width:100%;padding:12px;background:#F0F4FF;color:#3B5BDB;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">🖼️ Voir les photos</button>'
         + '<div id="adminPhotosGestion" style="display:none;margin-top:14px;"></div>'
       + '</div>'
+      + (p.matricule && p.statut==='valide' ? (
+          '<div style="margin-top:18px;background:'+(p.badge_remis?'#ECFDF5':'#FFFBEB')+';border:1.5px solid '+(p.badge_remis?'#86EFAC':'#FDE68A')+';border-radius:12px;padding:14px 16px;">'
+            + '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;">'
+              + '<input type="checkbox" '+(p.badge_remis?'checked':'')+' onchange="_adminToggleBadgeRemis(\''+p.id+'\',this.checked)" style="width:18px;height:18px;cursor:pointer;flex-shrink:0;">'
+              + '<span style="font-size:13px;font-weight:700;color:'+(p.badge_remis?'#065F46':'#92400E')+';">🎫 Badge remis au prestataire</span>'
+            + '</label>'
+            + '<div style="font-size:11.5px;color:'+(p.badge_remis?'#065F46':'#92400E')+';margin-top:6px;margin-left:28px;line-height:1.5;">À cocher une fois les 50 000 GNF reçus et la formation faite. Débloque le téléchargement du badge PDF côté prestataire.</div>'
+          + '</div>'
+        ) : '')
     + '</div>'
     // Footer
     + '<div style="padding:16px 28px;border-top:1px solid #F0F0F8;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">'
@@ -17852,6 +17861,16 @@ function adminVoirProfilFermer() {
   if (!modal) return;
   modal.style.display = 'none';
   if (modal._removeKey) { modal._removeKey(); modal._removeKey = null; }
+}
+
+async function _adminToggleBadgeRemis(id, checked) {
+  const { error } = await sb.from('providers').update({ badge_remis: checked }).eq('id', id);
+  if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
+  showToast(checked ? '✅ Badge marqué comme remis' : 'Badge remis décoché', 'success');
+  if (_adminProfilData && _adminProfilData.id === id) {
+    _adminProfilData.badge_remis = checked;
+    _adminRenderVue(_adminProfilData, _adminProfilPhotos);
+  }
 }
 
 // ══════════════════════════════════════════════════════════
