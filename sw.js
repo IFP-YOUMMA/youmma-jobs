@@ -1,4 +1,4 @@
-const CACHE_NAME = 'youmma-jobs-v3';
+const CACHE_NAME = 'youmma-jobs-v4';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
