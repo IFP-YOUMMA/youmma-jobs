@@ -7498,12 +7498,12 @@ document.addEventListener('keydown', e => {
       <div style="margin-bottom:18px;">
         <div id="dashBandeauMessage" style="display:none;margin-bottom:12px;"></div>
         <div style="font-size:26px;font-weight:800;color:#1A1A4E;line-height:1.25;margin-bottom:9px;">Bonjour <span id="dashGreetPrenom">...</span> 👋</div>
-        <div id="dashBanniereMdp" style="display:none;background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border:1.5px solid #FDBA74;border-radius:14px;padding:16px 18px;margin-bottom:12px;">
-          <div style="font-size:13.5px;font-weight:700;color:#9A3412;margin-bottom:10px;">⚠️ Changez votre code PIN par défaut</div>
+        <div id="dashBanniereMdp" style="display:none;background:#FFF3E0;border-left:4px solid #FF9800;border-radius:8px;padding:16px 18px;margin-bottom:12px;">
+          <div style="font-size:13.5px;font-weight:700;color:#E65100;margin-bottom:10px;">⚠️ Vous utilisez encore le code PIN par défaut (0000). Changez-le pour sécuriser votre compte.</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <input id="dashNouveauPin" type="password" inputmode="numeric" maxlength="4" placeholder="Nouveau PIN (4 chiffres)" style="flex:1;min-width:150px;padding:9px 12px;border:1.5px solid #FDBA74;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;"/>
-            <input id="dashConfirmerPin" type="password" inputmode="numeric" maxlength="4" placeholder="Confirmer" style="flex:1;min-width:120px;padding:9px 12px;border:1.5px solid #FDBA74;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;"/>
-            <button onclick="_dashChangerPin()" style="padding:9px 16px;background:#EA580C;color:#fff;border:none;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;">Valider</button>
+            <input id="dashNouveauPin" type="password" inputmode="numeric" maxlength="4" placeholder="Nouveau PIN (4 chiffres)" style="flex:1;min-width:150px;padding:9px 12px;border:1.5px solid #FFCC80;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;"/>
+            <input id="dashConfirmerPin" type="password" inputmode="numeric" maxlength="4" placeholder="Confirmer" style="flex:1;min-width:120px;padding:9px 12px;border:1.5px solid #FFCC80;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;"/>
+            <button onclick="_dashChangerPin()" style="padding:9px 16px;background:#FF9800;color:#fff;border:none;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;">Changer mon mot de passe</button>
           </div>
           <div id="dashPinErreur" style="display:none;color:#B91C1C;font-size:12px;margin-top:8px;"></div>
         </div>
@@ -10745,7 +10745,7 @@ async function getProviders({ categorie='', recherche='', limite=20, offset=0 }=
 
 async function getDashboardData(providerId) {
   const COLS_BASE = 'id,prenom,nom,matricule,metier,categorie,ville,commune,quartier,telephone,photo_url,description,skills,statut,note_moyenne,nb_vues,essai_actif,essai_fin,abonnement_actif,abonnement_fin,created_at,disponibilite';
-  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,nb_partages,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise,badge_ambassadeur,badge_ambassadeur_fin,doit_changer_mdp,cover_url,badge_remis';
+  const COLS_OPT = 'nb_favoris,nb_avis,nb_appels,nb_whatsapp,nb_partages,latitude,longitude,tarif,experience,type_compte,nom_entreprise,role_entreprise,badge_ambassadeur,badge_ambassadeur_fin,doit_changer_mdp,cover_url,badge_remis,password_hash';
   try {
     let res = await sb.from('providers')
       .select(COLS_BASE + ',' + COLS_OPT)
@@ -11709,9 +11709,20 @@ function _dashUpdateUI() {
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
   // Salutation simplifiée
   set('dashGreetPrenom', p.prenom || '...');
-  // Bannière changement de PIN (compte créé par l'admin, PIN par défaut 0000)
+  // Bannière changement de PIN — s'affiche si doit_changer_mdp=true (compte
+  // créé/réinitialisé par l'admin) OU si le PIN actuel est encore "0000"
+  // (cas d'un prestataire auto-inscrit ayant lui-même choisi 0000, non
+  // couvert par doit_changer_mdp qui ne concerne que les comptes admin)
   const _banniereMdp = document.getElementById('dashBanniereMdp');
-  if (_banniereMdp) _banniereMdp.style.display = p.doit_changer_mdp ? 'block' : 'none';
+  if (_banniereMdp) {
+    if (p.doit_changer_mdp) {
+      _banniereMdp.style.display = 'block';
+    } else if (p.password_hash) {
+      hashPassword('0000').then(h => { _banniereMdp.style.display = (h === p.password_hash) ? 'block' : 'none'; });
+    } else {
+      _banniereMdp.style.display = 'none';
+    }
+  }
   // Aperçu photo de couverture (onglet Mes photos)
   const _covPreview = document.getElementById('dashCouverturePreview');
   if (_covPreview) _covPreview.style.backgroundImage = p.cover_url ? `url('${p.cover_url}')` : '';
@@ -11823,12 +11834,17 @@ function _dashUpdateUI() {
     const pbTypeLabel = document.getElementById('pbTypeLabel');
     if (pbTypeLabel && p.nom_entreprise) pbTypeLabel.textContent = p.nom_entreprise;
   }
-  // Badge PDF téléchargeable
+  // Badge PDF — bouton toujours visible une fois le prestataire validé et
+  // matriculé ; badge_remis ne conditionne que le CLIC (téléchargement réel
+  // vs message d'attente), jamais la visibilité du bouton lui-même.
   const _badgeDlBtn = document.getElementById('dashBadgeDlBtn');
   if (_badgeDlBtn) {
-    if (p.statut === 'valide' && p.matricule && p.badge_remis === true) {
+    if (p.statut === 'valide' && p.matricule) {
       _badgeDlBtn.style.display = 'block';
-      _badgeDlBtn.innerHTML = '<button onclick="checkAcces(\'Télécharger mon badge PDF\', function(){ _genererBadgePDF(window.providerData); })" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B2A4A,#E8650A);color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;font-family:\'DM Sans\',sans-serif;">🎫 Télécharger mon badge PDF</button>';
+      const _onclickBadge = p.badge_remis === true
+        ? "checkAcces('Télécharger mon badge PDF', function(){ _genererBadgePDF(window.providerData); })"
+        : "_dashBadgeNonRemis()";
+      _badgeDlBtn.innerHTML = '<button onclick="'+_onclickBadge+'" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B2A4A,#E8650A);color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;font-family:\'DM Sans\',sans-serif;">🎫 Télécharger mon badge PDF</button>';
     } else {
       _badgeDlBtn.style.display = 'none';
     }
@@ -23323,6 +23339,11 @@ async function _verifLoad(matricule) {
   }
 }
 
+function _dashBadgeNonRemis() {
+  showToast('🎫 Votre badge vous sera remis en main propre avant le lancement officiel du 4 Septembre. Rendez-vous à YOUMMA !', 'info');
+}
+window._dashBadgeNonRemis = _dashBadgeNonRemis;
+
 async function _genererBadgePDF(p) {
   if (!p || !p.matricule) { showToast('Matricule manquant','error'); return; }
   showToast('Génération du badge en cours…','info');
@@ -24272,8 +24293,8 @@ async function _dashChangerPin() {
     if (typeof showToast === 'function') showToast('✅ Code PIN mis à jour', 'success');
     const banniere = document.getElementById('dashBanniereMdp');
     if (banniere) banniere.style.display = 'none';
-    if (typeof _dashData !== 'undefined' && _dashData) _dashData.doit_changer_mdp = false;
-    if (typeof providerData !== 'undefined' && providerData) providerData.doit_changer_mdp = false;
+    if (typeof _dashData !== 'undefined' && _dashData) { _dashData.doit_changer_mdp = false; _dashData.password_hash = password_hash; }
+    if (typeof providerData !== 'undefined' && providerData) { providerData.doit_changer_mdp = false; providerData.password_hash = password_hash; }
   } catch (e) {
     if (errEl) { errEl.textContent = 'Erreur : ' + e.message; errEl.style.display = 'block'; }
   }
