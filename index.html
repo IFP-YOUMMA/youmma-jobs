@@ -14,8 +14,8 @@
 <meta property="og:image" content="https://yoummajobs.com/og-image.jpg"/>
 <meta property="og:url" content="https://yoummajobs.com"/>
 <meta name="theme-color" content="#1A1A4E"/>
-<!-- Fond blanc immédiat si arrivée via QR #verif= (avant tout JS) -->
-<script>if(window.location.hash.toLowerCase().indexOf('verif=')===1){document.documentElement.style.background='#fff';}</script>
+<!-- Fond blanc immédiat si arrivée via QR #verif= ou lien de notation #noter/ (avant tout JS) -->
+<script>if(window.location.hash.toLowerCase().indexOf('verif=')===1||window.location.hash.toLowerCase().indexOf('noter/')===1){document.documentElement.style.background='#fff';}</script>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <link rel="manifest" href="/manifest.json"/>
@@ -6568,7 +6568,7 @@ function ouvrirProfil(id) {
       metier:data.metier, cat:data.categorie, ville:data.ville||'Conakry',
       commune:data.commune||'', quartier:data.quartier||'',
       tel:data.telephone, wa:data.telephone,
-      note:parseFloat(data.note_moyenne)>0?parseFloat(data.note_moyenne):4.0,
+      note:parseFloat(data.note_moyenne)||0,
       vues:data.nb_vues||0, missions:data.nb_missions||0,
       bg:_c.bg, color:_c.color, desc:data.description||'', skills:data.skills||[],
       pb:'pb-artisan', photo_url:data.photo_url||null, cover_url:data.cover_url||null,
@@ -6762,9 +6762,10 @@ function renderProviders() {
       badgeStatut,
     ].filter(Boolean).join(_sep);
     const _note = parseFloat(p.note) || 0;
-    const noteDisplay = _note > 0
+    const _nbAvis = p.nb_avis || 0;
+    const noteDisplay = _nbAvis > 0
       ? `<div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${window._renderStars(_note,11,'#f59e0b','#e5e7eb')}</div><div style="font-size:18px;font-weight:700;color:#111;">${_note.toFixed(1)}</div>`
-      : '<div style="display:flex;justify-content:center;gap:1px;margin-bottom:3px;"><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span><span style="color:#e5e7eb;font-size:11px;">★</span></div><div style="font-size:11px;font-weight:500;color:#9ca3af;margin-top:2px;">Pas encore noté</div>';
+      : '<div style="font-size:18px;font-weight:700;color:#111;">—</div><div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Note</div>';
     const coverUrl = _providerCoverUrl(p);
 
     return `
@@ -6804,7 +6805,7 @@ function renderProviders() {
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;">
         <div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">
-          <div style="font-size:18px;font-weight:700;color:#111;">${(p.missions||0) > 0 ? p.missions : '—'}</div>
+          <div style="font-size:18px;font-weight:700;color:#111;">${p.missions||0}</div>
           <div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Missions</div>
         </div>
         <div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">
@@ -7573,8 +7574,11 @@ document.addEventListener('keydown', e => {
         style="display:flex;align-items:center;gap:10px;padding:14px 18px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:14px;text-decoration:none;color:#166534;font-size:14px;font-weight:700;touch-action:manipulation;margin-bottom:6px;">
         ❓ Besoin d'aide ? Écrivez-nous sur WhatsApp
       </a>
-      <button onclick="_dashPartagerProfil()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 18px;background:#fff;border:1.5px solid #16A34A;border-radius:14px;color:#16A34A;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;box-sizing:border-box;">
+      <button onclick="_dashPartagerProfil()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 18px;background:#fff;border:1.5px solid #16A34A;border-radius:14px;color:#16A34A;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;box-sizing:border-box;margin-bottom:10px;">
         🔗 Partager mon profil à des amis
+      </button>
+      <button onclick="_dashOuvrirDeclarerMission()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 18px;background:#1A1A4E;color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;box-sizing:border-box;">
+        📋 Déclarer une mission
       </button>
     </div>
 
@@ -8792,6 +8796,7 @@ async function chargerAvis() {
     <div onclick="showAdmin('carousel')" id="amenu-carousel" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-photo-film" style="width:16px;"></i> Images à la une</div>
     <div onclick="showAdmin('app_message');_appMsgLoadAdmin();" id="amenu-app_message" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullhorn" style="width:16px;"></i> Message prestataires</div>
     <div onclick="showAdmin('missions')" id="amenu-missions" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullseye" style="width:16px;"></i> Missions</div>
+    <div onclick="showAdmin('missions_declarees');_admChargerMissionsDeclarees();" id="amenu-missions_declarees" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-clipboard-check" style="width:16px;"></i> Missions déclarées</div>
     <div onclick="showAdmin('projets_clients')" id="amenu-projets_clients" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-clipboard-list" style="width:16px;flex-shrink:0;"></i> Projets clients<span id="adminPcBadge" style="display:none;margin-left:auto;background:#E53E3E;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center;line-height:1.4;animation:yjBadgePulse 2s ease-in-out infinite;"></span></div>
     <div onclick="showAdmin('ambassadeurs');chargerClassementAdmin();" id="amenu-ambassadeurs" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-trophy" style="width:16px;"></i> Ambassadeurs</div>
     <div onclick="showAdmin('rapports')" id="amenu-rapports" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-chart-line" style="width:16px;"></i> Rapports</div>
@@ -9961,6 +9966,29 @@ async function chargerAvis() {
             <div id="missDetailContenu" style="padding:20px 24px;"></div>
             <div id="missDetailActions" style="padding:16px 24px;border-top:1px solid #F0F0F8;display:flex;gap:10px;flex-wrap:wrap;"></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ADMIN MISSIONS DÉCLARÉES ══ -->
+    <div class="admin-section" id="admin-missions_declarees">
+      <div class="admin-section-inner">
+        <div class="adm-section-header" style="margin-bottom:20px;">
+          <div class="adm-section-title">
+            <i class="fa-solid fa-clipboard-check" style="color:#E85D04;"></i> Missions déclarées
+          </div>
+          <button onclick="_admChargerMissionsDeclarees()" style="padding:8px 16px;background:#E85D04;color:#fff;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;">
+            <i class="fa-solid fa-rotate"></i> Actualiser
+          </button>
+        </div>
+        <div style="background:#EFF6FF;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start;">
+          <i class="fa-solid fa-circle-info" style="color:#2563EB;font-size:16px;flex-shrink:0;margin-top:1px;"></i>
+          <div style="font-size:13px;color:#1E40AF;line-height:1.6;">
+            Missions déclarées par les prestataires eux-mêmes. Valider une mission génère un lien de notation à envoyer au client par WhatsApp/SMS.
+          </div>
+        </div>
+        <div id="adminMissionsDeclareesList">
+          <div style="text-align:center;padding:30px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>
         </div>
       </div>
     </div>
@@ -11282,7 +11310,8 @@ async function loadProvidersFromSupabase() {
       quartier: p.quartier || '',
       tel: p.telephone,
       wa: p.telephone,
-      note: parseFloat(p.note_moyenne) > 0 ? parseFloat(p.note_moyenne) : 4.0,
+      note: parseFloat(p.note_moyenne) || 0,
+      nb_avis: p.nb_avis || 0,
       vues: p.nb_vues||0,
       missions: p.nb_missions||0,
       bg: (catColors[p.categorie]||{bg:'#F4F6FB'}).bg,
@@ -13853,8 +13882,13 @@ window.addEventListener('load', async function() {
     _verifLoad(_mat);
     return;
   }
+  if (hash.startsWith('noter/')) {
+    const _token = hash.replace('noter/', '').trim();
+    _noterLoad(_token);
+    return;
+  }
   if (hash === 'admin') {
-    if (typeof _realNavigate==='function') _realNavigate('admin'); 
+    if (typeof _realNavigate==='function') _realNavigate('admin');
     else if (typeof _showAdminPanel==='function') _showAdminPanel();
     if (typeof initAdmin==='function') await initAdmin(); 
   }
@@ -13918,6 +13952,13 @@ window.addEventListener('hashchange', async function() {
     const _hcMat = _rawHash2.replace(/[^A-Z0-9\-]/gi, '').toUpperCase().trim();
     console.log('[VERIF] hash brut:', _rawHash2, '| matricule nettoyé:', _hcMat);
     _verifLoad(_hcMat);
+    return;
+  }
+
+  // #noter/ intercepté en priorité absolue (page publique, aucune auth requise)
+  if (hash.startsWith('noter/')) {
+    const _hcToken = hash.replace('noter/', '').trim();
+    _noterLoad(_hcToken);
     return;
   }
 
@@ -14150,6 +14191,7 @@ function showAdmin(name) {
     carousel: '<i class="fa-solid fa-photo-film" style="color:#E85D04;margin-right:6px;"></i>Images à la une',
     app_message: '<i class="fa-solid fa-bullhorn" style="color:#E85D04;margin-right:6px;"></i>Message prestataires',
     missions: '<i class="fa-solid fa-bullseye" style="color:#E85D04;margin-right:6px;"></i>Missions',
+    missions_declarees: '<i class="fa-solid fa-clipboard-check" style="color:#E85D04;margin-right:6px;"></i>Missions déclarées',
     projets_clients: '<i class="fa-solid fa-clipboard-list" style="color:#E85D04;margin-right:6px;"></i>Projets clients',
     ambassadeurs: '<i class="fa-solid fa-trophy" style="color:#F5C842;margin-right:6px;"></i>Ambassadeurs',
     rapports: '<i class="fa-solid fa-chart-line" style="color:#E85D04;margin-right:6px;"></i>Rapports',
@@ -14163,7 +14205,7 @@ function showAdmin(name) {
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','app_message','missions','projets_clients','ambassadeurs','rapports','activite','notifications','equipe','registre_chantier'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','app_message','missions','missions_declarees','projets_clients','ambassadeurs','rapports','activite','notifications','equipe','registre_chantier'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (!el) return;
     // Ne pas réafficher un élément restreint à l'agent
@@ -14226,6 +14268,94 @@ async function _adminValidMission(missionId, statut, providerId) {
   showToast(statut==='valide'?'✅ Mission validée !':'Mission rejetée');
   chargerMissionsAdmin();
 }
+
+// ── ADMIN : MISSIONS DÉCLARÉES PAR LES PRESTATAIRES (missions_declarees) ──
+async function _admChargerMissionsDeclarees() {
+  const list = document.getElementById('adminMissionsDeclareesList');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:30px;color:#9CA3AF;font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Chargement...</div>';
+  try {
+    const { data, error } = await sb.from('missions_declarees')
+      .select('*, providers(prenom,nom,metier)')
+      .order('created_at', {ascending:false});
+    if (error) { list.innerHTML = `<div style="color:#DC2626;padding:20px;font-size:13px;">Erreur: ${error.message}</div>`; return; }
+    if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:#9CA3AF;font-size:13px;">Aucune mission déclarée</div>'; return; }
+
+    const statutBadge = s => {
+      const map = { en_attente:['#FFFBEB','#D97706','⏳ En attente'], validee:['#ECFDF5','#059669','✅ Validée'], rejetee:['#FEF2F2','#DC2626','❌ Rejetée'] };
+      const v = map[s] || ['#F3F4F6','#9CA3AF','—'];
+      return `<span style="background:${v[0]};color:${v[1]};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;">${v[2]}</span>`;
+    };
+
+    const rows = data.map(m => {
+      const provNom = m.providers ? ((m.providers.prenom||'')+' '+(m.providers.nom||'')).trim() : '—';
+      const actions = m.statut === 'en_attente'
+        ? `<button onclick="_admValiderMissionDeclaree('${m.id}','${m.provider_id}')" style="padding:6px 12px;background:rgba(22,163,74,.12);color:#16A34A;border:none;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;margin:2px;">✅ Valider + Envoyer lien</button><button onclick="_admRejeterMissionDeclaree('${m.id}')" style="padding:6px 12px;background:rgba(239,68,68,.1);color:#DC2626;border:none;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;margin:2px;">❌ Rejeter</button>`
+        : '<span style="color:#9CA3AF;font-size:11.5px;">—</span>';
+      return `<tr style="border-bottom:1px solid #F3F4F6;">
+        <td style="padding:10px 8px;font-weight:600;color:#1A1A4E;">${provNom}<div style="font-size:10.5px;color:#9CA3AF;font-weight:400;">${(m.providers&&m.providers.metier)||''}</div></td>
+        <td style="padding:10px 8px;">${m.client_nom}</td>
+        <td style="padding:10px 8px;white-space:nowrap;"><a href="tel:${m.client_telephone}" style="color:#1A1A4E;text-decoration:none;">${m.client_telephone}</a></td>
+        <td style="padding:10px 8px;max-width:220px;color:#6B7280;">${m.description||'—'}</td>
+        <td style="padding:10px 8px;">${statutBadge(m.statut)}</td>
+        <td style="padding:10px 8px;white-space:nowrap;color:#9CA3AF;">${new Date(m.created_at).toLocaleDateString('fr-FR')}</td>
+        <td style="padding:10px 8px;" id="admMissionDecActions_${m.id}">${actions}</td>
+      </tr>`;
+    }).join('');
+
+    list.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+      <thead><tr style="text-align:left;border-bottom:2px solid #E5E7EB;">
+        <th style="padding:10px 8px;">Prestataire</th>
+        <th style="padding:10px 8px;">Client</th>
+        <th style="padding:10px 8px;">Téléphone</th>
+        <th style="padding:10px 8px;">Description</th>
+        <th style="padding:10px 8px;">Statut</th>
+        <th style="padding:10px 8px;">Date</th>
+        <th style="padding:10px 8px;">Actions</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+  } catch(e) {
+    list.innerHTML = `<div style="color:#DC2626;padding:20px;font-size:13px;">Erreur: ${e.message}</div>`;
+  }
+}
+window._admChargerMissionsDeclarees = _admChargerMissionsDeclarees;
+
+async function _admValiderMissionDeclaree(missionId, providerId) {
+  try {
+    const { data: avis, error: e1 } = await sb.from('avis_clients').insert({ mission_id: missionId, provider_id: providerId }).select().single();
+    if (e1) throw e1;
+    const { error: e2 } = await sb.from('missions_declarees').update({ statut: 'validee' }).eq('id', missionId);
+    if (e2) throw e2;
+
+    const lien = 'https://yoummajobs.com/#noter/' + avis.token;
+    const cell = document.getElementById('admMissionDecActions_' + missionId);
+    if (cell) {
+      cell.innerHTML = `<div style="font-size:11px;color:#059669;font-weight:700;margin-bottom:4px;">✅ Lien généré</div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <input readonly value="${lien}" onclick="this.select()" style="font-size:10.5px;padding:5px 8px;border:1px solid #E5E7EB;border-radius:6px;width:150px;color:#374151;"/>
+          <button onclick="navigator.clipboard.writeText('${lien}');showToast('📋 Lien copié','success');" style="padding:5px 10px;background:#1A1A4E;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">Copier le lien</button>
+        </div>`;
+    }
+    showToast('✅ Mission validée, lien de notation généré', 'success');
+  } catch(e) {
+    showToast('Erreur: ' + e.message, 'error');
+  }
+}
+window._admValiderMissionDeclaree = _admValiderMissionDeclaree;
+
+async function _admRejeterMissionDeclaree(missionId) {
+  if (!window.confirm('Rejeter cette mission déclarée ?')) return;
+  try {
+    const { error } = await sb.from('missions_declarees').update({ statut: 'rejetee' }).eq('id', missionId);
+    if (error) throw error;
+    showToast('Mission rejetée', 'success');
+    _admChargerMissionsDeclarees();
+  } catch(e) {
+    showToast('Erreur: ' + e.message, 'error');
+  }
+}
+window._admRejeterMissionDeclaree = _admRejeterMissionDeclaree;
 
 function actionsHTML(p) {
   const b = (bg,c,t,type) => `<button style="padding:6px 12px;background:${bg};color:${c};border:none;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;margin:2px;" onclick="_adminAction('${type}','${p.id}')">${t}</button>`;
@@ -23339,6 +23469,151 @@ async function _verifLoad(matricule) {
   }
 }
 
+// ══════════════════════════════════════════════════════════════
+// PAGE PUBLIQUE DE NOTATION CLIENT — #noter/{token}
+// ══════════════════════════════════════════════════════════════
+// Même technique que _verifLoad() (#verif=) : overlay fullscreen
+// indépendant du système de navigation, aucune authentification requise.
+function _noterRetour() {
+  document.getElementById('noter-overlay')?.remove();
+  window.location.hash = '';
+}
+
+async function _noterLoad(token) {
+  if (!token) { window.location.hash = ''; return; }
+
+  document.getElementById('noter-overlay')?.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'noter-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#f5f7fa;z-index:99999;overflow-y:auto;font-family:\'DM Sans\',system-ui,sans-serif;display:flex;align-items:flex-start;justify-content:center;padding:20px;box-sizing:border-box;';
+  document.body.appendChild(overlay);
+
+  const _retour = '<div style="text-align:center;margin-top:16px;"><button onclick="_noterRetour()" style="background:#fff;border:1.5px solid #E5E7EB;color:#374151;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;padding:10px 28px;border-radius:40px;cursor:pointer;">← Retour au site</button></div>';
+
+  const _wrap = document.createElement('div');
+  _wrap.style.cssText = 'width:100%;max-width:420px;margin-top:40px;';
+  overlay.appendChild(_wrap);
+
+  _wrap.innerHTML =
+    '<div style="background:#fff;border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #E5E7EB;">'
+    + '<style>@keyframes _nSpin{to{transform:rotate(360deg)}}</style>'
+    + '<div style="width:44px;height:44px;border:4px solid #F3F4F6;border-top-color:#E8650A;border-radius:50%;animation:_nSpin 0.8s linear infinite;margin:0 auto 14px;"></div>'
+    + '<div style="font-size:14px;color:#6B7280;font-weight:500;">Chargement…</div>'
+    + '</div>';
+
+  try {
+    const { data: avis, error } = await sb.from('avis_clients')
+      .select('*, providers(prenom,nom,metier,categorie)')
+      .eq('token', token)
+      .maybeSingle();
+
+    if (error || !avis) {
+      _wrap.innerHTML =
+        '<div style="background:#fff;border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #E5E7EB;">'
+        + '<div style="font-family:\'Libre Baskerville\',serif;font-size:15px;font-weight:700;color:#1B2A4A;margin-bottom:16px;">YOUMMA<span style="color:#E8650A;">JOBS</span></div>'
+        + '<div style="font-size:52px;line-height:1;margin-bottom:14px;">❌</div>'
+        + '<div style="font-size:17px;font-weight:800;color:#374151;margin-bottom:10px;">Lien invalide</div>'
+        + '<div style="font-size:13px;color:#6B7280;line-height:1.7;">Ce lien de notation n\'existe pas ou a expiré.</div>'
+        + '</div>' + _retour;
+      return;
+    }
+
+    const p = avis.providers || {};
+    const nom = ((p.prenom||'') + ' ' + (p.nom||'')).trim() || 'Votre prestataire';
+
+    if (avis.token_used_at) {
+      _wrap.innerHTML =
+        '<div style="background:linear-gradient(160deg,#ECFDF5,#D1FAE5);border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #6EE7B7;">'
+        + '<div style="font-family:\'Libre Baskerville\',serif;font-size:15px;font-weight:700;color:#1B2A4A;margin-bottom:16px;">YOUMMA<span style="color:#E8650A;">JOBS</span></div>'
+        + '<div style="font-size:52px;line-height:1;margin-bottom:14px;">✅</div>'
+        + '<div style="font-size:17px;font-weight:800;color:#065F46;margin-bottom:10px;">Vous avez déjà noté ce prestataire.</div>'
+        + '<div style="font-size:14px;color:#059669;">Merci !</div>'
+        + '</div>' + _retour;
+      return;
+    }
+
+    window._noterNoteChoisie = 0;
+    const _renderEtoiles = () => {
+      let s = '';
+      for (let i = 1; i <= 5; i++) {
+        s += '<span onclick="_noterChoisirEtoile(' + i + ')" style="cursor:pointer;font-size:38px;color:' + (i <= window._noterNoteChoisie ? '#F59E0B' : '#E5E7EB') + ';padding:0 3px;">★</span>';
+      }
+      return s;
+    };
+
+    const _renderForm = () => {
+      _wrap.innerHTML =
+        '<div style="background:#fff;border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #E5E7EB;">'
+        + '<div style="font-family:\'Libre Baskerville\',serif;font-size:15px;font-weight:700;color:#1B2A4A;margin-bottom:18px;">YOUMMA<span style="color:#E8650A;">JOBS</span></div>'
+        + '<div style="font-size:18px;font-weight:800;color:#1A1A4E;margin-bottom:14px;">Notez votre prestataire</div>'
+        + '<div style="font-size:16px;font-weight:700;color:#374151;margin-bottom:2px;">' + nom + '</div>'
+        + '<div style="font-size:13px;color:#9CA3AF;margin-bottom:20px;">' + (p.metier || p.categorie || '') + '</div>'
+        + '<div id="noterEtoiles" style="margin-bottom:18px;">' + _renderEtoiles() + '</div>'
+        + '<textarea id="noterCommentaire" rows="3" placeholder="Votre commentaire (optionnel)" style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;resize:vertical;font-family:inherit;margin-bottom:16px;"></textarea>'
+        + '<div id="noterErreur" style="display:none;color:#DC2626;font-size:12px;margin-bottom:12px;"></div>'
+        + '<button id="noterEnvoyerBtn" onclick="_noterEnvoyer(\'' + avis.id + '\',\'' + avis.provider_id + '\')" style="width:100%;background:linear-gradient(135deg,#E8650A,#C74B00);color:#fff;border:none;border-radius:40px;padding:13px 20px;font-size:15px;font-weight:700;font-family:\'DM Sans\',sans-serif;cursor:pointer;">Envoyer ma note</button>'
+        + '</div>' + _retour;
+    };
+
+    window._noterChoisirEtoile = function(n) {
+      window._noterNoteChoisie = n;
+      const el = document.getElementById('noterEtoiles');
+      if (el) el.innerHTML = _renderEtoiles();
+    };
+
+    _renderForm();
+  } catch(e) {
+    console.error('[NOTER] Exception :', e);
+    _wrap.innerHTML =
+      '<div style="background:#fff;border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #FCA5A5;">'
+      + '<div style="font-size:13px;color:#DC2626;">Erreur inattendue : ' + e.message + '</div>'
+      + '</div>' + _retour;
+  }
+}
+
+async function _noterEnvoyer(avisId, providerId) {
+  const err = document.getElementById('noterErreur');
+  if (err) err.style.display = 'none';
+  const note = window._noterNoteChoisie || 0;
+  if (note < 1) { if (err) { err.textContent = 'Choisissez une note (1 à 5 étoiles).'; err.style.display = 'block'; } return; }
+  const commentaire = (document.getElementById('noterCommentaire')?.value || '').trim();
+
+  const btn = document.getElementById('noterEnvoyerBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Envoi...'; }
+
+  try {
+    const { error: e1 } = await sb.from('avis_clients').update({
+      note, commentaire: commentaire || null, token_used_at: new Date().toISOString()
+    }).eq('id', avisId);
+    if (e1) throw e1;
+
+    const { data: prov } = await sb.from('providers').select('nb_missions,nb_avis,note_moyenne').eq('id', providerId).single();
+    const oldNbAvis = (prov && prov.nb_avis) || 0;
+    const oldAvg = (prov && parseFloat(prov.note_moyenne)) || 0;
+    const newNbAvis = oldNbAvis + 1;
+    const newAvg = Math.round((((oldAvg * oldNbAvis) + note) / newNbAvis) * 10) / 10;
+    const newNbMissions = ((prov && prov.nb_missions) || 0) + 1;
+    await sb.from('providers').update({ nb_missions: newNbMissions, nb_avis: newNbAvis, note_moyenne: newAvg }).eq('id', providerId);
+
+    const overlay = document.getElementById('noter-overlay');
+    const _wrap = overlay ? overlay.firstChild : null;
+    if (_wrap) {
+      _wrap.innerHTML =
+        '<div style="background:linear-gradient(160deg,#ECFDF5,#D1FAE5);border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.09);border:1px solid #6EE7B7;">'
+        + '<div style="font-family:\'Libre Baskerville\',serif;font-size:15px;font-weight:700;color:#1B2A4A;margin-bottom:16px;">YOUMMA<span style="color:#E8650A;">JOBS</span></div>'
+        + '<div style="font-size:52px;line-height:1;margin-bottom:14px;">✅</div>'
+        + '<div style="font-size:17px;font-weight:800;color:#065F46;margin-bottom:6px;">Merci pour votre avis !</div>'
+        + '<div style="font-size:13px;color:#6B7280;">Votre note a bien été enregistrée.</div>'
+        + '</div>';
+    }
+    if (typeof showToast === 'function') showToast('Merci pour votre avis !', 'success');
+  } catch(e) {
+    if (err) { err.textContent = 'Erreur : ' + e.message; err.style.display = 'block'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Envoyer ma note'; }
+  }
+}
+
 function _dashBadgeNonRemis() {
   showToast('🎫 Votre badge vous sera remis en main propre avant le lancement officiel du 4 Septembre. Rendez-vous à YOUMMA !', 'info');
 }
@@ -24467,6 +24742,81 @@ async function _dashSupprimerUne(id) {
   }
 }
 window._dashSupprimerUne = _dashSupprimerUne;
+</script>
+
+<!-- ══ DÉCLARER UNE MISSION (prestataire) ══ -->
+<div id="modalDeclarerMission" style="display:none;position:fixed;inset:0;z-index:999998;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:18px;padding:24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto;box-sizing:border-box;">
+    <h3 style="font-family:'Libre Baskerville',serif;color:#1B2A4A;margin:0 0 16px;font-size:16px;">📋 Déclarer une mission</h3>
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:12.5px;font-weight:700;color:#374151;margin-bottom:6px;">Nom du client *</label>
+      <input id="declMissionClientNom" type="text" placeholder="Ex : Mamadou Diallo" style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;"/>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:12.5px;font-weight:700;color:#374151;margin-bottom:6px;">Téléphone du client *</label>
+      <input id="declMissionClientTel" type="tel" placeholder="Ex : 224621234567" style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;"/>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label style="display:block;font-size:12.5px;font-weight:700;color:#374151;margin-bottom:6px;">Description du travail (optionnel)</label>
+      <textarea id="declMissionDescription" rows="3" placeholder="Ex : Installation électrique salon" style="width:100%;box-sizing:border-box;padding:11px 14px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+    </div>
+    <div id="declMissionErreur" style="display:none;color:#DC2626;font-size:12px;margin-bottom:12px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="_dashFermerDeclarerMission()" style="flex:1;padding:12px;background:#F3F4F6;color:#374151;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;">Annuler</button>
+      <button id="declMissionEnvoyerBtn" onclick="_dashEnvoyerDeclarationMission()" style="flex:2;padding:12px;background:#E85D04;color:#fff;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;">Envoyer la déclaration</button>
+    </div>
+  </div>
+</div>
+<script>
+function _dashOuvrirDeclarerMission() {
+  const m = document.getElementById('modalDeclarerMission');
+  if (!m) return;
+  const nom = document.getElementById('declMissionClientNom');
+  const tel = document.getElementById('declMissionClientTel');
+  const desc = document.getElementById('declMissionDescription');
+  if (nom) nom.value = '';
+  if (tel) tel.value = '';
+  if (desc) desc.value = '';
+  const err = document.getElementById('declMissionErreur');
+  if (err) err.style.display = 'none';
+  m.style.display = 'flex';
+}
+window._dashOuvrirDeclarerMission = _dashOuvrirDeclarerMission;
+
+function _dashFermerDeclarerMission() {
+  const m = document.getElementById('modalDeclarerMission');
+  if (m) m.style.display = 'none';
+}
+window._dashFermerDeclarerMission = _dashFermerDeclarerMission;
+
+async function _dashEnvoyerDeclarationMission() {
+  const nom = (document.getElementById('declMissionClientNom').value || '').trim();
+  const tel = (document.getElementById('declMissionClientTel').value || '').trim();
+  const desc = (document.getElementById('declMissionDescription').value || '').trim();
+  const err = document.getElementById('declMissionErreur');
+  if (err) err.style.display = 'none';
+  if (!nom) { if (err) { err.textContent = 'Le nom du client est obligatoire.'; err.style.display = 'block'; } return; }
+  if (!tel) { if (err) { err.textContent = 'Le téléphone du client est obligatoire.'; err.style.display = 'block'; } return; }
+
+  const pid = (typeof _dashProviderId !== 'undefined' && _dashProviderId) || (typeof providerId !== 'undefined' && providerId);
+  if (!pid) { if (err) { err.textContent = 'Session expirée, reconnectez-vous.'; err.style.display = 'block'; } return; }
+
+  const btn = document.getElementById('declMissionEnvoyerBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Envoi...'; }
+  try {
+    const { error } = await sb.from('missions_declarees').insert({
+      provider_id: pid, client_nom: nom, client_telephone: tel, description: desc || null, statut: 'en_attente'
+    });
+    if (error) throw error;
+    showToast('✅ Mission déclarée ! YOUMMA va contacter votre client.', 'success');
+    _dashFermerDeclarerMission();
+  } catch(e) {
+    if (err) { err.textContent = 'Erreur : ' + e.message; err.style.display = 'block'; }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Envoyer la déclaration'; }
+  }
+}
+window._dashEnvoyerDeclarationMission = _dashEnvoyerDeclarationMission;
 </script>
 
 <!-- ══ ÉDITEUR PHOTO — CROP / ZOOM / REPOSITIONNEMENT (Canvas API) ══ -->
