@@ -10862,38 +10862,50 @@ async function resizeImage(file, type='realisation') {
 // Bucket 'Photos' (majuscule) = profils / réalisations / documents / logos
 async function uploadProviderPhoto(providerId, file, type='realisation') {
   console.log('[uploadProviderPhoto] fichier:', file && file.name, '|', file && (file.size/1024).toFixed(1), 'Ko | bucket cible: Photos | type:', type, '| providerId:', providerId);
-  const photos = await getProviderPhotos(providerId);
-  const reals = photos.filter(p => p.type==='realisation');
-  if (type==='realisation' && reals.length>=5) return { success:false, message:'Maximum 5 photos atteint' };
+  try {
+    const photos = await getProviderPhotos(providerId);
+    const reals = photos.filter(p => p.type==='realisation');
+    if (type==='realisation' && reals.length>=5) return { success:false, message:'Maximum 5 photos atteint' };
 
-  // Redimensionner avant upload
-  let fileToUpload = file;
-  try { fileToUpload = await resizeImage(file, type); } catch(e) { fileToUpload = file; }
+    // Redimensionner avant upload
+    let fileToUpload = file;
+    try { fileToUpload = await resizeImage(file, type); } catch(e) { fileToUpload = file; }
 
-  const filename = `${type === 'profil' ? 'profils' : 'realisations'}/${providerId}/${Date.now()}.jpg`;
-  const { error:uploadError } = await sb.storage.from('Photos').upload(filename, fileToUpload, { cacheControl:'3600', upsert:false, contentType:'image/jpeg' });
-  if (uploadError) { console.error('[uploadProviderPhoto] ÉCHEC upload:', uploadError.message, '| statusCode:', uploadError.statusCode, uploadError); return { success:false, message:uploadError.message }; }
-  const { data:urlData } = sb.storage.from('Photos').getPublicUrl(filename);
-  const publicUrl = urlData.publicUrl;
-  if (type==='profil') {
-    const oldProfil = photos.find(p => p.type==='profil');
-    if (oldProfil) {
-      await sb.from('provider_photos').delete().eq('id',oldProfil.id);
-      const op = oldProfil.url.split('Photos/')[1];
-      if (op) await sb.storage.from('Photos').remove([op]);
+    const filename = `${type === 'profil' ? 'profils' : 'realisations'}/${providerId}/${Date.now()}.jpg`;
+    const { error:uploadError } = await sb.storage.from('Photos').upload(filename, fileToUpload, { cacheControl:'3600', upsert:false, contentType:'image/jpeg' });
+    if (uploadError) {
+      console.error('[uploadProviderPhoto] ÉCHEC upload:', uploadError.message, '| statusCode:', uploadError.statusCode, uploadError);
+      if (typeof showToast === 'function') showToast('Erreur upload : ' + uploadError.message, 'error');
+      return { success:false, message:uploadError.message };
     }
-    await sb.from('providers').update({ photo_url:publicUrl }).eq('id',providerId);
+    const { data:urlData } = sb.storage.from('Photos').getPublicUrl(filename);
+    const publicUrl = urlData.publicUrl;
+    if (type==='profil') {
+      const oldProfil = photos.find(p => p.type==='profil');
+      if (oldProfil) {
+        await sb.from('provider_photos').delete().eq('id',oldProfil.id);
+        const op = oldProfil.url.split('Photos/')[1];
+        if (op) await sb.storage.from('Photos').remove([op]);
+      }
+      await sb.from('providers').update({ photo_url:publicUrl }).eq('id',providerId);
+    }
+    const { data:photo, error:insertError } = await sb.from('provider_photos').insert({ provider_id:providerId, url:publicUrl, type, ordre:photos.length }).select().single();
+    if (insertError) {
+      console.error('[uploadProviderPhoto] ÉCHEC INSERT:', insertError.message, insertError);
+      if (typeof showToast === 'function') showToast('Erreur upload : ' + insertError.message, 'error');
+      return { success:false, message:"L'ajout a échoué, réessayez" };
+    }
+    if (!photo) {
+      console.error('[uploadProviderPhoto] INSERT OK mais data null — vérifier RLS');
+      if (typeof showToast === 'function') showToast('Erreur upload : réponse vide après insertion (vérifier RLS)', 'error');
+      return { success:false, message:"L'ajout a échoué, réessayez" };
+    }
+    return { success:true, photo, url:publicUrl };
+  } catch(e) {
+    console.error('[uploadProviderPhoto] EXCEPTION non gérée:', e.message, e);
+    if (typeof showToast === 'function') showToast('Erreur upload : ' + e.message, 'error');
+    return { success:false, message: e.message };
   }
-  const { data:photo, error:insertError } = await sb.from('provider_photos').insert({ provider_id:providerId, url:publicUrl, type, ordre:photos.length }).select().single();
-  if (insertError) {
-    console.error('[uploadProviderPhoto] ÉCHEC INSERT:', insertError.message, insertError);
-    return { success:false, message:"L'ajout a échoué, réessayez" };
-  }
-  if (!photo) {
-    console.error('[uploadProviderPhoto] INSERT OK mais data null — vérifier RLS');
-    return { success:false, message:"L'ajout a échoué, réessayez" };
-  }
-  return { success:true, photo, url:publicUrl };
 }
 async function deleteProviderPhoto(photoId, providerId) {
   const { data:photo } = await sb.from('provider_photos').select('id,url,type,provider_id').eq('id',photoId).single();
