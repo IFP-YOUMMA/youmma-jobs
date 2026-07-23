@@ -10887,7 +10887,15 @@ async function uploadProviderPhoto(providerId, file, type='realisation') {
         const op = oldProfil.url.split('Photos/')[1];
         if (op) await sb.storage.from('Photos').remove([op]);
       }
-      await sb.from('providers').update({ photo_url:publicUrl }).eq('id',providerId);
+      const { data:updateData, error:updateError } = await sb.from('providers').update({ photo_url:publicUrl }).eq('id',providerId).select();
+      console.log('[UPDATE providers]', updateError, updateData);
+      if (updateError) {
+        console.error('[uploadProviderPhoto] ÉCHEC UPDATE photo_url:', updateError.message, '| code:', updateError.code, updateError);
+        if (typeof showToast === 'function') showToast('Erreur mise à jour profil : ' + updateError.message, 'error');
+      } else if (!updateData || !updateData.length) {
+        console.error('[uploadProviderPhoto] UPDATE photo_url : 0 ligne affectée — probable blocage RLS (policy UPDATE manquante sur providers)');
+        if (typeof showToast === 'function') showToast('Erreur : la mise à jour du profil a été bloquée (0 ligne affectée)', 'error');
+      }
     }
     const { data:photo, error:insertError } = await sb.from('provider_photos').insert({ provider_id:providerId, url:publicUrl, type, ordre:photos.length }).select().single();
     if (insertError) {
