@@ -7651,10 +7651,10 @@ document.addEventListener('keydown', e => {
       <div class="photos-section">
         <div class="photos-header">
           <div class="photos-title"><i class="fa-solid fa-camera"></i> Photo de profil</div>
-          <label onclick="event.preventDefault();console.log('[UploadPhoto] clic Changer la photo, providerData.id:',providerData&&providerData.id);this.querySelector('input[type=file]').click();" style="cursor:pointer;background:#E85D04;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
+          <button type="button" onclick="console.log('[UploadPhoto] clic Changer la photo, providerData.id:',providerData&&providerData.id);document.getElementById('inputPhotoProfil').click();" style="cursor:pointer;background:#E85D04;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;border:none;">
             <i class="fa-solid fa-camera"></i> Changer la photo
-            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){uploadPhoto(inp,'profil');})"/>
-          </label>
+          </button>
+          <input id="inputPhotoProfil" type="file" accept="image/jpeg,image/png,image/webp" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;" onchange="_cropEtUpload(this,'carre',function(inp){uploadPhoto(inp,'profil');})"/>
         </div>
         <div style="display:flex;align-items:center;gap:20px;padding:16px;background:#F4F6FB;border-radius:14px;">
           <div id="profilPhotoPreview" style="width:80px;height:80px;border-radius:16px;background:#E4E8F5;display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;font-family:'Libre Baskerville',serif;font-weight:700;color:#7A7F9A;">?</div>
@@ -7666,10 +7666,10 @@ document.addEventListener('keydown', e => {
       <div class="photos-section">
         <div class="photos-header">
           <div class="photos-title"><i class="fa-solid fa-image"></i> Photo de couverture</div>
-          <label onclick="event.preventDefault();console.log('[UploadPhoto] clic Changer la couverture, providerData.id:',providerData&&providerData.id);this.querySelector('input[type=file]').click();" style="cursor:pointer;background:#1A1A4E;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
+          <button type="button" onclick="console.log('[UploadPhoto] clic Changer la couverture, providerData.id:',providerData&&providerData.id);document.getElementById('inputPhotoCouverture').click();" style="cursor:pointer;background:#1A1A4E;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;border:none;">
             📷 Changer la couverture
-            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'bandeau',function(inp){_dashUploadCouverture(inp);})"/>
-          </label>
+          </button>
+          <input id="inputPhotoCouverture" type="file" accept="image/jpeg,image/png,image/webp" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;" onchange="_cropEtUpload(this,'bandeau',function(inp){_dashUploadCouverture(inp);})"/>
         </div>
         <div id="dashCouverturePreview" style="width:100%;height:100px;border-radius:14px;background:#E4E8F5;background-size:cover;background-position:center;"></div>
         <div style="font-size:13px;color:#7A7F9A;line-height:1.7;margin-top:10px;">Bandeau affiché en haut de votre carte et de votre profil.<br>Format : JPG, PNG, WebP — Max 5 Mo</div>
@@ -7679,13 +7679,13 @@ document.addEventListener('keydown', e => {
       <div class="photos-section">
         <div class="photos-header">
           <div class="photos-title">🖼️ Réalisations <span id="realsCountDisplay" style="font-size:12px;color:#7A7F9A;font-weight:400;">(max 5 photos)</span></div>
-          <label id="addRealLabel" onclick="event.preventDefault();console.log('[UploadPhoto] clic Ajouter une réalisation, providerData.id:',providerData&&providerData.id);this.querySelector('input[type=file]').click();" style="cursor:pointer;background:#1A1A4E;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;">
+          <button type="button" id="addRealLabel" onclick="console.log('[UploadPhoto] clic Ajouter une réalisation, providerData.id:',providerData&&providerData.id);document.getElementById('inputPhotoRealisation').click();" style="cursor:pointer;background:#1A1A4E;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;border:none;">
             + Ajouter une réalisation
-            <input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){uploadPhoto(inp,'realisation');})"/>
-          </label>
+          </button>
+          <input id="inputPhotoRealisation" type="file" accept="image/jpeg,image/png,image/webp" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;" onchange="_cropEtUpload(this,'carre',function(inp){uploadPhoto(inp,'realisation');})"/>
         </div>
         <div class="photos-grid" id="realisationsGrid">
-          <div class="photo-slot" onclick="document.querySelector('[onchange*=realisation]').click()">
+          <div class="photo-slot" onclick="document.getElementById('inputPhotoRealisation').click()">
             <div style="font-size:28px;"><i class="fa-solid fa-camera"></i></div>
             <div class="add-text">Ajouter</div>
           </div>
@@ -7701,10 +7701,10 @@ document.addEventListener('keydown', e => {
         <div style="font-size:12px;color:#7A7F9A;margin-bottom:12px;">Proposez une photo pour le carrousel de la page d'accueil.</div>
         <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:flex-end;margin-bottom:14px;">
           <input id="dashUneTitre" type="text" placeholder="Titre de la photo (optionnel)" maxlength="80" style="padding:10px 14px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13px;color:#374151;outline:none;width:100%;box-sizing:border-box;"/>
-          <label id="dashUneBtn" onclick="event.preventDefault();console.log('[UploadPhoto] clic Ajouter à la une, providerData.id:',providerData&&providerData.id);this.querySelector('input[type=file]').click();" style="cursor:pointer;background:#E85D04;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;white-space:nowrap;">
+          <button type="button" id="dashUneBtn" onclick="console.log('[UploadPhoto] clic Ajouter à la une, providerData.id:',providerData&&providerData.id);document.getElementById('inputPhotoUne').click();" style="cursor:pointer;background:#E85D04;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;white-space:nowrap;border:none;">
             📸 Ajouter à la une
-            <input type="file" accept="image/*" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){_dashAjouterUne(inp);})"/>
-          </label>
+          </button>
+          <input id="inputPhotoUne" type="file" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;" onchange="_cropEtUpload(this,'carre',function(inp){_dashAjouterUne(inp);})"/>
         </div>
         <div class="upload-progress" id="progressUne"><div class="upload-progress-bar"></div></div>
         <div id="dashUneListe"><div style="text-align:center;padding:16px;color:#9CA3AF;font-size:12.5px;">Chargement...</div></div>
@@ -11954,7 +11954,7 @@ function _dashRenderPhotos() {
       <img src="${photo.url}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block;cursor:zoom-in;" alt="Réalisation" onerror="this.style.display='none'" onclick="_yjLightbox('${photo.url}')"/>
       <button onclick="_dashSupprimerPhoto('${photo.id}')" style="position:absolute;top:6px;right:6px;width:34px;height:34px;background:rgba(220,38,38,.85);color:#fff;border:none;border-radius:50%;font-size:14px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;" title="Supprimer">🗑️</button>
     </div>`);
-  if (reals.length<5) slots.push(`<label class="photo-slot" onclick="event.preventDefault();console.log('[UploadPhoto] clic Ajouter (réalisation grid), providerData.id:',providerData&&providerData.id);this.querySelector('input[type=file]').click();" style="cursor:pointer;"><div style="font-size:28px;"><i class="fa-solid fa-camera"></i></div><div class="add-text">Ajouter</div><input type="file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="_cropEtUpload(this,'carre',function(inp){_dashUploadPhoto(inp,'realisation');})"/></label>`);
+  if (reals.length<5) slots.push(`<div class="photo-slot" onclick="console.log('[UploadPhoto] clic Ajouter (réalisation grid), providerData.id:',providerData&&providerData.id);document.getElementById('inputPhotoRealisationGrid').click();" style="cursor:pointer;"><div style="font-size:28px;"><i class="fa-solid fa-camera"></i></div><div class="add-text">Ajouter</div></div><input id="inputPhotoRealisationGrid" type="file" accept="image/jpeg,image/png,image/webp" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;" onchange="_cropEtUpload(this,'carre',function(inp){_dashUploadPhoto(inp,'realisation');})"/>`);
   grid.innerHTML = slots.join('');
   const _lbl = document.getElementById('addRealLabel');
   if (_lbl) _lbl.style.display = reals.length >= 5 ? 'none' : 'block';
