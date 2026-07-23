@@ -8538,18 +8538,22 @@ function renderPhotos() {
 }
 
 async function chargerPhotos() {
-  let pid = providerId || _dashProviderId;
+  let pid = _dashProviderId || providerId;
   if (!pid) { try { const s=JSON.parse(localStorage.getItem('yj_provider_session')); if(s?.provider_id) pid=s.provider_id; } catch(e){} }
   console.log('[chargerPhotos] pid:', pid);
   if (!pid) return;
   providerPhotos = await getProviderPhotos(pid);
   _dashPhotos = providerPhotos;
-  // Toujours rafraîchir _dashData pour que _dashRenderPhotos ait les bonnes données
-  if (!_dashData || !providerData) {
-    providerData = await getDashboardData(pid);
-    _dashData = providerData;
+  // Toujours rafraîchir _dashData pour que _dashRenderPhotos ait les bonnes données.
+  // Si chargerDashboard() a déjà chargé _dashData, le réutiliser directement au
+  // lieu de refaire un fetch réseau redondant (et potentiellement en échec) ici.
+  if (!_dashData) {
+    _dashData = await getDashboardData(pid);
+    providerData = _dashData;
+  } else if (!providerData) {
+    providerData = _dashData;
   }
-  console.log('[chargerPhotos] photos:', providerPhotos.length, '| providerData.id:', providerData?.id);
+  console.log('[chargerPhotos] photos:', providerPhotos.length, '| providerData.id:', _dashData?.id);
   renderPhotos();
   _dashRenderPhotos();
 }
@@ -8559,7 +8563,8 @@ async function uploadPhoto(input, type) {
   if (!file) return;
 
   // Récupérer l'ID prestataire depuis toutes les sources possibles
-  let pid = providerId || _dashProviderId;
+  // (système moderne _dashProviderId en priorité, providerId legacy en repli)
+  let pid = _dashProviderId || providerId;
   if (!pid) {
     // Fallback direct localStorage
     try {
