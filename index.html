@@ -13030,6 +13030,8 @@ function _adminValideTableHTML(data) {
   var now = new Date();
   var fd = d => d ? new Date(d).toLocaleDateString('fr-FR') : '—';
   var aboStatut = p => {
+    if (typeof estEnPeriodeLancement === 'function' && estEnPeriodeLancement())
+      return '<span style="font-size:11px;color:#059669;font-weight:700;">✅ Lancement</span>';
     if ((p.essai_actif && p.essai_fin && new Date(p.essai_fin) > now) ||
         (p.abonnement_actif && p.abonnement_fin && new Date(p.abonnement_fin) > now))
       return '<span style="font-size:11px;color:#059669;font-weight:700;">✅ Actif</span>';
