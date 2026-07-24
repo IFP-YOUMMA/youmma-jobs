@@ -6703,6 +6703,7 @@ window._providerCoverUrl = _providerCoverUrl;
 // ── RENDER PROVIDERS GRID ──
 function renderProviders() {
   const grid = document.getElementById('providersGrid');
+  console.log('[renderProviders] PRESTATAIRES:', PRESTATAIRES?.length, '| filteredData:', filteredData?.length, '| displayedCount:', displayedCount, '| recherche:', document.getElementById('searchInput')?.value||'', '| categorie:', document.getElementById('catFilter')?.value||'', '| dispoFilter:', document.getElementById('dispoFilter')?.value||'', '| activeFilter:', typeof activeFilter!=='undefined'?activeFilter:null);
   const toShow = filteredData.slice(0, displayedCount);
 
   if (toShow.length === 0) {
@@ -6721,6 +6722,7 @@ function renderProviders() {
   }
 
   grid.innerHTML = toShow.filter(p => {
+    if (typeof estEnPeriodeLancement === 'function' && estEnPeriodeLancement()) return true;
     const _jours = Math.floor((new Date() - new Date(p.created_at)) / (1000*60*60*24));
     const _periodeTerminee = !isNaN(_jours) && _jours >= 3;
     const _aAbo = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
