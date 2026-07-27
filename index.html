@@ -5988,6 +5988,980 @@ if (typeof inscrirePrestataire === 'undefined') {
 </script>
 </div>
 
+
+
+
+
+
+<script>
+const PRESTATAIRES = [
+  {id:1,nom:'Amadou Diallo',metier:'Électricien certifié',cat:'Artisans',ville:'Ratoma',tel:'+224620538290',wa:'+224620538290',note:5.0,vues:142,missions:47,ini:'AD',bg:'#FDE8D8',color:'#C74B00',experience:8,dispo:'Disponible maintenant',tarif:'50 000 – 200 000 GNF',badge_express:true,badge_verifie:true,badge_top:true,recommande:true,desc:"Électricien certifié avec 8 ans d'expérience à Conakry. Installation électrique résidentielle, dépannage, câblage et tableau électrique. Intervention rapide dans tout Conakry.",skills:['Installation électrique','Dépannage urgent','Câblage','Tableau électrique'],avis:[{auteur:'Sékou K.',note:5,txt:'Excellent travail, rapide et professionnel !',date:'mai 2025'},{auteur:'Mariama B.',note:5,txt:'Très réactif, tableau électrique refait parfaitement.',date:'avr. 2025'},{auteur:'Alpha D.',note:5,txt:'Je recommande à 100% pour toute urgence.',date:'mars 2025'}],portfolio:[' Installation tableau électrique moderne',' Câblage résidentiel complet',' Dépannage tableau RDC bureau',' Installation prises & éclairage LED',' Rénovation électrique villa Ratoma'],pb:'pb-artisan'},
+  {id:2,nom:'Ibrahima Bah',metier:'Plombier — Urgences 7j/7',cat:'Artisans',ville:'Kaloum',tel:'+224621000005',wa:'+224621000005',note:4.6,vues:94,missions:31,ini:'IB',bg:'#E8F5E9',color:'#1B5E20',experience:6,dispo:"Disponible aujourd'hui",tarif:'40 000 – 150 000 GNF',badge_express:true,badge_verifie:true,badge_top:false,recommande:false,desc:"Plombier expérimenté basé à Kaloum, interventions d'urgence 7j/7. Réparation de fuites, installations sanitaires, tuyauterie. Devis gratuit.",skills:['Réparation fuites','Installation sanitaire','Tuyauterie','Urgences 7j/7'],avis:[{auteur:'Fatoumata C.',note:5,txt:'Venu en urgence, très professionnel !',date:'juin 2026'},{auteur:'Oumar S.',note:4,txt:'Bon travail, devis respecté.',date:'mai 2025'}],portfolio:[' Réparation fuite cuisine',' Installation douche neuve',' Remplacement robinetterie',' Tuyauterie salle de bain',' Urgence fuite appartement'],pb:'pb-artisan'},
+  {id:3,nom:'Mamadou Kouyaté',metier:'Maçon — BTP & Rénovation',cat:'Artisans',ville:'Matam',tel:'+224622100010',wa:'+224622100010',note:4.8,vues:118,missions:24,ini:'MK',bg:'#FEF3C7',color:'#B45309',experience:12,dispo:'Disponible cette semaine',tarif:'Sur devis',badge_express:false,badge_verifie:true,badge_top:true,recommande:true,desc:"Maçon qualifié avec 12 ans d'expérience dans le BTP. Construction, rénovation, carrelage, enduit, dalle béton. Travaux soignés dans les délais.",skills:['Construction','Rénovation','Carrelage','Béton armé'],avis:[{auteur:'Djibril M.',note:5,txt:'Construction de mur impeccable, délais respectés.',date:'mai 2025'},{auteur:'Hadja K.',note:5,txt:'Rénovation de ma maison parfaite !',date:'avr. 2025'},{auteur:'Boubacar T.',note:4,txt:'Bon travail, propre et soigné.',date:'mars 2025'}],portfolio:[' Construction villa Matam',' Rénovation cuisine moderne',' Dallage cour résidentielle',' Enduit façade immeuble',' Escalier béton armé'],pb:'pb-artisan'},
+  {id:4,nom:'Souleymane Barry',metier:'Menuisier — Bois & Aluminium',cat:'Artisans',ville:'Dixinn',tel:'+224623200020',wa:'+224623200020',note:4.9,vues:76,missions:19,ini:'SB',bg:'#FFF3E8',color:'#8B4513',experience:9,dispo:'Disponible cette semaine',tarif:'Sur devis',badge_express:false,badge_verifie:true,badge_top:true,recommande:true,desc:"Menuisier professionnel spécialisé bois et aluminium. Meubles sur mesure, portes, fenêtres, dressing, placards. Finitions soignées garanties.",skills:['Meubles sur mesure','Portes & fenêtres','Aluminium','Dressing'],avis:[{auteur:'Mariama D.',note:5,txt:'Dressing magnifique, exactement comme je voulais.',date:'juin 2026'},{auteur:'Alpha C.',note:5,txt:'Portes en bois de qualité supérieure.',date:'mai 2025'}],portfolio:['🪵 Dressing chambre sur mesure','🪵 Cuisine équipée bois','🪵 Fenêtres aluminium double vitrage','🪵 Porte d\'entrée sécurisée','🪵 Bibliothèque murale'],pb:'pb-artisan'},
+  {id:5,nom:'Mariama Kouyaté',metier:'Coiffeuse — Spécialiste tresses',cat:'Santé & Beauté',ville:'Ratoma',tel:'+224621000004',wa:'+224621000004',note:4.9,vues:178,missions:67,ini:'MK',bg:'#FCE4EC',color:'#880E4F',experience:6,dispo:"Disponible aujourd'hui",tarif:'20 000 – 80 000 GNF',badge_express:false,badge_verifie:true,badge_top:true,recommande:true,desc:"Coiffeuse professionnelle spécialisée en coiffures africaines, tresses, extensions, tissages. Salon à Ratoma.",skills:['Tresses africaines','Extensions','Tissage','Soins capillaires'],avis:[{auteur:'Kadiatou S.',note:5,txt:'Tresses parfaites, je suis ravie !',date:'juin 2026'},{auteur:'Fatoumata B.',note:5,txt:'Très talentueuse et rapide.',date:'mai 2025'}],portfolio:['✂️ Tresses box braids','✂️ Extensions naturelles','✂️ Tissage complet','✂️ Coiffure cérémonie mariage','✂️ Soin kératine'],pb:'pb-sante'},
+  {id:6,nom:'Aissatou Balde',metier:'Esthéticienne & Makeup Artist',cat:'Santé & Beauté',ville:'Kaloum',tel:'+224624300030',wa:'+224624300030',note:5.0,vues:134,missions:43,ini:'AB',bg:'#FCE4EC',color:'#880E4F',experience:5,dispo:"Disponible aujourd'hui",tarif:'30 000 – 120 000 GNF',badge_express:false,badge_verifie:true,badge_top:true,recommande:true,desc:"Esthéticienne certifiée et maquilleuse professionnelle. Maquillage mariage, soins visage, manucure, pédicure. Déplacement à domicile.",skills:['Maquillage mariage','Soins visage','Manucure','Pédicure'],avis:[{auteur:'Mariam T.',note:5,txt:'Maquillage du mariage inoubliable !',date:'juin 2026'},{auteur:'Hadja C.',note:5,txt:'Soins du visage excellents.',date:'avr. 2025'}],portfolio:['💄 Maquillage mariée','💄 Soins du visage deep clean','💄 Nail art designs','💄 Maquillage soirée gala','💄 Soin corps hydratant'],pb:'pb-sante'},
+  {id:7,nom:'Dr. Fatoumata Diakité',metier:'Médecin généraliste',cat:'Santé & Beauté',ville:'Kaloum',tel:'+224621000001',wa:'+224621000001',note:4.8,vues:89,missions:45,ini:'FD',bg:'#E0E0F8',color:'#2D2D6B',experience:10,dispo:'Lun – Sam',tarif:'100 000 GNF / consultation',badge_express:false,badge_verifie:true,badge_top:false,recommande:true,desc:"Médecin généraliste diplômée Université de Conakry. Consultations cabinet et domicile. Médecine générale et pédiatrie de base.",skills:['Consultation générale','Pédiatrie','Visite domicile','Ordonnances'],avis:[{auteur:'Boubacar D.',note:5,txt:'Très professionnelle et à l\'écoute.',date:'mai 2025'},{auteur:'Aissatou M.',note:5,txt:'Consultation très sérieuse, je recommande.',date:'avr. 2025'}],portfolio:['🏥 Cabinet médical Kaloum','🏥 Consultation à domicile','🏥 Suivi pédiatrique','🏥 Bilan de santé complet','🏥 Consultation prénatale'],pb:'pb-sante'},
+  {id:8,nom:'Sékou Camara',metier:'Soudeur — Structures métalliques',cat:'Artisans',ville:'Matam',tel:'+224625400041',wa:'+224625400041',note:4.7,vues:84,missions:38,ini:'SC',bg:'#FDE8D8',color:'#C74B00',experience:7,dispo:"Disponible aujourd'hui",tarif:'Sur devis',badge_express:true,badge_verifie:true,badge_top:false,recommande:false,desc:"Soudeur professionnel spécialisé en structures métalliques, portails, grilles, escaliers. Travail soigné, délais respectés.",skills:['Soudure MIG/TIG','Portails','Grilles','Structures métalliques'],avis:[{auteur:'Mamadou K.',note:5,txt:'Portail magnifique, solide et bien fait.',date:'juin 2026'},{auteur:'Ibrahim S.',note:4,txt:'Bon travail, professionnel et ponctuel.',date:'mai 2025'}],portfolio:[' Portail résidentiel sécurisé',' Grilles de fenêtres',' Escalier métallique villa',' Charpente métallique',' Garde-corps terrasse'],pb:'pb-artisan'},
+  {id:9,nom:'Maître Mamadou Barry',metier:'Avocat — Droit des affaires',cat:'Juridique',ville:'Dixinn',tel:'+224621000002',wa:'+224621000002',note:5.0,vues:56,missions:28,ini:'MB',bg:'#FEF3C7',color:'#B45309',experience:15,dispo:'Sur rendez-vous',tarif:'Sur devis',badge_express:false,badge_verifie:true,badge_top:true,recommande:true,desc:"Avocat au barreau de Guinée, spécialisé droit des affaires, commercial et immobilier. Conseil juridique, rédaction contrats.",skills:['Droit des affaires','Contrats','Immobilier','Conseil juridique'],avis:[{auteur:'Alpha C.',note:5,txt:'Très compétent, mon dossier bien géré.',date:'mai 2025'},{auteur:'Fatoumata M.',note:5,txt:'Professionnel sérieux et disponible.',date:'mars 2025'}],portfolio:['⚖️ Contentieux commercial','⚖️ Rédaction contrats entreprise','⚖️ Conseil immobilier','⚖️ Création de société SARL','⚖️ Droit du travail'],pb:'pb-juridique'},
+  {id:10,nom:'Alpha Sow',metier:'Développeur web & Mobile',cat:'IT',ville:'Matam',tel:'+224621000003',wa:'+224621000003',note:4.7,vues:203,missions:18,ini:'AS',bg:'#E1F5EE',color:'#0F6E56',experience:5,dispo:'Disponible cette semaine',tarif:'Sur devis',badge_express:false,badge_verifie:true,badge_top:false,recommande:false,desc:"Développeur full stack React/Node.js et React Native. Sites web pro, applications mobiles, e-commerce. Portfolio sur demande.",skills:['React / Node.js','Sites web','Apps mobiles','E-commerce'],avis:[{auteur:'Mamadou D.',note:5,txt:'Site e-commerce livré dans les délais.',date:'juin 2026'},{auteur:'Ibrahima C.',note:4,txt:'Bon développeur, code propre.',date:'mai 2025'}],portfolio:[' Site e-commerce Conakry',' App mobile livraison',' Dashboard entreprise',' Landing page marketing',' Refonte site institutionnel'],pb:'pb-it'},
+  {id:11,nom:'Moussa Konaté',metier:'Mécanicien — Toutes marques',cat:'Artisans',ville:'Lambanyi',tel:'+224626500051',wa:'+224626500051',note:4.6,vues:88,missions:52,ini:'MK',bg:'#FEF3C7',color:'#B45309',experience:11,dispo:'Disponible maintenant',tarif:'Sur devis',badge_express:true,badge_verifie:true,badge_top:false,recommande:false,desc:"Mécanicien automobile expérimenté toutes marques. Révisions, réparations, diagnostics électroniques. Atelier à Lambanyi.",skills:['Mécanique auto','Diagnostic électronique','Révision','Réparation moteur'],avis:[{auteur:'Sékou B.',note:5,txt:'Ma voiture comme neuve, excellent !',date:'mai 2025'},{auteur:'Alpha K.',note:4,txt:'Diagnostic rapide et efficace.',date:'avr. 2025'}],portfolio:[' Révision moteur Toyota',' Remplacement boîte de vitesse',' Diagnostic électronique',' Réparation freins',' Entretien climatisation auto'],pb:'pb-artisan'},
+  {id:12,nom:'Kadiatou Camara',metier:'Professeure de maths & physique',cat:'Éducation',ville:'Dixinn',tel:'+224621000006',wa:'+224621000006',note:5.0,vues:67,missions:89,ini:'KC',bg:'#E8F0FE',color:'#1A73E8',experience:9,dispo:'Lun – Sam',tarif:'50 000 GNF / séance',badge_express:false,badge_verifie:true,badge_top:true,recommande:true,desc:"Professeure de mathématiques et physique-chimie lycée et université. Cours particuliers domicile ou en ligne. 9 ans d'expérience.",skills:['Mathématiques','Physique-chimie','Lycée & Université','Cours domicile'],avis:[{auteur:'Mamadou S.',note:5,txt:'Mon fils a eu mention au BAC grâce à elle !',date:'juin 2026'},{auteur:'Fatoumata D.',note:5,txt:'Pédagogie exceptionnelle.',date:'avr. 2025'}],portfolio:['📚 Cours maths Terminale','📚 Préparation BAC physique','📚 Cours université L1','📚 Soutien collège','📚 Cours en ligne'],pb:'pb-education'},
+  {id:13,nom:'Ibrahima Kouyaté',metier:'Carreleur — Sols & Façades',cat:'Artisans',ville:'Ratoma',tel:'+224621500007',wa:'+224621500007',note:4.8,vues:95,missions:34,ini:'IK',bg:'#FFF3E8',color:'#8B4513',experience:8,dispo:'Disponible cette semaine',tarif:'Sur devis',badge_express:false,badge_verifie:true,badge_top:false,recommande:false,desc:"Carreleur professionnel spécialisé en pose de carrelage sol, murs et façades. Travaux neufs et rénovation. Devis gratuit.",skills:['Carrelage sol','Carrelage mural','Façades','Rénovation'],avis:[{auteur:'Boubacar M.',note:5,txt:'Carrelage salon parfaitement posé !',date:'mai 2025'},{auteur:'Djibril K.',note:5,txt:'Finitions impeccables.',date:'mars 2025'}],portfolio:[' Carrelage salon grand format',' Salle de bain complète',' Façade extérieure villa',' Cuisine carrelée moderne',' Couloir immeuble'],pb:'pb-artisan'},
+  {id:14,nom:'Aissatou Diallo',metier:'Chauffeur VTC — 24h/24',cat:'Transport',ville:'Kaloum',tel:'+224621000008',wa:'+224621000008',note:4.8,vues:256,missions:134,ini:'AD',bg:'#FEF3C7',color:'#B45309',experience:4,dispo:'Disponible 24h/24',tarif:'Prix fixes par trajet',badge_express:true,badge_verifie:true,badge_top:true,recommande:true,desc:"Chauffeur VTC professionnel, véhicule climatisé et propre. Disponible 24h/24 pour courses, aéroport, mariages, événements.",skills:['Aéroport','Courses ville','Mariages & événements','24h/24'],avis:[{auteur:'Mamadou C.',note:5,txt:'Ponctuel, propre, je recommande vivement.',date:'juin 2026'},{auteur:'Kadiatou B.',note:5,txt:'Excellent chauffeur, voiture propre.',date:'mai 2025'}],portfolio:['🚘 Transport aéroport Conakry','🚘 Course mariage cérémonie','🚘 Transfer hôtel VIP','🚘 Course longue distance','🚘 Mise à disposition journée'],pb:'pb-transport'},
+  {id:15,nom:'Mohamed Soumah',metier:'Peintre en bâtiment',cat:'Artisans',ville:'Kipé',tel:'+224627600060',wa:'+224627600060',note:4.7,vues:63,missions:15,ini:'MS',bg:'#FFF3E8',color:'#8B4513',experience:6,dispo:'Disponible cette semaine',tarif:'Sur devis',badge_express:false,badge_verifie:true,badge_top:false,recommande:false,desc:"Peintre professionnel bâtiment. Peinture intérieure, extérieure, décoration murale, ravalement façade. Devis gratuit, matériaux qualité.",skills:['Peinture intérieure','Peinture extérieure','Décoration murale','Ravalement'],avis:[{auteur:'Sékou D.',note:5,txt:'Peinture salon magnifique, très propre.',date:'mai 2025'},{auteur:'Alpha B.',note:4,txt:'Bon travail, délais respectés.',date:'avr. 2025'}],portfolio:[' Peinture villa 4 pièces',' Décoration murale salon',' Ravalement façade immeuble',' Peinture bureau entreprise',' Peinture extérieure'],pb:'pb-artisan'},
+  {id:16,nom:'Fatoumata Bah',metier:'Couturière — Mode africaine',cat:'Artisans',ville:'Ratoma',tel:'+224628700070',wa:'+224628700070',note:4.9,vues:112,missions:78,ini:'FB',bg:'#FCE4EC',color:'#880E4F',experience:8,dispo:"Disponible aujourd'hui",tarif:'25 000 – 150 000 GNF',badge_express:false,badge_verifie:true,badge_top:true,recommande:true,desc:"Couturière professionnelle spécialisée en mode africaine, tenues de cérémonie, uniformes sur mesure. Délais respectés.",skills:['Mode africaine','Cérémonies','Uniformes','Sur mesure'],avis:[{auteur:'Mariama K.',note:5,txt:'Tenue de mariage sublime, merci !',date:'juin 2026'},{auteur:'Kadiatou D.',note:5,txt:'Uniforme entreprise parfait.',date:'mai 2025'}],portfolio:['👗 Boubou cérémonie grand format','👗 Tenue de mariée africaine','👗 Uniformes entreprise','👗 Robe soirée gala','👗 Collection bazin riche'],pb:'pb-sante'},
+  {id:17,nom:'Oumar Diallo',metier:'Climaticien — Froid & Climatisation',cat:'Artisans',ville:'Kaloum',tel:'+224629800080',wa:'+224629800080',note:4.6,vues:77,missions:41,ini:'OD',bg:'#E0E0F8',color:'#2D2D6B',experience:7,dispo:"Disponible aujourd'hui",tarif:'100 000 – 500 000 GNF',badge_express:true,badge_verifie:true,badge_top:false,recommande:false,desc:"Technicien climatisation certifié. Installation, entretien, réparation de climatiseurs toutes marques. Intervention rapide à Conakry.",skills:['Installation clim','Entretien','Réparation','Froid industriel'],avis:[{auteur:'Ibrahima B.',note:5,txt:'Clim installée parfaitement, très propre.',date:'mai 2025'},{auteur:'Fatoumata S.',note:4,txt:'Réparation rapide et efficace.',date:'mars 2025'}],portfolio:[' Installation clim split Conakry',' Entretien bureau entreprise',' Réparation Samsung urgence',' Installation froid commercial',' Maintenance préventive clim'],pb:'pb-artisan'},
+];
+
+</script>
+
+<script>
+// ════════════════════════════════════════════════════
+// YOUMMA JOBS 2026 — JS PRINCIPAL (site public)
+// ════════════════════════════════════════════════════
+
+let displayedCount = 9;
+let filteredData = [];
+let favorites = [];
+let activeFilter = 'all';
+let _gpsPosition = null; // { lat, lng } quand GPS activé
+
+try { favorites = JSON.parse(localStorage.getItem('yj_fav') || '[]'); } catch(e) {}
+
+// ── GÉOLOCALISATION ──
+function calcDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function geoLocateUser() {
+  const btn = document.getElementById('btnGeoLocate');
+  if (!navigator.geolocation) {
+    showToast("La géolocalisation n'est pas supportée par votre navigateur", 'error');
+    return;
+  }
+  if (btn) { btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Localisation...'; btn.disabled = true; }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      _gpsPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-location-dot" style="color:#16A34A;"></i> Localisé !';
+        btn.disabled = false;
+        btn.style.borderColor = '#16A34A';
+        btn.style.color = '#16A34A';
+      }
+      PRESTATAIRES.forEach(p => {
+        if (p.latitude && p.longitude) {
+          p._distance = calcDistance(_gpsPosition.lat, _gpsPosition.lng, parseFloat(p.latitude), parseFloat(p.longitude));
+        } else {
+          p._distance = null;
+        }
+      });
+      // Trier : prestataires avec distance d'abord (les plus proches), puis sans GPS
+      filteredData = [...filteredData].sort((a, b) => {
+        if (a._distance != null && b._distance != null) return a._distance - b._distance;
+        if (a._distance != null) return -1;
+        if (b._distance != null) return 1;
+        return 0;
+      });
+      renderProviders();
+      const nb = PRESTATAIRES.filter(p => p._distance != null).length;
+      showToast(`Position détectée ! ${nb} prestataire${nb>1?'s':''} géolocalisé${nb>1?'s':''}. Tri par distance activé.`, 'success');
+    },
+    () => {
+      if (btn) { btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> Me localiser'; btn.disabled = false; btn.style.borderColor=''; btn.style.color=''; }
+      showToast("Impossible d'accéder à votre position. Vérifiez les permissions du navigateur.", 'error');
+    },
+    { timeout: 10000, enableHighAccuracy: true }
+  );
+}
+
+function resetGpsLocate() {
+  _gpsPosition = null;
+  PRESTATAIRES.forEach(p => { delete p._distance; });
+  const btn = document.getElementById('btnGeoLocate');
+  if (btn) { btn.innerHTML = '<i class="fa-solid fa-location-dot"></i> Me localiser'; btn.style.borderColor=''; btn.style.color=''; btn.disabled = false; }
+}
+
+// ── BOUTON AUTH MOBILE NAV ──
+window._navMobileAuthClick = function() {
+  var s = typeof getSession === 'function' ? getSession() : null;
+  if (s) {
+    if (typeof _realNavigate === 'function') _realNavigate('dashboard');
+    else if (typeof navigate === 'function') navigate('dashboard');
+  } else {
+    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');p.style.display='';});
+    var mc=document.getElementById('mainContent'),mn=document.getElementById('mainNav');
+    document.body.classList.remove('on-home','on-dashboard','on-admin');
+    if(mc)mc.style.cssText='display:none!important';
+    if(mn)mn.style.cssText='display:none!important';
+    var pl=document.getElementById('page-login');
+    if(pl){pl.classList.add('active');pl.style.cssText='display:block!important';window.scrollTo(0,0);}
+  }
+};
+function _updateNavMobileAuth() {
+  var btn = document.getElementById('navMobileAuth'); if (!btn) return;
+  var lbl = btn.querySelector('.nav-mob-auth-label');
+  var ico = btn.querySelector('i');
+  var dot = btn.querySelector('.nav-mob-dot');
+  var s = typeof getSession === 'function' ? getSession() : null;
+  if (s) {
+    var prenom = (s.prenom || s.nom || 'Mon espace').split(' ')[0];
+    if (lbl) lbl.textContent = prenom;
+    if (ico) ico.style.display = 'none';
+    if (dot) dot.style.display = 'block';
+    btn.title = 'Connecté';
+    btn.style.borderColor = 'rgba(232,93,4,.5)';
+    btn.style.background  = 'rgba(232,93,4,.12)';
+  } else {
+    if (lbl) lbl.textContent = 'Connexion';
+    if (ico) { ico.className = 'fa-solid fa-lock'; ico.style.display = ''; }
+    if (dot) dot.style.display = 'none';
+    btn.title = '';
+    btn.style.borderColor = 'rgba(255,255,255,.3)';
+    btn.style.background  = 'transparent';
+  }
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  // Année dynamique dans les footers
+  const yr = new Date().getFullYear();
+  const fyEl = document.getElementById('footerYear'); if (fyEl) fyEl.textContent = yr;
+  const fySide = document.getElementById('footerYearSide'); if (fySide) fySide.textContent = yr;
+
+  // Ne pas charger les prestataires statiques — le routeur charge depuis Supabase
+  // filteredData sera rempli par loadProvidersFromSupabase()
+  initCounters();
+  observeFadeIn();
+  initNavScroll();
+  _updateNavMobileAuth();
+  setTimeout(() => showNotif('🇬🇳 Bienvenue', 'sur YOUMMA JOBS — La plateforme N°1 des artisans en Guinée !', '#E6FBF3'), 1500);
+});
+
+// ── NAV SCROLL ──
+function initNavScroll() {
+  const nav = document.getElementById('mainNav');
+  const update = () => {
+    if (!nav) return;
+    if (window.scrollY > 20) {
+      nav.classList.add('scrolled');
+      nav.style.boxShadow = '0 4px 24px rgba(0,0,0,0.18)';
+      nav.style.backdropFilter = 'blur(16px)';
+      nav.style.background = 'rgba(17,24,58,0.97)';
+    } else {
+      nav.classList.remove('scrolled');
+      nav.style.boxShadow = 'none';
+      nav.style.backdropFilter = 'blur(12px)';
+      nav.style.background = '';
+    }
+    // Active nav link
+    const sections = ['accueil','artisans','prestataires','categories','partenaires','temoignages','tarifs','faq','contact'];
+    let current = 'accueil';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && window.scrollY >= el.offsetTop - 100) current = id;
+    });
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+}
+
+// ── RENDER ARTISANS SPOTLIGHT (top 6 artisans) ──
+function ouvrirProfil(id) {
+  const p = PRESTATAIRES.find(x => String(x.id) === String(id));
+  if (p) { openModal(id); return; }
+  // Fallback Supabase : utilise le client global sb, mappe le provider et l'injecte dans PRESTATAIRES
+  sb.from('providers').select('*').eq('id', id).single().then(({data, error}) => {
+    if (error || !data) { console.warn('ouvrirProfil: profil introuvable', id, error); return; }
+    const _cc = {'Construction & BTP':{bg:'#FEF3C7',color:'#B45309'},'Électricité & Énergie':{bg:'#FEF3C7',color:'#D97706'},'Plomberie & Assainissement':{bg:'#E0F2FE',color:'#0369A1'},'Menuiserie & Métallerie':{bg:'#FEF3C7',color:'#92400E'},'Climatisation & Électroménager':{bg:'#ECFEFF',color:'#0891B2'},'Automobile & Moto':{bg:'#FEF3C7',color:'#B45309'},'Transport & Livraison':{bg:'#FEF3C7',color:'#B45309'},'Services à Domicile':{bg:'#E8F5E9',color:'#2E7D32'},'Cuisine & Traiteur':{bg:'#FFF7ED',color:'#B45309'},'Beauté & Mode':{bg:'#FCE4EC',color:'#9D174D'},'Événementiel':{bg:'#EDE9FE',color:'#7C3AED'},'Informatique & Digital':{bg:'#E0E0F8',color:'#2D2D6B'},'Formation & Coaching':{bg:'#E8F0FE',color:'#1A73E8'},'Sécurité & Surveillance':{bg:'#DBEAFE',color:'#1E40AF'},'Santé & Bien-être':{bg:'#E0F8E9',color:'#1B5E20'}};
+    const _c = (_cc[data.categorie]||{bg:'#F4F6FB',color:'#7A7F9A'});
+    const mapped = {
+      id: data.id,
+      nom: ((data.prenom||'')+' '+(data.nom||'')).trim()||'Prestataire',
+      ini: ((data.prenom||data.nom||'?')[0]+(data.nom||data.prenom||'?')[0]).toUpperCase(),
+      metier:data.metier, cat:data.categorie, ville:data.ville||'Conakry',
+      commune:data.commune||'', quartier:data.quartier||'',
+      tel:data.telephone, wa:data.telephone,
+      note:parseFloat(data.note_moyenne)||0,
+      vues:data.nb_vues||0, missions:data.nb_missions||0,
+      bg:_c.bg, color:_c.color, desc:data.description||'', skills:data.skills||[],
+      pb:'pb-artisan', photo_url:data.photo_url||null, cover_url:data.cover_url||null,
+      latitude:data.latitude||null, longitude:data.longitude||null,
+      badge_verifie:data.statut==='valide'||data.doc_cni_statut==='valide',
+      badge_top:data.doc_diplome_statut==='valide'||(data.note_moyenne||0)>=4.8,
+      badge_express:data.disponibilite==='express',
+      recommande:(data.nb_avis||0)>=3,
+      badge_ambassadeur:data.badge_ambassadeur||false,
+      badge_ambassadeur_fin:data.badge_ambassadeur_fin||null,
+      nb_partages:data.nb_partages||0,
+      dispo:data.disponibilite||'Disponible',
+      tarif:data.tarif||null, experience:data.experience||null,
+      portfolio:data.portfolio||[], avis:[], _supabase:true,
+      nb_avis: data.nb_avis || 0,
+      type_compte:data.type_compte||'particulier',
+      nom_entreprise:data.nom_entreprise||null,
+    };
+    const idx = PRESTATAIRES.findIndex(x => String(x.id) === String(id));
+    if (idx >= 0) PRESTATAIRES[idx] = mapped; else PRESTATAIRES.push(mapped);
+    openModal(id);
+  });
+}
+
+window._renderStars=function(note,size,fc,ec){var n=parseFloat(note)||0,f=Math.floor(n),dec=n-f;var fn=f+(dec>=0.75?1:0),half=dec>=0.25&&dec<0.75;var C1=fc||'#D4A017',C0=ec||'#D1D5DB',sz=size||12,s='';for(var i=0;i<fn;i++)s+='<span style="color:'+C1+';font-size:'+sz+'px;">★</span>';if(half)s+='<span style="display:inline-block;font-size:'+sz+'px;line-height:1;background:linear-gradient(90deg,'+C1+' 50%,'+C0+' 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">★</span>';for(var i=fn+(half?1:0);i<5;i++)s+='<span style="color:'+C0+';font-size:'+sz+'px;">★</span>';return s;};
+function renderArtisans() {
+  if (!document.getElementById('artisansGrid')) return; // section supprimée
+  const artisans = PRESTATAIRES
+    .filter(p => p.badge_verifie)
+    .sort((a,b) => {
+      const scoreB = (b.badge_top?3:0)+(b.badge_express?1:0)+(b.recommande?1:0);
+      const scoreA = (a.badge_top?3:0)+(a.badge_express?1:0)+(a.recommande?1:0);
+      return scoreB - scoreA || b.note - a.note;
+    })
+    .slice(0, 6);
+
+  document.getElementById('artisansGrid').innerHTML = artisans.map((p,i) => {
+    const stars5 = window._renderStars(p.note, 12);
+    const badgeRow = [
+      p.type_compte === 'youmma_equipe' ? `<span style="background:linear-gradient(135deg,#1A1A4E,#E85D04);color:#fff;border-radius:20px;padding:3px 10px;font-size:9.5px;font-weight:800;display:inline-flex;align-items:center;gap:4px;">⭐ YOUMMA CERTIFIÉ</span>` : '',
+      p.badge_express ? `<span class="badge-express"> Express</span>` : '',
+      p.badge_top     ? `<span class="badge-top"><i class="fa-solid fa-trophy" style="color:#F5C842;"></i> Top Artisan</span>` : '',
+      p.badge_verifie ? `<span class="badge-verifie"><i class="fa-solid fa-check"></i> Vérifié</span>` : '',
+      p.recommande    ? `<span class="badge-recommande">👍 Recommandé</span>` : '',
+    ].filter(Boolean).join('');
+    const isOccupe  = p.dispo === 'Occupé';
+    const isExpress = p.dispo === 'express';
+    const dispoClass = isOccupe ? 'led-red' : 'led-green';
+    const missionsBadge = p.missions ? `<span class="badge-missions"><i class="fa-solid fa-bullseye"></i> ${p.missions} missions</span>` : '';
+
+    // Portfolio preview: icônes représentatives
+    const portIcons = (p.portfolio||[]).slice(0,3).map(item => `
+      <div class="ac2-port-item" title="${item}">${item.split(' ').slice(0,4).join(' ')}</div>
+    `).join('');
+
+    return `
+    <div class="ac2-card fade-in" style="animation-delay:${i*0.09}s;cursor:pointer;" onclick="ouvrirProfil('${p.id}')">
+      <div class="ac2-header">
+        <div class="ac2-badges-row">${badgeRow}</div>
+        <div class="ac2-avatar-wrap">
+          <div class="ac2-avatar" style="background:${p.bg};color:${p.color};">${p.ini}</div>
+          <div class="ac2-online-ring"></div>
+        </div>
+        ${p.matricule ? `<div style="text-align:center;margin-bottom:4px;"><div style="font-size:9px;color:#9CA3AF;text-transform:uppercase;letter-spacing:1.5px;font-weight:500;">Matricule</div><div style="font-size:13px;color:#E8650A;font-weight:700;letter-spacing:1px;">${p.matricule}</div></div>` : ''}
+        <div class="ac2-name">${p.nom}</div>
+        <div class="ac2-metier">${p.metier}</div>
+        <div class="ac2-loc"><i class="fa-solid fa-location-dot"></i> ${p.ville}, Conakry</div>
+      </div>
+      <div class="ac2-body">
+        <div class="ac2-rating-row">
+          <div class="ac2-stars">${stars5}</div>
+          <span class="ac2-note">${p.note}</span>
+          <span class="ac2-avis">(${p.missions} avis)</span>
+          ${p.experience ? `<span class="ac2-exp">${p.experience} ans</span>` : ''}
+          ${missionsBadge}
+        </div>
+        ${p.dispo ? (isExpress
+          ? `<div class="ac2-dispo"><span style="font-size:11px;font-weight:800;color:#E85D04;background:rgba(232,93,4,.12);padding:2px 8px;border-radius:20px;border:1px solid rgba(232,93,4,.3);">⚡ Prêt à intervenir</span></div>`
+          : `<div class="ac2-dispo"><span class="dispo-led ${dispoClass}"></span><span style="font-size:12px;">${isOccupe ? 'Je suis Occupé(e)' : 'Je suis Disponible'}</span></div>`
+        ) : ''}
+        <div class="ac2-skills">${(p.skills||[]).slice(0,3).map(s=>`<span class="ac2-skill">${s}</span>`).join('')}</div>
+        ${p.tarif ? `<div class="ac2-tarif">💰 ${p.tarif}</div>` : ''}
+        <div class="ac2-portfolio-preview">${portIcons}</div>
+        <div class="ac2-stats">
+          <div class="ac2-stat"><span class="ac2-sv">${p.vues}</span><span class="ac2-sl"><i class="fa-solid fa-eye"></i> Vues</span></div>
+          <div class="ac2-stat"><span class="ac2-sv">${p.missions}</span><span class="ac2-sl"><i class="fa-solid fa-bullseye"></i> Missions</span></div>
+          <div class="ac2-stat"><span class="ac2-sv">${p.note}</span><span class="ac2-sl"><i class="fa-solid fa-star" style="color:#F5C842;"></i> Note</span></div>
+        </div>
+        <div class="ac2-actions">
+          <button class="btn-ac-wa" onclick="event.stopPropagation();openWA('${p.wa}','${p.nom}')"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>
+          <button class="btn-ac-profil" onclick="event.stopPropagation();ouvrirProfil('${p.id}')">👤 Voir le profil complet</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  observeFadeIn();
+}
+
+// ── PHOTO DE COUVERTURE — cover_url si renseigné, sinon image par défaut
+//    selon la catégorie/le métier (URLs Unsplash gratuites) ──
+const PROVIDER_COVER_DEFAULTS = {
+  'btp': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80',
+  'construction': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80',
+  'électricité': 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80',
+  'électricien': 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80',
+  'plomberie': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+  'plombier': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+  'menuiserie': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80',
+  'menuisier': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80',
+  'peinture': 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800&q=80',
+  'peintre': 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800&q=80',
+  'jardinage': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80',
+  'jardinier': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80',
+};
+const PROVIDER_COVER_DEFAULT = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
+
+function _providerCoverUrl(p) {
+  if (p && p.cover_url) return p.cover_url;
+  // p vient de PRESTATAIRES (objet "mapped" de loadProvidersFromSupabase()/
+  // ouvrirProfil()), où la catégorie est stockée sous la clé "cat" — jamais
+  // "categorie" (ça, c'est le nom de la colonne brute côté Supabase, avant
+  // le mapping). Vérifier les deux pour rester robuste si _providerCoverUrl
+  // est un jour appelé avec un objet brut.
+  const haystack = (((p && (p.cat || p.categorie)) || '') + ' ' + ((p && p.metier) || '')).toLowerCase();
+  for (const key in PROVIDER_COVER_DEFAULTS) {
+    if (haystack.indexOf(key) !== -1) return PROVIDER_COVER_DEFAULTS[key];
+  }
+  return PROVIDER_COVER_DEFAULT;
+}
+window._providerCoverUrl = _providerCoverUrl;
+
+// ── RENDER PROVIDERS GRID ──
+function renderProviders() {
+  const grid = document.getElementById('providersGrid');
+  console.log('[renderProviders] PRESTATAIRES:', PRESTATAIRES?.length, '| filteredData:', filteredData?.length, '| displayedCount:', displayedCount, '| recherche:', document.getElementById('searchInput')?.value||'', '| categorie:', document.getElementById('catFilter')?.value||'', '| dispoFilter:', document.getElementById('dispoFilter')?.value||'', '| activeFilter:', typeof activeFilter!=='undefined'?activeFilter:null);
+  const toShow = filteredData.slice(0, displayedCount);
+
+  if (toShow.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px 20px;">
+      <div style="font-size:44px;margin-bottom:14px;">🔧</div>
+      <div style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:var(--bleu);margin-bottom:8px;">Aucun artisan trouvé</div>
+      <div style="font-size:13.5px;color:var(--gris);margin-bottom:20px;line-height:1.7;">
+        YOUMMA JOBS peut vous fournir<br>un artisan certifié directement !</div>
+      <a href="https://wa.me/22461252510?text=Bonjour%20YOUMMA%20JOBS%2C%20je%20cherche%20un%20artisan%20mais%20je%20n%27ai%20pas%20trouv%C3%A9%20sur%20le%20site"
+      target="_blank"
+      style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:50px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;">
+        📱 Demander un artisan YOUMMA
+      </a>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = toShow.filter(p => {
+    if (typeof estEnPeriodeLancement === 'function' && estEnPeriodeLancement()) return true;
+    const _jours = Math.floor((new Date() - new Date(p.created_at)) / (1000*60*60*24));
+    const _periodeTerminee = !isNaN(_jours) && _jours >= 3;
+    const _aAbo = p.abonnement_actif === true && p.abonnement_fin && new Date(p.abonnement_fin) > new Date();
+    return !(_periodeTerminee && !_aAbo);
+  }).map((p, i) => {
+    const isFav = favorites.includes(p.id);
+    const stars5 = window._renderStars(p.note, 11);
+    const isEntreprise = p.type_compte === 'entreprise';
+    const isYoummaEquipe = p.type_compte === 'youmma_equipe';
+    const typeCompteBadge = isYoummaEquipe
+      ? `<span style="background:linear-gradient(135deg,#1A1A4E,#E85D04);color:#fff;border-radius:20px;padding:3px 10px;font-size:9.5px;font-weight:800;display:inline-flex;align-items:center;gap:4px;">⭐ YOUMMA CERTIFIÉ</span>`
+      : isEntreprise
+      ? `<span style="font-size:10px;font-weight:600;color:#e2e8f0;background:rgba(255,255,255,0.12);padding:2px 8px;border-radius:20px;white-space:nowrap;border:1px solid rgba(255,255,255,0.2);">🏢 Entreprise</span>`
+      : `<span style="font-size:10px;font-weight:600;color:#e2e8f0;background:rgba(255,255,255,0.12);padding:2px 8px;border-radius:20px;white-space:nowrap;border:1px solid rgba(255,255,255,0.2);">👤 Particulier</span>`;
+    const isOccupe  = p.dispo === 'Occupé';
+    const isExpress = p.dispo === 'express';
+    const dispoClass = isOccupe ? 'led-red' : 'led-green';
+    const joursInscrit = Math.floor((new Date() - new Date(p.created_at)) / (1000*60*60*24));
+    const badgeAnciennete = joursInscrit <= 7
+      ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#3730a3;white-space:nowrap;">✦ Nouveau</span>'
+      : joursInscrit <= 90
+      ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#065f46;white-space:nowrap;">⬆ Actif</span>'
+      : joursInscrit <= 365
+      ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#92400e;white-space:nowrap;">★ Confirmé</span>'
+      : '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#1e40af;white-space:nowrap;">◆ Expert</span>';
+    const maintenant = new Date();
+    const expirationAmbassadeur = p.badge_ambassadeur_fin ? new Date(p.badge_ambassadeur_fin) : null;
+    const estAmbassadeur = p.badge_ambassadeur === true && expirationAmbassadeur && expirationAmbassadeur > maintenant;
+    const badgeStatut = estAmbassadeur
+      ? '<span style="font-size:10px;padding:2px 7px;color:#d97706;font-weight:600;white-space:nowrap;">Ambassadeur</span>'
+      : '<span style="font-size:10px;padding:2px 7px;color:#6b7280;white-space:nowrap;">Membre</span>';
+    const _sep = '<span style="width:1px;height:11px;background:#e5e7eb;flex-shrink:0;display:inline-block;"></span>';
+    const badgePills = [
+      isExpress ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#E85D04;display:flex;align-items:center;gap:2px;white-space:nowrap;">⚡ Express</span>'
+        : isOccupe ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#dc2626;display:flex;align-items:center;gap:2px;white-space:nowrap;">✗ Occupé</span>'
+        : '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#059669;display:flex;align-items:center;gap:2px;white-space:nowrap;">✓ Disponible</span>',
+      p.badge_verifie ? '<span style="font-size:10px;font-weight:500;padding:4px 10px;color:#2563eb;display:flex;align-items:center;gap:2px;white-space:nowrap;">✓ Vérifié</span>' : null,
+      badgeAnciennete,
+      badgeStatut,
+    ].filter(Boolean).join(_sep);
+    const _note = parseFloat(p.note) || 0;
+    const _nbAvis = p.nb_avis || 0;
+    const noteDisplay = _nbAvis > 0
+      ? `<div style="display:flex;justify-content:center;gap:1px;margin-bottom:1px;">${window._renderStars(_note,11,'#f59e0b','#e5e7eb')}</div><div style="font-size:18px;font-weight:700;color:#111;">${_note.toFixed(1)}</div>`
+      : '<div style="font-size:18px;font-weight:700;color:#111;">—</div><div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Note</div>';
+    const coverUrl = _providerCoverUrl(p);
+
+    return `
+    <div class="pc2-card fade-in" style="overflow:hidden;border-radius:20px;border:1px solid #e8ecf0;box-shadow:0 2px 12px rgba(0,0,0,0.06);" onclick="openModal('${p.id}')">
+
+
+      <div style="height:110px;overflow:hidden;border-radius:12px 12px 0 0;background-image:url('${coverUrl}');background-size:cover;background-position:center;position:relative;margin-bottom:10px;">
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.80) 100%);"></div>
+        <div style="position:absolute;inset:0;padding:10px 12px 10px 80px;display:flex;flex-direction:column;justify-content:flex-end;">
+          <div class="pc2-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font-size:15px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);">
+            ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom_entreprise : p.nom}
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:1px;">
+            <div class="pc2-metier" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fb923c;font-size:11.5px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);">
+              ${p.type_compte==='entreprise' && p.nom_entreprise ? p.nom + ' · ' + p.metier : p.metier}
+            </div>
+            <span style="flex-shrink:0;font-size:9.5px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,0.92);color:#1a1a1a;font-weight:600;">
+              ${p.type_compte === 'entreprise' ? 'Entreprise' : 'Particulier'}
+            </span>
+          </div>
+          <div style="font-size:10px;color:#fff;margin-top:2px;text-shadow:0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);">
+            📍 ${p.commune && p.commune !== p.ville ? p.commune + ', ' + (p.ville||'Conakry') : (p.ville||'Conakry')}
+          </div>
+        </div>
+        <div style="position:absolute;left:12px;bottom:10px;">
+          <div style="width:56px;height:56px;border-radius:10px;border:3px solid #fff;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.25);">
+            ${p.photo_url
+              ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"/><div style="width:100%;height:100%;display:none;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;background:${p.bg};color:${p.color};">${p.ini}</div>`
+              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;background:${p.bg};color:${p.color};">${p.ini}</div>`}
+          </div>
+          ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="font-size:10px;color:#fff;opacity:0.85;margin-top:3px;text-shadow:0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);">${p.matricule}</div>` : ''}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;padding:0 4px;margin-bottom:12px;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:0;">${badgePills}</div>
+        <button class="btn-pfav" onclick="event.stopPropagation();toggleFav('${p.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px 5px;line-height:1;flex-shrink:0;">${isFav?'<i class="fa-solid fa-heart" style="color:#E85D04;"></i>':'<i class="fa-regular fa-heart" style="color:#9ca3af;"></i>'}</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;">
+        <div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">
+          <div style="font-size:18px;font-weight:700;color:#111;">${p.missions||0}</div>
+          <div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Missions</div>
+        </div>
+        <div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">
+          ${noteDisplay}
+        </div>
+        <div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">
+          <div style="font-size:18px;font-weight:700;color:#111;">${(p.experience>0) ? p.experience+' an'+(p.experience>1?'s':'') : '—'}</div>
+          <div style="font-size:9px;color:#9ca3af;margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Expérience</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr${p.latitude?` 1fr`:''};gap:6px;margin:10px 0 8px;">
+        <button onclick="event.stopPropagation();openWA('${p.wa}','${p.nom}')" style="display:flex;align-items:center;justify-content:center;gap:5px;height:42px;border-radius:12px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:#22c55e;color:#fff;font-family:'DM Sans',sans-serif;">
+          <i class="fa-brands fa-whatsapp" style="font-size:13px;"></i> WhatsApp
+        </button>
+        <button onclick="event.stopPropagation();window.open('tel:${p.tel}')" style="display:flex;align-items:center;justify-content:center;gap:5px;height:42px;border-radius:12px;font-size:13px;font-weight:700;border:1.5px solid #fbd5c5;cursor:pointer;background:#fff4f0;color:#E8521A;font-family:'DM Sans',sans-serif;">
+          <i class="fa-solid fa-phone" style="font-size:11px;"></i> Appeler
+        </button>
+        ${p.latitude?`<button onclick="event.stopPropagation();window.open('https://www.google.com/maps?q=${p.latitude},${p.longitude}')" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:9px 4px;border-radius:10px;font-size:12px;font-weight:700;border:1.5px solid #4285F4;cursor:pointer;background:#fff;color:#4285F4;"><i class="fa-solid fa-location-dot" style="font-size:11px;"></i> Localiser</button>`:''}
+      </div>
+
+      
+      <button onclick="event.stopPropagation();openModal('${p.id}')" style="width:100%;height:44px;border-radius:12px;background:#1B2A6B;color:#fff;border:none;cursor:pointer;font-size:14px;font-weight:700;letter-spacing:0.01em;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        <i class="fa-solid fa-user"></i> Voir le profil complet
+      </button>
+    </div>`;
+  }).join('');
+  observeFadeIn();
+}
+
+// ── FILTERS ──
+
+function filterCat(cat) {
+  const sel = document.getElementById('catFilter');
+  if (sel) sel.value = cat;
+  const sel2 = document.getElementById('catFilter2');
+  if (sel2) sel2.value = cat;
+  filterProviders();
+  document.getElementById('prestataires').scrollIntoView({behavior:'smooth'});
+}
+
+function setActiveFilter(type) {
+  activeFilter = type;
+  document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+  const chipEl = document.getElementById('chip-' + type);
+  if (chipEl) chipEl.classList.add('active');
+  filterProviders();
+}
+
+function resetFilters() {
+  activeFilter = 'all';
+  document.querySelectorAll('.filter-chip').forEach(ch => ch.classList.remove('active'));
+  const chipAll = document.getElementById('chip-all');
+  if (chipAll) chipAll.classList.add('active');
+  ['searchInput','catFilter','villeFilter','dispoFilter','noteFilter'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  resetGpsLocate();
+  const rb = document.getElementById('resetBtn');
+  if (rb) rb.style.display = 'none';
+  filterProviders();
+}
+
+function loadMore() {
+  const prev = displayedCount;
+  displayedCount = Math.min(displayedCount + 6, filteredData.length);
+  if (displayedCount > prev) {
+    renderProviders();
+    showToast(displayedCount >= filteredData.length ? '✅ Tous les artisans affichés !' : `${displayedCount} / ${filteredData.length} artisans`);
+  } else {
+    showToast('✅ Tous les artisans sont affichés');
+  }
+}
+
+// ── MODAL PROFIL ──
+function openModal(id) {
+  const p = PRESTATAIRES.find(x => x.id == id || x.id === id);
+  if (!p) { console.warn('openModal: prestataire non trouvé', id); return; }
+
+  const stars5Full = window._renderStars(p.note, 16, '#D4A017', '#CBD5E1');
+  const badgeAmbFin = p.badge_ambassadeur_fin ? new Date(p.badge_ambassadeur_fin) : null;
+  const badgeAmbValide = p.badge_ambassadeur && badgeAmbFin && badgeAmbFin > new Date();
+  const badgesHtml = [
+    p.badge_verifie   ? '<span class="badge-verifie"><i class="fa-solid fa-check"></i> Vérifié YOUMMA</span>' : '',
+    p.badge_top       ? '<span class="badge-top"><i class="fa-solid fa-trophy" style="color:#F5C842;"></i> Top Artisan</span>' : '',
+    p.badge_express   ? '<span class="badge-express"> Express</span>' : '',
+    p.recommande      ? '<span class="badge-recommande">👍 Recommandé</span>' : '',
+    badgeAmbValide    ? '<span style="background:linear-gradient(135deg,#F5C842,#E85D04);color:#fff;font-size:10.5px;font-weight:800;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;">🏆 Ambassadeur</span>' : '',
+  ].filter(Boolean).join(' ');
+
+  // Portfolio — galerie 5 réalisations (icônes représentatives)
+  const portEmojis = ['','','','🔨','🛠️','','',''];
+  const portfolioHtml = (p.portfolio||[]).map((item, idx) => `
+    <div class="mp-port-item">
+      <div class="mp-port-img" style="background:linear-gradient(135deg,${p.bg},${p.color}22);">
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:24px;">${portEmojis[idx%portEmojis.length]}</div>
+      </div>
+      <div class="mp-port-label">${item.replace(/^[^\s]+ /,'')}</div>
+    </div>
+  `).join('');
+
+  // Avis clients avec étoiles
+  const avisHtml = (p.avis||[]).map(a => `
+    <div class="mp-avis-item">
+      <div class="mp-avis-head">
+        <div class="mp-avis-avatar">${a.auteur.charAt(0)}</div>
+        <div>
+          <div class="mp-avis-name">${a.auteur}</div>
+          <div class="mp-avis-stars">${'★'.repeat(a.note)}${'☆'.repeat(5-a.note)} <span class="mp-avis-date">${a.date}</span></div>
+        </div>
+      </div>
+      <div class="mp-avis-txt">"${a.txt}"</div>
+    </div>
+  `).join('');
+
+  const isExpressModal = p.dispo === 'express';
+  const isOccupeModal  = p.dispo === 'Occupé';
+  const dispoClass = isOccupeModal ? 'led-red' : 'led-green';
+  // Note réelle uniquement si des avis existent (évite le 4.0 fictif par défaut)
+  const _hasNote = (p.nb_avis || 0) > 0 || (!p._supabase && (p.note || 0) > 0);
+  const _ville = p.ville || p.localisation || '';
+  const _commune = p.commune || '';
+  const lieuAffiche = (_ville && _commune && _ville !== _commune)
+    ? `${_commune}, ${_ville}`
+    : _ville || _commune || 'Conakry';
+  const coverUrl = _providerCoverUrl(p);
+
+  document.getElementById('modalContent').innerHTML = `
+
+    <div style="border-radius:18px;overflow:hidden;margin-bottom:16px;">
+      <div style="height:180px;overflow:hidden;background-image:url('${coverUrl}');background-size:cover;background-position:center;position:relative;">
+        <div style="position:absolute;inset:0;background:linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 100%);"></div>
+        <div style="position:absolute;inset:0;padding:14px 18px 14px 100px;display:flex;flex-direction:column;justify-content:flex-end;text-align:left;">
+          <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-shadow:0 1px 3px rgba(0,0,0,0.8);">${p.nom}</div>
+          <div style="font-size:13px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.8);">${p.metier} · <i class="fa-solid fa-location-dot"></i> ${lieuAffiche}</div>
+        </div>
+        <div style="position:absolute;left:16px;bottom:14px;">
+          <div style="width:72px;height:72px;border-radius:16px;border:3px solid #fff;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.3);">
+            ${p.photo_url
+              ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}"/>`
+              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:24px;background:${p.bg};color:${p.color};">${p.ini}</div>`}
+          </div>
+          ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="font-size:12px;color:#fff;opacity:0.85;margin-top:4px;text-shadow:0 1px 3px rgba(0,0,0,0.8);">${p.matricule}</div>` : ''}
+        </div>
+      </div>
+      <div style="background:#1B2A6B;padding:18px 22px 22px;">
+        <div style="text-align:center;width:100%;">
+          <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;">${badgesHtml}</div>
+          ${badgeAmbValide ? `
+          <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#F5C518,#E85D04);color:#fff;border-radius:25px;padding:5px 14px;font-size:13px;font-weight:800;letter-spacing:.04em;box-shadow:0 4px 16px rgba(232,93,4,.4);margin:8px 0;width:fit-content;">
+            🏆 Artisan Ambassadeur YOUMMA JOBS
+          </div>` : ''}
+        </div>
+      </div>
+    </div>
+
+    
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+      <div style="background:var(--fond2);border-radius:14px;padding:14px;text-align:center;border:1px solid var(--bordure);">
+        <div style="font-size:22px;font-weight:800;color:var(--bleu);font-family:'Libre Baskerville',serif;">${p.vues}</div>
+        <div style="font-size:11px;color:var(--gris);margin-top:2px;"><i class="fa-solid fa-eye"></i> Vues profil</div>
+      </div>
+      <div style="background:var(--fond2);border-radius:14px;padding:14px;text-align:center;border:1px solid var(--bordure);">
+        <div style="font-size:22px;font-weight:800;color:var(--bleu);font-family:'Libre Baskerville',serif;">${p.missions}</div>
+        <div style="font-size:11px;color:var(--gris);margin-top:2px;"><i class="fa-solid fa-bullseye"></i> Missions</div>
+      </div>
+      <div style="background:${_hasNote?'#FFFBEB':'var(--fond2)'};border-radius:14px;padding:14px;text-align:center;border:1px solid ${_hasNote?'#FDE68A':'var(--bordure)'};">
+        <div style="font-size:${_hasNote?'22':'17'}px;font-weight:800;color:${_hasNote?'#D97706':'var(--gris)'};font-family:'Libre Baskerville',serif;">${_hasNote?p.note+' ★':'Nouveau'}</div>
+        <div style="font-size:11px;color:var(--gris);margin-top:2px;">${_hasNote?'Note moyenne':'Pas encore noté'}</div>
+      </div>
+    </div>
+
+    ${badgeAmbValide ? `
+    <div style="background:linear-gradient(135deg,#F5C518,#E85D04);color:#fff;border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:24px;flex-shrink:0;">🏅</span>
+      <div>
+        <div style="font-weight:800;font-size:13px;">Ambassadeur YOUMMA JOBS</div>
+        <div style="font-size:11px;opacity:.85;margin-top:2px;">Valide jusqu'au ${badgeAmbFin ? badgeAmbFin.toLocaleDateString('fr-FR') : ''}</div>
+      </div>
+    </div>` : `
+    <div style="background:#f3f4f6;border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:24px;flex-shrink:0;">🏷️</span>
+      <div>
+        <div style="font-weight:800;font-size:13px;color:#374151;">Membre YOUMMA JOBS</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:2px;">Partagez 50 fois pour devenir Ambassadeur</div>
+      </div>
+    </div>`}
+
+    <div class="mp-info-grid">
+      ${p.dispo ? `<div class="mp-info-item"><div class="mp-info-label">Disponibilité</div><div class="mp-info-val" style="display:flex;align-items:center;gap:6px;">${isExpressModal ? '<span style="font-size:12px;font-weight:800;color:#E85D04;background:rgba(232,93,4,.1);padding:2px 8px;border-radius:20px;border:1px solid rgba(232,93,4,.3);">⚡ Prêt à intervenir</span>' : `<span class="dispo-led ${dispoClass}"></span>${isOccupeModal ? 'Je suis Occupé(e)' : 'Je suis Disponible'}`}</div></div>` : ''}
+      ${p.tarif ? `<div class="mp-info-item"><div class="mp-info-label">Tarifs indicatifs</div><div class="mp-info-val">💰 ${p.tarif}</div></div>` : ''}
+      ${p.experience ? `<div class="mp-info-item"><div class="mp-info-label">Expérience</div><div class="mp-info-val">${p.experience} ans d'expérience</div></div>` : ''}
+      <div class="mp-info-item"><div class="mp-info-label">Localisation</div><div class="mp-info-val"><i class="fa-solid fa-location-dot"></i> ${lieuAffiche}</div></div>
+    </div>
+
+    
+    ${(p.desc && p.desc !== 'Professionnel') ? `
+    <div class="mp-section-title">À propos</div>
+    <p style="font-size:13.5px;color:var(--gris);line-height:1.75;margin-bottom:4px;">${p.desc}</p>
+    ` : ''}
+
+    
+    ${(p.skills||[]).length ? `
+    <div class="mp-section-title">Compétences</div>
+    <div class="mp-skills-wrap">${(p.skills||[]).map(s=>`<span class="modal-skill">${s}</span>`).join('')}</div>
+    ` : ''}
+
+    
+    <div id="modalRealsSection">
+      <div class="mp-section-title"><i class="fa-solid fa-images"></i> Réalisations</div>
+      <div id="modalPhotos" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;">
+        <div style="text-align:center;color:var(--gris);font-size:12px;grid-column:1/-1;padding:14px;">Chargement...</div>
+      </div>
+    </div>
+
+    
+    <div class="mp-section-title"><i class="fa-solid fa-shield-halved"></i> Vérification & Documents</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div style="background:${p.badge_verifie?'#F0FDF4':'var(--fond2)'};border:1.5px solid ${p.badge_verifie?'#86EFAC':'var(--bordure)'};border-radius:14px;padding:14px;text-align:center;">
+        <div style="font-size:24px;margin-bottom:6px;">${p.badge_verifie?'✅':'⏳'}</div>
+        <div style="font-size:12px;font-weight:700;color:${p.badge_verifie?'#16A34A':'var(--gris)'};">Pièce d'identité</div>
+        <div style="font-size:10.5px;color:var(--gris);margin-top:3px;">${p.badge_verifie?'Vérifiée par YOUMMA':'En cours de vérification'}</div>
+      </div>
+      <div style="background:${p.badge_top?'#FFFBEB':'var(--fond2)'};border:1.5px solid ${p.badge_top?'#FDE68A':'var(--bordure)'};border-radius:14px;padding:14px;text-align:center;">
+        <div style="font-size:24px;margin-bottom:6px;">${p.badge_top?'🎓':'📄'}</div>
+        <div style="font-size:12px;font-weight:700;color:${p.badge_top?'#D97706':'var(--gris)'};">Diplôme / Formation</div>
+        <div style="font-size:10.5px;color:var(--gris);margin-top:3px;">${p.badge_top?'Certifié Top Artisan':'Non renseigné'}</div>
+      </div>
+    </div>
+
+    
+    ${(p.avis||[]).length ? `
+    <div class="mp-section-title"><i class="fa-solid fa-star" style="color:#F5C842;"></i> Avis clients (${p.avis.length} · ${p.note}/5)</div>
+    ${avisHtml}
+    ` : `<div class="mp-section-title"><i class="fa-solid fa-star" style="color:#F5C842;"></i> Avis clients</div>
+    <div style="text-align:center;padding:1.5rem;color:#9ca3af;font-size:13px;background:#f9fafb;border-radius:10px;margin-bottom:12px;">⭐ Aucun avis pour le moment.<br><span style="font-size:12px;">Soyez le premier à laisser un avis !</span></div>`}
+
+    
+    <div class="mp-actions-row">
+      <button class="btn-mp-call" onclick="callProvider('${p.tel}')"><i class="fa-solid fa-phone"></i> Appeler</button>
+      <button class="btn-mp-maps" onclick="openMaps('${p.nom}','${p.ville}')"><i class="fa-solid fa-location-dot"></i> Localiser</button>
+    </div>
+    <div style="background:#fff;border-radius:16px;padding:16px;margin-top:16px;border:1.5px solid var(--bordure);">
+      <div style="font-size:13px;font-weight:700;color:var(--bleu);margin-bottom:12px;">📤 Partager ce profil</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+        <button onclick="partagerWhatsApp('${p.id}')" style="padding:10px 6px;background:#25D366;border:none;border-radius:10px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">📱 WhatsApp</button>
+        <button onclick="partagerFacebook('${p.id}')" style="padding:10px 6px;background:#1877F2;border:none;border-radius:10px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">👍 Facebook</button>
+        <button onclick="copierLienPublic('${p.id}')" style="padding:10px 6px;background:var(--fond);border:1.5px solid var(--bordure);border-radius:10px;color:var(--bleu);font-size:11px;font-weight:700;cursor:pointer;">🔗 Copier</button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:10px;padding:10px;background:var(--fond2);border-radius:12px;">
+      <div style="font-size:11.5px;color:var(--gris);">Vous êtes artisan ? <span onclick="closeModal();ouvrirInscription()" style="color:var(--orange);font-weight:700;cursor:pointer;">Créez votre profil gratuit →</span></div>
+    </div>
+  `;
+
+  // ── Bouton WA flottant ──────────────────────────────────────────
+  (function() {
+    var _old = document.getElementById('modalWaFloat');
+    if (_old) _old.remove();
+    var _waRaw = (p.wa || p.tel || '').replace(/[\+\s\-\(\)]/g, '');
+    if (!_waRaw) return;
+    var _waInt = _waRaw.startsWith('224') ? _waRaw : '224' + _waRaw.replace(/^0/, '');
+    if (!/^224\d{9}$/.test(_waInt)) return;
+    var _prenom = (p.prenom || p.nom || '').split(' ')[0];
+    var _msg = encodeURIComponent('Bonjour ' + _prenom + ', je vous contacte depuis YOUMMA JOBS pour une intervention ou un devis.');
+    var _floatDiv = document.createElement('div');
+    _floatDiv.id = 'modalWaFloat';
+    _floatDiv.innerHTML = '<a href="https://wa.me/' + _waInt + '?text=' + _msg + '" id="modalWaFloatBtn" target="_blank" rel="noopener">'
+      + '<i class="fa-brands fa-whatsapp" style="font-size:20px;"></i>'
+      + '<span class="wa-float-full">Contactez-moi pour une intervention ou un devis</span>'
+      + '<span class="wa-float-short">Intervention ou devis ?</span>'
+      + '</a>';
+    document.querySelector('#modalOverlay .modal').appendChild(_floatDiv);
+  })();
+
+  // Charger les photos depuis Supabase
+  if (p._supabase && p.id) {
+    getProviderPhotos(p.id).then(photos => {
+      const container = document.getElementById('modalPhotos');
+      const section   = document.getElementById('modalRealsSection');
+      if (!container) return;
+      const reals = photos.filter(ph => ph.type === 'realisation' && !ph.url.includes('youmma') && !ph.url.includes('logo') && !ph.url.includes('default'));
+      if (reals.length === 0) {
+        if (container) container.innerHTML = '<div style="text-align:center;color:#9ca3af;font-size:13px;padding:1rem;">Aucune réalisation ajoutée pour le moment</div>';
+      } else {
+        container.innerHTML = reals.map(ph => `
+          <div style="aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--fond2);cursor:zoom-in;min-height:100px;"
+               data-url="${ph.url}" data-cap="${(ph.caption||'').replace(/"/g,'&quot;')}"
+               onclick="_yjLightbox(this.getAttribute('data-url'),this.getAttribute('data-cap'))">
+            <img src="${ph.url}" style="width:100%;height:100%;object-fit:cover;" loading="lazy"/>
+          </div>`).join('');
+      }
+    }).catch(() => {
+      const section = document.getElementById('modalRealsSection');
+      if (section) section.style.display = 'none';
+    });
+  } else {
+    const section = document.getElementById('modalRealsSection');
+    if (section) section.style.display = 'none';
+  }
+
+  mettreAJourOpenGraph(p);
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  history.replaceState(null, '', location.pathname + '?profil=' + id);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  history.replaceState(null, '', location.pathname);
+}
+
+// ── CONTACTS ──
+function openWA(wa, nom) {
+  const clean = wa.replace(/[\+\s]/g, '');
+  const msg = encodeURIComponent(`Bonjour ${nom} 👋, je vous contacte via YOUMMA JOBS. Je suis intéressé(e) par vos services.`);
+  window.open(`https://wa.me/${clean}?text=${msg}`, '_blank');
+  showToast('<i class="fa-brands fa-whatsapp"></i> Ouverture de WhatsApp...');
+}
+
+function callProvider(tel) {
+  window.location.href = `tel:${tel}`;
+}
+
+function toggleFav(id) {
+  if (favorites.includes(id)) {
+    favorites = favorites.filter(f=>f!==id);
+    showToast('Retiré des favoris');
+  } else {
+    favorites.push(id);
+    showToast('<i class="fa-solid fa-heart" style="color:#E85D04;"></i> Ajouté aux favoris !');
+  }
+  try { localStorage.setItem('yj_fav', JSON.stringify(favorites)); } catch(e) {}
+  const btn = document.getElementById(`fav-${id}`);
+  if (btn) btn.textContent = favorites.includes(id) ? '<i class="fa-solid fa-heart" style="color:#E85D04;"></i>' : '🤍';
+}
+
+// ── INSCRIPTION ──
+function ouvrirInscription() {
+  document.getElementById('inscrOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function fermerInscription() {
+  document.getElementById('inscrOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function envoyerInscription() {
+  const prenom = document.getElementById('iPrenom').value.trim();
+  const nom = document.getElementById('iNom').value.trim();
+  const tel = document.getElementById('iTel').value.trim();
+  const cat = document.getElementById('iCat').value;
+  const quartier = document.getElementById('iQuartier').value.trim();
+  const desc = document.getElementById('iDesc').value.trim();
+  if (!prenom || !nom || !tel || !cat || !quartier || !desc) {
+    showToast('⚠️ Remplissez tous les champs obligatoires (*)','error'); return;
+  }
+  const wa = document.getElementById('iWA').value.trim() || tel;
+  const exp = document.getElementById('iExp').value;
+  const tarif = document.getElementById('iTarif').value.trim();
+  const dispo = document.getElementById('iDispo').value;
+  const ville = document.getElementById('iVille').value;
+  const adresse = document.getElementById('iAdresse').value.trim();
+  const email = document.getElementById('iEmail').value.trim();
+
+  const msg = encodeURIComponent(
+    `🚀 *Demande d'inscription YOUMMA JOBS*\n\n` +
+    `👤 *Nom :* ${prenom} ${nom}\n` +
+    `<i class="fa-solid fa-phone"></i> *Téléphone :* ${tel}\n` +
+    `<i class="fa-brands fa-whatsapp"></i> *WhatsApp :* ${wa}\n` +
+    `<i class="fa-solid fa-envelope"></i> *Email :* ${email || 'Non renseigné'}\n` +
+    `<i class="fa-solid fa-bullseye"></i> *Spécialité :* ${cat}\n` +
+    `📅 *Expérience :* ${exp ? exp + ' ans' : 'Non renseigné'}\n` +
+    `💰 *Tarifs :* ${tarif || 'Non renseigné'}\n` +
+    `🟢 *Disponibilité :* ${dispo}\n` +
+    `<i class="fa-solid fa-location-dot"></i> *Localisation :* ${quartier}, ${ville}\n` +
+    `<i class="fa-solid fa-house"></i> *Adresse :* ${adresse || 'Non renseigné'}\n\n` +
+    `📝 *Description :*\n${desc}\n\n` +
+    `— Envoyé depuis yoummajobs.com`
+  );
+  window.open(`https://wa.me/22461252510?text=${msg}`, '_blank');
+  fermerInscription();
+  showToast('✅ Redirection WhatsApp — notre équipe vous contacte sous 24h !', 'success');
+  ['iPrenom','iNom','iTel','iWA','iEmail','iExp','iDesc','iTarif','iQuartier','iAdresse','iFb','iIg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+// ── CONTACT ──
+function envoyerContact() {
+  const prenom = document.getElementById('fPrenom').value.trim();
+  const msg = document.getElementById('fMessage').value.trim();
+  const nom = document.getElementById('fNom').value.trim();
+  const tel = document.getElementById('fTel').value.trim();
+  const sujet = document.getElementById('fSujet').value;
+  if (!prenom || !msg) { showToast('⚠️ Remplissez au moins le prénom et le message','error'); return; }
+  const text = encodeURIComponent(`Bonjour YOUMMA JOBS 👋\n\n*Nom :* ${prenom} ${nom}\n*Tél :* ${tel}\n*Sujet :* ${sujet}\n\n*Message :*\n${msg}`);
+  window.open(`https://wa.me/22461252510?text=${text}`, '_blank');
+  showToast('✅ Redirection vers WhatsApp...');
+  ['fPrenom','fNom','fTel','fMessage'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('fSujet').value = '';
+}
+
+// ── FAQ ──
+function toggleFaq(item) {
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+// ── MENU MOBILE ──
+function toggleMenu() {
+  const menu = document.getElementById('mobileMenu');
+  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function toggleDashSidebar() {
+  const sidebar = document.querySelector('#page-dashboard .sidebar');
+  if (!sidebar) return;
+  const isOpen = sidebar.classList.contains('open');
+  if (isOpen) {
+    sidebar.classList.remove('open');
+    sidebar.style.transform = 'translateX(-100%)';
+    const overlay = document.getElementById('dashSidebarOverlay');
+    if (overlay) overlay.remove();
+  } else {
+    sidebar.classList.add('open');
+    sidebar.style.transform = 'translateX(0)';
+    const overlay = document.createElement('div');
+    overlay.id = 'dashSidebarOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);';
+    overlay.onclick = toggleDashSidebar;
+    document.getElementById('page-dashboard').appendChild(overlay);
+  }
+}
+
+function toggleAdminSidebar() {
+  const sidebar = document.getElementById('adminSidebarEl');
+  if (!sidebar) return;
+  const isOpen = sidebar.classList.contains('open');
+  if (isOpen) {
+    sidebar.classList.remove('open');
+    sidebar.style.transform = 'translateX(-100%)';
+    const overlay = document.getElementById('adminSidebarOverlay');
+    if (overlay) overlay.remove();
+  } else {
+    sidebar.classList.add('open');
+    sidebar.style.transform = 'translateX(0)';
+    const overlay = document.createElement('div');
+    overlay.id = 'adminSidebarOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);';
+    overlay.onclick = toggleAdminSidebar;
+    document.body.appendChild(overlay);
+  }
+}
+
+// ── COMPTEURS ANIMÉS ──
+function animateCounter(el, target) {
+  const isLarge = target >= 1000;
+  const duration = 2000;
+  const step = Math.max(1, Math.ceil(target / (duration / 16)));
+  let current = 0;
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = isLarge ? (current/1000).toFixed(0)+'K' : current;
+    if (current >= target) clearInterval(timer);
+  }, 16);
+}
+
+function initCounters() {
+  const counters = [
+    { id: 'cnt1', target: 500 },
+    { id: 'cnt2', target: 20 },
+    { id: 'cnt3', target: 10000 },
+  ];
+  const kpis = document.querySelectorAll('.kpi-num[data-target]');
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        counters.forEach(c => {
+          const el = document.getElementById(c.id);
+          if (el) animateCounter(el, c.target);
+        });
+        kpis.forEach(kpi => {
+          const t = parseInt(kpi.dataset.target);
+          if (t) animateCounter(kpi, t);
+        });
+        obs.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  const target = document.querySelector('.counters-bg') || document.querySelector('.hero-kpis');
+  if (target) obs.observe(target);
+}
+
+// ── FADE IN OBSERVER ──
+function observeFadeIn() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-in:not(.visible)').forEach(el => obs.observe(el));
+}
+
+// ── TOAST ──
+
+// ── NOTIF ──
+function showNotif(title, desc, bg) {
+  const center = document.getElementById('notifCenter');
+  const el = document.createElement('div');
+  el.className = 'notif';
+  const parts = title.split(' ');
+  el.innerHTML = `<div class="notif-icon" style="background:${bg||'#FDE8D8'};">${parts[0]}</div><div><div class="notif-title">${parts.slice(1).join(' ')}</div><div class="notif-desc">${desc}</div></div>`;
+  center.appendChild(el);
+  setTimeout(() => el.classList.add('show'), 50);
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 400); }, 5000);
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); fermerInscription(); }
+});
+</script>
+
+
+
+
+</div>
+
 <div class="page" id="page-dashboard">
 <div class="dash-layout">
   
@@ -18430,6 +19404,7 @@ if (typeof _dashUpdateUI === 'function') {
     }
   };
 }
+
 
 
 
