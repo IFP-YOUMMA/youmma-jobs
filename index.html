@@ -14053,9 +14053,6 @@ window.addEventListener('hashchange', async function() {
 <script>
 // ── FONCTIONS ADMIN ──
 function _showAdminPanel() {
-  // Masquer le bouton flottant YOUMMA ÉQUIPES dans l'admin
-  const _fe = document.getElementById('btnYoummaEquipes');
-  if (_fe) _fe.style.display = 'none';
   // Activer le mode admin sur body
   document.body.classList.add('admin-mode', 'on-admin');
   document.body.classList.remove('on-home', 'on-dashboard');
@@ -14186,9 +14183,6 @@ function logoutAdmin() {
   document.body.classList.remove('role-super_admin','role-agent','role-admin','role-moderator');
   document.querySelectorAll('[data-super-only]').forEach(el => { el.style.display = ''; });
   document.body.classList.remove('admin-mode');
-  // Réafficher le bouton flottant YOUMMA ÉQUIPES
-  const _fe = document.getElementById('btnYoummaEquipes');
-  if (_fe) _fe.style.removeProperty('display');
   // Détruire l'overlay admin
   const overlay = document.getElementById('_adminOverlay');
   if (overlay) overlay.style.display = 'none';
@@ -22239,25 +22233,6 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') fermerLegal();
 });
 </script>
-
-<style>
-@keyframes pulse-btn {
-  0%, 100% { box-shadow: 0 8px 28px rgba(232,93,4,.4); }
-  50% { box-shadow: 0 8px 40px rgba(232,93,4,.7); }
-}
-#btnYoummaEquipes:hover { transform: translateY(-3px) scale(1.03); }
-</style>
-
-<a href="https://wa.me/22461252510?text=Bonjour%20YOUMMA%20JOBS%2C%20je%20cherche%20un%20artisan"
-target="_blank"
-id="btnYoummaEquipes"
-style="position:fixed;bottom:24px;left:24px;z-index:9998;display:flex;align-items:center;gap:10px;padding:14px 20px;background:linear-gradient(135deg,#1A1A4E,#E85D04);border-radius:50px;color:#fff;text-decoration:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;box-shadow:0 8px 28px rgba(26,26,78,.4);transition:all .3s;animation:pulse-btn 2s infinite;">
-  <span style="font-size:18px;">🔧</span>
-  <div>
-    <div style="font-size:11px;opacity:.75;line-height:1;">Artisan introuvable ?</div>
-    <div style="font-size:13px;font-weight:800;line-height:1.3;">Contactez YOUMMA JOBS</div>
-  </div>
-</a>
 
 <script>
 (function() {
