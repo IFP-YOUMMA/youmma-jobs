@@ -14315,7 +14315,7 @@ async function _admChargerMissionsDeclarees() {
     const rows = data.map(m => {
       const provNom = m.providers ? ((m.providers.prenom||'')+' '+(m.providers.nom||'')).trim() : '—';
       const actions = m.statut === 'en_attente'
-        ? `<button onclick="_admValiderMissionDeclaree('${m.id}','${m.provider_id}')" style="padding:6px 12px;background:rgba(22,163,74,.12);color:#16A34A;border:none;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;margin:2px;">✅ Valider + Envoyer lien</button><button onclick="_admRejeterMissionDeclaree('${m.id}')" style="padding:6px 12px;background:rgba(239,68,68,.1);color:#DC2626;border:none;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;margin:2px;">❌ Rejeter</button>`
+        ? `<button onclick="_admValiderMissionDeclaree('${m.id}','${m.provider_id}','${(m.client_telephone||'').replace(/'/g,"")}')" style="padding:6px 12px;background:rgba(22,163,74,.12);color:#16A34A;border:none;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;margin:2px;">✅ Valider + Envoyer lien</button><button onclick="_admRejeterMissionDeclaree('${m.id}')" style="padding:6px 12px;background:rgba(239,68,68,.1);color:#DC2626;border:none;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;margin:2px;">❌ Rejeter</button>`
         : '<span style="color:#9CA3AF;font-size:11.5px;">—</span>';
       return `<tr style="border-bottom:1px solid #F3F4F6;">
         <td style="padding:10px 8px;font-weight:600;color:#1A1A4E;">${provNom}<div style="font-size:10.5px;color:#9CA3AF;font-weight:400;">${(m.providers&&m.providers.metier)||''}</div></td>
@@ -14346,7 +14346,17 @@ async function _admChargerMissionsDeclarees() {
 }
 window._admChargerMissionsDeclarees = _admChargerMissionsDeclarees;
 
-async function _admValiderMissionDeclaree(missionId, providerId) {
+// Normalise un numéro guinéen pour wa.me : retire le 0 initial, ajoute 224
+// si absent (0625302415 → 224625302415, 625302415 → 224625302415,
+// 224625302415 → inchangé).
+function _admFormatTelephoneWA(tel) {
+  let t = (tel || '').replace(/[^\d]/g, '');
+  if (t.startsWith('224')) return t;
+  if (t.startsWith('0')) t = t.slice(1);
+  return '224' + t;
+}
+
+async function _admValiderMissionDeclaree(missionId, providerId, clientTelephone) {
   try {
     const { data: avis, error: e1 } = await sb.from('avis_clients').insert({ mission_id: missionId, provider_id: providerId }).select().single();
     if (e1) throw e1;
@@ -14356,10 +14366,14 @@ async function _admValiderMissionDeclaree(missionId, providerId) {
     const lien = 'https://yoummajobs.com/#noter/' + avis.token;
     const cell = document.getElementById('admMissionDecActions_' + missionId);
     if (cell) {
+      const waTel = _admFormatTelephoneWA(clientTelephone);
+      const waMsg = encodeURIComponent(`Bonjour ! Votre prestataire YOUMMA JOBS a déclaré une mission avec vous. Merci de noter son travail ici : ${lien}`);
+      const waUrl = `https://wa.me/${waTel}?text=${waMsg}`;
       cell.innerHTML = `<div style="font-size:11px;color:#059669;font-weight:700;margin-bottom:4px;">✅ Lien généré</div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
           <input readonly value="${lien}" onclick="this.select()" style="font-size:10.5px;padding:5px 8px;border:1px solid #E5E7EB;border-radius:6px;width:150px;color:#374151;"/>
           <button onclick="navigator.clipboard.writeText('${lien}');showToast('📋 Lien copié','success');" style="padding:5px 10px;background:#1A1A4E;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">Copier le lien</button>
+          <a href="${waUrl}" target="_blank" style="padding:5px 10px;background:#25D366;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">📲 Envoyer par WhatsApp</a>
         </div>`;
     }
     showToast('✅ Mission validée, lien de notation généré', 'success');
