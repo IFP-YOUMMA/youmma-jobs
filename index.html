@@ -1335,9 +1335,15 @@ function renderProviderCards() {
 }
 
 function filterProviders() {
-  const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
-  const cat = document.getElementById('catFilter')?.value || '';
-  const locVal = (document.getElementById('villeFilter')?.value || '').toLowerCase();
+  // Deux barres de recherche existent dans la page (recherche héro
+  // #searchInput/#locationInput, et recherche embarquée #searchProviders/
+  // #filterCat juste au-dessus de la grille) — on lit la première qui a une
+  // valeur pour que les deux fonctionnent, quel que soit l'endroit où
+  // l'utilisateur tape.
+  console.log('[filterProviders] recherche:', document.getElementById('searchInput')?.value, 'PRESTATAIRES:', PRESTATAIRES?.length);
+  const q = ((document.getElementById('searchInput')?.value) || (document.getElementById('searchProviders')?.value) || '').toLowerCase().trim();
+  const cat = (document.getElementById('catFilter')?.value) || (document.getElementById('filterCat')?.value) || '';
+  const locVal = ((document.getElementById('villeFilter')?.value) || (document.getElementById('locationInput')?.value) || '').toLowerCase();
   const noteMin = parseFloat(document.getElementById('noteFilter')?.value || '0');
   const dispoFilter = document.getElementById('dispoFilter')?.value || '';
 
@@ -7327,30 +7333,6 @@ function showNotif(title, desc, bg) {
   center.appendChild(el);
   setTimeout(() => el.classList.add('show'), 50);
   setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 400); }, 5000);
-}
-
-// ── CHARGEMENT PRESTATAIRES PUBLICS ──
-var _allProviders = [];
-var _filteredProviders = [];
-var _provPage = 0;
-const _provPerPage = 9;
-
-function filterProviders() {
-  const search = (document.getElementById('searchProviders')?.value || '').toLowerCase().trim();
-  const cat = document.getElementById('filterCat')?.value || '';
-
-  _filteredProviders = _allProviders.filter(p => {
-    const matchSearch = !search ||
-      (p.prenom||'').toLowerCase().includes(search) ||
-      (p.nom||'').toLowerCase().includes(search) ||
-      (p.metier||'').toLowerCase().includes(search) ||
-      (p.ville||'').toLowerCase().includes(search);
-    const matchCat = !cat || p.categorie === cat;
-    return matchSearch && matchCat;
-  });
-
-  _provPage = 0;
-  renderProviderCards();
 }
 
 // ── KEYBOARD ──
