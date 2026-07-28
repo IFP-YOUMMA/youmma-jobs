@@ -3125,7 +3125,7 @@ if (typeof connexionPrestataire === 'undefined') {
   <!-- ============================================ -->
   <!-- DASHBOARD CLIENT YOUMMA - NOUVEAU v2        -->
   <!-- ============================================ -->
-  <div id="dashboardClientV2" style="display:none">
+  <div id="dashboardClientV2" style="display:none;width:100%;">
 
     <!-- TOPBAR -->
     <div class="dcl-topbar">
@@ -3359,7 +3359,15 @@ if (typeof connexionPrestataire === 'undefined') {
 /* ============================================ */
 /* DASHBOARD CLIENT V2 - YOUMMA JOBS           */
 /* ============================================ */
-.dcl-topbar{background:#fff;border-bottom:0.5px solid #e5e7eb;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+/* #dashboardClientV2 est niché dans #espaceWrapper, dont le fond dégradé
+   sombre (#1A1A4E→#0D0D2E), le padding et le centrage flex sont pensés
+   pour l'écran de connexion OTP — pas pour un tableau de bord plein
+   écran. #espaceWrapper.dcl-active (posée/retirée en JS par
+   _espaceAfficherTableauBord()) neutralise ce style au lieu de lutter
+   contre le calcul flex + marges négatives (peu fiable ici). */
+#espaceWrapper.dcl-active{padding:0!important;background:#f9fafb!important;display:block!important;height:auto!important;min-height:100vh!important;}
+#dashboardClientV2{background:#f9fafb;min-height:100vh;color:#0f172a;}
+.dcl-topbar{background:#ffffff!important;border-bottom:0.5px solid #e5e7eb;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .dcl-logo{font-size:15px;font-weight:600;color:#0f172a}.dcl-logo span{color:#E05A1B}
 .dcl-sep{color:#e5e7eb;margin:0 8px}
 .dcl-page-name{font-size:13px;color:#6b7280}
@@ -3369,7 +3377,7 @@ if (typeof connexionPrestataire === 'undefined') {
 .dcl-notif-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#ef4444}
 .dcl-user-info{font-size:13px;color:#6b7280}
 .dcl-avatar{width:32px;height:32px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center}
-.dcl-nav{background:#fff;border-bottom:0.5px solid #e5e7eb;padding:0 20px;display:flex;overflow-x:auto}
+.dcl-nav{background:#ffffff!important;border-bottom:0.5px solid #e5e7eb;padding:0 20px;display:flex;overflow-x:auto}
 .dcl-tab{padding:12px 16px;font-size:13px;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;user-select:none}
 .dcl-tab.active{color:#E05A1B;border-bottom-color:#E05A1B;font-weight:500}
 .dcl-alert{background:#fffbeb;border-bottom:0.5px solid #f59e0b;padding:10px 20px;display:flex;align-items:center;gap:10px}
@@ -3449,6 +3457,18 @@ if (typeof connexionPrestataire === 'undefined') {
   .dcl-two-col{grid-template-columns:1fr}
   .dcl-user-info{display:none}
 }
+@media(max-width:640px){
+  .dcl-topbar{padding:10px 12px}
+  .dcl-main{padding:12px}
+  .dcl-metrics{grid-template-columns:1fr 1fr;gap:8px}
+  .dcl-two-col{grid-template-columns:1fr}
+  .dcl-metric-val{font-size:16px}
+  .dcl-nav{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .dcl-tab{padding:10px 12px;font-size:12px}
+  .dcl-card{padding:12px}
+  .dcl-rapport-actions{flex-direction:column}
+  .dcl-btn-valider,.dcl-btn-dl{width:100%;justify-content:center}
+}
 </style>
 
 <script>
@@ -3516,8 +3536,7 @@ async function dclInit() {
     if (error) throw error;
 
     if (!chantiers || !chantiers.length) {
-      document.getElementById('dashboardClientV2').innerHTML =
-        '<div style="padding:40px;text-align:center;color:#6b7280">Aucun chantier actif pour votre compte.</div>';
+      dclRenderDemo();
       return;
     }
     const chantier = chantiers.find(c => c.statut !== 'termine') || chantiers[0];
@@ -3580,6 +3599,92 @@ async function dclInit() {
   }
 }
 window.dclInit = dclInit;
+
+// -- MODE DÉMO — aucun chantier réel associé au compte --
+// Permet de visualiser le dashboard sans données réelles (QA/démo
+// commerciale). Un bandeau explicite marque ces chiffres comme fictifs :
+// un vrai client sans chantier ne doit jamais pouvoir croire que ce sont
+// ses propres montants (185M GNF, etc.) affichés sans avertissement.
+function dclRenderDemo() {
+  const main = document.querySelector('#dashboardClientV2 .dcl-main');
+  if (main && !document.getElementById('dclDemoBanner')) {
+    const banner = document.createElement('div');
+    banner.id = 'dclDemoBanner';
+    banner.style.cssText = 'background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;font-size:12.5px;padding:10px 14px;border-radius:8px;margin-bottom:4px;text-align:center;';
+    banner.innerHTML = '<i class="fa-solid fa-circle-info"></i> Aperçu de démonstration — aucun chantier réel n\'est encore associé à votre compte. Ces chiffres sont fictifs.';
+    main.insertBefore(banner, main.firstChild);
+  }
+
+  document.getElementById('dclUserInfo').textContent = 'Mamadou Diallo — Paris 🇫🇷';
+  document.getElementById('dclAvatar').textContent = 'MD';
+  document.getElementById('dclStatusBadge').textContent = 'En cours';
+  document.getElementById('dclTotalVerse').textContent = '185 000 000 GNF';
+  document.getElementById('dclSolde').textContent = '12 500 000 GNF';
+  document.getElementById('dclCommission').textContent = '27 750 000 GNF';
+  document.getElementById('dclCommissionSub').textContent = 'GNF (15% cumulé)';
+  document.getElementById('dclAvancement').textContent = '42%';
+  document.getElementById('dclPhaseActuelle').textContent = 'Élévation murs R+1';
+  document.getElementById('dclProgPct').textContent = '42%';
+  document.getElementById('dclProgFill').style.width = '42%';
+
+  // Phases fictives illustratives — dclRenderPhases() réelle reste liée aux
+  // 3 statuts de chantiers.statut, on ne la détourne pas pour la démo.
+  const demoPhases = [
+    { label: 'Fondations', state: 'done' },
+    { label: 'Dalle RDC', state: 'done' },
+    { label: 'Élévation murs R+1', state: 'active' },
+    { label: 'Dalle R+1', state: 'todo' },
+    { label: 'Toiture', state: 'todo' },
+    { label: 'Finitions', state: 'todo' }
+  ];
+  document.getElementById('dclPhases').innerHTML = demoPhases.map(p => {
+    const label = p.state === 'done' ? 'Terminé' : p.state === 'active' ? 'En cours' : 'À venir';
+    return `<div class="dcl-phase-row">
+      <div class="dcl-phase-dot ${p.state}"></div>
+      <span class="dcl-phase-name">${p.label}</span>
+      <span class="dcl-phase-status ${p.state}">${label}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('dclMouvements').innerHTML = `
+    <div class="dcl-reg-row">
+      <div class="dcl-reg-icon out"><i class="fa-solid fa-arrow-up"></i></div>
+      <div class="dcl-reg-body">
+        <div class="dcl-reg-title">Sortie — 15 sacs ciment CPA 42.5</div>
+        <div class="dcl-reg-sub">Confirmé fournisseur</div>
+      </div>
+      <div class="dcl-reg-time">Aujourd'hui 08h30</div>
+    </div>
+    <div class="dcl-reg-row">
+      <div class="dcl-reg-icon pay"><i class="fa-solid fa-check"></i></div>
+      <div class="dcl-reg-body">
+        <div class="dcl-reg-title">Versement confirmé — 30 000 000 GNF</div>
+        <div class="dcl-reg-sub">Confirmé par fournisseur</div>
+      </div>
+      <div class="dcl-reg-time">Il y a 3 jours</div>
+    </div>`;
+
+  document.getElementById('dclVersementsRecents').innerHTML = `
+    <div class="dcl-vers-row">
+      <div><div class="dcl-vers-amount">50 000 000 GNF</div>
+      <div class="dcl-vers-meta">Wave · 15 mai 2026</div></div>
+      <span class="dcl-vers-status conf">Confirmé</span>
+    </div>
+    <div class="dcl-vers-row">
+      <div><div class="dcl-vers-amount">20 000 000 GNF</div>
+      <div class="dcl-vers-meta">Western Union · 20 juillet 2026</div></div>
+      <span class="dcl-vers-status pend">En attente</span>
+    </div>`;
+
+  document.getElementById('dclCommNiveau').textContent = 'Commission YOUMMA — niveau Confort (15%)';
+  document.getElementById('dclCommTotal').textContent = '185 000 000 GNF';
+  document.getElementById('dclCommDue').textContent = '27 750 000 GNF';
+  document.getElementById('dclCommPayee').textContent = '15 000 000 GNF';
+  document.getElementById('dclCommReste').textContent = '12 750 000 GNF';
+  document.getElementById('dclAlertSolde').style.display = 'flex';
+  document.getElementById('dclRapportAttenteCard').style.display = 'none';
+}
+window.dclRenderDemo = dclRenderDemo;
 
 // -- AVANCEMENT (simplifié : 3 statuts réels, pas de phases détaillées en base) --
 function dclRenderPhases(statut) {
@@ -4218,6 +4323,7 @@ function _espaceInitiales(nom) {
 
 function _espaceAfficherTableauBord() {
   ['espaceDashFournisseur', 'espaceDashSuperviseur', 'espaceDashClient', 'dashboardClientV2'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  const _ewReset = document.getElementById('espaceWrapper'); if (_ewReset) _ewReset.classList.remove('dcl-active');
   // Le formulaire de connexion ne doit JAMAIS rester visible en même temps
   // qu'un tableau de bord (ex. restauration de session persistante : ces
   // étapes n'étaient sinon jamais explicitement masquées ici).
@@ -4239,6 +4345,7 @@ function _espaceAfficherTableauBord() {
     _espaceChargerSuperviseur();
   } else if (_espaceSession.role === 'client') {
     document.getElementById('dashboardClientV2').style.display = 'block';
+    const _ewActive = document.getElementById('espaceWrapper'); if (_ewActive) _ewActive.classList.add('dcl-active');
     if (typeof dclInit === 'function') dclInit();
     if (typeof _espaceCliVerifierPremierAcces === 'function') _espaceCliVerifierPremierAcces();
   }
