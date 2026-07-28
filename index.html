@@ -1047,15 +1047,15 @@ section,main,[id^="page-"]{overflow-x:hidden!important}
 .modal{position:relative!important}
 .modal-body{padding-bottom:80px!important}
 #modalWaFloat{
-  position:absolute;bottom:12px;left:16px;right:16px;z-index:20;
+  position:fixed;bottom:0;left:0;right:0;z-index:20;
   animation:_waFloatIn .35s ease
 }
 #modalWaFloatBtn{
   display:flex;align-items:center;justify-content:center;
   background:#25D366;color:#fff;font-weight:700;font-size:14px;
-  height:52px;border-radius:100px;text-decoration:none;
-  box-shadow:0 4px 20px rgba(37,211,102,.45);gap:8px;padding:0 20px;
-  transition:opacity .18s
+  height:52px;border-radius:0;text-decoration:none;
+  box-shadow:0 -4px 20px rgba(37,211,102,.3);gap:8px;padding:0 20px;
+  transition:opacity .18s;width:100%;box-sizing:border-box
 }
 #modalWaFloatBtn:active{opacity:.85}
 .wa-float-short{display:none}
@@ -6558,48 +6558,49 @@ function openModal(id) {
     : _ville || _commune || 'Conakry';
   const coverUrl = _providerCoverUrl(p);
 
+  // Bloc section réutilisable : titre gris uppercase + contenu, séparateur fin
+  const _mpSection = (title, html) => `<div style="padding:16px;border-top:1px solid #E5E7EB;">
+    <div style="font-size:13px;text-transform:uppercase;color:#9CA3AF;font-weight:700;letter-spacing:.04em;margin-bottom:8px;">${title}</div>
+    <div style="font-size:15px;color:#1B2A4A;line-height:1.6;">${html}</div>
+  </div>`;
+
+  const _dispoContent = (isExpressModal
+    ? `<span style="display:inline-flex;align-items:center;gap:6px;font-weight:700;color:#E07A30;"><i class="fa-solid fa-bolt"></i> Prêt à intervenir rapidement</span>`
+    : `<span style="display:inline-flex;align-items:center;gap:7px;font-weight:700;color:${isOccupeModal?'#DC2626':'#16A34A'};"><span class="dispo-led ${dispoClass}"></span>${isOccupeModal ? 'Occupé(e) actuellement' : 'Disponible'}</span>`)
+    + (p.tarif ? `<div style="font-size:13px;color:#6B7280;margin-top:6px;">💰 ${p.tarif}</div>` : '');
+
+  const _locContent = `<i class="fa-solid fa-location-dot" style="color:#E07A30;"></i> ${lieuAffiche}`
+    + (p.latitude ? ` &nbsp;<a href="https://www.google.com/maps?q=${p.latitude},${p.longitude}" target="_blank" style="color:#1B2A4A;font-size:13px;font-weight:700;text-decoration:underline;">Voir sur la carte</a>` : '');
+
   document.getElementById('modalContent').innerHTML = `
 
-    <div style="border-radius:18px;overflow:hidden;margin-bottom:16px;">
-      <div style="height:180px;overflow:hidden;background-image:url('${coverUrl}');background-size:cover;background-position:center;position:relative;">
-        <div style="position:absolute;inset:0;background:linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 100%);"></div>
-        <div style="position:absolute;inset:0;padding:14px 18px 14px 100px;display:flex;flex-direction:column;justify-content:flex-end;text-align:left;">
-          <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;text-shadow:0 1px 3px rgba(0,0,0,0.8);">${p.nom}</div>
-          <div style="font-size:13px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.8);">${p.metier} · <i class="fa-solid fa-location-dot"></i> ${lieuAffiche}</div>
+    <div style="border-radius:18px;overflow:hidden;margin-bottom:16px;background:#fff;border:1px solid #E5E7EB;">
+      <div style="height:160px;overflow:hidden;background-image:url('${coverUrl}');background-size:cover;background-position:center;"></div>
+      <div style="text-align:center;padding:0 16px 18px;margin-top:-35px;">
+        <div style="width:70px;height:70px;border-radius:50%;border:3px solid #fff;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.2);margin:0 auto;background:#fff;">
+          ${p.photo_url
+            ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}"/>`
+            : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:22px;background:${p.bg};color:${p.color};">${p.ini}</div>`}
         </div>
-        <div style="position:absolute;left:16px;bottom:14px;">
-          <div style="width:72px;height:72px;border-radius:16px;border:3px solid #fff;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.3);">
-            ${p.photo_url
-              ? `<img src="${p.photo_url}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;" alt="${p.nom}"/>`
-              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-weight:700;font-size:24px;background:${p.bg};color:${p.color};">${p.ini}</div>`}
-          </div>
-          ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="font-size:12px;color:#fff;opacity:0.85;margin-top:4px;text-shadow:0 1px 3px rgba(0,0,0,0.8);">${p.matricule}</div>` : ''}
-        </div>
-      </div>
-      <div style="background:#1B2A6B;padding:18px 22px 22px;">
-        <div style="text-align:center;width:100%;">
-          <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;">${badgesHtml}</div>
-          ${badgeAmbValide ? `
-          <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#F5C518,#E85D04);color:#fff;border-radius:25px;padding:5px 14px;font-size:13px;font-weight:800;letter-spacing:.04em;box-shadow:0 4px 16px rgba(232,93,4,.4);margin:8px 0;width:fit-content;">
-            🏆 Artisan Ambassadeur YOUMMA JOBS
-          </div>` : ''}
-        </div>
+        <div style="font-size:18px;font-weight:700;color:#1B2A4A;margin-top:10px;">${p.nom}</div>
+        <div style="font-size:14px;font-weight:600;color:#E07A30;margin-top:2px;">${p.metier}</div>
+        ${(p.matricule && p.matricule !== 'YMJ-000000') ? `<div style="font-size:11px;color:#9CA3AF;margin-top:3px;">${p.matricule}</div>` : ''}
+        <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-top:10px;">${badgesHtml}</div>
       </div>
     </div>
 
-    
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
-      <div style="background:var(--fond2);border-radius:14px;padding:14px;text-align:center;border:1px solid var(--bordure);">
-        <div style="font-size:22px;font-weight:800;color:var(--bleu);font-family:'Libre Baskerville',serif;">${p.vues}</div>
-        <div style="font-size:11px;color:var(--gris);margin-top:2px;"><i class="fa-solid fa-eye"></i> Vues profil</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
+      <div style="background:#F7F8FA;border:1px solid #E5E7EB;border-radius:10px;padding:12px 6px;text-align:center;">
+        <div style="font-size:18px;font-weight:800;color:#1B2A4A;">${p.missions||0}</div>
+        <div style="font-size:10.5px;color:#6B7280;margin-top:2px;">Missions</div>
       </div>
-      <div style="background:var(--fond2);border-radius:14px;padding:14px;text-align:center;border:1px solid var(--bordure);">
-        <div style="font-size:22px;font-weight:800;color:var(--bleu);font-family:'Libre Baskerville',serif;">${p.missions}</div>
-        <div style="font-size:11px;color:var(--gris);margin-top:2px;"><i class="fa-solid fa-bullseye"></i> Missions</div>
+      <div style="background:#F7F8FA;border:1px solid #E5E7EB;border-radius:10px;padding:12px 6px;text-align:center;">
+        <div style="font-size:18px;font-weight:800;color:#1B2A4A;">${_hasNote ? p.note+' ★' : '—'}</div>
+        <div style="font-size:10.5px;color:#6B7280;margin-top:2px;">Note</div>
       </div>
-      <div style="background:${_hasNote?'#FFFBEB':'var(--fond2)'};border-radius:14px;padding:14px;text-align:center;border:1px solid ${_hasNote?'#FDE68A':'var(--bordure)'};">
-        <div style="font-size:${_hasNote?'22':'17'}px;font-weight:800;color:${_hasNote?'#D97706':'var(--gris)'};font-family:'Libre Baskerville',serif;">${_hasNote?p.note+' ★':'Nouveau'}</div>
-        <div style="font-size:11px;color:var(--gris);margin-top:2px;">${_hasNote?'Note moyenne':'Pas encore noté'}</div>
+      <div style="background:#F7F8FA;border:1px solid #E5E7EB;border-radius:10px;padding:12px 6px;text-align:center;">
+        <div style="font-size:18px;font-weight:800;color:#1B2A4A;">${p.experience ? p.experience+' ans' : '—'}</div>
+        <div style="font-size:10.5px;color:#6B7280;margin-top:2px;">Expérience</div>
       </div>
     </div>
 
@@ -6610,79 +6611,52 @@ function openModal(id) {
         <div style="font-weight:800;font-size:13px;">Ambassadeur YOUMMA JOBS</div>
         <div style="font-size:11px;opacity:.85;margin-top:2px;">Valide jusqu'au ${badgeAmbFin ? badgeAmbFin.toLocaleDateString('fr-FR') : ''}</div>
       </div>
-    </div>` : `
-    <div style="background:#f3f4f6;border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
-      <span style="font-size:24px;flex-shrink:0;">🏷️</span>
-      <div>
-        <div style="font-weight:800;font-size:13px;color:#374151;">Membre YOUMMA JOBS</div>
-        <div style="font-size:11px;color:#6b7280;margin-top:2px;">Partagez 50 fois pour devenir Ambassadeur</div>
-      </div>
-    </div>`}
+    </div>` : ''}
 
-    <div class="mp-info-grid">
-      ${p.dispo ? `<div class="mp-info-item"><div class="mp-info-label">Disponibilité</div><div class="mp-info-val" style="display:flex;align-items:center;gap:6px;">${isExpressModal ? '<span style="font-size:12px;font-weight:800;color:#E85D04;background:rgba(232,93,4,.1);padding:2px 8px;border-radius:20px;border:1px solid rgba(232,93,4,.3);">⚡ Prêt à intervenir</span>' : `<span class="dispo-led ${dispoClass}"></span>${isOccupeModal ? 'Je suis Occupé(e)' : 'Je suis Disponible'}`}</div></div>` : ''}
-      ${p.tarif ? `<div class="mp-info-item"><div class="mp-info-label">Tarifs indicatifs</div><div class="mp-info-val">💰 ${p.tarif}</div></div>` : ''}
-      ${p.experience ? `<div class="mp-info-item"><div class="mp-info-label">Expérience</div><div class="mp-info-val">${p.experience} ans d'expérience</div></div>` : ''}
-      <div class="mp-info-item"><div class="mp-info-label">Localisation</div><div class="mp-info-val"><i class="fa-solid fa-location-dot"></i> ${lieuAffiche}</div></div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:4px;">
+      <button onclick="openWA('${p.wa}','${p.nom}')" style="height:48px;border-radius:12px;background:#25D366;color:#fff;border:none;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-family:'DM Sans',sans-serif;">
+        <i class="fa-brands fa-whatsapp"></i> WhatsApp
+      </button>
+      <button onclick="callProvider('${p.tel}')" style="height:48px;border-radius:12px;background:#fff;color:#E07A30;border:1.5px solid #E07A30;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font-family:'DM Sans',sans-serif;">
+        <i class="fa-solid fa-phone"></i> Appeler
+      </button>
     </div>
 
-    
-    ${(p.desc && p.desc !== 'Professionnel') ? `
-    <div class="mp-section-title">À propos</div>
-    <p style="font-size:13.5px;color:var(--gris);line-height:1.75;margin-bottom:4px;">${p.desc}</p>
-    ` : ''}
-
-    
-    ${(p.skills||[]).length ? `
-    <div class="mp-section-title">Compétences</div>
-    <div class="mp-skills-wrap">${(p.skills||[]).map(s=>`<span class="modal-skill">${s}</span>`).join('')}</div>
-    ` : ''}
-
-    
-    <div id="modalRealsSection">
-      <div class="mp-section-title"><i class="fa-solid fa-images"></i> Réalisations</div>
-      <div id="modalPhotos" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;">
-        <div style="text-align:center;color:var(--gris);font-size:12px;grid-column:1/-1;padding:14px;">Chargement...</div>
-      </div>
+    <div style="background:#fff;border-radius:14px;border:1px solid #E5E7EB;overflow:hidden;margin-top:12px;">
+      ${p.dispo ? _mpSection('Disponibilité', _dispoContent).replace('border-top:1px solid #E5E7EB;','border-top:none;') : ''}
+      ${_mpSection('Localisation', _locContent)}
+      ${(p.desc && p.desc !== 'Professionnel') ? _mpSection('À propos', `<span style="font-size:13.5px;color:#374151;">${p.desc}</span>`) : ''}
+      ${(p.skills||[]).length ? _mpSection('Compétences', `<div style="display:flex;flex-wrap:wrap;gap:7px;">${(p.skills||[]).map(s=>`<span class="modal-skill">${s}</span>`).join('')}</div>`) : ''}
+      ${_mpSection('<i class="fa-solid fa-images"></i> Réalisations', `<div id="modalRealsSection"><div id="modalPhotos" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
+        <div style="text-align:center;color:#9CA3AF;font-size:12px;grid-column:1/-1;padding:14px;">Chargement...</div>
+      </div></div>`)}
+      ${_mpSection('<i class="fa-solid fa-shield-halved"></i> Documents', `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:${p.badge_verifie?'#F0FDF4':'#F7F8FA'};border:1.5px solid ${p.badge_verifie?'#86EFAC':'#E5E7EB'};border-radius:12px;padding:12px;text-align:center;">
+          <div style="font-size:22px;margin-bottom:5px;">${p.badge_verifie?'✅':'⏳'}</div>
+          <div style="font-size:12px;font-weight:700;color:${p.badge_verifie?'#16A34A':'#6B7280'};">Pièce d'identité</div>
+          <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;">${p.badge_verifie?'Vérifiée par YOUMMA':'En cours'}</div>
+        </div>
+        <div style="background:${p.badge_top?'#FFFBEB':'#F7F8FA'};border:1.5px solid ${p.badge_top?'#FDE68A':'#E5E7EB'};border-radius:12px;padding:12px;text-align:center;">
+          <div style="font-size:22px;margin-bottom:5px;">${p.badge_top?'🎓':'📄'}</div>
+          <div style="font-size:12px;font-weight:700;color:${p.badge_top?'#D97706':'#6B7280'};">Diplôme / Formation</div>
+          <div style="font-size:10.5px;color:#9CA3AF;margin-top:3px;">${p.badge_top?'Certifié Top Artisan':'Non renseigné'}</div>
+        </div>
+      </div>`)}
+      ${_mpSection(`<i class="fa-solid fa-star" style="color:#F5C842;"></i> Avis clients` + ((p.avis||[]).length ? ` (${p.avis.length} · ${p.note}/5)` : ''), (p.avis||[]).length
+        ? avisHtml
+        : `<div style="text-align:center;padding:1.2rem;color:#9CA3AF;font-size:13px;background:#F7F8FA;border-radius:10px;">⭐ Aucun avis pour le moment.<br><span style="font-size:12px;">Soyez le premier à laisser un avis !</span></div>`)}
     </div>
 
-    
-    <div class="mp-section-title"><i class="fa-solid fa-shield-halved"></i> Vérification & Documents</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-      <div style="background:${p.badge_verifie?'#F0FDF4':'var(--fond2)'};border:1.5px solid ${p.badge_verifie?'#86EFAC':'var(--bordure)'};border-radius:14px;padding:14px;text-align:center;">
-        <div style="font-size:24px;margin-bottom:6px;">${p.badge_verifie?'✅':'⏳'}</div>
-        <div style="font-size:12px;font-weight:700;color:${p.badge_verifie?'#16A34A':'var(--gris)'};">Pièce d'identité</div>
-        <div style="font-size:10.5px;color:var(--gris);margin-top:3px;">${p.badge_verifie?'Vérifiée par YOUMMA':'En cours de vérification'}</div>
-      </div>
-      <div style="background:${p.badge_top?'#FFFBEB':'var(--fond2)'};border:1.5px solid ${p.badge_top?'#FDE68A':'var(--bordure)'};border-radius:14px;padding:14px;text-align:center;">
-        <div style="font-size:24px;margin-bottom:6px;">${p.badge_top?'🎓':'📄'}</div>
-        <div style="font-size:12px;font-weight:700;color:${p.badge_top?'#D97706':'var(--gris)'};">Diplôme / Formation</div>
-        <div style="font-size:10.5px;color:var(--gris);margin-top:3px;">${p.badge_top?'Certifié Top Artisan':'Non renseigné'}</div>
-      </div>
-    </div>
-
-    
-    ${(p.avis||[]).length ? `
-    <div class="mp-section-title"><i class="fa-solid fa-star" style="color:#F5C842;"></i> Avis clients (${p.avis.length} · ${p.note}/5)</div>
-    ${avisHtml}
-    ` : `<div class="mp-section-title"><i class="fa-solid fa-star" style="color:#F5C842;"></i> Avis clients</div>
-    <div style="text-align:center;padding:1.5rem;color:#9ca3af;font-size:13px;background:#f9fafb;border-radius:10px;margin-bottom:12px;">⭐ Aucun avis pour le moment.<br><span style="font-size:12px;">Soyez le premier à laisser un avis !</span></div>`}
-
-    
-    <div class="mp-actions-row">
-      <button class="btn-mp-call" onclick="callProvider('${p.tel}')"><i class="fa-solid fa-phone"></i> Appeler</button>
-      <button class="btn-mp-maps" onclick="openMaps('${p.nom}','${p.ville}')"><i class="fa-solid fa-location-dot"></i> Localiser</button>
-    </div>
-    <div style="background:#fff;border-radius:16px;padding:16px;margin-top:16px;border:1.5px solid var(--bordure);">
-      <div style="font-size:13px;font-weight:700;color:var(--bleu);margin-bottom:12px;">📤 Partager ce profil</div>
+    <div style="background:#fff;border-radius:16px;padding:16px;margin-top:16px;border:1px solid #E5E7EB;">
+      <div style="font-size:13px;font-weight:700;color:#1B2A4A;margin-bottom:12px;">📤 Partager ce profil</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
         <button onclick="partagerWhatsApp('${p.id}')" style="padding:10px 6px;background:#25D366;border:none;border-radius:10px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">📱 WhatsApp</button>
         <button onclick="partagerFacebook('${p.id}')" style="padding:10px 6px;background:#1877F2;border:none;border-radius:10px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">👍 Facebook</button>
-        <button onclick="copierLienPublic('${p.id}')" style="padding:10px 6px;background:var(--fond);border:1.5px solid var(--bordure);border-radius:10px;color:var(--bleu);font-size:11px;font-weight:700;cursor:pointer;">🔗 Copier</button>
+        <button onclick="copierLienPublic('${p.id}')" style="padding:10px 6px;background:#F7F8FA;border:1.5px solid #E5E7EB;border-radius:10px;color:#1B2A4A;font-size:11px;font-weight:700;cursor:pointer;">🔗 Copier</button>
       </div>
     </div>
-    <div style="text-align:center;margin-top:10px;padding:10px;background:var(--fond2);border-radius:12px;">
-      <div style="font-size:11.5px;color:var(--gris);">Vous êtes artisan ? <span onclick="closeModal();ouvrirInscription()" style="color:var(--orange);font-weight:700;cursor:pointer;">Créez votre profil gratuit →</span></div>
+    <div style="text-align:center;margin-top:10px;padding:10px;background:#F7F8FA;border-radius:12px;margin-bottom:60px;">
+      <div style="font-size:11.5px;color:#6B7280;">Vous êtes artisan ? <span onclick="closeModal();ouvrirInscription()" style="color:#E07A30;font-weight:700;cursor:pointer;">Créez votre profil gratuit →</span></div>
     </div>
   `;
 
@@ -6717,7 +6691,7 @@ function openModal(id) {
         if (container) container.innerHTML = '<div style="text-align:center;color:#9ca3af;font-size:13px;padding:1rem;">Aucune réalisation ajoutée pour le moment</div>';
       } else {
         container.innerHTML = reals.map(ph => `
-          <div style="aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--fond2);cursor:zoom-in;min-height:100px;"
+          <div style="aspect-ratio:1;border-radius:8px;overflow:hidden;background:#F7F8FA;cursor:zoom-in;min-height:100px;"
                data-url="${ph.url}" data-cap="${(ph.caption||'').replace(/"/g,'&quot;')}"
                onclick="_yjLightbox(this.getAttribute('data-url'),this.getAttribute('data-cap'))">
             <img src="${ph.url}" style="width:100%;height:100%;object-fit:cover;" loading="lazy"/>
