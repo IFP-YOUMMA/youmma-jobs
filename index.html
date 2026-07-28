@@ -2940,6 +2940,205 @@ if (typeof connexionPrestataire === 'undefined') {
     </div>
   </div>
 
+  <!-- ============================================ -->
+  <!-- DASHBOARD FOURNISSEUR V2 - YOUMMA JOBS     -->
+  <!-- ============================================ -->
+  <div id="dashboardFournisseurV2" style="display:none;width:100%;">
+
+    <div class="dfo-topbar">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="dfo-logo">YOUMMA<span>JOBS</span></span>
+        <span style="color:#e5e7eb">|</span>
+        <span style="font-size:13px;color:#6b7280">Espace fournisseur</span>
+        <span class="dfo-role-badge">Fournisseur partenaire</span>
+      </div>
+      <div class="dfo-topbar-right">
+        <div class="dfo-notif-btn">
+          <i class="fa-solid fa-bell"></i>
+          <div class="dfo-notif-dot" id="dfoNotifDot" style="display:none"></div>
+        </div>
+        <span class="dfo-user-info" id="dfoUserInfo">—</span>
+        <div class="dfo-avatar" id="dfoAvatar">—</div>
+      </div>
+    </div>
+
+    <div class="dfo-nav">
+      <div class="dfo-tab active" data-tab="overview">Vue générale</div>
+      <div class="dfo-tab" data-tab="sorties">Demandes de sortie</div>
+      <div class="dfo-tab" data-tab="versements">Versements à confirmer</div>
+      <div class="dfo-tab" data-tab="registre">Registre chantier</div>
+      <div class="dfo-tab" data-tab="rapports">Rapports journaliers</div>
+      <div class="dfo-tab" data-tab="catalogue">Mon catalogue</div>
+      <div class="dfo-tab" data-tab="profil">Mon profil</div>
+    </div>
+
+    <div class="dfo-alert" id="dfoAlertSorties" style="display:none">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p id="dfoAlertMsg">Demandes de sortie en attente — le chantier est bloqué jusqu'à votre confirmation.</p>
+    </div>
+
+    <div class="dfo-main">
+
+      <!-- ONGLET 1 : VUE GÉNÉRALE -->
+      <div class="dfo-panel active" id="dfoPanel-overview">
+
+        <div class="dfo-metrics">
+          <div class="dfo-metric">
+            <div class="dfo-metric-lbl">Sorties en attente</div>
+            <div class="dfo-metric-val warn" id="dfoMetricSorties">0</div>
+            <div class="dfo-metric-sub">À confirmer maintenant</div>
+          </div>
+          <div class="dfo-metric">
+            <div class="dfo-metric-lbl">Versements à valider</div>
+            <div class="dfo-metric-val warn" id="dfoMetricVersements">0</div>
+            <div class="dfo-metric-sub">Déclaré par le client</div>
+          </div>
+          <div class="dfo-metric">
+            <div class="dfo-metric-lbl">Total reçu ce chantier</div>
+            <div class="dfo-metric-val ok" id="dfoMetricTotal">—</div>
+            <div class="dfo-metric-sub">GNF confirmés</div>
+          </div>
+          <div class="dfo-metric">
+            <div class="dfo-metric-lbl">Commission YOUMMA due</div>
+            <div class="dfo-metric-val accent" id="dfoMetricCommission">—</div>
+            <div class="dfo-metric-sub">GNF</div>
+          </div>
+        </div>
+
+        <div class="dfo-two-col">
+
+          <div class="dfo-card">
+            <div class="dfo-card-title">
+              <div class="dfo-card-title-left"><i class="fa-solid fa-arrow-up"></i> Demandes de sortie</div>
+              <span class="dfo-count-badge warn" id="dfoBadgeSorties">0 en attente</span>
+            </div>
+            <div id="dfoSortiesOverview"></div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+
+            <div class="dfo-card">
+              <div class="dfo-card-title">
+                <div class="dfo-card-title-left"><i class="fa-solid fa-money-bill"></i> Versement à confirmer</div>
+                <span class="dfo-count-badge warn" id="dfoBadgeVers">0 en attente</span>
+              </div>
+              <div id="dfoVersementsOverview"></div>
+            </div>
+
+            <div class="dfo-card">
+              <div class="dfo-card-title">
+                <div class="dfo-card-title-left"><i class="fa-solid fa-list"></i> Derniers mouvements</div>
+              </div>
+              <div id="dfoMouvements"></div>
+            </div>
+
+            <div class="dfo-commission-card">
+              <div class="dfo-comm-title" id="dfoCommTitre">Commission YOUMMA</div>
+              <div class="dfo-comm-row"><span>Total reçu confirmé</span><span id="dfoCommTotal">—</span></div>
+              <div class="dfo-comm-row"><span>Commission due</span><span id="dfoCommDue">—</span></div>
+              <div class="dfo-comm-row"><span>Déjà payée</span><span id="dfoCommPayee">—</span></div>
+              <div class="dfo-comm-sep"></div>
+              <div class="dfo-comm-row dfo-comm-bold"><span>Reste à payer</span><span id="dfoCommReste">—</span></div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="dfo-two-col">
+
+          <div class="dfo-card">
+            <div class="dfo-card-title">
+              <div class="dfo-card-title-left"><i class="fa-solid fa-file-lines"></i> Rapport à cosigner</div>
+              <span class="dfo-count-badge warn" id="dfoBadgeRapport">0 en attente</span>
+            </div>
+            <div id="dfoRapportAttenteOverview"></div>
+          </div>
+
+          <div class="dfo-card">
+            <div class="dfo-card-title">
+              <div class="dfo-card-title-left"><i class="fa-solid fa-shop"></i> Chantier actif</div>
+              <span class="dfo-stat-chip conf" id="dfoChantierStatutChip">En cours</span>
+            </div>
+            <div class="dfo-chantier-info" id="dfoChantierInfo"></div>
+            <hr class="dfo-divider">
+            <div class="dfo-contact-actions">
+              <button class="dfo-btn-whatsapp" id="dfoBtnWhatsapp">
+                <i class="fa-brands fa-whatsapp"></i>
+                Contacter le superviseur sur WhatsApp
+              </button>
+              <button class="dfo-btn-signaler" onclick="dfoSignalerProbleme()">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                Signaler un problème à YOUMMA
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ONGLET 2 : DEMANDES DE SORTIE -->
+      <div class="dfo-panel" id="dfoPanel-sorties">
+        <div class="dfo-card">
+          <div class="dfo-card-title">
+            <div class="dfo-card-title-left"><i class="fa-solid fa-arrow-up"></i> Toutes les demandes de sortie</div>
+          </div>
+          <div id="dfoSortiesListe"></div>
+        </div>
+      </div>
+
+      <!-- ONGLET 3 : VERSEMENTS -->
+      <div class="dfo-panel" id="dfoPanel-versements">
+        <div class="dfo-card">
+          <div class="dfo-card-title">
+            <div class="dfo-card-title-left"><i class="fa-solid fa-money-bill"></i> Tous les versements</div>
+          </div>
+          <div id="dfoVersementsListe"></div>
+        </div>
+      </div>
+
+      <!-- ONGLET 4 : REGISTRE -->
+      <div class="dfo-panel" id="dfoPanel-registre">
+        <div class="dfo-card">
+          <div class="dfo-card-title">
+            <div class="dfo-card-title-left"><i class="fa-solid fa-list"></i> Registre complet du chantier</div>
+          </div>
+          <div id="dfoRegistreListe"></div>
+        </div>
+      </div>
+
+      <!-- ONGLET 5 : RAPPORTS -->
+      <div class="dfo-panel" id="dfoPanel-rapports">
+        <div class="dfo-card">
+          <div class="dfo-card-title">
+            <div class="dfo-card-title-left"><i class="fa-solid fa-file-lines"></i> Rapports journaliers</div>
+          </div>
+          <div id="dfoRapportsListe"></div>
+        </div>
+      </div>
+
+      <!-- ONGLET 6 : CATALOGUE -->
+      <div class="dfo-panel" id="dfoPanel-catalogue">
+        <div class="dfo-card">
+          <div class="dfo-card-title">
+            <div class="dfo-card-title-left"><i class="fa-solid fa-box"></i> Mon catalogue de matériaux</div>
+          </div>
+          <div id="dfoCatalogueListe"></div>
+        </div>
+      </div>
+
+      <!-- ONGLET 7 : PROFIL -->
+      <div class="dfo-panel" id="dfoPanel-profil">
+        <div class="dfo-card">
+          <div class="dfo-card-title">
+            <div class="dfo-card-title-left"><i class="fa-solid fa-user"></i> Mon profil</div>
+          </div>
+          <div id="dfoProfilDetail"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Tableau de bord SUPERVISEUR -->
   <div id="espaceDashSuperviseur" style="display:none;width:100%;max-width:820px;">
     <div class="esp-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
@@ -3469,6 +3668,106 @@ if (typeof connexionPrestataire === 'undefined') {
   .dcl-rapport-actions{flex-direction:column}
   .dcl-btn-valider,.dcl-btn-dl{width:100%;justify-content:center}
 }
+
+/* ============================================ */
+/* DASHBOARD FOURNISSEUR V2 - YOUMMA JOBS      */
+/* ============================================ */
+/* Même remarque que #dashboardClientV2 : #espaceWrapper.dfo-active
+   neutralise le fond sombre / padding / centrage flex pensés pour l'écran
+   de connexion OTP, posée/retirée en JS par _espaceAfficherTableauBord(). */
+#espaceWrapper.dfo-active{padding:0!important;background:#f9fafb!important;display:block!important;height:auto!important;min-height:100vh!important;}
+#dashboardFournisseurV2{background:#f9fafb;min-height:100vh;color:#0f172a}
+.dfo-topbar{background:#fff!important;border-bottom:0.5px solid #e5e7eb;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.dfo-logo{font-size:15px;font-weight:600;color:#0f172a}.dfo-logo span{color:#E05A1B}
+.dfo-role-badge{background:#fef3c7;color:#92400e;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;margin-left:8px}
+.dfo-topbar-right{display:flex;align-items:center;gap:12px}
+.dfo-notif-btn{position:relative;cursor:pointer;color:#6b7280;font-size:20px}
+.dfo-notif-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;position:absolute;top:-2px;right:-2px}
+.dfo-avatar{width:32px;height:32px;border-radius:50%;background:#fef3c7;color:#92400e;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center}
+.dfo-nav{background:#fff!important;border-bottom:0.5px solid #e5e7eb;padding:0 20px;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dfo-tab{padding:12px 16px;font-size:13px;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;user-select:none}
+.dfo-tab.active{color:#E05A1B;border-bottom-color:#E05A1B;font-weight:500}
+.dfo-alert{background:#fef2f2;border-bottom:0.5px solid #fca5a5;padding:10px 20px;display:flex;align-items:center;gap:10px}
+.dfo-alert i{color:#dc2626;font-size:16px}
+.dfo-alert p{font-size:13px;color:#991b1b;flex:1}
+.dfo-main{padding:20px;display:flex;flex-direction:column;gap:16px;background:#f9fafb;min-height:calc(100vh - 120px)}
+.dfo-panel{display:none}.dfo-panel.active{display:flex;flex-direction:column;gap:16px}
+.dfo-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.dfo-metric{background:#fff;border-radius:8px;padding:12px 14px;border:0.5px solid #e5e7eb}
+.dfo-metric-lbl{font-size:12px;color:#6b7280;margin-bottom:4px}
+.dfo-metric-val{font-size:20px;font-weight:600;color:#0f172a}
+.dfo-metric-val.warn{color:#d97706}
+.dfo-metric-val.ok{color:#16a34a}
+.dfo-metric-val.accent{color:#E05A1B}
+.dfo-metric-sub{font-size:11px;color:#9ca3af;margin-top:2px}
+.dfo-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dfo-card{background:#fff;border:0.5px solid #e5e7eb;border-radius:12px;padding:16px}
+.dfo-card-title{font-size:13px;font-weight:500;color:#0f172a;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.dfo-card-title-left{display:flex;align-items:center;gap:6px}
+.dfo-card-title i{color:#6b7280;font-size:16px}
+.dfo-count-badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+.dfo-count-badge.warn{background:#fee2e2;color:#991b1b}
+.dfo-count-badge.ok{background:#dcfce7;color:#166534}
+.dfo-sortie-row{border:0.5px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px}
+.dfo-sortie-row:last-child{margin-bottom:0}
+.dfo-sortie-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.dfo-sortie-title{font-size:13px;font-weight:500;color:#0f172a}
+.dfo-sortie-meta{font-size:11px;color:#9ca3af;margin-top:2px}
+.dfo-sortie-urgent{background:#fef2f2;color:#991b1b;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;flex-shrink:0}
+.dfo-photo-req{background:#fffbeb;border:0.5px solid #fcd34d;border-radius:6px;padding:8px;font-size:12px;color:#92400e;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.dfo-sortie-actions{display:flex;gap:8px}
+.dfo-btn-conf{background:#16a34a;color:#fff;border:none;padding:7px 14px;border-radius:6px;font-size:12px;cursor:pointer;flex:1;display:flex;align-items:center;justify-content:center;gap:4px}
+.dfo-btn-ref{background:transparent;color:#dc2626;border:0.5px solid #fca5a5;padding:7px 14px;border-radius:6px;font-size:12px;cursor:pointer;flex:1;display:flex;align-items:center;justify-content:center;gap:4px}
+.dfo-vers-row{display:flex;align-items:center;justify-content:space-between;padding:10px;background:#f9fafb;border-radius:8px;margin-bottom:8px;flex-wrap:wrap}
+.dfo-vers-row:last-child{margin-bottom:0}
+.dfo-vers-amount{font-size:14px;font-weight:600;color:#0f172a}
+.dfo-vers-meta{font-size:11px;color:#9ca3af;margin-top:2px}
+.dfo-vers-expire{font-size:11px;color:#d97706;margin-top:2px}
+.dfo-vers-actions{display:flex;gap:6px;flex-shrink:0}
+.dfo-btn-val-vers{background:#16a34a;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.dfo-btn-rej-vers{background:transparent;color:#dc2626;border:0.5px solid #fca5a5;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+.dfo-reg-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid #f3f4f6}
+.dfo-reg-row:last-child{border-bottom:none}
+.dfo-reg-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.dfo-reg-icon.out{background:#fffbeb;color:#d97706}
+.dfo-reg-icon.pay{background:#dcfce7;color:#16a34a}
+.dfo-reg-body{flex:1}
+.dfo-reg-title{font-size:13px;color:#0f172a}
+.dfo-reg-sub{font-size:11px;color:#9ca3af}
+.dfo-stat-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:20px}
+.dfo-stat-chip.conf{background:#dcfce7;color:#166534}
+.dfo-stat-chip.pend{background:#fffbeb;color:#92400e}
+.dfo-commission-card{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:12px;padding:14px}
+.dfo-comm-title{font-size:12px;color:#1d4ed8;margin-bottom:8px;font-weight:500}
+.dfo-comm-row{display:flex;justify-content:space-between;font-size:12px;color:#1e40af;margin-bottom:4px}
+.dfo-comm-sep{border-top:0.5px solid #bfdbfe;margin:8px 0}
+.dfo-comm-bold{font-weight:600}
+.dfo-rapport-row{border:0.5px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px}
+.dfo-rapport-row:last-child{margin-bottom:0}
+.dfo-rapport-date{font-size:13px;font-weight:500;color:#0f172a;margin-bottom:4px}
+.dfo-rapport-body{font-size:12px;color:#6b7280;line-height:1.5;margin-bottom:8px;background:#f9fafb;padding:8px;border-radius:6px}
+.dfo-rapport-photos{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.dfo-photo-thumb{width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:pointer;border:0.5px solid #e5e7eb}
+.dfo-btn-cosign{background:#E05A1B;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;width:100%;justify-content:center}
+.dfo-chantier-info{display:flex;flex-direction:column;margin-bottom:14px}
+.dfo-info-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:7px 0;border-bottom:0.5px solid #f3f4f6}
+.dfo-info-row:last-child{border-bottom:none}
+.dfo-info-lbl{color:#6b7280}
+.dfo-info-val{color:#0f172a;font-weight:500;text-align:right}
+.dfo-info-val.warn{color:#d97706}
+.dfo-contact-actions{display:flex;flex-direction:column;gap:8px}
+.dfo-btn-whatsapp{background:#25D366;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:500}
+.dfo-btn-signaler{background:transparent;color:#dc2626;border:0.5px solid #fca5a5;padding:10px 16px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.dfo-divider{border:none;border-top:0.5px solid #e5e7eb;margin:12px 0}
+.dfo-label{font-size:12px;color:#6b7280;display:block;margin-bottom:4px}
+.dfo-empty{color:#9ca3af;font-size:13px;padding:8px 0;text-align:center}
+@media(max-width:640px){
+  .dfo-metrics{grid-template-columns:1fr 1fr;gap:8px}
+  .dfo-two-col{grid-template-columns:1fr}
+  .dfo-main{padding:12px}
+  .dfo-topbar{padding:10px 12px}
+  .dfo-metric-val{font-size:16px}
+}
 </style>
 
 <script>
@@ -3987,6 +4286,468 @@ window.dclLoadDocuments = dclLoadDocuments;
 
 <script>
 // ══════════════════════════════════════════════════════════════
+// DASHBOARD FOURNISSEUR V2 - YOUMMA JOBS
+// ══════════════════════════════════════════════════════════════
+// Adapté au vrai schéma Supabase et au vrai flux déjà en place
+// (_espaceChargerFournisseur(), _espaceTraiterSortie(),
+// _espaceFournisseurTraiterVersement()) :
+// - comptes_materiaux : PLUSIEURS comptes par fournisseur (un par chantier),
+//   colonne solde_gnf. Les onglets Sorties/Versements/Registre couvrent
+//   TOUS les comptes du fournisseur (comme l'ancien dashboard), la carte
+//   "Chantier actif" de la vue générale affiche le chantier en_cours le
+//   plus pertinent.
+// - registre_transactions : modèle APPEND-ONLY, jamais d'UPDATE sur une
+//   ligne existante. Confirmer/refuser une sortie ou un versement = INSERT
+//   d'une nouvelle ligne (type_operation='sortie_confirmee'/'rejetee' ou
+//   'versement_valide'/'rejete') avec reference_transaction_id vers la
+//   ligne d'origine. Un trigger SQL fn_gerer_solde_registre (BEFORE INSERT)
+//   met à jour comptes_materiaux.solde_gnf automatiquement — on ne
+//   recalcule JAMAIS le solde à la main côté client, on réutilise
+//   _espaceTraiterSortie()/_espaceFournisseurTraiterVersement() telles
+//   quelles (déjà correctes et testées) plutôt que de les réécrire.
+// - catalogue_produits (pas catalogue_fournisseur) : nom_produit, prix_gnf,
+//   unite, disponible.
+// - rapport_final_chantier.validation_fournisseur_id : validation de FIN de
+//   chantier (pas de cosignature de rapport quotidien dans le vrai schéma —
+//   rapports_journaliers n'a pas cette notion côté fournisseur).
+// - Photo obligatoire à la confirmation d'une sortie : nouvelle colonne
+//   photo_sortie_url (migration 20260723, non exécutée) — _espaceTraiterSortie()
+//   a été étendue avec un 4e paramètre optionnel photoUrl, rétrocompatible
+//   avec ses 2 appels existants dans l'ancien dashboard.
+
+function dfoFormatGNF(n) {
+  return (typeof _espaceFormatGNF === 'function') ? _espaceFormatGNF(n) : (Math.round(n||0).toLocaleString('fr-FR') + ' GNF');
+}
+
+function dfoShowTab(tabName) {
+  document.querySelectorAll('#dashboardFournisseurV2 .dfo-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#dashboardFournisseurV2 .dfo-panel').forEach(p => p.classList.remove('active'));
+  const tab = document.querySelector(`#dashboardFournisseurV2 .dfo-tab[data-tab="${tabName}"]`);
+  const panel = document.getElementById(`dfoPanel-${tabName}`);
+  if (tab) tab.classList.add('active');
+  if (panel) panel.classList.add('active');
+  if (tabName === 'sorties') dfoLoadSorties();
+  if (tabName === 'versements') dfoLoadVersements();
+  if (tabName === 'registre') dfoLoadRegistre();
+  if (tabName === 'rapports') dfoLoadRapports();
+  if (tabName === 'catalogue') dfoLoadCatalogue();
+  if (tabName === 'profil') dfoLoadProfil();
+}
+window.dfoShowTab = dfoShowTab;
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('#dashboardFournisseurV2 .dfo-tab').forEach(tab => {
+    tab.addEventListener('click', () => dfoShowTab(tab.dataset.tab));
+  });
+});
+
+// -- INIT PRINCIPAL --
+async function dfoInit() {
+  if (typeof _espaceSession === 'undefined' || !_espaceSession || _espaceSession.role !== 'fournisseur') return;
+  const fournisseurId = _espaceSession.id;
+  window._dfoFournisseurId = fournisseurId;
+
+  const nom = _espaceSession.nom || 'Fournisseur';
+  document.getElementById('dfoUserInfo').textContent = nom;
+  document.getElementById('dfoAvatar').textContent = nom.substring(0,2).toUpperCase();
+
+  try {
+    const { data: comptes, error } = await sb.from('comptes_materiaux')
+      .select('id,solde_gnf,chantier_id,chantiers(id,nom,statut,client_id,commission_taux,commission_payee,superviseur_id,clients(nom,prenom,telephone),superviseurs(nom,prenom,telephone))')
+      .eq('fournisseur_id', fournisseurId);
+    if (error) throw error;
+
+    if (!comptes || !comptes.length) {
+      document.getElementById('dfoPanel-overview').innerHTML =
+        '<div class="dfo-empty" style="padding:40px">Aucun chantier actif assigné à votre compte.</div>';
+      return;
+    }
+
+    window._dfoComptes = comptes;
+    window._dfoCompteIds = comptes.map(c => c.id);
+    const compteActif = comptes.find(c => c.chantiers && c.chantiers.statut === 'en_cours') || comptes[0];
+    window._dfoChantierId = compteActif.chantier_id;
+    window._dfoSuperviseurTel = (compteActif.chantiers && compteActif.chantiers.superviseurs && compteActif.chantiers.superviseurs.telephone) || null;
+
+    // Transactions sur TOUS les comptes du fournisseur (comme l'ancien
+    // dashboard), pas seulement le chantier "principal" affiché en fiche.
+    const { data: transactions } = await sb.from('registre_transactions')
+      .select('*, chantiers(nom)')
+      .in('compte_id', window._dfoCompteIds)
+      .order('created_at', { ascending: false });
+    const allTrans = transactions || [];
+    window._dfoTransactions = allTrans;
+
+    const referencees = new Set(allTrans.map(t => t.reference_transaction_id).filter(Boolean));
+    const sortiesAttente = allTrans.filter(t => t.type_operation === 'sortie_demandee' && !referencees.has(t.id));
+    const versementsAttente = allTrans.filter(t => t.type_operation === 'versement_declare' && !referencees.has(t.id));
+
+    document.getElementById('dfoMetricSorties').textContent = sortiesAttente.length;
+    document.getElementById('dfoBadgeSorties').textContent = sortiesAttente.length + ' en attente';
+    document.getElementById('dfoBadgeSorties').className = 'dfo-count-badge ' + (sortiesAttente.length > 0 ? 'warn' : 'ok');
+
+    document.getElementById('dfoMetricVersements').textContent = versementsAttente.length;
+    document.getElementById('dfoBadgeVers').textContent = versementsAttente.length + ' en attente';
+    document.getElementById('dfoBadgeVers').className = 'dfo-count-badge ' + (versementsAttente.length > 0 ? 'warn' : 'ok');
+
+    if (sortiesAttente.length) {
+      document.getElementById('dfoAlertSorties').style.display = 'flex';
+      document.getElementById('dfoAlertMsg').textContent =
+        `${sortiesAttente.length} demande${sortiesAttente.length > 1 ? 's' : ''} de sortie en attente — le chantier est bloqué jusqu'à votre confirmation.`;
+      document.getElementById('dfoNotifDot').style.display = 'block';
+    } else {
+      document.getElementById('dfoAlertSorties').style.display = 'none';
+      document.getElementById('dfoNotifDot').style.display = 'none';
+    }
+
+    // Total reçu + commission pour le chantier "principal" affiché en fiche
+    const totalRecu = allTrans.filter(t => t.type_operation === 'versement_valide' && t.chantier_id === window._dfoChantierId).reduce((s,t) => s + Number(t.montant_gnf||0), 0);
+    document.getElementById('dfoMetricTotal').textContent = dfoFormatGNF(totalRecu);
+
+    const chantierPrincipal = compteActif.chantiers || {};
+    const commTaux = chantierPrincipal.commission_taux || 0;
+    const commDue = Math.round(totalRecu * commTaux / 100);
+    const commPayee = chantierPrincipal.commission_payee === true;
+    document.getElementById('dfoMetricCommission').textContent = dfoFormatGNF(commDue);
+    document.getElementById('dfoCommTitre').textContent = 'Commission YOUMMA' + (commTaux ? ' (' + commTaux + '%)' : '');
+    document.getElementById('dfoCommTotal').textContent = dfoFormatGNF(totalRecu);
+    document.getElementById('dfoCommDue').textContent = dfoFormatGNF(commDue);
+    document.getElementById('dfoCommPayee').textContent = commPayee ? dfoFormatGNF(commDue) : dfoFormatGNF(0);
+    document.getElementById('dfoCommReste').textContent = commPayee ? dfoFormatGNF(0) : dfoFormatGNF(commDue);
+
+    // Fiche chantier
+    const client = chantierPrincipal.clients ? ((chantierPrincipal.clients.prenom ? chantierPrincipal.clients.prenom + ' ' : '') + chantierPrincipal.clients.nom) : '—';
+    const superviseur = chantierPrincipal.superviseurs ? ((chantierPrincipal.superviseurs.prenom ? chantierPrincipal.superviseurs.prenom + ' ' : '') + chantierPrincipal.superviseurs.nom) : '—';
+    const sc = (typeof _rcStatutChantierConfig === 'function') ? _rcStatutChantierConfig(chantierPrincipal.statut) : { label: chantierPrincipal.statut || '—' };
+    document.getElementById('dfoChantierStatutChip').textContent = sc.label;
+    document.getElementById('dfoChantierInfo').innerHTML = `
+      <div class="dfo-info-row"><span class="dfo-info-lbl">Chantier</span><span class="dfo-info-val">${chantierPrincipal.nom || '—'}</span></div>
+      <div class="dfo-info-row"><span class="dfo-info-lbl">Client</span><span class="dfo-info-val">${client}</span></div>
+      <div class="dfo-info-row"><span class="dfo-info-lbl">Superviseur</span><span class="dfo-info-val">${superviseur}</span></div>
+      <div class="dfo-info-row"><span class="dfo-info-lbl">Solde client</span><span class="dfo-info-val warn">${dfoFormatGNF(compteActif.solde_gnf)}</span></div>
+    `;
+
+    document.getElementById('dfoBtnWhatsapp').onclick = () => {
+      const tel = (window._dfoSuperviseurTel || '').replace(/\D/g,'');
+      if (tel) window.open('https://wa.me/' + tel);
+      else if (typeof showToast === 'function') showToast('Numéro du superviseur non disponible.', 'error');
+      else alert('Numéro du superviseur non disponible.');
+    };
+
+    dfoRenderSortiesOverview(sortiesAttente);
+    dfoRenderVersementsOverview(versementsAttente);
+    dfoRenderMouvements(allTrans.slice(0,5));
+    await dfoLoadRapportOverview();
+
+  } catch(e) {
+    console.error('dfoInit error:', e);
+  }
+}
+window.dfoInit = dfoInit;
+
+// -- DEMANDES DE SORTIE (append-only : réutilise _espaceTraiterSortie) --
+function dfoRenderSortiesOverview(sorties) {
+  const el = document.getElementById('dfoSortiesOverview');
+  if (!sorties.length) { el.innerHTML = '<p class="dfo-empty">Aucune demande en attente.</p>'; return; }
+  el.innerHTML = sorties.slice(0,2).map(s => dfoRenderSortieRow(s)).join('');
+}
+
+function dfoRenderSortieRow(s) {
+  const date = new Date(s.created_at).toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  const inputId = 'dfoPhoto_' + s.id;
+  const libelle = [s.materiau, s.quantite, s.unite].filter(Boolean).join(' ') || s.description || '—';
+  return `<div class="dfo-sortie-row">
+    <div class="dfo-sortie-header">
+      <div>
+        <div class="dfo-sortie-title">${libelle}</div>
+        <div class="dfo-sortie-meta">${s.chantiers && s.chantiers.nom ? s.chantiers.nom + ' · ' : ''}${date}</div>
+      </div>
+      <span class="dfo-sortie-urgent">Urgent</span>
+    </div>
+    <div class="dfo-photo-req"><i class="fa-solid fa-camera"></i> Photo obligatoire avant confirmation</div>
+    <input type="file" accept="image/*" id="${inputId}" style="width:100%;font-size:12px;margin-bottom:8px">
+    <div class="dfo-sortie-actions">
+      <button class="dfo-btn-conf" onclick="dfoConfirmerSortie('${s.id}','${inputId}')"><i class="fa-solid fa-check"></i> Confirmer</button>
+      <button class="dfo-btn-ref" onclick="_espaceBasculerRejetSortie('${s.id}')"><i class="fa-solid fa-xmark"></i> Refuser</button>
+    </div>
+    <div id="espaceRejetZone-${s.id}" style="display:none;margin-top:10px;">
+      <textarea id="espaceRejetMotif-${s.id}" rows="2" placeholder="Motif du refus (optionnel)" style="width:100%;box-sizing:border-box;padding:8px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;font-family:inherit;resize:vertical;margin-bottom:8px;"></textarea>
+      <button class="dfo-btn-ref" style="width:100%" onclick="_espaceConfirmerRejetSortie('${s.id}')">Confirmer le refus</button>
+    </div>
+  </div>`;
+}
+window.dfoRenderSortieRow = dfoRenderSortieRow;
+
+async function dfoConfirmerSortie(sortieId, inputId) {
+  const fileInput = document.getElementById(inputId);
+  const file = fileInput && fileInput.files[0];
+  if (!file) { if (typeof showToast === 'function') showToast('La photo est obligatoire pour confirmer la sortie.', 'error'); else alert('La photo est obligatoire pour confirmer la sortie.'); return; }
+  try {
+    const ext = file.name.split('.').pop();
+    const path = `sorties/${sortieId}_${Date.now()}.${ext}`;
+    const { error: upErr } = await sb.storage.from('Photos').upload(path, file);
+    if (upErr) throw upErr;
+    const { data: urlData } = sb.storage.from('Photos').getPublicUrl(path);
+    await _espaceTraiterSortie(sortieId, 'valider', null, urlData.publicUrl);
+  } catch(e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error'); else alert('Erreur : ' + e.message);
+  }
+}
+window.dfoConfirmerSortie = dfoConfirmerSortie;
+
+// -- VERSEMENTS À CONFIRMER (append-only : réutilise _espaceFournisseurTraiterVersement) --
+function dfoRenderVersementsOverview(versements) {
+  const el = document.getElementById('dfoVersementsOverview');
+  if (!versements.length) { el.innerHTML = '<p class="dfo-empty">Aucun versement en attente.</p>'; return; }
+  el.innerHTML = versements.map(v => dfoRenderVersementRow(v)).join('');
+}
+
+function dfoRenderVersementRow(v) {
+  const date = new Date(v.created_at).toLocaleDateString('fr-FR', {day:'numeric',month:'short'});
+  return `<div class="dfo-vers-row">
+    <div>
+      <div class="dfo-vers-amount">${dfoFormatGNF(v.montant_gnf)}</div>
+      <div class="dfo-vers-meta">${v.chantiers && v.chantiers.nom ? v.chantiers.nom + ' · ' : ''}Déclaré le ${date}${v.description ? ' · "' + v.description + '"' : ''}</div>
+    </div>
+    <div class="dfo-vers-actions">
+      <button class="dfo-btn-val-vers" onclick="_espaceFournisseurTraiterVersement('${v.id}','valider')"><i class="fa-solid fa-check"></i> Confirmer</button>
+      <button class="dfo-btn-rej-vers" onclick="_espaceBasculerRejetVersement('${v.id}')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="espaceVersRejetZone-${v.id}" style="display:none;margin-top:10px;width:100%;">
+      <textarea id="espaceVersRejetMotif-${v.id}" rows="2" placeholder="Motif du rejet (optionnel)" style="width:100%;box-sizing:border-box;padding:8px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;font-family:inherit;resize:vertical;margin-bottom:8px;"></textarea>
+      <button class="dfo-btn-rej-vers" style="width:100%" onclick="_espaceConfirmerRejetVersement('${v.id}')">Confirmer le rejet</button>
+    </div>
+  </div>`;
+}
+window.dfoRenderVersementRow = dfoRenderVersementRow;
+
+function dfoRenderMouvements(transactions) {
+  const el = document.getElementById('dfoMouvements');
+  if (!transactions.length) { el.innerHTML = '<p class="dfo-empty">Aucun mouvement.</p>'; return; }
+  el.innerHTML = transactions.map(t => {
+    const isSortie = (t.type_operation||'').startsWith('sortie');
+    const sc = (typeof _rcStatutConfig === 'function') ? _rcStatutConfig(t.type_operation) : { label: t.type_operation };
+    const date = new Date(t.created_at).toLocaleDateString('fr-FR', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const libelle = isSortie ? ([t.materiau,t.quantite,t.unite].filter(Boolean).join(' ') || t.description || sc.label) : (t.description || sc.label);
+    const confirme = t.type_operation === 'sortie_confirmee' || t.type_operation === 'versement_valide';
+    return `<div class="dfo-reg-row">
+      <div class="dfo-reg-icon ${isSortie ? 'out' : 'pay'}"><i class="fa-solid ${isSortie ? 'fa-arrow-up' : 'fa-check'}"></i></div>
+      <div class="dfo-reg-body">
+        <div class="dfo-reg-title">${libelle}</div>
+        <div class="dfo-reg-sub">${date}</div>
+      </div>
+      <span class="dfo-stat-chip ${confirme ? 'conf' : 'pend'}">${sc.label}</span>
+    </div>`;
+  }).join('');
+}
+
+// -- RAPPORT À COSIGNER (rapport_final_chantier — fin de chantier, pas quotidien) --
+async function dfoLoadRapportOverview() {
+  const el = document.getElementById('dfoRapportAttenteOverview');
+  try {
+    const { data } = await sb.from('rapport_final_chantier')
+      .select('*')
+      .eq('chantier_id', window._dfoChantierId)
+      .is('validation_fournisseur_id', null)
+      .order('created_at', { ascending: false })
+      .limit(1);
+    const rapport = data && data[0];
+    const count = rapport ? 1 : 0;
+    document.getElementById('dfoBadgeRapport').textContent = count + ' en attente';
+    document.getElementById('dfoBadgeRapport').className = 'dfo-count-badge ' + (count > 0 ? 'warn' : 'ok');
+
+    if (!rapport) { el.innerHTML = '<p class="dfo-empty">Aucun rapport à cosigner.</p>'; return; }
+
+    const date = rapport.created_at ? new Date(rapport.created_at).toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long'}) : '—';
+    el.innerHTML = `<div class="dfo-rapport-row">
+      <div class="dfo-rapport-date">Rapport final du ${date}</div>
+      <div class="dfo-rapport-body">${rapport.contenu || rapport.resume || 'Rapport de fin de chantier en attente de votre validation.'}</div>
+      <button class="dfo-btn-cosign" onclick="dfoCosignerRapport('${rapport.id}')"><i class="fa-solid fa-pen"></i> Cosigner ce rapport</button>
+    </div>`;
+  } catch(e) {
+    console.warn('[dfo] rapport final indisponible:', e.message);
+    document.getElementById('dfoBadgeRapport').textContent = '0 en attente';
+    document.getElementById('dfoBadgeRapport').className = 'dfo-count-badge ok';
+    el.innerHTML = '<p class="dfo-empty">Aucun rapport à cosigner.</p>';
+  }
+}
+
+async function dfoCosignerRapport(rapportId) {
+  try {
+    const { error } = await sb.from('rapport_final_chantier').update({ validation_fournisseur_id: window._dfoFournisseurId }).eq('id', rapportId);
+    if (error) throw error;
+    if (typeof showToast === 'function') showToast('✅ Rapport cosigné et archivé', 'success'); else alert('Rapport cosigné et archivé.');
+    dfoLoadRapportOverview();
+  } catch(e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error'); else alert('Erreur : ' + e.message);
+  }
+}
+window.dfoCosignerRapport = dfoCosignerRapport;
+
+// -- ONGLET SORTIES COMPLET (tous comptes du fournisseur) --
+async function dfoLoadSorties() {
+  const el = document.getElementById('dfoSortiesListe');
+  const { data } = await sb.from('registre_transactions')
+    .select('*, chantiers(nom)')
+    .in('compte_id', window._dfoCompteIds || [])
+    .like('type_operation', 'sortie%')
+    .order('created_at', { ascending: false });
+
+  if (!data || !data.length) { el.innerHTML = '<p class="dfo-empty">Aucune demande de sortie.</p>'; return; }
+  const referencees = new Set(data.map(t => t.reference_transaction_id).filter(Boolean));
+
+  el.innerHTML = data.map(s => {
+    if (s.type_operation === 'sortie_demandee' && !referencees.has(s.id)) return dfoRenderSortieRow(s);
+    const sc = (typeof _rcStatutConfig === 'function') ? _rcStatutConfig(s.type_operation) : { label: s.type_operation };
+    const date = new Date(s.created_at).toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const libelle = [s.materiau,s.quantite,s.unite].filter(Boolean).join(' ') || s.description || '—';
+    return `<div class="dfo-reg-row">
+      <div class="dfo-reg-icon out"><i class="fa-solid fa-arrow-up"></i></div>
+      <div class="dfo-reg-body"><div class="dfo-reg-title">${libelle}${s.chantiers && s.chantiers.nom ? ' — ' + s.chantiers.nom : ''}</div><div class="dfo-reg-sub">${date}</div></div>
+      <span class="dfo-stat-chip ${s.type_operation === 'sortie_confirmee' ? 'conf' : 'pend'}">${sc.label}</span>
+    </div>`;
+  }).join('');
+}
+window.dfoLoadSorties = dfoLoadSorties;
+
+// -- ONGLET VERSEMENTS COMPLET (tous comptes du fournisseur) --
+async function dfoLoadVersements() {
+  const el = document.getElementById('dfoVersementsListe');
+  const { data } = await sb.from('registre_transactions')
+    .select('*, chantiers(nom)')
+    .in('compte_id', window._dfoCompteIds || [])
+    .like('type_operation', 'versement%')
+    .order('created_at', { ascending: false });
+
+  if (!data || !data.length) { el.innerHTML = '<p class="dfo-empty">Aucun versement déclaré.</p>'; return; }
+  const referencees = new Set(data.map(t => t.reference_transaction_id).filter(Boolean));
+
+  el.innerHTML = data.map(v => {
+    if (v.type_operation === 'versement_declare' && !referencees.has(v.id)) return dfoRenderVersementRow(v);
+    const date = new Date(v.created_at).toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'});
+    const statut = v.type_operation === 'versement_valide' ? 'conf' : 'pend';
+    const label = v.type_operation === 'versement_valide' ? 'Confirmé' : v.type_operation === 'versement_rejete' ? 'Rejeté' : 'En attente';
+    return `<div class="dfo-vers-row" style="margin-bottom:8px">
+      <div><div class="dfo-vers-amount">${dfoFormatGNF(v.montant_gnf)}</div><div class="dfo-vers-meta">${v.chantiers && v.chantiers.nom ? v.chantiers.nom + ' · ' : ''}${date}</div></div>
+      <span class="dfo-stat-chip ${statut}">${label}</span>
+    </div>`;
+  }).join('');
+}
+window.dfoLoadVersements = dfoLoadVersements;
+
+// -- ONGLET REGISTRE COMPLET (tous comptes du fournisseur) --
+async function dfoLoadRegistre() {
+  const el = document.getElementById('dfoRegistreListe');
+  const { data } = await sb.from('registre_transactions')
+    .select('*, chantiers(nom)')
+    .in('compte_id', window._dfoCompteIds || [])
+    .order('created_at', { ascending: false });
+
+  if (!data || !data.length) { el.innerHTML = '<p class="dfo-empty">Aucun mouvement enregistré.</p>'; return; }
+
+  el.innerHTML = data.map(t => {
+    const isSortie = (t.type_operation||'').startsWith('sortie');
+    const sc = (typeof _rcStatutConfig === 'function') ? _rcStatutConfig(t.type_operation) : { label: t.type_operation };
+    const date = new Date(t.created_at).toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const libelle = isSortie ? ([t.materiau,t.quantite,t.unite].filter(Boolean).join(' ') || t.description || sc.label) : (t.description || sc.label);
+    const chantierNom = t.chantiers && t.chantiers.nom ? ' — ' + t.chantiers.nom : '';
+    const confirme = t.type_operation === 'sortie_confirmee' || t.type_operation === 'versement_valide';
+    return `<div class="dfo-reg-row">
+      <div class="dfo-reg-icon ${isSortie ? 'out' : 'pay'}"><i class="fa-solid ${isSortie ? 'fa-arrow-up' : 'fa-check'}"></i></div>
+      <div class="dfo-reg-body"><div class="dfo-reg-title">${libelle}${chantierNom}</div><div class="dfo-reg-sub">${date}</div></div>
+      <span class="dfo-stat-chip ${confirme ? 'conf' : 'pend'}">${sc.label}</span>
+    </div>`;
+  }).join('');
+}
+window.dfoLoadRegistre = dfoLoadRegistre;
+
+// -- ONGLET RAPPORTS JOURNALIERS (rapports_journaliers, lecture seule) --
+async function dfoLoadRapports() {
+  const el = document.getElementById('dfoRapportsListe');
+  try {
+    const { data } = await sb.from('rapports_journaliers')
+      .select('*, rapport_journalier_photos(photo_url)')
+      .eq('chantier_id', window._dfoChantierId)
+      .order('date_rapport', { ascending: false });
+
+    if (!data || !data.length) { el.innerHTML = '<p class="dfo-empty">Aucun rapport journalier disponible.</p>'; return; }
+
+    el.innerHTML = data.map(r => {
+      const date = new Date(r.date_rapport).toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long'});
+      const photos = (r.rapport_journalier_photos||[]).map(p => p.photo_url).filter(Boolean);
+      return `<div class="dfo-rapport-row">
+        <div class="dfo-rapport-date">${date}</div>
+        <div class="dfo-rapport-body">${r.commentaire || '—'}</div>
+        ${photos.length ? `<div class="dfo-rapport-photos">${photos.slice(0,4).map(u => `<img src="${u}" class="dfo-photo-thumb" onclick="window.open('${u}')">`).join('')}</div>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<p class="dfo-empty">Rapports journaliers indisponibles.</p>';
+  }
+}
+window.dfoLoadRapports = dfoLoadRapports;
+
+// -- ONGLET CATALOGUE (catalogue_produits) --
+async function dfoLoadCatalogue() {
+  const el = document.getElementById('dfoCatalogueListe');
+  const { data } = await sb.from('catalogue_produits')
+    .select('*')
+    .eq('fournisseur_id', window._dfoFournisseurId)
+    .order('ordre', { ascending: true })
+    .order('created_at', { ascending: true });
+
+  if (!data || !data.length) { el.innerHTML = '<p class="dfo-empty">Aucun article dans votre catalogue.</p>'; return; }
+
+  el.innerHTML = data.map(p => `
+    <div class="dfo-reg-row">
+      <div class="dfo-reg-body">
+        <div class="dfo-reg-title">${p.nom_produit}${p.unite ? ' <span style="color:#9ca3af;font-weight:400">/ ' + p.unite + '</span>' : ''}</div>
+        <div class="dfo-reg-sub">${p.disponible ? 'Disponible' : 'Indisponible'}</div>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:#E05A1B;flex-shrink:0;">${p.prix_gnf != null ? dfoFormatGNF(p.prix_gnf) : '—'}</div>
+    </div>`).join('');
+}
+window.dfoLoadCatalogue = dfoLoadCatalogue;
+
+// -- ONGLET PROFIL (fournisseurs_materiaux) --
+async function dfoLoadProfil() {
+  const el = document.getElementById('dfoProfilDetail');
+  try {
+    const { data: f } = await sb.from('fournisseurs_materiaux').select('nom_entreprise,telephone,ville,commune,description').eq('id', window._dfoFournisseurId).single();
+    const nom = (f && f.nom_entreprise) || _espaceSession.nom || '—';
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div class="dfo-avatar" style="width:48px;height:48px;font-size:18px">${nom.substring(0,2).toUpperCase()}</div>
+        <div>
+          <div style="font-size:15px;font-weight:500;color:#0f172a">${nom}</div>
+          <div style="font-size:13px;color:#6b7280">${[f && f.ville, f && f.commune].filter(Boolean).join(', ') || 'Conakry'} · Fournisseur partenaire YOUMMA</div>
+        </div>
+      </div>
+      <div class="dfo-chantier-info">
+        <div class="dfo-info-row"><span class="dfo-info-lbl">Téléphone</span><span class="dfo-info-val">${(f && f.telephone) || _espaceSession.telephone || '—'}</span></div>
+        <div class="dfo-info-row"><span class="dfo-info-lbl">Statut</span><span class="dfo-info-val" style="color:#16a34a">Vérifié YOUMMA JOBS</span></div>
+      </div>`;
+  } catch(e) {
+    el.innerHTML = '<p class="dfo-empty">Profil indisponible.</p>';
+  }
+}
+window.dfoLoadProfil = dfoLoadProfil;
+
+// -- SIGNALER UN PROBLÈME --
+// Ouvre directement WhatsApp (comme "Contacter le superviseur") plutôt que
+// window.prompt() : peu fiable sur mobile Safari/Chrome Android embarqué,
+// cf. commentaire sur _espaceBasculerRejetSortie/Versement dans ce fichier.
+function dfoSignalerProbleme() {
+  const chantierRef = window._dfoChantierId ? ' (chantier ' + window._dfoChantierId + ')' : '';
+  const msg = encodeURIComponent('Bonjour YOUMMA, je souhaite signaler un problème' + chantierRef + '.');
+  const tel = (typeof YOUMMA_WHATSAPP_NUM !== 'undefined') ? YOUMMA_WHATSAPP_NUM : '22461252510';
+  window.open('https://wa.me/' + tel + '?text=' + msg);
+}
+window.dfoSignalerProbleme = dfoSignalerProbleme;
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════════
 // ESPACE PROFESSIONNEL (#espace) — connexion OTP SMS unique pour
 // clients / fournisseurs_materiaux / superviseurs, détection de rôle
 // par numéro de téléphone, tableau de bord dédié par rôle.
@@ -4084,7 +4845,7 @@ async function _espaceInit() {
   document.getElementById('espaceEtapeOtp').style.display = 'none';
   document.getElementById('espaceEtapeInscription').style.display = 'none';
   const pwdStep = document.getElementById('espaceEtapePwd'); if (pwdStep) pwdStep.style.display = 'none';
-  ['espaceDashFournisseur', 'espaceDashSuperviseur', 'espaceDashClient', 'dashboardClientV2'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  ['espaceDashFournisseur', 'espaceDashSuperviseur', 'espaceDashClient', 'dashboardClientV2', 'dashboardFournisseurV2'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   const tel = document.getElementById('espaceTelephone'); if (tel) tel.value = '';
   if (resultat.message) { _espaceAfficherErreur('espaceErreurTel', resultat.message); }
   else { _espaceCacherErreur('espaceErreurTel'); }
@@ -4322,8 +5083,8 @@ function _espaceInitiales(nom) {
 }
 
 function _espaceAfficherTableauBord() {
-  ['espaceDashFournisseur', 'espaceDashSuperviseur', 'espaceDashClient', 'dashboardClientV2'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-  const _ewReset = document.getElementById('espaceWrapper'); if (_ewReset) _ewReset.classList.remove('dcl-active');
+  ['espaceDashFournisseur', 'espaceDashSuperviseur', 'espaceDashClient', 'dashboardClientV2', 'dashboardFournisseurV2'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  const _ewReset = document.getElementById('espaceWrapper'); if (_ewReset) _ewReset.classList.remove('dcl-active', 'dfo-active');
   // Le formulaire de connexion ne doit JAMAIS rester visible en même temps
   // qu'un tableau de bord (ex. restauration de session persistante : ces
   // étapes n'étaient sinon jamais explicitement masquées ici).
@@ -4331,12 +5092,9 @@ function _espaceAfficherTableauBord() {
   if (!_espaceSession) { _espaceInit(); return; }
   const initiales = _espaceInitiales(_espaceSession.nom);
   if (_espaceSession.role === 'fournisseur') {
-    document.getElementById('espaceDashFournisseur').style.display = 'block';
-    document.getElementById('espaceFourPrenom').textContent = _espaceSession.nom;
-    document.getElementById('espaceFourAvatar').textContent = initiales;
-    _espaceBasculerOnglet('four', 'chantiers');
-    _espaceChargerFournisseur();
-    _espaceFournisseurChargerProfilEtCatalogue();
+    document.getElementById('dashboardFournisseurV2').style.display = 'block';
+    const _ewFour = document.getElementById('espaceWrapper'); if (_ewFour) _ewFour.classList.add('dfo-active');
+    if (typeof dfoInit === 'function') dfoInit();
   } else if (_espaceSession.role === 'superviseur') {
     document.getElementById('espaceDashSuperviseur').style.display = 'block';
     document.getElementById('espaceSupPrenom').textContent = _espaceSession.nom;
@@ -4904,7 +5662,7 @@ async function _espaceFournisseurSupprimerProduit(produitId) {
 // chk_registre_acteur_coherent pour sortie_confirmee/sortie_rejetee). Motif
 // de rejet optionnel stocké dans description de CET événement (pas celle
 // de la demande d'origine, qui reste inchangée — append-only oblige).
-async function _espaceTraiterSortie(transactionId, decision, motif) {
+async function _espaceTraiterSortie(transactionId, decision, motif, photoUrl) {
   try {
     const { data: origine, error: errOrig } = await sb.from('registre_transactions').select('*').eq('id', transactionId).single();
     if (errOrig) throw errOrig;
@@ -4922,6 +5680,17 @@ async function _espaceTraiterSortie(transactionId, decision, motif) {
       fournisseur_id: _espaceSession.id,
       description: motif || null
     };
+    // photoUrl : paramètre optionnel (dashboard fournisseur v2 uniquement —
+    // photo obligatoire à la confirmation, voir dfoConfirmerSortie()).
+    // Absent des 2 appels historiques de l'ancien dashboard, donc
+    // rétrocompatible. Colonne ajoutée par la migration
+    // 20260723_registre_transactions_photo_sortie.sql (pas encore exécutée
+    // au moment de l'écriture) : si la colonne n'existe pas encore côté DB,
+    // Supabase ignore la clé silencieusement... en réalité PostgREST
+    // renverrait une erreur de colonne inconnue — on n'ajoute donc la clé
+    // que si une valeur est fournie, pour ne jamais casser les 2 anciens
+    // appels tant que la migration n'a pas tourné.
+    if (photoUrl) payload.photo_sortie_url = photoUrl;
     const { error } = await sb.from('registre_transactions').insert(payload);
     if (error) {
       const msg = (error.message || '').toLowerCase();
@@ -4931,6 +5700,7 @@ async function _espaceTraiterSortie(transactionId, decision, motif) {
     }
     if (typeof showToast === 'function') showToast(decision === 'valider' ? '✅ Sortie validée' : '✅ Sortie rejetée', 'success');
     _espaceChargerFournisseur();
+    if (typeof dfoInit === 'function') dfoInit();
   } catch (e) {
     if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error'); else window.alert('Erreur : ' + e.message);
   }
@@ -4978,6 +5748,7 @@ async function _espaceFournisseurTraiterVersement(transactionId, decision, motif
     }
     if (typeof showToast === 'function') showToast(decision === 'valider' ? '✅ Versement validé — solde mis à jour' : '✅ Versement rejeté', 'success');
     _espaceChargerFournisseur();
+    if (typeof dfoInit === 'function') dfoInit();
   } catch (e) {
     if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error'); else window.alert('Erreur : ' + e.message);
   }
