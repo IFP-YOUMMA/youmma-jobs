@@ -2947,6 +2947,7 @@ if (typeof connexionPrestataire === 'undefined') {
 
     <div class="dfo-topbar">
       <div style="display:flex;align-items:center;gap:8px">
+        <img src="/icons/icon-96x96.png" alt="YOUMMA JOBS" style="height:28px;width:28px;border-radius:6px" onerror="this.style.display='none'">
         <span class="dfo-logo">YOUMMA<span>JOBS</span></span>
         <span style="color:#e5e7eb">|</span>
         <span style="font-size:13px;color:#6b7280">Espace fournisseur</span>
@@ -2958,6 +2959,8 @@ if (typeof connexionPrestataire === 'undefined') {
           <div class="dfo-notif-dot" id="dfoNotifDot" style="display:none"></div>
         </div>
         <span class="dfo-user-info" id="dfoUserInfo">—</span>
+        <button onclick="dfoDeconnexion()" class="dfo-btn-topbar" onmouseover="this.style.borderColor='#ef4444';this.style.color='#dc2626'" onmouseout="this.style.borderColor='#e5e7eb';this.style.color='#6b7280'"><i class="fa-solid fa-right-from-bracket"></i> <span class="dfo-btn-topbar-label">Déconnexion</span></button>
+        <button onclick="navigate('home')" class="dfo-btn-topbar"><i class="fa-solid fa-house"></i> <span class="dfo-btn-topbar-label">Accueil</span></button>
         <div class="dfo-avatar" id="dfoAvatar">—</div>
       </div>
     </div>
@@ -3228,10 +3231,11 @@ if (typeof connexionPrestataire === 'undefined') {
   <!-- ============================================ -->
   <!-- DASHBOARD SUPERVISEUR V2 - YOUMMA JOBS      -->
   <!-- ============================================ -->
-  <div id="dashboardSuperviseurV2" style="display:none">
+  <div id="dashboardSuperviseurV2" style="display:none;width:100%;">
 
     <div class="dsu-topbar">
       <div style="display:flex;align-items:center;gap:8px">
+        <img src="/icons/icon-96x96.png" alt="YOUMMA JOBS" style="height:28px;width:28px;border-radius:6px" onerror="this.style.display='none'">
         <span class="dsu-logo">YOUMMA<span>JOBS</span></span>
         <span style="color:#e5e7eb">|</span>
         <span style="font-size:13px;color:#6b7280">Espace superviseur</span>
@@ -3243,8 +3247,9 @@ if (typeof connexionPrestataire === 'undefined') {
           <div class="dsu-notif-dot" id="dsuNotifDot"></div>
         </div>
         <span id="dsuUserInfo" style="font-size:13px;color:#6b7280">—</span>
+        <button onclick="dsuDeconnexion()" class="dsu-btn-topbar" onmouseover="this.style.borderColor='#ef4444';this.style.color='#dc2626'" onmouseout="this.style.borderColor='#e5e7eb';this.style.color='#6b7280'"><i class="fa-solid fa-right-from-bracket"></i> <span class="dsu-btn-topbar-label">Déconnexion</span></button>
+        <button onclick="navigate('home')" class="dsu-btn-topbar"><i class="fa-solid fa-house"></i> <span class="dsu-btn-topbar-label">Accueil</span></button>
         <div class="dsu-avatar" id="dsuAvatar">—</div>
-        <button onclick="_espaceDeconnexion()" class="esp-btn-logout" style="position:static"><i class="fa-solid fa-right-from-bracket"></i></button>
       </div>
     </div>
 
@@ -3509,6 +3514,7 @@ if (typeof connexionPrestataire === 'undefined') {
     <!-- TOPBAR -->
     <div class="dcl-topbar">
       <div class="dcl-topbar-left">
+        <img src="/icons/icon-96x96.png" alt="YOUMMA JOBS" style="height:28px;width:28px;border-radius:6px" onerror="this.style.display='none'">
         <span class="dcl-logo">YOUMMA<span>JOBS</span></span>
         <span class="dcl-sep">|</span>
         <span class="dcl-page-name">Mon chantier</span>
@@ -3520,6 +3526,8 @@ if (typeof connexionPrestataire === 'undefined') {
           <div class="dcl-notif-dot" id="dclNotifDot" style="display:none"></div>
         </div>
         <span class="dcl-user-info" id="dclUserInfo">—</span>
+        <button onclick="dclDeconnexion()" class="dcl-btn-topbar" onmouseover="this.style.borderColor='#ef4444';this.style.color='#dc2626'" onmouseout="this.style.borderColor='#e5e7eb';this.style.color='#6b7280'"><i class="fa-solid fa-right-from-bracket"></i> <span class="dcl-btn-topbar-label">Déconnexion</span></button>
+        <button onclick="navigate('home')" class="dcl-btn-topbar"><i class="fa-solid fa-house"></i> <span class="dcl-btn-topbar-label">Accueil</span></button>
         <div class="dcl-avatar" id="dclAvatar">—</div>
       </div>
     </div>
@@ -3744,42 +3752,58 @@ if (typeof connexionPrestataire === 'undefined') {
    écran. #espaceWrapper.dcl-active (posée/retirée en JS par
    _espaceAfficherTableauBord()) neutralise ce style au lieu de lutter
    contre le calcul flex + marges négatives (peu fiable ici). */
-#espaceWrapper.dcl-active{padding:0!important;background:#f9fafb!important;display:block!important;height:auto!important;min-height:100vh!important;}
+/* body{overflow-x:hidden} (sitewide, anti-scroll-horizontal) force le
+   navigateur à recalculer overflow-y en 'auto' (règle CSS : si un seul des
+   deux axes n'est pas 'visible', l'autre devient 'auto') — body devient
+   alors un vrai conteneur de scroll séparé du vrai scroll de la page
+   (document.scrollingElement reste <html>), et position:sticky se
+   positionne par rapport à <body> qui, lui, ne bouge jamais (bodyScrollTop
+   reste 0 en pratique car sa hauteur épouse déjà son contenu) — d'où un
+   topbar/nav qui défile normalement au lieu de rester collé. Confirmé par
+   test live : sticky recommence à fonctionner dès que overflow-x de body
+   repasse à 'visible'. Sans risque ici : aucun des 3 dashboards V2 ne
+   produit de débordement horizontal (vérifié à 375px/768px/1200px). */
+body.espace-v2-active{overflow-x:visible!important}
+#espaceWrapper.dcl-active{padding:0!important;background:#f9fafb!important;display:block!important;height:auto!important;min-height:100vh!important;overflow:visible!important;}
 #dashboardClientV2{background:#f9fafb;min-height:100vh;color:#0f172a;}
-.dcl-topbar{background:#ffffff!important;border-bottom:0.5px solid #e5e7eb;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.dcl-topbar{background:#ffffff!important;border-bottom:1px solid #f1f5f9;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,.06);position:sticky;top:0;z-index:100}
 .dcl-logo{font-size:15px;font-weight:600;color:#0f172a}.dcl-logo span{color:#E05A1B}
 .dcl-sep{color:#e5e7eb;margin:0 8px}
 .dcl-page-name{font-size:13px;color:#6b7280}
-.dcl-status-badge{background:#dcfce7;color:#166534;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;margin-left:8px}
+.dcl-status-badge{background:#dcfce7;color:#15803d;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:.02em;margin-left:8px}
 .dcl-topbar-right{display:flex;align-items:center;gap:12px}
-.dcl-notif-btn{position:relative;cursor:pointer;color:#6b7280;font-size:20px}
-.dcl-notif-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#ef4444}
+.dcl-btn-topbar{background:transparent;border:0.5px solid #e5e7eb;color:#6b7280;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;text-decoration:none;transition:all .2s;white-space:nowrap}
+.dcl-notif-btn{position:relative;cursor:pointer;color:#94a3b8;font-size:20px;padding:6px;border-radius:8px;transition:background .15s}
+.dcl-notif-btn:hover{background:#f8fafc;color:#0f172a}
+.dcl-notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid #fff}
 .dcl-user-info{font-size:13px;color:#6b7280}
-.dcl-avatar{width:32px;height:32px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center}
-.dcl-nav{background:#ffffff!important;border-bottom:0.5px solid #e5e7eb;padding:0 20px;display:flex;overflow-x:auto}
-.dcl-tab{padding:12px 16px;font-size:13px;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;user-select:none}
+.dcl-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#E05A1B 0%,#f97316 100%);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(224,90,27,.4)}
+.dcl-nav{background:#ffffff!important;border-bottom:1px solid #f1f5f9;padding:0 24px;display:flex;overflow-x:auto;box-shadow:0 1px 3px rgba(0,0,0,.04);position:sticky;top:56px;z-index:99}
+.dcl-tab{padding:14px 18px;font-size:13px;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-weight:400;transition:color .15s;user-select:none}
+.dcl-tab:hover{color:#0f172a}
 .dcl-tab.active{color:#E05A1B;border-bottom-color:#E05A1B;font-weight:500}
-.dcl-alert{background:#fffbeb;border-bottom:0.5px solid #f59e0b;padding:10px 20px;display:flex;align-items:center;gap:10px}
+.dcl-alert{background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%);border-bottom:none;border-left:4px solid #f59e0b;padding:12px 20px;display:flex;align-items:center;gap:10px}
 .dcl-alert i{color:#d97706;font-size:16px}
-.dcl-alert p{font-size:13px;color:#92400e;flex:1}
-.dcl-alert button{background:#f59e0b;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer}
-.dcl-main{padding:20px;display:flex;flex-direction:column;gap:16px;background:#f9fafb;min-height:calc(100vh - 120px)}
+.dcl-alert p{font-size:13px;color:#78350f;font-weight:500;flex:1}
+.dcl-alert button{background:#f59e0b;color:#fff;border:none;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer}
+.dcl-main{padding:24px;display:flex;flex-direction:column;gap:20px;background:#f8fafc;min-height:calc(100vh - 120px)}
 .dcl-panel{display:none}.dcl-panel.active{display:flex;flex-direction:column;gap:16px}
 .dcl-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.dcl-metric{background:#fff;border-radius:8px;padding:12px 14px;border:0.5px solid #e5e7eb}
-.dcl-metric-lbl{font-size:12px;color:#6b7280;margin-bottom:4px}
-.dcl-metric-val{font-size:20px;font-weight:600;color:#0f172a}
+.dcl-metric{background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:box-shadow .2s}
+.dcl-metric:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.dcl-metric-lbl{font-size:12px;color:#94a3b8;margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.03em}
+.dcl-metric-val{font-size:22px;font-weight:700;color:#0f172a;letter-spacing:-.02em}
 .dcl-metric-val.dcl-warn{color:#d97706}
 .dcl-metric-val.dcl-ok{color:#16a34a}
-.dcl-metric-sub{font-size:11px;color:#9ca3af;margin-top:2px}
+.dcl-metric-sub{font-size:12px;color:#94a3b8;margin-top:4px}
 .dcl-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.dcl-card{background:#fff;border:0.5px solid #e5e7eb;border-radius:12px;padding:16px}
-.dcl-card-title{font-size:13px;font-weight:500;color:#0f172a;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.dcl-card{background:#fff;border:1px solid #f1f5f9;border-radius:14px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.dcl-card-title{font-size:13px;font-weight:600;color:#0f172a;margin-bottom:14px;display:flex;align-items:center;gap:6px;padding-bottom:10px;border-bottom:1px solid #f8fafc}
 .dcl-card-title i{color:#6b7280;font-size:16px}
 .dcl-prog-wrap{margin-bottom:12px}
 .dcl-prog-label{display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:6px}
-.dcl-prog-bar{height:8px;background:#f3f4f6;border-radius:4px;overflow:hidden}
-.dcl-prog-fill{height:100%;border-radius:4px;background:#E05A1B;transition:width .5s ease}
+.dcl-prog-bar{height:10px;background:#f1f5f9;border-radius:5px;overflow:hidden}
+.dcl-prog-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#E05A1B 0%,#f97316 100%);transition:width .5s ease}
 .dcl-phases{display:flex;flex-direction:column;gap:0}
 .dcl-phase-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid #f3f4f6}
 .dcl-phase-row:last-child{border-bottom:none}
@@ -3821,8 +3845,9 @@ if (typeof connexionPrestataire === 'undefined') {
 .dcl-vers-status.conf{background:#dcfce7;color:#166534}
 .dcl-vers-status.pend{background:#fffbeb;color:#92400e}
 .dcl-vers-status.reject{background:#fee2e2;color:#991b1b}
-.dcl-btn-declarer{width:100%;background:#E05A1B;color:#fff;border:none;padding:10px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
-.dcl-commission-card{background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:12px;padding:14px}
+.dcl-btn-declarer{width:100%;background:linear-gradient(135deg,#E05A1B 0%,#f97316 100%);color:#fff;border:none;padding:11px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(224,90,27,.3);transition:box-shadow .2s}
+.dcl-btn-declarer:hover{box-shadow:0 4px 14px rgba(224,90,27,.4)}
+.dcl-commission-card{background:linear-gradient(135deg,#eff6ff 0%,#dbeafe 100%);border:1px solid #bfdbfe;border-radius:12px;padding:14px 16px}
 .dcl-comm-title{font-size:12px;color:#1d4ed8;margin-bottom:8px;font-weight:500}
 .dcl-comm-row{display:flex;justify-content:space-between;font-size:12px;color:#1e40af;margin-bottom:4px}
 .dcl-comm-separator{border-top:0.5px solid #bfdbfe;margin:8px 0}
@@ -3835,6 +3860,8 @@ if (typeof connexionPrestataire === 'undefined') {
   .dcl-metrics{grid-template-columns:1fr 1fr}
   .dcl-two-col{grid-template-columns:1fr}
   .dcl-user-info{display:none}
+  .dcl-btn-topbar-label{display:none}
+  .dcl-btn-topbar{padding:6px 9px}
 }
 @media(max-width:640px){
   .dcl-topbar{padding:10px 12px}
@@ -3855,34 +3882,38 @@ if (typeof connexionPrestataire === 'undefined') {
 /* Même remarque que #dashboardClientV2 : #espaceWrapper.dfo-active
    neutralise le fond sombre / padding / centrage flex pensés pour l'écran
    de connexion OTP, posée/retirée en JS par _espaceAfficherTableauBord(). */
-#espaceWrapper.dfo-active{padding:0!important;background:#f9fafb!important;display:block!important;height:auto!important;min-height:100vh!important;}
+#espaceWrapper.dfo-active{padding:0!important;background:#f9fafb!important;display:block!important;height:auto!important;min-height:100vh!important;overflow:visible!important;}
 #dashboardFournisseurV2{background:#f9fafb;min-height:100vh;color:#0f172a}
-.dfo-topbar{background:#fff!important;border-bottom:0.5px solid #e5e7eb;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.dfo-topbar{background:#fff!important;border-bottom:1px solid #f1f5f9;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,.06);position:sticky;top:0;z-index:100}
 .dfo-logo{font-size:15px;font-weight:600;color:#0f172a}.dfo-logo span{color:#E05A1B}
-.dfo-role-badge{background:#fef3c7;color:#92400e;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;margin-left:8px}
+.dfo-role-badge{background:#fef3c7;color:#92400e;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:.02em;margin-left:8px}
 .dfo-topbar-right{display:flex;align-items:center;gap:12px}
-.dfo-notif-btn{position:relative;cursor:pointer;color:#6b7280;font-size:20px}
-.dfo-notif-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;position:absolute;top:-2px;right:-2px}
-.dfo-avatar{width:32px;height:32px;border-radius:50%;background:#fef3c7;color:#92400e;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center}
-.dfo-nav{background:#fff!important;border-bottom:0.5px solid #e5e7eb;padding:0 20px;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.dfo-tab{padding:12px 16px;font-size:13px;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;user-select:none}
+.dfo-btn-topbar{background:transparent;border:0.5px solid #e5e7eb;color:#6b7280;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;text-decoration:none;transition:all .2s;white-space:nowrap}
+.dfo-notif-btn{position:relative;cursor:pointer;color:#94a3b8;font-size:20px;padding:6px;border-radius:8px;transition:background .15s}
+.dfo-notif-btn:hover{background:#f8fafc;color:#0f172a}
+.dfo-notif-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;position:absolute;top:4px;right:4px;border:2px solid #fff}
+.dfo-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#f59e0b 0%,#fbbf24 100%);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(245,158,11,.4)}
+.dfo-nav{background:#fff!important;border-bottom:1px solid #f1f5f9;padding:0 24px;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;box-shadow:0 1px 3px rgba(0,0,0,.04);position:sticky;top:56px;z-index:99}
+.dfo-tab{padding:14px 18px;font-size:13px;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-weight:400;transition:color .15s;user-select:none}
+.dfo-tab:hover{color:#0f172a}
 .dfo-tab.active{color:#E05A1B;border-bottom-color:#E05A1B;font-weight:500}
-.dfo-alert{background:#fef2f2;border-bottom:0.5px solid #fca5a5;padding:10px 20px;display:flex;align-items:center;gap:10px}
+.dfo-alert{background:linear-gradient(135deg,#fef2f2 0%,#fee2e2 100%);border-bottom:none;border-left:4px solid #dc2626;padding:12px 20px;display:flex;align-items:center;gap:10px}
 .dfo-alert i{color:#dc2626;font-size:16px}
-.dfo-alert p{font-size:13px;color:#991b1b;flex:1}
-.dfo-main{padding:20px;display:flex;flex-direction:column;gap:16px;background:#f9fafb;min-height:calc(100vh - 120px)}
+.dfo-alert p{font-size:13px;color:#991b1b;font-weight:500;flex:1}
+.dfo-main{padding:24px;display:flex;flex-direction:column;gap:20px;background:#f8fafc;min-height:calc(100vh - 120px)}
 .dfo-panel{display:none}.dfo-panel.active{display:flex;flex-direction:column;gap:16px}
 .dfo-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.dfo-metric{background:#fff;border-radius:8px;padding:12px 14px;border:0.5px solid #e5e7eb}
-.dfo-metric-lbl{font-size:12px;color:#6b7280;margin-bottom:4px}
-.dfo-metric-val{font-size:20px;font-weight:600;color:#0f172a}
+.dfo-metric{background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:box-shadow .2s}
+.dfo-metric:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.dfo-metric-lbl{font-size:12px;color:#94a3b8;margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.03em}
+.dfo-metric-val{font-size:22px;font-weight:700;color:#0f172a;letter-spacing:-.02em}
 .dfo-metric-val.warn{color:#d97706}
 .dfo-metric-val.ok{color:#16a34a}
 .dfo-metric-val.accent{color:#E05A1B}
-.dfo-metric-sub{font-size:11px;color:#9ca3af;margin-top:2px}
+.dfo-metric-sub{font-size:12px;color:#94a3b8;margin-top:4px}
 .dfo-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.dfo-card{background:#fff;border:0.5px solid #e5e7eb;border-radius:12px;padding:16px}
-.dfo-card-title{font-size:13px;font-weight:500;color:#0f172a;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.dfo-card{background:#fff;border:1px solid #f1f5f9;border-radius:14px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.dfo-card-title{font-size:13px;font-weight:600;color:#0f172a;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid #f8fafc}
 .dfo-card-title-left{display:flex;align-items:center;gap:6px}
 .dfo-card-title i{color:#6b7280;font-size:16px}
 .dfo-count-badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
@@ -3928,7 +3959,7 @@ if (typeof connexionPrestataire === 'undefined') {
 .dfo-rapport-body{font-size:12px;color:#6b7280;line-height:1.5;margin-bottom:8px;background:#f9fafb;padding:8px;border-radius:6px}
 .dfo-rapport-photos{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
 .dfo-photo-thumb{width:50px;height:50px;border-radius:6px;object-fit:cover;cursor:pointer;border:0.5px solid #e5e7eb}
-.dfo-btn-cosign{background:#E05A1B;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;width:100%;justify-content:center}
+.dfo-btn-cosign{background:linear-gradient(135deg,#E05A1B 0%,#f97316 100%);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;width:100%;justify-content:center;box-shadow:0 2px 8px rgba(224,90,27,.3)}
 .dfo-chantier-info{display:flex;flex-direction:column;margin-bottom:14px}
 .dfo-info-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:7px 0;border-bottom:0.5px solid #f3f4f6}
 .dfo-info-row:last-child{border-bottom:none}
@@ -3945,38 +3976,44 @@ if (typeof connexionPrestataire === 'undefined') {
   .dfo-metrics{grid-template-columns:1fr 1fr;gap:8px}
   .dfo-two-col{grid-template-columns:1fr}
   .dfo-main{padding:12px}
-  .dfo-topbar{padding:10px 12px}
+  .dfo-topbar{padding:0 12px}
   .dfo-metric-val{font-size:16px}
+  .dfo-btn-topbar-label{display:none}
+  .dfo-btn-topbar{padding:6px 9px}
 }
 
 /* ============================================ */
 /* DASHBOARD SUPERVISEUR V2 - YOUMMA JOBS      */
 /* ============================================ */
-#espaceWrapper.dsu-active{padding:0!important;background:#f9fafb!important;display:block!important;height:auto!important;min-height:100vh!important;}
+#espaceWrapper.dsu-active{padding:0!important;background:#f9fafb!important;display:block!important;height:auto!important;min-height:100vh!important;overflow:visible!important;}
 #dashboardSuperviseurV2{background:#f9fafb;min-height:100vh;color:#0f172a}
-.dsu-topbar{background:#fff;border-bottom:0.5px solid #e5e7eb;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.dsu-topbar{background:#fff;border-bottom:1px solid #f1f5f9;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,.06);position:sticky;top:0;z-index:100}
 .dsu-logo{font-size:15px;font-weight:600;color:#0f172a}.dsu-logo span{color:#E05A1B}
-.dsu-role-badge{background:#ede9fe;color:#5b21b6;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;margin-left:8px}
+.dsu-role-badge{background:#ede9fe;color:#5b21b6;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:.02em;margin-left:8px}
 .dsu-topbar-right{display:flex;align-items:center;gap:12px}
-.dsu-notif-btn{position:relative;cursor:pointer;color:#6b7280;font-size:20px}
-.dsu-notif-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;position:absolute;top:-2px;right:-2px;display:none}
-.dsu-avatar{width:32px;height:32px;border-radius:50%;background:#ede9fe;color:#5b21b6;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center}
-.dsu-nav{background:#fff;border-bottom:0.5px solid #e5e7eb;padding:0 20px;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.dsu-tab{padding:12px 16px;font-size:13px;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;user-select:none}
+.dsu-btn-topbar{background:transparent;border:0.5px solid #e5e7eb;color:#6b7280;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;text-decoration:none;transition:all .2s;white-space:nowrap}
+.dsu-notif-btn{position:relative;cursor:pointer;color:#94a3b8;font-size:20px;padding:6px;border-radius:8px;transition:background .15s}
+.dsu-notif-btn:hover{background:#f8fafc;color:#0f172a}
+.dsu-notif-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;position:absolute;top:4px;right:4px;display:none;border:2px solid #fff}
+.dsu-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7C3AED 0%,#a78bfa 100%);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(124,58,237,.4)}
+.dsu-nav{background:#fff;border-bottom:1px solid #f1f5f9;padding:0 24px;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;box-shadow:0 1px 3px rgba(0,0,0,.04);position:sticky;top:56px;z-index:99}
+.dsu-tab{padding:14px 18px;font-size:13px;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-weight:400;transition:color .15s;user-select:none}
+.dsu-tab:hover{color:#0f172a}
 .dsu-tab.active{color:#E05A1B;border-bottom-color:#E05A1B;font-weight:500}
-.dsu-main{padding:20px;display:flex;flex-direction:column;gap:16px;background:#f9fafb;min-height:calc(100vh - 120px)}
+.dsu-main{padding:24px;display:flex;flex-direction:column;gap:20px;background:#f8fafc;min-height:calc(100vh - 120px)}
 .dsu-panel{display:none}.dsu-panel.active{display:flex;flex-direction:column;gap:16px}
 .dsu-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.dsu-metric{background:#fff;border-radius:8px;padding:12px 14px;border:0.5px solid #e5e7eb}
-.dsu-metric-lbl{font-size:12px;color:#6b7280;margin-bottom:4px}
-.dsu-metric-val{font-size:20px;font-weight:600;color:#0f172a}
+.dsu-metric{background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:box-shadow .2s}
+.dsu-metric:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.dsu-metric-lbl{font-size:12px;color:#94a3b8;margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.03em}
+.dsu-metric-val{font-size:22px;font-weight:700;color:#0f172a;letter-spacing:-.02em}
 .dsu-metric-val.warn{color:#d97706}
 .dsu-metric-val.ok{color:#16a34a}
 .dsu-metric-val.accent{color:#E05A1B}
-.dsu-metric-sub{font-size:11px;color:#9ca3af;margin-top:2px}
+.dsu-metric-sub{font-size:12px;color:#94a3b8;margin-top:4px}
 .dsu-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.dsu-card{background:#fff;border:0.5px solid #e5e7eb;border-radius:12px;padding:16px}
-.dsu-card-title{font-size:13px;font-weight:500;color:#0f172a;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.dsu-card{background:#fff;border:1px solid #f1f5f9;border-radius:14px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.dsu-card-title{font-size:13px;font-weight:600;color:#0f172a;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid #f8fafc}
 .dsu-card-title-left{display:flex;align-items:center;gap:6px}
 .dsu-card-title i{color:#6b7280;font-size:16px}
 .dsu-badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
@@ -3985,7 +4022,7 @@ if (typeof connexionPrestataire === 'undefined') {
 .dsu-badge.danger{background:#fee2e2;color:#991b1b}
 .dsu-label{font-size:12px;color:#6b7280;display:block;margin-bottom:4px;font-weight:500}
 .dsu-input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.dsu-btn-primary{background:#E05A1B;color:#fff;border:none;padding:10px 16px;border-radius:6px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:500;width:100%}
+.dsu-btn-primary{background:linear-gradient(135deg,#E05A1B 0%,#f97316 100%);color:#fff;border:none;padding:11px 16px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:600;width:100%;box-shadow:0 2px 8px rgba(224,90,27,.3)}
 .dsu-btn-secondary{background:transparent;color:#6b7280;border:0.5px solid #e5e7eb;padding:8px 14px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px}
 .dsu-solde-bar{background:#f3f4f6;border-radius:8px;padding:12px;margin-bottom:12px}
 .dsu-solde-label{font-size:12px;color:#6b7280;margin-bottom:4px}
@@ -4031,9 +4068,11 @@ if (typeof connexionPrestataire === 'undefined') {
   .dsu-metrics{grid-template-columns:1fr 1fr;gap:8px}
   .dsu-two-col{grid-template-columns:1fr}
   .dsu-main{padding:12px}
-  .dsu-topbar{padding:10px 12px}
+  .dsu-topbar{padding:0 12px}
   .dsu-metric-val{font-size:16px}
   .dsu-input-row{grid-template-columns:1fr}
+  .dsu-btn-topbar-label{display:none}
+  .dsu-btn-topbar{padding:6px 9px}
 }
 
 /* ============================================ */
@@ -5899,6 +5938,26 @@ function _espaceDeconnexion() {
   _espaceInit();
 }
 
+// Boutons déconnexion des dashboards V2 (client/fournisseur/superviseur) —
+// tous les 3 réutilisent la même vraie fonction de déconnexion #espace
+// (_espaceDeconnexion, ci-dessus), jamais réimplémentée : elle vide déjà
+// _espaceSession/_espaceContexte + le localStorage puis réaffiche l'étape
+// téléphone. Fallback uniquement si ce fichier venait à ne plus la définir.
+function dclDeconnexion() {
+  if (typeof _espaceDeconnexion === 'function') {
+    _espaceDeconnexion();
+  } else {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = '/';
+  }
+}
+window.dclDeconnexion = dclDeconnexion;
+function dfoDeconnexion() { dclDeconnexion(); }
+window.dfoDeconnexion = dfoDeconnexion;
+function dsuDeconnexion() { dclDeconnexion(); }
+window.dsuDeconnexion = dsuDeconnexion;
+
 function _espaceInitiales(nom) {
   const mots = String(nom || '').trim().split(/\s+/).filter(Boolean);
   if (!mots.length) return '??';
@@ -5909,6 +5968,7 @@ function _espaceInitiales(nom) {
 function _espaceAfficherTableauBord() {
   ['espaceDashFournisseur', 'espaceDashSuperviseur', 'espaceDashClient', 'dashboardClientV2', 'dashboardFournisseurV2', 'dashboardSuperviseurV2'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   const _ewReset = document.getElementById('espaceWrapper'); if (_ewReset) _ewReset.classList.remove('dcl-active', 'dfo-active', 'dsu-active');
+  document.body.classList.remove('espace-v2-active');
   // Le formulaire de connexion ne doit JAMAIS rester visible en même temps
   // qu'un tableau de bord (ex. restauration de session persistante : ces
   // étapes n'étaient sinon jamais explicitement masquées ici).
@@ -5917,14 +5977,17 @@ function _espaceAfficherTableauBord() {
   if (_espaceSession.role === 'fournisseur') {
     document.getElementById('dashboardFournisseurV2').style.display = 'block';
     const _ewFour = document.getElementById('espaceWrapper'); if (_ewFour) _ewFour.classList.add('dfo-active');
+    document.body.classList.add('espace-v2-active');
     if (typeof dfoInit === 'function') dfoInit();
   } else if (_espaceSession.role === 'superviseur') {
     document.getElementById('dashboardSuperviseurV2').style.display = 'block';
     const _ewSup = document.getElementById('espaceWrapper'); if (_ewSup) _ewSup.classList.add('dsu-active');
+    document.body.classList.add('espace-v2-active');
     if (typeof dsuInit === 'function') dsuInit();
   } else if (_espaceSession.role === 'client') {
     document.getElementById('dashboardClientV2').style.display = 'block';
     const _ewActive = document.getElementById('espaceWrapper'); if (_ewActive) _ewActive.classList.add('dcl-active');
+    document.body.classList.add('espace-v2-active');
     if (typeof dclInit === 'function') dclInit();
     if (typeof _espaceCliVerifierPremierAcces === 'function') _espaceCliVerifierPremierAcces();
   }
