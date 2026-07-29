@@ -4035,6 +4035,123 @@ if (typeof connexionPrestataire === 'undefined') {
   .dsu-metric-val{font-size:16px}
   .dsu-input-row{grid-template-columns:1fr}
 }
+
+/* ============================================ */
+/* DASHBOARD ADMIN CONSTRUCTION V2             */
+/* ============================================ */
+#dashboardAdminConstructionV2{background:#f9fafb;min-height:100vh;color:#0f172a}
+.dac-topbar{background:#0f172a;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.dac-logo{font-size:15px;font-weight:600;color:#fff}.dac-logo span{color:#E05A1B}
+.dac-role-badge{background:#E05A1B;color:#fff;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;margin-left:8px}
+.dac-topbar-right{display:flex;align-items:center;gap:12px}
+.dac-notif-btn{position:relative;cursor:pointer;color:#9ca3af;font-size:20px}
+.dac-notif-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;position:absolute;top:-2px;right:-2px;display:none}
+.dac-avatar{width:32px;height:32px;border-radius:50%;background:#E05A1B;color:#fff;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center}
+.dac-user-info{font-size:13px;color:#94a3b8}
+.dac-nav{background:#1e293b;padding:0 20px;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dac-tab{padding:12px 16px;font-size:13px;color:#94a3b8;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;user-select:none}
+.dac-tab.active{color:#E05A1B;border-bottom-color:#E05A1B;font-weight:500}
+.dac-main{padding:20px;display:flex;flex-direction:column;gap:16px;min-height:calc(100vh - 110px)}
+.dac-panel{display:none}.dac-panel.active{display:flex;flex-direction:column;gap:16px}
+.dac-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.dac-metric{background:#fff;border-radius:8px;padding:12px 14px;border:0.5px solid #e5e7eb}
+.dac-metric-lbl{font-size:12px;color:#6b7280;margin-bottom:4px}
+.dac-metric-val{font-size:22px;font-weight:600;color:#0f172a}
+.dac-metric-val.warn{color:#d97706}
+.dac-metric-val.ok{color:#16a34a}
+.dac-metric-val.accent{color:#E05A1B}
+.dac-metric-val.danger{color:#dc2626}
+.dac-metric-sub{font-size:11px;color:#9ca3af;margin-top:2px}
+.dac-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dac-card{background:#fff;border:0.5px solid #e5e7eb;border-radius:12px;padding:16px}
+.dac-card-title{font-size:13px;font-weight:500;color:#0f172a;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.dac-card-title-left{display:flex;align-items:center;gap:6px}
+.dac-card-title i{color:#6b7280;font-size:16px}
+.dac-alert-row{display:flex;align-items:center;gap:10px;padding:10px;background:#fef2f2;border:0.5px solid #fca5a5;border-radius:8px;margin-bottom:8px}
+.dac-alert-row:last-child{margin-bottom:0}
+.dac-alert-row i{color:#dc2626;font-size:16px;flex-shrink:0}
+.dac-alert-body{flex:1;min-width:0}
+.dac-alert-title{font-size:13px;color:#991b1b;font-weight:500}
+.dac-alert-sub{font-size:11px;color:#dc2626;margin-top:2px}
+.dac-alert-btn{background:#dc2626;color:#fff;border:none;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.dac-reg-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid #f3f4f6}
+.dac-reg-row:last-child{border-bottom:none}
+.dac-reg-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.dac-reg-icon.out{background:#fffbeb;color:#d97706}
+.dac-reg-icon.pay{background:#dcfce7;color:#16a34a}
+.dac-reg-icon.rep{background:#dbeafe;color:#1d4ed8}
+.dac-reg-icon.alert{background:#fee2e2;color:#dc2626}
+.dac-reg-body{flex:1;min-width:0}
+.dac-reg-title{font-size:13px;color:#0f172a}
+.dac-reg-sub{font-size:11px;color:#9ca3af}
+.dac-reg-time{font-size:11px;color:#9ca3af;white-space:nowrap}
+.dac-stat-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.dac-stat-chip.actif{background:#dcfce7;color:#166534}
+.dac-stat-chip.pause{background:#fffbeb;color:#92400e}
+.dac-stat-chip.alerte{background:#fee2e2;color:#991b1b}
+.dac-stat-chip.bloque{background:#f1f5f9;color:#475569}
+.dac-stat-chip.termine{background:#e0e7ff;color:#3730a3}
+.dac-sup-card{background:#fff;border:0.5px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.dac-sup-card:last-child{margin-bottom:0}
+.dac-sup-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:0.5px solid #e5e7eb;flex-wrap:wrap;gap:8px}
+.dac-sup-info{display:flex;align-items:center;gap:10px}
+.dac-sup-avatar{width:36px;height:36px;border-radius:50%;background:#ede9fe;color:#5b21b6;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dac-sup-nom{font-size:13px;font-weight:500;color:#0f172a}
+.dac-sup-meta{font-size:11px;color:#9ca3af}
+.dac-sup-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.dac-sup-body{padding:12px 14px}
+.dac-sup-chantier{font-size:12px;color:#6b7280;margin-bottom:10px;padding:8px;background:#f9fafb;border-radius:6px}
+.dac-access-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.dac-access-item{background:#f9fafb;border-radius:6px;padding:8px;display:flex;align-items:center;justify-content:space-between}
+.dac-access-label{font-size:12px;color:#374151}
+.dac-toggle{width:36px;height:20px;border-radius:10px;cursor:pointer;position:relative;flex-shrink:0}
+.dac-toggle.on{background:#16a34a}
+.dac-toggle.off{background:#d1d5db}
+.dac-toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px}
+.dac-toggle.on::after{left:18px}
+.dac-toggle.off::after{left:2px}
+.dac-sup-actions{display:flex;gap:6px;flex-wrap:wrap}
+.dac-bloque-banner{background:#fee2e2;border:0.5px solid #fca5a5;border-radius:6px;padding:8px 12px;font-size:12px;color:#991b1b;display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.dac-chantier-card{border:0.5px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px}
+.dac-chantier-card:last-child{margin-bottom:0}
+.dac-chantier-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px}
+.dac-chantier-nom{font-size:13px;font-weight:500;color:#0f172a}
+.dac-chantier-meta{font-size:11px;color:#9ca3af;margin-top:2px}
+.dac-chantier-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.dac-chantier-stat{background:#f9fafb;border-radius:6px;padding:6px;text-align:center}
+.dac-chantier-stat-val{font-size:13px;font-weight:500;color:#0f172a}
+.dac-chantier-stat-lbl{font-size:10px;color:#9ca3af}
+.dac-chantier-actions{display:flex;gap:6px;flex-wrap:wrap}
+.dac-kpi-row{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:0.5px solid #f3f4f6}
+.dac-kpi-row:last-child{border-bottom:none}
+.dac-kpi-lbl{color:#6b7280}
+.dac-kpi-val{font-weight:500;color:#0f172a}
+.dac-kpi-val.ok{color:#16a34a}
+.dac-kpi-val.warn{color:#d97706}
+.dac-kpi-val.danger{color:#dc2626}
+.dac-btn-primary{background:#E05A1B;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.dac-btn-danger{background:#dc2626;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.dac-btn-warn{background:#d97706;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.dac-btn-success{background:#16a34a;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.dac-btn-ghost{background:transparent;color:#6b7280;border:0.5px solid #e5e7eb;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px}
+.dac-btn-full{width:100%;justify-content:center;padding:9px 12px;font-size:12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;border:none;margin-bottom:6px}
+.dac-btn-full:last-child{margin-bottom:0}
+.dac-empty{color:#9ca3af;font-size:13px;padding:12px 0;text-align:center}
+.dac-label{font-size:12px;color:#6b7280;display:block;margin-bottom:4px;font-weight:500}
+.dac-errbox{display:none;color:#dc2626;font-size:12px;margin-top:2px}
+.dac-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999}
+.dac-modal{background:#fff;border-radius:12px;padding:20px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto}
+.dac-modal-title{font-size:15px;font-weight:500;color:#0f172a;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.dac-modal-actions{display:flex;gap:8px;margin-top:16px}
+.dac-modal input,.dac-modal select,.dac-modal textarea{width:100%;box-sizing:border-box;padding:9px 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:13px;font-family:inherit}
+@media(max-width:640px){
+  .dac-metrics{grid-template-columns:1fr 1fr;gap:8px}
+  .dac-two-col{grid-template-columns:1fr}
+  .dac-main{padding:12px}
+  .dac-topbar{padding:10px 12px}
+  .dac-metric-val{font-size:16px}
+  .dac-sup-header{flex-direction:column;align-items:flex-start}
+}
 </style>
 
 <script>
@@ -10682,6 +10799,7 @@ async function chargerAvis() {
     </div>
     <div onclick="showAdmin('equipe');_adminLoadEquipe();" id="amenu-equipe" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-users-gear" style="width:16px;"></i> Équipe</div>
     <div onclick="showAdmin('registre_chantier');_adminLoadRegistreChantier();" id="amenu-registre_chantier" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-clipboard-list" style="width:16px;flex-shrink:0;"></i> Registre chantier<span id="rcMenuBadge" style="display:none;margin-left:auto;background:#E53E3E;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center;line-height:1.4;animation:yjBadgePulse 2s ease-in-out infinite;"></span></div>
+    <div onclick="showAdmin('construction_v2');if(typeof dacInit==='function')dacInit();" id="amenu-construction_v2" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-helmet-safety" style="width:16px;flex-shrink:0;"></i> Construire V2</div>
   </div>
   <div style="padding:8px;border-top:1px solid rgba(255,255,255,.08);margin-top:10px;">
     <div onclick="logoutAdmin()" style="padding:10px 12px;border-radius:8px;color:#FCA5A5;font-size:13px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.1);"><i class="fa-solid fa-right-from-bracket" style="width:16px;"></i> Déconnexion</div>
@@ -11598,6 +11716,207 @@ async function chargerAvis() {
         </div>
 
       </div>
+    </div>
+
+
+    <!-- ============================================ -->
+    <!-- DASHBOARD ADMIN CONSTRUCTION V2             -->
+    <!-- ============================================ -->
+    <div class="admin-section" id="admin-construction_v2">
+    <div id="dashboardAdminConstructionV2">
+
+      <div class="dac-topbar">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="dac-logo">YOUMMA<span>JOBS</span></span>
+          <span style="color:#334155">|</span>
+          <span style="font-size:13px;color:#94a3b8">Administration — Construire</span>
+          <span class="dac-role-badge">Contrôle total</span>
+        </div>
+        <div class="dac-topbar-right">
+          <span class="dac-user-info" id="dacUserInfo">Direction Générale</span>
+          <div class="dac-avatar" id="dacAvatar">DG</div>
+        </div>
+      </div>
+
+      <div class="dac-nav">
+        <div class="dac-tab active" data-tab="overview" onclick="dacShowTab('overview')">Vue globale</div>
+        <div class="dac-tab" data-tab="chantiers" onclick="dacShowTab('chantiers')">Tous les chantiers</div>
+        <div class="dac-tab" data-tab="alertes" onclick="dacShowTab('alertes')">Alertes</div>
+        <div class="dac-tab" data-tab="superviseurs" onclick="dacShowTab('superviseurs')">Contrôle superviseurs</div>
+        <div class="dac-tab" data-tab="fournisseurs" onclick="dacShowTab('fournisseurs')">Fournisseurs</div>
+        <div class="dac-tab" data-tab="clients" onclick="dacShowTab('clients')">Clients</div>
+        <div class="dac-tab" data-tab="visites" onclick="dacShowTab('visites')">Visites terrain</div>
+        <div class="dac-tab" data-tab="finances" onclick="dacShowTab('finances')">Finances</div>
+      </div>
+
+      <div class="dac-main">
+
+        <!-- ONGLET 1 : VUE GLOBALE -->
+        <div class="dac-panel active" id="dacPanel-overview">
+          <div class="dac-metrics">
+            <div class="dac-metric">
+              <div class="dac-metric-lbl">Chantiers actifs</div>
+              <div class="dac-metric-val ok" id="dacMetricChantiers">—</div>
+              <div class="dac-metric-sub" id="dacMetricChantiersSub">—</div>
+            </div>
+            <div class="dac-metric">
+              <div class="dac-metric-lbl">Alertes urgentes</div>
+              <div class="dac-metric-val danger" id="dacMetricAlertes">0</div>
+              <div class="dac-metric-sub">Action requise maintenant</div>
+            </div>
+            <div class="dac-metric">
+              <div class="dac-metric-lbl">Commission encaissée</div>
+              <div class="dac-metric-val accent" id="dacMetricCommission">—</div>
+              <div class="dac-metric-sub">GNF ce mois</div>
+            </div>
+            <div class="dac-metric">
+              <div class="dac-metric-lbl">Superviseurs actifs</div>
+              <div class="dac-metric-val ok" id="dacMetricSuperviseurs">—</div>
+              <div class="dac-metric-sub" id="dacMetricSupSub">—</div>
+            </div>
+          </div>
+
+          <div class="dac-two-col">
+            <div class="dac-card">
+              <div class="dac-card-title">
+                <div class="dac-card-title-left"><i class="fa-solid fa-triangle-exclamation"></i> Alertes urgentes</div>
+                <span id="dacAlerteBadge" style="background:#fee2e2;color:#991b1b;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500">0 actions</span>
+              </div>
+              <div id="dacAlertesListe"><p class="dac-empty">Chargement...</p></div>
+            </div>
+            <div class="dac-card">
+              <div class="dac-card-title">
+                <div class="dac-card-title-left"><i class="fa-solid fa-list"></i> Activité récente</div>
+              </div>
+              <div id="dacActiviteRecente"><p class="dac-empty">Chargement...</p></div>
+            </div>
+          </div>
+
+          <div class="dac-two-col">
+            <div class="dac-card">
+              <div class="dac-card-title">
+                <div class="dac-card-title-left"><i class="fa-solid fa-building"></i> Chantiers actifs</div>
+                <button class="dac-btn-ghost" onclick="dacShowTab('chantiers')">Voir tous</button>
+              </div>
+              <div id="dacChantiersOverview"><p class="dac-empty">Chargement...</p></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="dac-card">
+                <div class="dac-card-title">
+                  <div class="dac-card-title-left"><i class="fa-solid fa-chart-column"></i> Finances du mois</div>
+                </div>
+                <div id="dacFinancesOverview"><p class="dac-empty">Chargement...</p></div>
+              </div>
+              <div class="dac-card">
+                <div class="dac-card-title">
+                  <div class="dac-card-title-left"><i class="fa-solid fa-shield-halved"></i> Actions rapides</div>
+                </div>
+                <button class="dac-btn-full dac-btn-primary" onclick="dacModalSortieAdmin()">
+                  <i class="fa-solid fa-arrow-up"></i> Faire une sortie (à la place d'un superviseur)
+                </button>
+                <button class="dac-btn-full dac-btn-primary" onclick="dacModalRapportAdmin()">
+                  <i class="fa-solid fa-file-lines"></i> Soumettre un rapport (à la place d'un superviseur)
+                </button>
+                <button class="dac-btn-full dac-btn-warn" onclick="dacShowTab('superviseurs')">
+                  <i class="fa-solid fa-ban"></i> Gérer accès superviseurs
+                </button>
+                <button class="dac-btn-full dac-btn-ghost" onclick="dacForcerValidationVersement()">
+                  <i class="fa-solid fa-check"></i> Forcer validation versement
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ONGLET 2 : TOUS LES CHANTIERS -->
+        <div class="dac-panel" id="dacPanel-chantiers">
+          <div class="dac-card">
+            <div class="dac-card-title">
+              <div class="dac-card-title-left"><i class="fa-solid fa-building"></i> Tous les chantiers</div>
+              <select id="dacFiltreStatut" style="font-size:12px;padding:4px 8px;border-radius:6px;border:0.5px solid #e5e7eb" onchange="dacLoadChantiers()">
+                <option value="">Tous les statuts</option>
+                <option value="en_etude">En étude</option>
+                <option value="en_cours">En cours</option>
+                <option value="suspendu">Suspendus</option>
+                <option value="termine">Terminés</option>
+              </select>
+            </div>
+            <div id="dacChantiersListe"><p class="dac-empty">Chargement...</p></div>
+          </div>
+        </div>
+
+        <!-- ONGLET 3 : ALERTES -->
+        <div class="dac-panel" id="dacPanel-alertes">
+          <div class="dac-card">
+            <div class="dac-card-title">
+              <div class="dac-card-title-left"><i class="fa-solid fa-triangle-exclamation"></i> Toutes les alertes</div>
+            </div>
+            <div id="dacAlertesCompletes"><p class="dac-empty">Chargement...</p></div>
+          </div>
+        </div>
+
+        <!-- ONGLET 4 : CONTRÔLE SUPERVISEURS -->
+        <div class="dac-panel" id="dacPanel-superviseurs">
+          <div class="dac-card">
+            <div class="dac-card-title">
+              <div class="dac-card-title-left"><i class="fa-solid fa-shield"></i> Contrôle superviseurs</div>
+              <span style="font-size:11px;color:#6b7280">Agir à la place du superviseur ou restreindre son accès</span>
+            </div>
+            <div id="dacSuperviseursListe"><p class="dac-empty">Chargement...</p></div>
+          </div>
+        </div>
+
+        <!-- ONGLET 5 : FOURNISSEURS -->
+        <div class="dac-panel" id="dacPanel-fournisseurs">
+          <div class="dac-card">
+            <div class="dac-card-title">
+              <div class="dac-card-title-left"><i class="fa-solid fa-truck-fast"></i> Fournisseurs partenaires</div>
+            </div>
+            <div id="dacFournisseursListe"><p class="dac-empty">Chargement...</p></div>
+          </div>
+        </div>
+
+        <!-- ONGLET 6 : CLIENTS -->
+        <div class="dac-panel" id="dacPanel-clients">
+          <div class="dac-card">
+            <div class="dac-card-title">
+              <div class="dac-card-title-left"><i class="fa-solid fa-users"></i> Clients construction</div>
+            </div>
+            <div id="dacClientsListe"><p class="dac-empty">Chargement...</p></div>
+          </div>
+        </div>
+
+        <!-- ONGLET 7 : VISITES TERRAIN -->
+        <div class="dac-panel" id="dacPanel-visites">
+          <div class="dac-card">
+            <div class="dac-card-title">
+              <div class="dac-card-title-left"><i class="fa-solid fa-map-pin"></i> Visites terrain</div>
+              <button class="dac-btn-primary" onclick="dacModalPlanifierVisite()">
+                <i class="fa-solid fa-plus"></i> Planifier une visite
+              </button>
+            </div>
+            <div id="dacVisitesListe"><p class="dac-empty">Chargement...</p></div>
+          </div>
+        </div>
+
+        <!-- ONGLET 8 : FINANCES -->
+        <div class="dac-panel" id="dacPanel-finances">
+          <div class="dac-card">
+            <div class="dac-card-title">
+              <div class="dac-card-title-left"><i class="fa-solid fa-chart-column"></i> Finances détaillées</div>
+            </div>
+            <div id="dacFinancesDetail"><p class="dac-empty">Chargement...</p></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MODAL ADMIN -->
+    <div id="dacModalOverlay" class="dac-modal-overlay" style="display:none" onclick="if(event.target===this)dacCloseModal()">
+      <div class="dac-modal" id="dacModalContent"></div>
+    </div>
+
     </div>
 
 
@@ -16081,12 +16400,13 @@ function showAdmin(name) {
     equipe: '<i class="fa-solid fa-users-gear" style="color:#E8650A;margin-right:6px;"></i>Équipe admin',
     activite: '<i class="fa-solid fa-chart-bar" style="color:#E85D04;margin-right:6px;"></i>Activité équipe',
     registre_chantier: '<i class="fa-solid fa-clipboard-list" style="color:#E8650A;margin-right:6px;"></i>Registre chantier',
+    construction_v2: '<i class="fa-solid fa-helmet-safety" style="color:#E8650A;margin-right:6px;"></i>Construire V2',
   };
   const tt = document.getElementById('adminTopbarTitle');
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','app_message','missions','missions_declarees','projets_clients','ambassadeurs','rapports','activite','notifications','equipe','registre_chantier'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','app_message','missions','missions_declarees','projets_clients','ambassadeurs','rapports','activite','notifications','equipe','registre_chantier','construction_v2'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (!el) return;
     // Ne pas réafficher un élément restreint à l'agent
@@ -16103,6 +16423,7 @@ function showAdmin(name) {
   else if (name==='equipe') { _adminLoadEquipe(); }
   else if (name==='activite') { _adminLoadActivite(); }
   else if (name==='registre_chantier') { _adminLoadRegistreChantier(); }
+  else if (name==='construction_v2') { if (typeof dacInit === 'function') dacInit(); }
   else if (name!=='dashboard') { if(typeof _adminLoadAll==='function') _adminLoadAll(); }
 }
 
@@ -19423,6 +19744,819 @@ async function _rcValiderOuvertureChantier(chantierId) {
     if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
   }
 }
+
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD ADMIN CONSTRUCTION V2 — habillage + contrôle superviseurs
+// Réutilise au maximum l'infrastructure _rc* / admin_actions déjà en
+// place (voir migration 20260724_admin_construction_v2.sql) : le
+// blocage total d'un superviseur reste géré par superviseurs.statut
+// ('actif'/'suspendu', déjà bloquant à la connexion), la traçabilité
+// par admin_actions (_logAdminAction), la validation d'un versement
+// bloqué par _espaceFournisseurTraiterVersement (append-only + trigger
+// fn_gerer_solde_registre — JAMAIS d'UPDATE manuel de solde_gnf), le
+// détail riche d'un chantier par _rcOuvrirDetail(). Seules les
+// fonctionnalités réellement nouvelles (toggles d'accès granulaires,
+// score/note, visites terrain, action "à la place du superviseur")
+// sont du code neuf.
+// ══════════════════════════════════════════════════════════════
+
+const DAC_SEUIL_SOLDE_BAS = 10000000;
+
+function dacFormatGNF(n) {
+  if (!n && n !== 0) return '—';
+  if (typeof _espaceFormatGNF === 'function') return _espaceFormatGNF(n);
+  return Math.round(n).toLocaleString('fr-FR') + ' GNF';
+}
+
+function dacShowTab(tabName) {
+  document.querySelectorAll('#dashboardAdminConstructionV2 .dac-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+  document.querySelectorAll('#dashboardAdminConstructionV2 .dac-panel').forEach(p => p.classList.toggle('active', p.id === 'dacPanel-' + tabName));
+  const loaders = {
+    chantiers: dacLoadChantiers,
+    alertes: dacLoadAlertesCompletes,
+    superviseurs: dacLoadSuperviseurs,
+    fournisseurs: dacLoadFournisseurs,
+    clients: dacLoadClients,
+    visites: dacLoadVisites,
+    finances: dacLoadFinances
+  };
+  if (loaders[tabName]) loaders[tabName]();
+}
+window.dacShowTab = dacShowTab;
+
+function dacOpenModal(html) {
+  document.getElementById('dacModalContent').innerHTML = html;
+  document.getElementById('dacModalOverlay').style.display = 'flex';
+}
+window.dacOpenModal = dacOpenModal;
+function dacCloseModal() {
+  document.getElementById('dacModalOverlay').style.display = 'none';
+}
+window.dacCloseModal = dacCloseModal;
+
+// -- INIT PRINCIPAL --
+let _dacChantiersCache = [];
+let _dacSuperviseursCache = [];
+
+async function dacInit() {
+  const nom = (typeof adminData !== 'undefined' && adminData?.nom) || 'Direction Générale';
+  document.getElementById('dacUserInfo').textContent = nom;
+  document.getElementById('dacAvatar').textContent = nom.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase() || 'DG';
+
+  try {
+    const [chantiersRes, superviseursRes] = await Promise.all([
+      sb.from('chantiers').select('id,nom,statut,date_debut,client_id,superviseur_id,commission_taux,commission_payee,commission_payee_le,clients(nom,prenom,telephone),superviseurs(nom,prenom,telephone),comptes_materiaux(id,solde_gnf,solde_reserve,fournisseur_id,fournisseurs_materiaux(nom_entreprise,telephone))').order('date_debut', { ascending: false }),
+      sb.from('superviseurs').select('id,nom,prenom,telephone,statut,acces_sorties,acces_rapports,acces_registre,acces_contact,score_admin,note_admin,chantiers(id,nom,statut)').order('nom')
+    ]);
+    if (chantiersRes.error) throw chantiersRes.error;
+    if (superviseursRes.error) throw superviseursRes.error;
+    _dacChantiersCache = chantiersRes.data || [];
+    _dacSuperviseursCache = superviseursRes.data || [];
+
+    const chantiersActifs = _dacChantiersCache.filter(c => c.statut === 'en_cours');
+    document.getElementById('dacMetricChantiers').textContent = chantiersActifs.length;
+    document.getElementById('dacMetricChantiersSub').textContent = _dacChantiersCache.length + ' au total';
+
+    const supActifs = _dacSuperviseursCache.filter(s => s.statut === 'actif').length;
+    const supSuspendus = _dacSuperviseursCache.filter(s => s.statut !== 'actif').length;
+    document.getElementById('dacMetricSuperviseurs').textContent = supActifs + ' / ' + _dacSuperviseursCache.length;
+    document.getElementById('dacMetricSupSub').textContent = supSuspendus > 0 ? supSuspendus + ' suspendu' + (supSuspendus > 1 ? 's' : '') : 'Tous actifs';
+
+    await dacChargerCommissionMois();
+    await dacLoadAlertesOverview();
+    await dacLoadActivite();
+    dacRenderChantiersOverview(chantiersActifs.slice(0, 3));
+    dacRenderFinancesOverview();
+  } catch (e) {
+    console.error('[dac] dacInit error:', e);
+    if (typeof showToast === 'function') showToast('Erreur de chargement : ' + e.message, 'error');
+  }
+}
+window.dacInit = dacInit;
+
+// -- COMMISSION DU MOIS (réutilise _commissionCalculer, jamais de calcul manuel dupliqué) --
+async function dacChargerCommissionMois() {
+  const debutMois = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+  try {
+    const ids = _dacChantiersCache.map(c => c.id);
+    let totalVerseParChantier = {};
+    if (ids.length) {
+      const { data: versements, error } = await sb.from('registre_transactions').select('chantier_id,montant_gnf').in('chantier_id', ids).eq('type_operation', 'versement_valide');
+      if (error) throw error;
+      (versements || []).forEach(v => { totalVerseParChantier[v.chantier_id] = (totalVerseParChantier[v.chantier_id] || 0) + Number(v.montant_gnf || 0); });
+    }
+    let commEncaissee = 0;
+    _dacChantiersCache.forEach(c => {
+      if (c.commission_payee && c.commission_payee_le >= debutMois) {
+        commEncaissee += _commissionCalculer(totalVerseParChantier[c.id] || 0, c).montant;
+      }
+    });
+    document.getElementById('dacMetricCommission').textContent = dacFormatGNF(commEncaissee);
+    window._dacTotalVerseParChantier = totalVerseParChantier;
+  } catch (e) {
+    console.warn('[dac] commission du mois indisponible:', e.message);
+    document.getElementById('dacMetricCommission').textContent = '—';
+  }
+}
+
+// -- ALERTES --
+async function dacCalculerAlertes() {
+  const alertes = [];
+
+  _dacChantiersCache.filter(c => c.statut === 'en_cours').forEach(c => {
+    (c.comptes_materiaux || []).forEach(cm => {
+      const dispo = Number(cm.solde_gnf || 0) - Number(cm.solde_reserve || 0);
+      if (dispo < DAC_SEUIL_SOLDE_BAS && dispo >= 0) {
+        const client = c.clients ? ((c.clients.prenom ? c.clients.prenom + ' ' : '') + c.clients.nom) : '—';
+        alertes.push({
+          icon: 'fa-wallet',
+          titre: `Solde bas — ${c.nom} (${client})`,
+          sous: `${dacFormatGNF(dispo)} disponibles chez ${cm.fournisseurs_materiaux?.nom_entreprise || '—'} · Sorties bientôt bloquées`,
+          action: 'Notifier client',
+          fn: () => dacNotifierClient(c)
+        });
+      }
+    });
+  });
+
+  try {
+    const il_y_a_24h = new Date(Date.now() - 24*60*60*1000).toISOString();
+    const { data: declares, error } = await sb.from('registre_transactions').select('id,montant_gnf,chantier_id,created_at').eq('type_operation', 'versement_declare').lt('created_at', il_y_a_24h);
+    if (error) throw error;
+    if (declares?.length) {
+      const { data: traites } = await sb.from('registre_transactions').select('reference_transaction_id').in('type_operation', ['versement_valide','versement_rejete']).in('reference_transaction_id', declares.map(d => d.id));
+      const traiteesSet = new Set((traites || []).map(t => t.reference_transaction_id));
+      const nomsParId = {}; _dacChantiersCache.forEach(c => { nomsParId[c.id] = c.nom; });
+      declares.filter(d => !traiteesSet.has(d.id)).forEach(d => {
+        alertes.push({
+          icon: 'fa-clock',
+          titre: `Versement non confirmé +24h — ${nomsParId[d.chantier_id] || '—'}`,
+          sous: `${dacFormatGNF(d.montant_gnf)} déclaré · Le fournisseur n'a pas confirmé`,
+          action: 'Forcer validation',
+          fn: () => dacForcerVersement(d.id)
+        });
+      });
+    }
+  } catch (e) { console.warn('[dac] alertes versements indisponibles:', e.message); }
+
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const chantierIdsActifs = _dacChantiersCache.filter(c => c.statut === 'en_cours').map(c => c.id);
+    if (chantierIdsActifs.length) {
+      const { data: rapports, error } = await sb.from('rapports_journaliers').select('chantier_id').in('chantier_id', chantierIdsActifs).eq('date_rapport', today);
+      if (error) throw error;
+      const couvertSet = new Set((rapports || []).map(r => r.chantier_id));
+      _dacSuperviseursCache.filter(s => s.statut === 'actif').forEach(s => {
+        const chantiersSup = (s.chantiers || []).filter(c => c.statut === 'en_cours');
+        const manquants = chantiersSup.filter(c => !couvertSet.has(c.id));
+        if (manquants.length) {
+          alertes.push({
+            icon: 'fa-file-circle-xmark',
+            titre: `Rapport du jour manquant — ${(s.prenom ? s.prenom + ' ' : '') + s.nom}`,
+            sous: manquants.map(c => c.nom).join(', '),
+            action: 'Voir superviseur',
+            fn: () => dacShowTab('superviseurs')
+          });
+        }
+      });
+    }
+  } catch (e) { console.warn('[dac] alertes rapports indisponibles (migration 20260718_rapports_journaliers.sql pas encore appliquée ?):', e.message); }
+
+  return alertes;
+}
+
+async function dacLoadAlertesOverview() {
+  const alertes = await dacCalculerAlertes();
+  window._dacAlertes = alertes;
+  document.getElementById('dacMetricAlertes').textContent = alertes.length;
+  document.getElementById('dacAlerteBadge').textContent = alertes.length + ' action' + (alertes.length > 1 ? 's' : '');
+  const el = document.getElementById('dacAlertesListe');
+  if (!alertes.length) { el.innerHTML = '<p class="dac-empty">Aucune alerte urgente.</p>'; return; }
+  el.innerHTML = alertes.slice(0, 4).map((a, i) => dacAlerteRowHtml(a, i)).join('');
+}
+
+function dacAlerteRowHtml(a, i) {
+  return `<div class="dac-alert-row">
+    <i class="fa-solid ${a.icon}"></i>
+    <div class="dac-alert-body">
+      <div class="dac-alert-title">${a.titre}</div>
+      <div class="dac-alert-sub">${a.sous}</div>
+    </div>
+    <button class="dac-alert-btn" onclick="dacAlerteAction(${i})">${a.action}</button>
+  </div>`;
+}
+
+function dacAlerteAction(i) {
+  window._dacAlertes?.[i]?.fn?.();
+}
+window.dacAlerteAction = dacAlerteAction;
+
+async function dacLoadAlertesCompletes() {
+  const alertes = await dacCalculerAlertes();
+  window._dacAlertes = alertes;
+  const el = document.getElementById('dacAlertesCompletes');
+  el.innerHTML = alertes.length ? alertes.map((a, i) => dacAlerteRowHtml(a, i)).join('') : '<p class="dac-empty">Aucune alerte urgente.</p>';
+}
+window.dacLoadAlertesCompletes = dacLoadAlertesCompletes;
+
+function dacNotifierClient(chantier) {
+  const tel = (chantier.clients?.telephone || '').replace(/\D/g, '');
+  if (!tel) { if (typeof showToast === 'function') showToast('Numéro client indisponible.', 'error'); return; }
+  const msg = encodeURIComponent(`Bonjour, le solde matériaux de votre chantier "${chantier.nom}" est bas. Merci de provisionner votre compte pour éviter tout blocage des sorties. — YOUMMA JOBS`);
+  window.open('https://wa.me/224' + tel.replace(/^0+/, '') + '?text=' + msg);
+}
+window.dacNotifierClient = dacNotifierClient;
+
+// -- ACTIVITÉ RÉCENTE --
+async function dacLoadActivite() {
+  try {
+    const { data, error } = await sb.from('registre_transactions').select('*, chantiers(nom)').order('created_at', { ascending: false }).limit(6);
+    if (error) throw error;
+    const el = document.getElementById('dacActiviteRecente');
+    if (!data?.length) { el.innerHTML = '<p class="dac-empty">Aucune activité.</p>'; return; }
+    el.innerHTML = data.map(t => {
+      const cfg = (typeof _rcStatutConfig === 'function') ? _rcStatutConfig(t.type_operation) : { label: t.type_operation, bg: '#f3f4f6', color: '#374151' };
+      const isSortie = (t.type_operation || '').startsWith('sortie');
+      const isVers = (t.type_operation || '').startsWith('versement');
+      const iconClass = isSortie ? 'out' : isVers ? 'pay' : 'rep';
+      const icon = isSortie ? 'fa-arrow-up' : isVers ? 'fa-check' : 'fa-file-lines';
+      const date = new Date(t.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+      return `<div class="dac-reg-row">
+        <div class="dac-reg-icon ${iconClass}"><i class="fa-solid ${icon}"></i></div>
+        <div class="dac-reg-body">
+          <div class="dac-reg-title">${cfg.label} — ${t.chantiers?.nom || '—'}</div>
+          <div class="dac-reg-sub">${dacFormatGNF(t.montant_gnf)}</div>
+        </div>
+        <div class="dac-reg-time">${date}</div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    document.getElementById('dacActiviteRecente').innerHTML = '<p class="dac-empty">Erreur : ' + e.message + '</p>';
+  }
+}
+window.dacLoadActivite = dacLoadActivite;
+
+// -- CHANTIERS --
+function dacRenderChantiersOverview(chantiers) {
+  const el = document.getElementById('dacChantiersOverview');
+  el.innerHTML = chantiers.length ? chantiers.map(c => dacChantierCardHtml(c)).join('') : '<p class="dac-empty">Aucun chantier actif.</p>';
+}
+
+function dacChantierCardHtml(c) {
+  const cfg = (typeof _rcStatutChantierConfig === 'function') ? _rcStatutChantierConfig(c.statut) : { label: c.statut, bg: '#f3f4f6', color: '#374151' };
+  const client = c.clients ? ((c.clients.prenom ? c.clients.prenom + ' ' : '') + c.clients.nom) : '—';
+  const superviseur = c.superviseurs ? ((c.superviseurs.prenom ? c.superviseurs.prenom + ' ' : '') + c.superviseurs.nom) : '— (non assigné)';
+  const comptes = c.comptes_materiaux || [];
+  const soldeTotal = comptes.reduce((s, cm) => s + Number(cm.solde_gnf || 0) - Number(cm.solde_reserve || 0), 0);
+  const totalVerse = (window._dacTotalVerseParChantier || {})[c.id] || 0;
+  const soldeWarn = soldeTotal < DAC_SEUIL_SOLDE_BAS;
+  const commission = _commissionCalculer(totalVerse, c);
+  return `<div class="dac-chantier-card">
+    <div class="dac-chantier-header">
+      <div>
+        <div class="dac-chantier-nom">${c.nom}</div>
+        <div class="dac-chantier-meta">Client : ${client} · Superviseur : ${superviseur}</div>
+      </div>
+      <span class="dac-stat-chip ${soldeWarn ? 'alerte' : c.statut === 'suspendu' ? 'pause' : c.statut === 'termine' ? 'termine' : 'actif'}">${soldeWarn ? 'Solde bas' : cfg.label}</span>
+    </div>
+    <div class="dac-chantier-stats">
+      <div class="dac-chantier-stat"><div class="dac-chantier-stat-val" style="color:${soldeWarn ? '#d97706' : '#16a34a'}">${dacFormatGNF(soldeTotal)}</div><div class="dac-chantier-stat-lbl">Solde dispo</div></div>
+      <div class="dac-chantier-stat"><div class="dac-chantier-stat-val">${dacFormatGNF(totalVerse)}</div><div class="dac-chantier-stat-lbl">Total versé</div></div>
+      <div class="dac-chantier-stat"><div class="dac-chantier-stat-val" style="color:${commission.color}">${dacFormatGNF(commission.montant)}</div><div class="dac-chantier-stat-lbl">Commission</div></div>
+    </div>
+    <div class="dac-chantier-actions">
+      <button class="dac-btn-primary" onclick="_rcOuvrirDetail('${c.id}')"><i class="fa-solid fa-eye"></i> Voir</button>
+      <button class="dac-btn-warn" onclick="dacChangerSuperviseur('${c.id}')"><i class="fa-solid fa-arrows-rotate"></i> Changer superviseur</button>
+      <button class="dac-btn-ghost" onclick="dacTogglePauseChantier('${c.id}','${c.statut}')">
+        <i class="fa-solid fa-${c.statut === 'suspendu' ? 'play' : 'pause'}"></i>
+        ${c.statut === 'suspendu' ? 'Reprendre' : 'Pause'}
+      </button>
+    </div>
+  </div>`;
+}
+
+async function dacLoadChantiers() {
+  const statut = document.getElementById('dacFiltreStatut')?.value;
+  const liste = statut ? _dacChantiersCache.filter(c => c.statut === statut) : _dacChantiersCache;
+  const el = document.getElementById('dacChantiersListe');
+  el.innerHTML = liste.length ? liste.map(c => dacChantierCardHtml(c)).join('') : '<p class="dac-empty">Aucun chantier trouvé.</p>';
+}
+window.dacLoadChantiers = dacLoadChantiers;
+
+async function dacTogglePauseChantier(chantierId, statutActuel) {
+  const nouveau = statutActuel === 'suspendu' ? 'en_cours' : 'suspendu';
+  if (!window.confirm(nouveau === 'suspendu' ? 'Mettre ce chantier en pause ?' : 'Reprendre ce chantier ?')) return;
+  try {
+    const { error } = await sb.from('chantiers').update({ statut: nouveau }).eq('id', chantierId);
+    if (error) throw error;
+    await _logAdminAction(nouveau === 'suspendu' ? 'suspension_chantier' : 'reprise_chantier', '', '', 'chantier_id: ' + chantierId);
+    if (typeof showToast === 'function') showToast(nouveau === 'suspendu' ? '⏸ Chantier mis en pause' : '▶️ Chantier repris', 'success');
+    await dacInit();
+    dacLoadChantiers();
+  } catch (e) {
+    const msg = (e.message || '').toLowerCase().includes('check') ? "Migration 20260717_chantier_statut_suspendu.sql pas encore appliquée." : e.message;
+    if (typeof showToast === 'function') showToast('Erreur : ' + msg, 'error');
+  }
+}
+window.dacTogglePauseChantier = dacTogglePauseChantier;
+
+function dacChangerSuperviseur(chantierId) {
+  const options = _dacSuperviseursCache.filter(s => s.statut === 'actif').map(s => `<option value="${s.id}">${(s.prenom ? s.prenom + ' ' : '') + s.nom}</option>`).join('');
+  dacOpenModal(`
+    <div class="dac-modal-title"><i class="fa-solid fa-arrows-rotate" style="color:#E05A1B"></i> Changer le superviseur</div>
+    <label class="dac-label">Nouveau superviseur</label>
+    <select id="dacNouveauSuperviseurId"><option value="">— Sélectionner —</option>${options}</select>
+    <div class="dac-modal-actions">
+      <button class="dac-btn-primary" style="flex:1;justify-content:center;padding:10px" onclick="dacConfirmerChangerSuperviseur('${chantierId}')"><i class="fa-solid fa-check"></i> Confirmer</button>
+      <button class="dac-btn-ghost" onclick="dacCloseModal()">Annuler</button>
+    </div>
+  `);
+}
+window.dacChangerSuperviseur = dacChangerSuperviseur;
+
+async function dacConfirmerChangerSuperviseur(chantierId) {
+  const nouveauId = document.getElementById('dacNouveauSuperviseurId').value;
+  if (!nouveauId) { if (typeof showToast === 'function') showToast('Sélectionnez un superviseur.', 'error'); return; }
+  try {
+    const { error } = await sb.from('chantiers').update({ superviseur_id: nouveauId }).eq('id', chantierId);
+    if (error) throw error;
+    await _logAdminAction('changement_superviseur_chantier', '', '', 'chantier_id: ' + chantierId + ' | nouveau: ' + nouveauId);
+    if (typeof showToast === 'function') showToast('✅ Superviseur changé', 'success');
+    dacCloseModal();
+    await dacInit();
+    dacLoadChantiers();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+window.dacConfirmerChangerSuperviseur = dacConfirmerChangerSuperviseur;
+
+// -- FINANCES --
+function dacRenderFinancesOverview() {
+  const totalVerse = Object.values(window._dacTotalVerseParChantier || {}).reduce((s, v) => s + v, 0);
+  let commTotale = 0, commPayee = 0;
+  _dacChantiersCache.forEach(c => {
+    const m = _commissionCalculer((window._dacTotalVerseParChantier || {})[c.id] || 0, c);
+    commTotale += m.montant;
+    if (c.commission_payee) commPayee += m.montant;
+  });
+  document.getElementById('dacFinancesOverview').innerHTML = `
+    <div class="dac-kpi-row"><span class="dac-kpi-lbl">Total matériaux versés</span><span class="dac-kpi-val">${dacFormatGNF(totalVerse)}</span></div>
+    <div class="dac-kpi-row"><span class="dac-kpi-lbl">Commission totale calculée</span><span class="dac-kpi-val">${dacFormatGNF(commTotale)}</span></div>
+    <div class="dac-kpi-row"><span class="dac-kpi-lbl">Commission déjà payée</span><span class="dac-kpi-val ok">${dacFormatGNF(commPayee)}</span></div>
+    <div class="dac-kpi-row"><span class="dac-kpi-lbl">Reste à percevoir</span><span class="dac-kpi-val warn">${dacFormatGNF(commTotale - commPayee)}</span></div>`;
+}
+
+async function dacLoadFinances() {
+  dacRenderFinancesOverview();
+  const el = document.getElementById('dacFinancesDetail');
+  const lignes = _dacChantiersCache.map(c => {
+    const totalVerse = (window._dacTotalVerseParChantier || {})[c.id] || 0;
+    const m = _commissionCalculer(totalVerse, c);
+    return { c, totalVerse, m };
+  }).filter(l => l.totalVerse > 0);
+  if (!lignes.length) { el.innerHTML = '<p class="dac-empty">Aucun versement confirmé pour le moment.</p>'; return; }
+  el.innerHTML = lignes.map(({ c, totalVerse, m }) => `
+    <div class="dac-chantier-card">
+      <div class="dac-chantier-header">
+        <div class="dac-chantier-nom">${c.nom}</div>
+        <span class="dac-stat-chip" style="background:${m.bg};color:${m.color}">${m.label}</span>
+      </div>
+      <div class="dac-kpi-row"><span class="dac-kpi-lbl">Total versé</span><span class="dac-kpi-val">${dacFormatGNF(totalVerse)}</span></div>
+      <div class="dac-kpi-row"><span class="dac-kpi-lbl">Commission (${m.taux}%)</span><span class="dac-kpi-val" style="color:${m.color}">${dacFormatGNF(m.montant)}</span></div>
+      ${!m.payee && m.montant > 0 ? `<button class="dac-btn-success" style="margin-top:8px" onclick="dacMarquerCommissionPayee('${c.id}')"><i class="fa-solid fa-check"></i> Marquer comme payée</button>` : ''}
+    </div>
+  `).join('');
+}
+window.dacLoadFinances = dacLoadFinances;
+
+async function dacMarquerCommissionPayee(chantierId) {
+  await _rcCommissionMarquerPayee(chantierId, null);
+  await dacInit();
+  dacLoadFinances();
+}
+window.dacMarquerCommissionPayee = dacMarquerCommissionPayee;
+
+// -- SUPERVISEURS --
+async function dacLoadSuperviseurs() {
+  const el = document.getElementById('dacSuperviseursListe');
+  el.innerHTML = _dacSuperviseursCache.length ? _dacSuperviseursCache.map(s => dacSuperviseurCardHtml(s)).join('') : '<p class="dac-empty">Aucun superviseur.</p>';
+}
+window.dacLoadSuperviseurs = dacLoadSuperviseurs;
+
+function dacSuperviseurCardHtml(s) {
+  const nom = (s.prenom ? s.prenom + ' ' : '') + s.nom;
+  const initiales = nom.split(' ').filter(Boolean).map(w => w[0]).join('').substring(0, 2).toUpperCase();
+  const bloque = s.statut !== 'actif';
+  const chantiersActifs = (s.chantiers || []).filter(c => c.statut === 'en_cours');
+  const toggle = (label, colonne, valeur) => `<div class="dac-access-item">
+    <span class="dac-access-label">${label}</span>
+    <div class="dac-toggle ${valeur !== false ? 'on' : 'off'}" onclick="dacToggleAcces('${s.id}','${colonne}',${valeur !== false})"></div>
+  </div>`;
+  return `<div class="dac-sup-card">
+    <div class="dac-sup-header">
+      <div class="dac-sup-info">
+        <div class="dac-sup-avatar" style="${bloque ? 'background:#fee2e2;color:#991b1b' : ''}">${initiales}</div>
+        <div>
+          <div class="dac-sup-nom">${nom}</div>
+          <div class="dac-sup-meta">${s.telephone || ''} · Score : ${s.score_admin ?? 5}/5</div>
+        </div>
+      </div>
+      <div class="dac-sup-controls">
+        <span class="dac-stat-chip ${bloque ? 'bloque' : 'actif'}"><i class="fa-solid ${bloque ? 'fa-ban' : 'fa-circle-check'}" style="font-size:11px"></i> ${bloque ? 'Accès bloqué' : 'Accès actif'}</span>
+        ${bloque
+          ? `<button class="dac-btn-success" onclick="dacReactiverSuperviseur('${s.id}')"><i class="fa-solid fa-lock-open"></i> Réactiver</button>`
+          : `<button class="dac-btn-danger" onclick="dacBloquerSuperviseur('${s.id}')"><i class="fa-solid fa-ban"></i> Suspendre</button>`}
+      </div>
+    </div>
+    <div class="dac-sup-body">
+      ${chantiersActifs.length ? `<div class="dac-sup-chantier">Chantier${chantiersActifs.length > 1 ? 's' : ''} : ${chantiersActifs.map(c => c.nom).join(', ')}</div>` : '<div class="dac-sup-chantier">Aucun chantier actif assigné</div>'}
+      ${s.note_admin ? `<div class="dac-sup-chantier"><i class="fa-solid fa-note-sticky"></i> ${s.note_admin}</div>` : ''}
+      ${!bloque ? `<div class="dac-access-grid">
+        ${toggle('Demandes de sortie', 'acces_sorties', s.acces_sorties)}
+        ${toggle('Rapport journalier', 'acces_rapports', s.acces_rapports)}
+        ${toggle('Vue registre', 'acces_registre', s.acces_registre)}
+        ${toggle('Contact fournisseur', 'acces_contact', s.acces_contact)}
+      </div>` : ''}
+      <div class="dac-sup-actions">
+        <button class="dac-btn-primary" onclick="dacModalSortieAdmin('${s.id}')"><i class="fa-solid fa-arrow-up"></i> Sortie à sa place</button>
+        <button class="dac-btn-primary" onclick="dacModalRapportAdmin('${s.id}')"><i class="fa-solid fa-file-lines"></i> Rapport à sa place</button>
+        <button class="dac-btn-ghost" onclick="dacNoterSuperviseur('${s.id}')"><i class="fa-solid fa-star"></i> Modifier score</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// Contrôle granulaire (nouveau) — distinct du blocage total (statut).
+// Aucune valeur par défaut n'affecte un superviseur qui n'a jamais été
+// modifié : NULL/absent est traité comme TRUE (!== false) partout.
+async function dacToggleAcces(supId, colonne, valeurActuelle) {
+  try {
+    const { error } = await sb.from('superviseurs').update({ [colonne]: !valeurActuelle }).eq('id', supId);
+    if (error) throw error;
+    await _logAdminAction('toggle_acces_superviseur', '', '', 'superviseur_id: ' + supId + ' | ' + colonne + ': ' + !valeurActuelle);
+    await dacInit();
+    dacLoadSuperviseurs();
+  } catch (e) {
+    const msg = (e.message || '').toLowerCase().includes('column') ? 'Migration 20260724_admin_construction_v2.sql pas encore appliquée.' : e.message;
+    if (typeof showToast === 'function') showToast('Erreur : ' + msg, 'error');
+  }
+}
+window.dacToggleAcces = dacToggleAcces;
+
+// Blocage TOTAL — réutilise exactement le mécanisme existant (statut),
+// déjà vérifié bloquant à la connexion OTP superviseur.
+async function dacBloquerSuperviseur(supId) {
+  if (!window.confirm('Suspendre complètement l\'accès de ce superviseur ? Il ne pourra plus se connecter.')) return;
+  try {
+    const { error } = await sb.from('superviseurs').update({ statut: 'suspendu' }).eq('id', supId);
+    if (error) throw error;
+    await _logAdminAction('suspension_superviseur', '', '', 'superviseur_id: ' + supId);
+    if (typeof showToast === 'function') showToast('✅ Accès suspendu', 'success');
+    await dacInit();
+    dacLoadSuperviseurs();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+window.dacBloquerSuperviseur = dacBloquerSuperviseur;
+
+async function dacReactiverSuperviseur(supId) {
+  try {
+    const { error } = await sb.from('superviseurs').update({ statut: 'actif' }).eq('id', supId);
+    if (error) throw error;
+    await _logAdminAction('reactivation_superviseur', '', '', 'superviseur_id: ' + supId);
+    if (typeof showToast === 'function') showToast('✅ Accès rétabli', 'success');
+    await dacInit();
+    dacLoadSuperviseurs();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+window.dacReactiverSuperviseur = dacReactiverSuperviseur;
+
+function dacNoterSuperviseur(supId) {
+  const s = _dacSuperviseursCache.find(x => x.id === supId);
+  dacOpenModal(`
+    <div class="dac-modal-title"><i class="fa-solid fa-star" style="color:#E05A1B"></i> Noter le superviseur</div>
+    <label class="dac-label">Score (1 à 5)</label>
+    <input type="number" id="dacScoreInput" min="1" max="5" step="0.5" value="${s?.score_admin ?? 5}">
+    <label class="dac-label" style="margin-top:10px">Note / commentaire</label>
+    <textarea id="dacNoteInput" rows="3">${s?.note_admin || ''}</textarea>
+    <div class="dac-modal-actions">
+      <button class="dac-btn-primary" style="flex:1;justify-content:center;padding:10px" onclick="dacConfirmerNoterSuperviseur('${supId}')"><i class="fa-solid fa-check"></i> Enregistrer</button>
+      <button class="dac-btn-ghost" onclick="dacCloseModal()">Annuler</button>
+    </div>
+  `);
+}
+window.dacNoterSuperviseur = dacNoterSuperviseur;
+
+async function dacConfirmerNoterSuperviseur(supId) {
+  const score = parseFloat(document.getElementById('dacScoreInput').value);
+  const note = document.getElementById('dacNoteInput').value.trim();
+  if (isNaN(score) || score < 1 || score > 5) { if (typeof showToast === 'function') showToast('Score invalide (1 à 5).', 'error'); return; }
+  try {
+    const { error } = await sb.from('superviseurs').update({ score_admin: score, note_admin: note || null }).eq('id', supId);
+    if (error) throw error;
+    await _logAdminAction('notation_superviseur', '', '', 'superviseur_id: ' + supId + ' | score: ' + score);
+    if (typeof showToast === 'function') showToast('✅ Score enregistré', 'success');
+    dacCloseModal();
+    await dacInit();
+    dacLoadSuperviseurs();
+  } catch (e) {
+    const msg = (e.message || '').toLowerCase().includes('column') ? 'Migration 20260724_admin_construction_v2.sql pas encore appliquée.' : e.message;
+    if (typeof showToast === 'function') showToast('Erreur : ' + msg, 'error');
+  }
+}
+window.dacConfirmerNoterSuperviseur = dacConfirmerNoterSuperviseur;
+
+// -- SORTIE / RAPPORT "À LA PLACE DU SUPERVISEUR" --
+// registre_transactions a une contrainte CHECK stricte
+// (chk_registre_acteur_coherent) : une ligne 'sortie_demandee' exige
+// superviseur_id NOT NULL — l'admin doit donc choisir pour quel
+// superviseur il agit, jamais le laisser vide.
+function dacModalSortieAdmin(supId) {
+  const chantiers = supId ? _dacChantiersCache.filter(c => c.superviseur_id === supId) : _dacChantiersCache.filter(c => c.statut === 'en_cours');
+  const supOptions = _dacSuperviseursCache.map(s => `<option value="${s.id}" ${s.id === supId ? 'selected' : ''}>${(s.prenom ? s.prenom + ' ' : '') + s.nom}</option>`).join('');
+  dacOpenModal(`
+    <div class="dac-modal-title"><i class="fa-solid fa-arrow-up" style="color:#E05A1B"></i> Faire une sortie (admin)</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div><label class="dac-label">Au nom du superviseur</label><select id="dacModalSuperviseurId">${supOptions}</select></div>
+      <div><label class="dac-label">Chantier</label><select id="dacModalChantierId" onchange="dacModalChargerComptesSortie()"><option value="">Sélectionner...</option>${chantiers.map(c => `<option value="${c.id}">${c.nom}</option>`).join('')}</select></div>
+      <div><label class="dac-label">Fournisseur</label><select id="dacModalCompteId"><option value="">— Choisir un chantier d'abord —</option></select></div>
+      <div id="dacModalSoldeInfo" style="font-size:12px;color:#6b7280"></div>
+      <div><label class="dac-label">Matériau</label><input type="text" id="dacModalMateriau" placeholder="Ex: Ciment CPA 42.5"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><label class="dac-label">Quantité</label><input type="number" id="dacModalQte"></div>
+        <div><label class="dac-label">Unité</label><select id="dacModalUnite"><option value="sacs">Sacs</option><option value="tonnes">Tonnes</option><option value="barres">Barres</option><option value="m³">M³</option><option value="unités">Unités</option></select></div>
+      </div>
+      <div><label class="dac-label">Montant estimé (GNF)</label><input type="number" id="dacModalMontant"></div>
+      <div><label class="dac-label">Motif</label><input type="text" id="dacModalMotif" placeholder="Motif de la sortie..."></div>
+      <div class="dac-errbox" id="dacModalErreur"></div>
+    </div>
+    <div class="dac-modal-actions">
+      <button class="dac-btn-primary" style="flex:1;justify-content:center;padding:10px" onclick="dacSoumettreSortieAdmin()"><i class="fa-solid fa-paper-plane"></i> Envoyer au fournisseur</button>
+      <button class="dac-btn-ghost" onclick="dacCloseModal()">Annuler</button>
+    </div>
+  `);
+}
+window.dacModalSortieAdmin = dacModalSortieAdmin;
+
+function dacModalChargerComptesSortie() {
+  const chantierId = document.getElementById('dacModalChantierId').value;
+  const chantier = _dacChantiersCache.find(c => c.id === chantierId);
+  const sel = document.getElementById('dacModalCompteId');
+  document.getElementById('dacModalSoldeInfo').textContent = '';
+  if (!chantier) { sel.innerHTML = '<option value="">— Choisir un chantier d\'abord —</option>'; return; }
+  const comptes = chantier.comptes_materiaux || [];
+  sel.innerHTML = comptes.length
+    ? '<option value="">— Sélectionner —</option>' + comptes.map(cm => `<option value="${cm.id}">${cm.fournisseurs_materiaux?.nom_entreprise || '—'}</option>`).join('')
+    : '<option value="">Aucun fournisseur sur ce chantier</option>';
+  sel.onchange = () => {
+    const compte = comptes.find(cm => cm.id === sel.value);
+    const info = document.getElementById('dacModalSoldeInfo');
+    if (!compte) { info.textContent = ''; return; }
+    const dispo = Number(compte.solde_gnf || 0) - Number(compte.solde_reserve || 0);
+    info.textContent = 'Solde disponible : ' + dacFormatGNF(dispo);
+  };
+}
+window.dacModalChargerComptesSortie = dacModalChargerComptesSortie;
+
+async function dacSoumettreSortieAdmin() {
+  const superviseurId = document.getElementById('dacModalSuperviseurId').value;
+  const chantierId = document.getElementById('dacModalChantierId').value;
+  const compteId = document.getElementById('dacModalCompteId').value;
+  const materiau = document.getElementById('dacModalMateriau').value.trim();
+  const qte = document.getElementById('dacModalQte').value;
+  const unite = document.getElementById('dacModalUnite').value;
+  const montant = document.getElementById('dacModalMontant').value;
+  const motif = document.getElementById('dacModalMotif').value.trim();
+  const err = document.getElementById('dacModalErreur');
+  err.style.display = 'none';
+  if (!superviseurId || !chantierId || !compteId || !materiau || !qte || !montant) {
+    err.textContent = 'Tous les champs sauf le motif sont obligatoires.'; err.style.display = 'block'; return;
+  }
+  try {
+    const { error } = await sb.from('registre_transactions').insert({
+      chantier_id: chantierId, compte_id: compteId,
+      type_operation: 'sortie_demandee',
+      montant_gnf: parseInt(montant, 10), materiau,
+      quantite: parseFloat(qte), unite,
+      description: (motif ? motif + ' ' : '') + '(Sortie déclarée par l\'administration YOUMMA)',
+      superviseur_id: superviseurId
+    });
+    if (error) throw error;
+    await _logAdminAction('sortie_admin', '', '', 'chantier_id: ' + chantierId + ' | materiau: ' + materiau + ' | qte: ' + qte + ' ' + unite);
+    if (typeof showToast === 'function') showToast('✅ Demande de sortie envoyée au fournisseur', 'success');
+    dacCloseModal();
+  } catch (e) {
+    const msg = (e.message || '').toLowerCase().includes('solde disponible insuffisant') ? 'Solde disponible insuffisant sur ce compte.' : e.message;
+    err.textContent = 'Erreur : ' + msg; err.style.display = 'block';
+  }
+}
+window.dacSoumettreSortieAdmin = dacSoumettreSortieAdmin;
+
+function dacModalRapportAdmin(supId) {
+  const chantiers = supId ? _dacChantiersCache.filter(c => c.superviseur_id === supId) : _dacChantiersCache.filter(c => c.statut === 'en_cours');
+  const supOptions = _dacSuperviseursCache.map(s => `<option value="${s.id}" ${s.id === supId ? 'selected' : ''}>${(s.prenom ? s.prenom + ' ' : '') + s.nom}</option>`).join('');
+  dacOpenModal(`
+    <div class="dac-modal-title"><i class="fa-solid fa-file-lines" style="color:#E05A1B"></i> Soumettre un rapport (admin)</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div><label class="dac-label">Au nom du superviseur</label><select id="dacRapportSuperviseurId">${supOptions}</select></div>
+      <div><label class="dac-label">Chantier</label><select id="dacRapportChantierId"><option value="">Sélectionner...</option>${chantiers.map(c => `<option value="${c.id}">${c.nom}</option>`).join('')}</select></div>
+      <div><label class="dac-label">Résumé des travaux</label><textarea id="dacRapportResume" rows="4" placeholder="Travaux du jour..."></textarea></div>
+      <div class="dac-errbox" id="dacRapportErreur"></div>
+    </div>
+    <div class="dac-modal-actions">
+      <button class="dac-btn-primary" style="flex:1;justify-content:center;padding:10px" onclick="dacSoumettreRapportAdmin()"><i class="fa-solid fa-paper-plane"></i> Soumettre</button>
+      <button class="dac-btn-ghost" onclick="dacCloseModal()">Annuler</button>
+    </div>
+  `);
+}
+window.dacModalRapportAdmin = dacModalRapportAdmin;
+
+async function dacSoumettreRapportAdmin() {
+  const superviseurId = document.getElementById('dacRapportSuperviseurId').value;
+  const chantierId = document.getElementById('dacRapportChantierId').value;
+  const resume = document.getElementById('dacRapportResume').value.trim();
+  const err = document.getElementById('dacRapportErreur');
+  err.style.display = 'none';
+  if (!chantierId || !resume) { err.textContent = 'Chantier et résumé sont obligatoires.'; err.style.display = 'block'; return; }
+  try {
+    const { error } = await sb.from('rapports_journaliers').insert({
+      chantier_id: chantierId,
+      superviseur_id: superviseurId || null,
+      date_rapport: new Date().toISOString().slice(0, 10),
+      commentaire: resume + ' (Rapport soumis par l\'administration YOUMMA)'
+    });
+    if (error) throw error;
+    await _logAdminAction('rapport_admin', '', '', 'chantier_id: ' + chantierId);
+    if (typeof showToast === 'function') showToast('✅ Rapport soumis', 'success');
+    dacCloseModal();
+  } catch (e) {
+    err.textContent = 'Erreur : ' + e.message; err.style.display = 'block';
+  }
+}
+window.dacSoumettreRapportAdmin = dacSoumettreRapportAdmin;
+
+// -- FORCER VALIDATION VERSEMENT --
+// Réutilise directement _espaceFournisseurTraiterVersement (déjà en
+// prod côté fournisseur V2) : append-only + trigger fn_gerer_solde_registre.
+// JAMAIS d'UPDATE manuel de comptes_materiaux.solde_gnf ici.
+async function dacForcerValidationVersement() {
+  try {
+    const { data, error } = await sb.from('registre_transactions').select('id,montant_gnf,chantier_id,created_at,chantiers(nom)').eq('type_operation', 'versement_declare').order('created_at', { ascending: true }).limit(20);
+    if (error) throw error;
+    if (!data?.length) { if (typeof showToast === 'function') showToast('Aucun versement en attente.', 'error'); return; }
+    const { data: traites } = await sb.from('registre_transactions').select('reference_transaction_id').in('type_operation', ['versement_valide','versement_rejete']).in('reference_transaction_id', data.map(d => d.id));
+    const traiteesSet = new Set((traites || []).map(t => t.reference_transaction_id));
+    const enAttente = data.filter(d => !traiteesSet.has(d.id));
+    if (!enAttente.length) { if (typeof showToast === 'function') showToast('Aucun versement en attente.', 'error'); return; }
+    dacOpenModal(`
+      <div class="dac-modal-title"><i class="fa-solid fa-check" style="color:#E05A1B"></i> Versements en attente</div>
+      <div>${enAttente.map(v => `<div class="dac-reg-row">
+        <div class="dac-reg-icon pay"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div class="dac-reg-body"><div class="dac-reg-title">${v.chantiers?.nom || '—'}</div><div class="dac-reg-sub">${dacFormatGNF(v.montant_gnf)}</div></div>
+        <button class="dac-btn-success" onclick="dacForcerVersement('${v.id}')"><i class="fa-solid fa-check"></i> Valider</button>
+      </div>`).join('')}</div>
+      <div class="dac-modal-actions"><button class="dac-btn-ghost" style="flex:1;justify-content:center;padding:10px" onclick="dacCloseModal()">Fermer</button></div>
+    `);
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+window.dacForcerValidationVersement = dacForcerValidationVersement;
+
+// ⚠️ Ne réutilise PAS _espaceFournisseurTraiterVersement() telle quelle :
+// cette fonction lit _espaceSession.id comme fournisseur_id, une variable
+// qui n'existe QUE dans le contexte #espace d'un fournisseur connecté —
+// toujours null côté admin (découvert en test live : l'appel échouait
+// silencieusement, avalé par le try/catch de la fonction réutilisée,
+// aucune erreur visible). Le fournisseur_id correct pour la ligne
+// 'versement_valide' est celui du compte matériaux visé (comptes_materiaux.
+// fournisseur_id), pas celui de la session courante — même modèle
+// append-only + trigger fn_gerer_solde_registre, juste sans la dépendance
+// à une session fournisseur.
+async function dacForcerVersement(versementId) {
+  try {
+    const { data: origine, error: errOrig } = await sb.from('registre_transactions').select('*').eq('id', versementId).single();
+    if (errOrig) throw errOrig;
+    if (origine.type_operation !== 'versement_declare') { if (typeof showToast === 'function') showToast("Ce versement n'est plus en attente.", 'error'); return; }
+    const { data: compte, error: errCompte } = await sb.from('comptes_materiaux').select('fournisseur_id').eq('id', origine.compte_id).single();
+    if (errCompte) throw errCompte;
+    const { error } = await sb.from('registre_transactions').insert({
+      chantier_id: origine.chantier_id,
+      compte_id: origine.compte_id,
+      type_operation: 'versement_valide',
+      montant_gnf: origine.montant_gnf,
+      reference_transaction_id: origine.id,
+      fournisseur_id: compte.fournisseur_id,
+      description: 'Validé manuellement par admin YOUMMA'
+    });
+    if (error) throw error;
+    await _logAdminAction('forcage_versement_admin', '', '', 'transaction_id: ' + versementId);
+    if (typeof showToast === 'function') showToast('✅ Versement validé — solde mis à jour', 'success');
+    dacCloseModal();
+    await dacInit();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('Erreur : ' + e.message, 'error');
+  }
+}
+window.dacForcerVersement = dacForcerVersement;
+
+// -- FOURNISSEURS / CLIENTS (lecture seule) --
+async function dacLoadFournisseurs() {
+  const el = document.getElementById('dacFournisseursListe');
+  try {
+    const { data, error } = await sb.from('fournisseurs_materiaux').select('id,nom_entreprise,telephone,ville,commune,statut').order('nom_entreprise');
+    if (error) throw error;
+    el.innerHTML = data?.length ? data.map(f => `<div class="dac-reg-row">
+      <div class="dac-reg-icon rep"><i class="fa-solid fa-truck-fast"></i></div>
+      <div class="dac-reg-body"><div class="dac-reg-title">${f.nom_entreprise || '—'}</div><div class="dac-reg-sub">${f.telephone || ''} · ${f.commune || f.ville || 'Conakry'}</div></div>
+      <span class="dac-stat-chip ${f.statut === 'actif' ? 'actif' : 'bloque'}">${f.statut === 'actif' ? 'Actif' : f.statut}</span>
+    </div>`).join('') : '<p class="dac-empty">Aucun fournisseur.</p>';
+  } catch (e) { el.innerHTML = '<p class="dac-empty">Erreur : ' + e.message + '</p>'; }
+}
+window.dacLoadFournisseurs = dacLoadFournisseurs;
+
+async function dacLoadClients() {
+  const el = document.getElementById('dacClientsListe');
+  try {
+    const { data, error } = await sb.from('clients').select('id,nom,prenom,telephone,ville,commune,chantiers(id)').order('created_at', { ascending: false });
+    if (error) throw error;
+    el.innerHTML = data?.length ? data.map(c => {
+      const nb = (c.chantiers || []).length;
+      return `<div class="dac-reg-row">
+        <div class="dac-reg-icon pay"><i class="fa-solid fa-user"></i></div>
+        <div class="dac-reg-body"><div class="dac-reg-title">${(c.prenom ? c.prenom + ' ' : '') + c.nom}</div><div class="dac-reg-sub">${c.telephone || ''} · ${c.commune || c.ville || 'Conakry'}</div></div>
+        <span class="dac-stat-chip ${nb ? 'actif' : 'pause'}">${nb ? nb + ' chantier' + (nb > 1 ? 's' : '') : 'Sans chantier'}</span>
+      </div>`;
+    }).join('') : '<p class="dac-empty">Aucun client.</p>';
+  } catch (e) { el.innerHTML = '<p class="dac-empty">Erreur : ' + e.message + '</p>'; }
+}
+window.dacLoadClients = dacLoadClients;
+
+// -- VISITES TERRAIN --
+async function dacLoadVisites() {
+  const el = document.getElementById('dacVisitesListe');
+  try {
+    const { data, error } = await sb.from('visites_terrain').select('*, chantiers(nom)').order('date_visite', { ascending: true });
+    if (error) throw error;
+    el.innerHTML = data?.length ? data.map(v => {
+      const date = v.date_visite ? new Date(v.date_visite).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
+      return `<div class="dac-reg-row">
+        <div class="dac-reg-icon ${v.type_visite === 'surprise' ? 'alert' : 'rep'}"><i class="fa-solid ${v.type_visite === 'surprise' ? 'fa-eye-slash' : 'fa-map-pin'}"></i></div>
+        <div class="dac-reg-body"><div class="dac-reg-title">${v.chantiers?.nom || '—'}</div><div class="dac-reg-sub">${date} · ${v.agent_nom || '—'} · ${v.type_visite === 'surprise' ? 'Surprise' : 'Annoncée'}</div></div>
+        <span class="dac-stat-chip ${v.statut === 'planifiee' ? 'pause' : v.statut === 'annulee' ? 'bloque' : 'actif'}">${v.statut === 'planifiee' ? 'Planifiée' : v.statut === 'annulee' ? 'Annulée' : 'Effectuée'}</span>
+      </div>`;
+    }).join('') : '<p class="dac-empty">Aucune visite planifiée.</p>';
+  } catch (e) {
+    const msg = (e.message || '').toLowerCase().includes('does not exist') ? 'Migration 20260724_admin_construction_v2.sql pas encore appliquée.' : e.message;
+    el.innerHTML = '<p class="dac-empty">' + msg + '</p>';
+  }
+}
+window.dacLoadVisites = dacLoadVisites;
+
+function dacModalPlanifierVisite() {
+  const options = _dacChantiersCache.filter(c => c.statut === 'en_cours').map(c => `<option value="${c.id}">${c.nom}</option>`).join('');
+  dacOpenModal(`
+    <div class="dac-modal-title"><i class="fa-solid fa-map-pin" style="color:#E05A1B"></i> Planifier une visite terrain</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div><label class="dac-label">Chantier</label><select id="dacVisiteChantierId"><option value="">Sélectionner...</option>${options}</select></div>
+      <div><label class="dac-label">Agent</label><input type="text" id="dacVisiteAgent" placeholder="Nom de l'agent"></div>
+      <div><label class="dac-label">Date et heure</label><input type="datetime-local" id="dacVisiteDate"></div>
+      <div><label class="dac-label">Type</label><select id="dacVisiteType"><option value="annoncee">Annoncée</option><option value="surprise">Surprise (non annoncée)</option></select></div>
+      <div class="dac-errbox" id="dacVisiteErreur"></div>
+    </div>
+    <div class="dac-modal-actions">
+      <button class="dac-btn-primary" style="flex:1;justify-content:center;padding:10px" onclick="dacSauvegarderVisite()"><i class="fa-solid fa-check"></i> Planifier</button>
+      <button class="dac-btn-ghost" onclick="dacCloseModal()">Annuler</button>
+    </div>
+  `);
+}
+window.dacModalPlanifierVisite = dacModalPlanifierVisite;
+
+async function dacSauvegarderVisite() {
+  const chantierId = document.getElementById('dacVisiteChantierId').value;
+  const agent = document.getElementById('dacVisiteAgent').value.trim();
+  const date = document.getElementById('dacVisiteDate').value;
+  const type = document.getElementById('dacVisiteType').value;
+  const err = document.getElementById('dacVisiteErreur');
+  err.style.display = 'none';
+  if (!chantierId || !agent || !date) { err.textContent = 'Chantier, agent et date sont obligatoires.'; err.style.display = 'block'; return; }
+  try {
+    const { error } = await sb.from('visites_terrain').insert({ chantier_id: chantierId, agent_nom: agent, date_visite: new Date(date).toISOString(), type_visite: type, statut: 'planifiee' });
+    if (error) throw error;
+    await _logAdminAction('planification_visite_terrain', '', '', 'chantier_id: ' + chantierId);
+    if (typeof showToast === 'function') showToast('✅ Visite planifiée', 'success');
+    dacCloseModal();
+    dacLoadVisites();
+  } catch (e) {
+    const msg = (e.message || '').toLowerCase().includes('does not exist') ? 'Migration 20260724_admin_construction_v2.sql pas encore appliquée.' : e.message;
+    err.textContent = 'Erreur : ' + msg; err.style.display = 'block';
+  }
+}
+window.dacSauvegarderVisite = dacSauvegarderVisite;
 
 async function _adminAction(type, id) {
   if (type !== 'supprimer') {
