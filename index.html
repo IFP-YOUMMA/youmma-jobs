@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://slawwbhlakilnviwzyrb.supabase.co" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -115,11 +115,10 @@ var allProviders = {};
 #mainContent{display:block}
 :root{--orange:#E85D04;--orange-light:#FDE8D8;--orange-dark:#C74B00;--orange-50:#FFF7F0;--bleu:#1A1A4E;--bleu-mid:#2D2D6B;--bleu-light:#E0E0F8;--bleu-50:#F0F0FF;--or:#F5C842;--or-light:#FEF9C3;--or-dark:#D4A017;--blanc:#FFFFFF;--fond:#F7F8FC;--fond2:#FAFBFF;--texte:#0F1020;--gris:#6B7280;--gris-light:#9CA3AF;--bordure:#E5E7EB;--vert:#16A34A;--rouge:#DC2626;--violet:#7C3AED;--artisan:#8B4513;--artisan-light:#FFF3E8;--radius-sm:8px;--radius-md:14px;--radius-lg:20px;--radius-xl:28px;--shadow-sm:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);--shadow-lg:0 10px 40px rgba(0,0,0,.1),0 4px 12px rgba(0,0,0,.05);--shadow-xl:0 20px 60px rgba(0,0,0,.12),0 8px 20px rgba(0,0,0,.06);--transition:.2s cubic-bezier(.4,0,.2,1)}
 /* YOUMMA DESIGN SYSTEM — Dashboards v2 (client/fournisseur/superviseur).
-   --yd-font réutilise DM Sans : c'est la police déjà chargée par le site
-   (voir le <link> Google Fonts dans le <head>, family=DM+Sans) — pas Inter,
-   qui n'est chargée nulle part ici. */
+   --yd-font utilise Inter (chargée via le <link> Google Fonts dans le
+   <head>, family=Inter:wght@400;500;600;700;800). */
 :root{
-  --yd-font:'DM Sans',system-ui,sans-serif;
+  --yd-font:'Inter',system-ui,sans-serif;
   --yd-orange:#E05A1B;
   --yd-orange-light:#fff5f0;
   --yd-orange-gradient:linear-gradient(135deg,#E05A1B 0%,#f97316 100%);
@@ -3030,12 +3029,12 @@ if (typeof connexionPrestataire === 'undefined') {
           </div>
           <div class="dfo-metric">
             <div class="dfo-metric-lbl">Total reçu ce chantier</div>
-            <div class="dfo-metric-val ok" id="dfoMetricTotal">—</div>
+            <div class="dfo-metric-val" id="dfoMetricTotal">—</div>
             <div class="dfo-metric-sub">GNF confirmés</div>
           </div>
           <div class="dfo-metric">
             <div class="dfo-metric-lbl">Commission YOUMMA due</div>
-            <div class="dfo-metric-val accent" id="dfoMetricCommission">—</div>
+            <div class="dfo-metric-val" id="dfoMetricCommission">—</div>
             <div class="dfo-metric-sub">GNF</div>
           </div>
         </div>
@@ -3301,7 +3300,7 @@ if (typeof connexionPrestataire === 'undefined') {
         <div class="dsu-metrics">
           <div class="dsu-metric">
             <div class="dsu-metric-lbl">Chantiers assignés</div>
-            <div class="dsu-metric-val accent" id="dsuMetricChantiers">—</div>
+            <div class="dsu-metric-val" id="dsuMetricChantiers">—</div>
             <div class="dsu-metric-sub">En cours</div>
           </div>
           <div class="dsu-metric">
@@ -3316,7 +3315,7 @@ if (typeof connexionPrestataire === 'undefined') {
           </div>
           <div class="dsu-metric">
             <div class="dsu-metric-lbl">Rapport du jour</div>
-            <div class="dsu-metric-val warn" id="dsuMetricRapport">—</div>
+            <div class="dsu-metric-val" id="dsuMetricRapport">—</div>
             <div class="dsu-metric-sub">Chantiers clôturés</div>
           </div>
         </div>
@@ -3391,7 +3390,7 @@ if (typeof connexionPrestataire === 'undefined') {
             <div class="dsu-card">
               <div class="dsu-card-title">
                 <div class="dsu-card-title-left"><i class="fa-solid fa-file-lines"></i> Rapport journalier</div>
-                <span class="dsu-badge warn" id="dsuBadgeRapport">—</span>
+                <span class="dsu-badge neutral" id="dsuBadgeRapport">—</span>
               </div>
               <div id="dsuRapportOverview"><p class="dsu-empty">Chargement...</p></div>
             </div>
@@ -3931,6 +3930,9 @@ body.espace-v2-active{overflow-x:visible!important}
   transition: all .15s;
   display: flex;
   align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
 }
 .dcl-notif-btn:hover, .dfo-notif-btn:hover, .dsu-notif-btn:hover {
   background: var(--yd-surface);
@@ -3949,8 +3951,11 @@ body.espace-v2-active{overflow-x:visible!important}
 .yd-btn-topbar {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   padding: 6px 10px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: var(--yd-radius-sm);
   font-size: 12px;
   font-weight: 500;
@@ -4041,6 +4046,10 @@ body.espace-v2-active{overflow-x:visible!important}
   cursor: pointer;
   font-family: var(--yd-font);
   white-space: nowrap;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── MAIN CONTENT ── */
@@ -4700,9 +4709,10 @@ body.espace-v2-active{overflow-x:visible!important}
 .dfo-sortie-actions { display: flex; gap: 8px; }
 
 /* ── COUNT BADGE (0 en attente → neutre gris, jamais vert ni rouge) ── */
-.dfo-count-badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; }
-.dfo-count-badge.warn { background: var(--yd-danger-bg); color: var(--yd-danger); }
-.dfo-count-badge.neutral { background: var(--yd-neutral-bg); color: var(--yd-neutral); }
+.dfo-count-badge, .dsu-badge, .dcl-badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; }
+.dfo-count-badge.warn, .dsu-badge.warn, .dcl-badge.warn { background: var(--yd-danger-bg); color: var(--yd-danger); }
+.dfo-count-badge.neutral, .dsu-badge.neutral, .dcl-badge.neutral { background: var(--yd-neutral-bg); color: var(--yd-neutral); }
+.dfo-count-badge.ok, .dsu-badge.ok, .dcl-badge.ok { background: var(--yd-success-bg); color: var(--yd-success); }
 
 /* ── OUVRIER ROW ── */
 .dsu-ouvrier-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--yd-border); }
@@ -4947,7 +4957,7 @@ async function dclInit() {
 
     document.getElementById('dclTotalVerse').textContent = dclFormatGNF(totalVerse);
     document.getElementById('dclSolde').textContent = dclFormatGNF(solde);
-    document.getElementById('dclSolde').className = 'dcl-metric-val' + (solde < 5000000 ? ' warn' : ' ok');
+    document.getElementById('dclSolde').className = 'dcl-metric-val' + (solde === 0 ? '' : solde < 5000000 ? ' warn' : ' ok');
 
     if (solde < 5000000) document.getElementById('dclAlertSolde').style.display = 'flex';
 
@@ -5002,8 +5012,8 @@ function dclRenderDemo() {
   document.getElementById('dclStatusBadge').textContent = 'En cours';
   document.getElementById('dclTotalVerse').textContent = '185 000 000 GNF';
   document.getElementById('dclSolde').textContent = '12 500 000 GNF';
-  document.getElementById('dclCommission').textContent = '27 750 000 GNF';
-  document.getElementById('dclCommissionSub').textContent = 'GNF (15% cumulé)';
+  document.getElementById('dclCommission').textContent = '9 250 000 GNF';
+  document.getElementById('dclCommissionSub').textContent = 'GNF (5% cumulé)';
   document.getElementById('dclAvancement').textContent = '42%';
   document.getElementById('dclPhaseActuelle').textContent = 'Élévation murs R+1';
   document.getElementById('dclProgPct').textContent = '42%';
@@ -5058,11 +5068,11 @@ function dclRenderDemo() {
       <span class="dcl-vers-status pend">En attente</span>
     </div>`;
 
-  document.getElementById('dclCommNiveau').textContent = 'Commission YOUMMA — niveau Confort (15%)';
+  document.getElementById('dclCommNiveau').textContent = 'Commission YOUMMA — niveau Confort (5%)';
   document.getElementById('dclCommTotal').textContent = '185 000 000 GNF';
-  document.getElementById('dclCommDue').textContent = '27 750 000 GNF';
-  document.getElementById('dclCommPayee').textContent = '15 000 000 GNF';
-  document.getElementById('dclCommReste').textContent = '12 750 000 GNF';
+  document.getElementById('dclCommDue').textContent = '9 250 000 GNF';
+  document.getElementById('dclCommPayee').textContent = '5 000 000 GNF';
+  document.getElementById('dclCommReste').textContent = '4 250 000 GNF';
   document.getElementById('dclAlertSolde').style.display = 'flex';
   document.getElementById('dclRapportAttenteCard').style.display = 'none';
 }
@@ -5488,19 +5498,16 @@ async function dfoInit() {
     // Total reçu + commission pour le chantier "principal" affiché en fiche
     const totalRecu = allTrans.filter(t => t.type_operation === 'versement_valide' && t.chantier_id === window._dfoChantierId).reduce((s,t) => s + Number(t.montant_gnf||0), 0);
     document.getElementById('dfoMetricTotal').textContent = dfoFormatGNF(totalRecu);
+    document.getElementById('dfoMetricTotal').className = 'dfo-metric-val' + (totalRecu > 0 ? ' ok' : '');
 
     const chantierPrincipal = compteActif.chantiers || {};
-    const commTaux = chantierPrincipal.commission_taux || 0;
+    const commTaux = (chantierPrincipal.commission_taux != null && !isNaN(Number(chantierPrincipal.commission_taux)))
+      ? Number(chantierPrincipal.commission_taux) : YOUMMA_COMMISSION_TAUX_DEFAUT;
     const commDue = Math.round(totalRecu * commTaux / 100);
     const commPayee = chantierPrincipal.commission_payee === true;
     document.getElementById('dfoMetricCommission').textContent = dfoFormatGNF(commDue);
-    // ⚠️ Libellé volontairement figé à "(5%)" sur demande explicite (choix
-    // "changer uniquement le texte affiché, pas le calcul") — commDue
-    // ci-dessus reste calculé avec le VRAI taux (commission_taux, 15% par
-    // défaut, partagé avec client/superviseur/admin via _commissionCalculer).
-    // Le texte et le montant affichés sont donc volontairement incohérents ;
-    // voir le résumé de la conversation pour le contexte de cette décision.
-    document.getElementById('dfoCommTitre').textContent = 'Commission YOUMMA (5%)';
+    document.getElementById('dfoMetricCommission').className = 'dfo-metric-val' + (commDue > 0 ? ' accent' : '');
+    document.getElementById('dfoCommTitre').textContent = `Commission YOUMMA (${commTaux}%)`;
     document.getElementById('dfoCommTotal').textContent = dfoFormatGNF(totalRecu);
     document.getElementById('dfoCommDue').textContent = dfoFormatGNF(commDue);
     document.getElementById('dfoCommPayee').textContent = commPayee ? dfoFormatGNF(commDue) : dfoFormatGNF(0);
@@ -5889,13 +5896,17 @@ window.dsuInit = dsuInit;
 async function dsuChargerMetriquesJour() {
   const chantiers = (typeof _espaceSupChantiersCache !== 'undefined') ? _espaceSupChantiersCache : [];
   document.getElementById('dsuMetricChantiers').textContent = chantiers.length;
+  document.getElementById('dsuMetricChantiers').className = 'dsu-metric-val' + (chantiers.length > 0 ? ' accent' : '');
   const soldeTotal = chantiers.reduce((s, c) => s + (c.comptes_materiaux || []).reduce((s2, cm) => s2 + Number(cm.solde_gnf || 0), 0), 0);
   document.getElementById('dsuMetricSolde').textContent = dsuFormatGNF(soldeTotal);
-  document.getElementById('dsuMetricSolde').className = 'dsu-metric-val' + (soldeTotal < 5000000 ? ' warn' : '');
+  document.getElementById('dsuMetricSolde').className = 'dsu-metric-val' + (soldeTotal > 0 && soldeTotal < 5000000 ? ' warn' : '');
 
   if (!chantiers.length) {
     document.getElementById('dsuMetricSorties').textContent = '0';
     document.getElementById('dsuMetricRapport').textContent = '—';
+    document.getElementById('dsuMetricRapport').className = 'dsu-metric-val';
+    document.getElementById('dsuBadgeRapport').textContent = '—';
+    document.getElementById('dsuBadgeRapport').className = 'dsu-badge neutral';
     document.getElementById('dsuSortiesRecentes').innerHTML = '<p class="dsu-empty">Aucun chantier assigné.</p>';
     document.getElementById('dsuRapportOverview').innerHTML = '<p class="dsu-empty">Aucun chantier assigné.</p>';
     return;
@@ -6684,11 +6695,11 @@ let _espaceFourTransactionsCache = [];
 // GNF : même formatage que partout ailleurs dans le site (toLocaleString('fr-FR') + ' GNF').
 function _espaceFormatGNF(n) { return Number(n || 0).toLocaleString('fr-FR') + ' GNF'; }
 
-// ── Commission YOUMMA (15% par défaut) ──────────────────────────────────
+// ── Commission YOUMMA (5% par défaut) ──────────────────────────────────
 // Colonnes chantiers.commission_taux/commission_payee/commission_payee_le
 // — migration 20260717_commission_youmma.sql, pas exécutée par défaut :
 // si absentes (colonne inconnue → l'appelant reçoit chantier=null/objet
-// sans ces clés), les valeurs par défaut (taux 15%, non payée) sont
+// sans ces clés), les valeurs par défaut (taux 5%, non payée) sont
 // utilisées, jamais de crash. Le calcul se fait toujours ici, côté JS, en
 // sommant des registre_transactions déjà récupérées — jamais en base.
 // Fonction PARTAGÉE : réutilisée telle quelle par le panel admin (onglet
@@ -6696,7 +6707,7 @@ function _espaceFormatGNF(n) { return Number(n || 0).toLocaleString('fr-FR') + '
 // (#espace) s'exécute en premier dans l'ordre du document, donc la
 // fonction existe déjà (portée globale) quand le panel admin la référence.
 const YOUMMA_COMMISSION_SEUIL_GNF = 50000000;
-const YOUMMA_COMMISSION_TAUX_DEFAUT = 15;
+const YOUMMA_COMMISSION_TAUX_DEFAUT = 5;
 
 function _commissionCalculer(totalVerse, chantier) {
   const taux = (chantier && chantier.commission_taux != null && !isNaN(Number(chantier.commission_taux)))
