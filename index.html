@@ -2990,7 +2990,7 @@ if (typeof connexionPrestataire === 'undefined') {
           <div class="dfo-notif-dot" id="dfoNotifDot" style="display:none"></div>
         </div>
         <span class="dfo-user-info" id="dfoUserInfo">—</span>
-        <button onclick="dfoDeconnexion()" class="yd-btn-topbar"><i class="fa-solid fa-right-from-bracket"></i> <span class="yd-btn-label">Déconnexion</span></button>
+        <button onclick="dfoDeconnexion()" class="yd-btn-topbar logout"><i class="fa-solid fa-right-from-bracket"></i> <span class="yd-btn-label">Déconnexion</span></button>
         <button onclick="navigate('home')" class="yd-btn-topbar home"><i class="fa-solid fa-house"></i> <span class="yd-btn-label">Accueil</span></button>
         <div class="dfo-avatar" id="dfoAvatar">—</div>
       </div>
@@ -3278,7 +3278,7 @@ if (typeof connexionPrestataire === 'undefined') {
           <div class="dsu-notif-dot" id="dsuNotifDot"></div>
         </div>
         <span class="dsu-user-info" id="dsuUserInfo">—</span>
-        <button onclick="dsuDeconnexion()" class="yd-btn-topbar"><i class="fa-solid fa-right-from-bracket"></i> <span class="yd-btn-label">Déconnexion</span></button>
+        <button onclick="dsuDeconnexion()" class="yd-btn-topbar logout"><i class="fa-solid fa-right-from-bracket"></i> <span class="yd-btn-label">Déconnexion</span></button>
         <button onclick="navigate('home')" class="yd-btn-topbar home"><i class="fa-solid fa-house"></i> <span class="yd-btn-label">Accueil</span></button>
         <div class="dsu-avatar" id="dsuAvatar">—</div>
       </div>
@@ -3557,7 +3557,7 @@ if (typeof connexionPrestataire === 'undefined') {
           <div class="dcl-notif-dot" id="dclNotifDot" style="display:none"></div>
         </div>
         <span class="dcl-user-info" id="dclUserInfo">—</span>
-        <button onclick="dclDeconnexion()" class="yd-btn-topbar"><i class="fa-solid fa-right-from-bracket"></i> <span class="yd-btn-label">Déconnexion</span></button>
+        <button onclick="dclDeconnexion()" class="yd-btn-topbar logout"><i class="fa-solid fa-right-from-bracket"></i> <span class="yd-btn-label">Déconnexion</span></button>
         <button onclick="navigate('home')" class="yd-btn-topbar home"><i class="fa-solid fa-house"></i> <span class="yd-btn-label">Accueil</span></button>
         <div class="dcl-avatar" id="dclAvatar">—</div>
       </div>
@@ -3790,7 +3790,18 @@ if (typeof connexionPrestataire === 'undefined') {
    neutralisant overflow-x de body tant qu'un dashboard v2 est actif (classe
    posée/retirée par _espaceAfficherTableauBord()). Sans risque : aucun des
    3 dashboards ne produit de débordement horizontal (vérifié à 375/768/1200px). */
-body.espace-v2-active{overflow-x:visible!important}
+body.espace-v2-active {
+  overflow: unset !important;
+}
+body.espace-v2-active #espaceWrapper {
+  overflow: unset !important;
+  background: var(--yd-surface) !important;
+  display: block !important;
+  min-height: unset !important;
+  padding: 0 !important;
+  align-items: unset !important;
+  justify-content: unset !important;
+}
 #espaceWrapper.dcl-active,
 #espaceWrapper.dfo-active,
 #espaceWrapper.dsu-active{padding:0!important;background:#f9fafb!important;display:block!important;height:auto!important;min-height:100vh!important;overflow:visible!important;}
@@ -3809,18 +3820,20 @@ body.espace-v2-active{overflow-x:visible!important}
 
 /* ── TOPBAR ── */
 .dcl-topbar, .dfo-topbar, .dsu-topbar {
-  background: var(--yd-white);
-  border-bottom: 1px solid var(--yd-border);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
   padding: 0 16px;
-  height: var(--yd-topbar-h);
+  height: 58px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  box-shadow: var(--yd-shadow-sm);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
   gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .dcl-logo, .dfo-logo, .dsu-logo {
@@ -3949,46 +3962,73 @@ body.espace-v2-active{overflow-x:visible!important}
 
 /* Boutons topbar */
 .yd-btn-topbar {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 6px 10px;
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: var(--yd-radius-sm);
-  font-size: 12px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: 10px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all .15s;
   text-decoration: none;
-  border: 1px solid var(--yd-border-strong);
-  background: transparent;
-  color: var(--yd-text-secondary);
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
   font-family: var(--yd-font);
   white-space: nowrap;
-  min-height: 44px;
+  transition: all .15s;
 }
-.yd-btn-topbar:hover { border-color: var(--yd-danger); color: var(--yd-danger); }
-.yd-btn-topbar.home { display: none; }
-@media(min-width:480px){ .yd-btn-topbar.home { display: flex; } }
-/* Sur mobile — juste l'icône pour déconnexion */
-.yd-btn-topbar .yd-btn-label { display: none; }
-@media(min-width:480px){ .yd-btn-topbar .yd-btn-label { display: inline; } }
+.yd-btn-topbar:hover {
+  border-color: #E05A1B;
+  color: #E05A1B;
+  background: #fff5f0;
+}
+.yd-btn-topbar i,
+.yd-btn-topbar .fa-solid {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+/* Label toujours visible mais plus petit sur mobile */
+.yd-btn-topbar .yd-btn-label {
+  display: none;
+}
+@media(min-width: 540px) {
+  .yd-btn-topbar .yd-btn-label {
+    display: inline;
+  }
+  .yd-btn-topbar {
+    padding: 0 14px;
+  }
+}
+/* Bouton déconnexion — rouge au hover */
+.yd-btn-topbar.logout:hover {
+  border-color: #ef4444;
+  color: #dc2626;
+  background: #fef2f2;
+}
+/* Bouton Accueil — orange au hover */
+.yd-btn-topbar.home {
+  display: inline-flex;
+}
 
 /* ── NAV ONGLETS ── */
 .dcl-nav, .dfo-nav, .dsu-nav {
-  background: var(--yd-white);
-  border-bottom: 1px solid var(--yd-border);
-  padding: 0 16px;
+  position: sticky;
+  top: 58px;
+  z-index: 999;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 0 4px;
   display: flex;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  position: sticky;
-  top: var(--yd-topbar-h);
-  z-index: 199;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  width: 100%;
+  box-sizing: border-box;
 }
 .dcl-nav::-webkit-scrollbar,
 .dfo-nav::-webkit-scrollbar,
@@ -4912,6 +4952,128 @@ function dclFormatGNF(n) {
   return (typeof _espaceFormatGNF === 'function') ? _espaceFormatGNF(n) : (Math.round(n||0).toLocaleString('fr-FR') + ' GNF');
 }
 
+// ============================================
+// MESSAGE DE BIENVENUE YOUMMA — Dashboards v2
+// ============================================
+function ydAfficherBienvenue(nom, role) {
+  // Ne pas afficher 2 fois dans la même session
+  const key = 'yd_bienvenue_' + role;
+  if (sessionStorage.getItem(key)) return;
+  sessionStorage.setItem(key, '1');
+
+  const heure = new Date().getHours();
+  let salutation = heure < 12 ? 'Bonjour' : heure < 18 ? 'Bon après-midi' : 'Bonsoir';
+
+  const messages = {
+    client: [
+      `Votre chantier avance — on s'en occupe.`,
+      `Chaque franc est tracé. Chaque jour documenté.`,
+      `Vous bâtissez depuis loin. Nous veillons sur place.`
+    ],
+    fournisseur: [
+      `Vos matériaux font la différence sur le terrain.`,
+      `Merci d'être un partenaire de confiance YOUMMA.`,
+      `La qualité que vous fournissez, c'est la maison de quelqu'un.`
+    ],
+    superviseur: [
+      `Le chantier vous attend. Bonne journée de travail.`,
+      `Chaque rapport que vous soumettez rassure une famille.`,
+      `Vous êtes les yeux de YOUMMA sur le terrain.`
+    ]
+  };
+
+  const msgList = messages[role] || messages.client;
+  const msg = msgList[Math.floor(Math.random() * msgList.length)];
+  const prenom = nom ? nom.split(' ')[0] : '';
+
+  const toast = document.createElement('div');
+  toast.id = 'ydBienvenueToast';
+  toast.innerHTML = `
+    <div style="
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      z-index: 9999;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+      border-left: 4px solid #E05A1B;
+      max-width: 340px;
+      width: calc(100vw - 32px);
+      opacity: 0;
+      transition: all .4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    " id="ydBienvenueInner">
+      <div style="
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #E05A1B, #f97316);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 18px;
+      ">🏗️</div>
+      <div style="flex:1;min-width:0">
+        <div style="
+          font-family: var(--yd-font, sans-serif);
+          font-size: 14px;
+          font-weight: 700;
+          color: #0f172a;
+          margin-bottom: 3px;
+        ">${salutation}${prenom ? ', ' + prenom : ''} 👋</div>
+        <div style="
+          font-family: var(--yd-font, sans-serif);
+          font-size: 13px;
+          color: #64748b;
+          line-height: 1.4;
+        ">${msg}</div>
+      </div>
+      <button onclick="document.getElementById('ydBienvenueToast').remove()" style="
+        background: none;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 0;
+        flex-shrink: 0;
+        line-height: 1;
+      ">×</button>
+    </div>
+  `;
+  document.body.appendChild(toast);
+
+  // Animation entrée
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const inner = document.getElementById('ydBienvenueInner');
+      if (inner) {
+        inner.style.opacity = '1';
+        inner.style.transform = 'translateY(0)';
+      }
+    });
+  });
+
+  // Disparition automatique après 5 secondes
+  setTimeout(() => {
+    const inner = document.getElementById('ydBienvenueInner');
+    if (inner) {
+      inner.style.opacity = '0';
+      inner.style.transform = 'translateY(-10px)';
+      setTimeout(() => {
+        const toast = document.getElementById('ydBienvenueToast');
+        if (toast) toast.remove();
+      }, 400);
+    }
+  }, 5000);
+}
+window.ydAfficherBienvenue = ydAfficherBienvenue;
+
 // -- CHARGEMENT PRINCIPAL --
 async function dclInit() {
   if (typeof _espaceSession === 'undefined' || !_espaceSession || _espaceSession.role !== 'client') return;
@@ -4937,6 +5099,7 @@ async function dclInit() {
     const nom = _espaceSession.nom || 'Client';
     document.getElementById('dclUserInfo').textContent = nom;
     document.getElementById('dclAvatar').textContent = nom.substring(0,2).toUpperCase();
+    if (typeof ydAfficherBienvenue === 'function') ydAfficherBienvenue(nom, 'client');
     const sc = (typeof _rcStatutChantierConfig === 'function') ? _rcStatutChantierConfig(chantier.statut) : { label: chantier.statut || '—' };
     document.getElementById('dclStatusBadge').textContent = sc.label;
 
@@ -5443,6 +5606,7 @@ async function dfoInit() {
   const nom = _espaceSession.nom || 'Fournisseur';
   document.getElementById('dfoUserInfo').textContent = nom;
   document.getElementById('dfoAvatar').textContent = nom.substring(0,2).toUpperCase();
+  if (typeof ydAfficherBienvenue === 'function') ydAfficherBienvenue(nom, 'fournisseur');
 
   try {
     const { data: comptes, error } = await sb.from('comptes_materiaux')
@@ -5880,6 +6044,7 @@ async function dsuInit() {
   const nom = _espaceSession.nom || 'Superviseur';
   document.getElementById('dsuUserInfo').textContent = nom;
   document.getElementById('dsuAvatar').textContent = (typeof _espaceInitiales === 'function') ? _espaceInitiales(nom) : nom.slice(0,2).toUpperCase();
+  if (typeof ydAfficherBienvenue === 'function') ydAfficherBienvenue(nom, 'superviseur');
 
   // Réutilise le chargement réel existant : remplit à la fois l'ancien
   // dashboard (masqué) et les caches globales (_espaceSupChantiersCache
