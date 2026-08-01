@@ -3793,14 +3793,39 @@ if (typeof connexionPrestataire === 'undefined') {
 body.espace-v2-active {
   overflow: unset !important;
 }
+/* #page-espace matche le sélecteur global `[id^="page-"]{overflow-x:hidden
+   !important}` : avec overflow-y resté à sa valeur initiale (visible), la
+   spec CSS (Overflow Module) force le COMPUTED overflow-y à "auto" dès que
+   overflow-x n'est pas "visible" — même si le contenu ne déborde jamais
+   réellement de la boîte. #page-espace devient alors, du point de vue du
+   moteur de rendu, un vrai "scroll container" (classification indépendante
+   du fait qu'il scroll ou non visuellement), ce qui devient la référence de
+   `position:sticky` pour tous ses descendants (topbar/nav) au lieu du
+   scroll du document — la topbar ne "colle" alors plus jamais au vrai
+   scroll de la page. Seul un overflow-x ET overflow-y tous deux "visible"
+   évite ce recalcul forcé ; d'où le shorthand ci-dessous plutôt qu'un
+   overflow-y seul. */
+body.espace-v2-active #page-espace {
+  overflow: visible !important;
+}
 body.espace-v2-active #espaceWrapper {
-  overflow: unset !important;
+  overflow: visible !important;
+  -webkit-overflow-scrolling: auto !important;
   background: var(--yd-surface) !important;
   display: block !important;
+  height: auto !important;
+  max-height: none !important;
   min-height: unset !important;
   padding: 0 !important;
   align-items: unset !important;
   justify-content: unset !important;
+}
+body.espace-v2-active #dashboardClientV2,
+body.espace-v2-active #dashboardFournisseurV2,
+body.espace-v2-active #dashboardSuperviseurV2 {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
 }
 #espaceWrapper.dcl-active,
 #espaceWrapper.dfo-active,
