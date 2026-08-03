@@ -12678,6 +12678,9 @@ async function chargerAvis() {
         <div class="dac-tab" data-tab="clients" onclick="dacShowTab('clients')">Clients</div>
         <div class="dac-tab" data-tab="visites" onclick="dacShowTab('visites')">Visites terrain</div>
         <div class="dac-tab" data-tab="finances" onclick="dacShowTab('finances')">Finances</div>
+        <button onclick="dacOuvrirCreerChantier()" style="margin-left:auto;background:#D85A30;color:#fff;border:none;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">
+          + Créer un chantier
+        </button>
       </div>
 
       <div class="dac-main">
@@ -21094,6 +21097,8 @@ function dacChantierCardHtml(c) {
         <i class="fa-solid fa-${c.statut === 'suspendu' ? 'play' : 'pause'}"></i>
         ${c.statut === 'suspendu' ? 'Reprendre' : 'Pause'}
       </button>
+      <button class="dac-btn-ghost" onclick="dacOuvrirRegistre('${c.id}')"><i class="fa-solid fa-clipboard-list"></i> Registre</button>
+      <button class="dac-btn-ghost" onclick="dacOuvrirRapports('${c.id}')"><i class="fa-solid fa-chart-simple"></i> Rapports</button>
     </div>
   </div>`;
 }
@@ -28843,6 +28848,362 @@ function _cropEtUpload(input, aspectType, realCallback) {
   });
 }
 window._cropEtUpload = _cropEtUpload;
+</script>
+
+<!-- ══ ADMIN — CONSTRUIRE V2 : créer chantier / registre / rapports par projet ══ -->
+<div id="modalDacCreerChantier" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;overflow-y:auto;">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:460px;margin:20px auto;box-sizing:border-box;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h3 style="margin:0;font-size:18px;color:#1A1A4E;">Nouveau chantier</h3>
+      <button onclick="dacFermerCreerChantier()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;">&times;</button>
+    </div>
+
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;color:#374151;">Nom du chantier *</label>
+    <input id="dacCreerNom" type="text" placeholder="Ex: Villa R+1 — Kipé" style="width:100%;padding:9px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;box-sizing:border-box;margin-bottom:14px;">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div>
+        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;color:#374151;">Niveau</label>
+        <select id="dacCreerNiveau" style="width:100%;padding:9px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;">
+          <option value="essentiel">Essentiel (&lt;200M GNF)</option>
+          <option value="confort">Confort (200-400M GNF)</option>
+          <option value="prestige">Prestige (&gt;400M GNF)</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;color:#374151;">Montant estimé (GNF)</label>
+        <input id="dacCreerMontant" type="number" placeholder="150000000" style="width:100%;padding:9px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;box-sizing:border-box;">
+      </div>
+    </div>
+
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;color:#374151;">Client *</label>
+    <select id="dacCreerClient" style="width:100%;padding:9px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;margin-bottom:14px;">
+      <option value="">Chargement...</option>
+    </select>
+
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;color:#374151;">Superviseur</label>
+    <select id="dacCreerSuperviseur" style="width:100%;padding:9px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;margin-bottom:14px;">
+      <option value="">— Aucun pour l'instant —</option>
+    </select>
+
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;color:#374151;">Fournisseur matériaux</label>
+    <select id="dacCreerFournisseur" style="width:100%;padding:9px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;margin-bottom:14px;">
+      <option value="">— Aucun pour l'instant —</option>
+    </select>
+
+    <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px;color:#374151;">Description / adresse du chantier</label>
+    <textarea id="dacCreerDescription" placeholder="Ex: Construction villa R+1 — Kipé, Ratoma" style="width:100%;padding:9px 10px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;height:64px;box-sizing:border-box;resize:none;margin-bottom:16px;"></textarea>
+
+    <div id="dacCreerErreur" style="color:#DC2626;font-size:13px;margin-bottom:10px;display:none;"></div>
+
+    <div style="display:flex;gap:10px;">
+      <button onclick="dacFermerCreerChantier()" style="flex:1;padding:11px;border:1px solid #E5E7EB;border-radius:10px;background:#F9FAFB;font-size:14px;cursor:pointer;color:#374151;">Annuler</button>
+      <button id="dacCreerChantierBtn" onclick="dacCreerChantier()" style="flex:2;padding:11px;background:#D85A30;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">Créer le chantier</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalDacRegistre" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-start;justify-content:center;overflow-y:auto;">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:700px;margin:20px auto;box-sizing:border-box;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div>
+        <h3 style="margin:0;font-size:17px;color:#1A1A4E;" id="dacRegistreTitre">Registre</h3>
+        <p style="margin:4px 0 0;font-size:12px;color:#9CA3AF;" id="dacRegistreSous"></p>
+      </div>
+      <button onclick="dacFermerRegistre()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;">&times;</button>
+    </div>
+    <div id="dacRegistreContenu">Chargement...</div>
+  </div>
+</div>
+
+<div id="modalDacRapports" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-start;justify-content:center;overflow-y:auto;">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:640px;margin:20px auto;box-sizing:border-box;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div>
+        <h3 style="margin:0;font-size:17px;color:#1A1A4E;" id="dacRapportsTitre">Rapports journaliers</h3>
+        <p style="margin:4px 0 0;font-size:12px;color:#9CA3AF;" id="dacRapportsSous"></p>
+      </div>
+      <button onclick="dacFermerRapports()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;">&times;</button>
+    </div>
+    <div id="dacRapportsContenu">Chargement...</div>
+  </div>
+</div>
+
+<!-- ══ ADMIN — CONSTRUIRE V2 : créer chantier / registre / rapports (JS) ══
+     chantiers.fournisseur_id N'EXISTE PLUS (supprimée par
+     20260716_registre_chantier_multi_fournisseur.sql) : lien fournisseur via
+     comptes_materiaux(chantier_id,fournisseur_id) uniquement, plusieurs
+     fournisseurs possibles par chantier. Pas de colonne "niveau" ni
+     "montant_estime" (→ budget_estime, jamais utilisée ailleurs jusqu'ici).
+     registre_transactions.photo_sortie_url (pas "photo_url", migration
+     20260723). rapports_journaliers.commentaire (pas "texte"), confirmé par
+     _espaceSupCloturerJournee() déjà existante. -->
+<script>
+function _dacAfficherErreurChantier(msg) {
+  const el = document.getElementById('dacCreerErreur');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+
+async function dacOuvrirCreerChantier() {
+  document.getElementById('dacCreerNom').value = '';
+  document.getElementById('dacCreerNiveau').value = 'essentiel';
+  document.getElementById('dacCreerMontant').value = '';
+  document.getElementById('dacCreerDescription').value = '';
+  const errEl = document.getElementById('dacCreerErreur');
+  if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+
+  const selClient = document.getElementById('dacCreerClient');
+  const selSuperviseur = document.getElementById('dacCreerSuperviseur');
+  const selFournisseur = document.getElementById('dacCreerFournisseur');
+  selClient.innerHTML = '<option value="">Chargement...</option>';
+  selSuperviseur.innerHTML = '<option value="">— Aucun pour l\'instant —</option>';
+  selFournisseur.innerHTML = '<option value="">— Aucun pour l\'instant —</option>';
+
+  document.getElementById('modalDacCreerChantier').style.display = 'flex';
+
+  try {
+    const [cliRes, supRes, fourRes] = await Promise.all([
+      sb.from('clients').select('id,nom,prenom,telephone').eq('statut', 'actif').order('nom').limit(300),
+      sb.from('superviseurs').select('id,nom,prenom').eq('statut', 'actif').order('nom').limit(300),
+      sb.from('fournisseurs_materiaux').select('id,nom_entreprise').eq('statut', 'actif').order('nom_entreprise').limit(300)
+    ]);
+    if (cliRes.error) throw cliRes.error;
+    selClient.innerHTML = '<option value="">— Sélectionner —</option>' +
+      (cliRes.data || []).map(c => `<option value="${c.id}">${(c.prenom ? c.prenom + ' ' : '') + c.nom} — ${c.telephone || ''}</option>`).join('');
+
+    if (!supRes.error) {
+      selSuperviseur.innerHTML = '<option value="">— Aucun pour l\'instant —</option>' +
+        (supRes.data || []).map(s => `<option value="${s.id}">${(s.prenom ? s.prenom + ' ' : '') + s.nom}</option>`).join('');
+    } else { console.warn('[dac] superviseurs indisponible:', supRes.error.message); }
+
+    if (!fourRes.error) {
+      selFournisseur.innerHTML = '<option value="">— Aucun pour l\'instant —</option>' +
+        (fourRes.data || []).map(f => `<option value="${f.id}">${f.nom_entreprise}</option>`).join('');
+    } else { console.warn('[dac] fournisseurs_materiaux indisponible:', fourRes.error.message); }
+  } catch (e) {
+    _dacAfficherErreurChantier('Erreur de chargement : ' + e.message);
+  }
+}
+window.dacOuvrirCreerChantier = dacOuvrirCreerChantier;
+
+function dacFermerCreerChantier() {
+  document.getElementById('modalDacCreerChantier').style.display = 'none';
+}
+window.dacFermerCreerChantier = dacFermerCreerChantier;
+
+async function dacCreerChantier() {
+  const nomChantier = (document.getElementById('dacCreerNom').value || '').trim();
+  const niveau = document.getElementById('dacCreerNiveau').value;
+  const montant = document.getElementById('dacCreerMontant').value;
+  const clientId = document.getElementById('dacCreerClient').value;
+  const superviseurId = document.getElementById('dacCreerSuperviseur').value || null;
+  const fournisseurId = document.getElementById('dacCreerFournisseur').value || null;
+  const descriptionSaisie = (document.getElementById('dacCreerDescription').value || '').trim();
+  const errEl = document.getElementById('dacCreerErreur');
+  if (errEl) errEl.style.display = 'none';
+
+  if (!nomChantier) { _dacAfficherErreurChantier('Le nom du chantier est obligatoire.'); return; }
+  if (!clientId) { _dacAfficherErreurChantier('Le client est obligatoire.'); return; }
+  if (montant && Number(montant) <= 0) { _dacAfficherErreurChantier('Le montant estimé doit être positif.'); return; }
+
+  const btn = document.getElementById('dacCreerChantierBtn');
+  const btnLabel = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Création...'; }
+
+  try {
+    // "niveau" n'a aucune colonne dédiée sur chantiers (aucune trace dans
+    // supabase/migrations/*, ni "niveau" ni "montant_estime" — seule
+    // budget_estime existe) : préfixé dans description plutôt qu'inventé.
+    const niveauLabel = { essentiel: 'Essentiel', confort: 'Confort', prestige: 'Prestige' }[niveau] || niveau;
+    const descriptionFinale = 'Niveau : ' + niveauLabel + (descriptionSaisie ? '\n' + descriptionSaisie : '');
+
+    const { data: chantier, error: errChantier } = await sb.from('chantiers').insert({
+      nom: nomChantier,
+      client_id: clientId,
+      superviseur_id: superviseurId,
+      description: descriptionFinale,
+      budget_estime: montant ? Number(montant) : null
+    }).select('id').single();
+    if (errChantier) throw errChantier;
+
+    // chantiers.fournisseur_id n'existe plus : lien via comptes_materiaux,
+    // même mécanisme que _rcSauvegarderChantier() déjà existante.
+    if (fournisseurId) {
+      const { error: errCompte } = await sb.from('comptes_materiaux').insert({ chantier_id: chantier.id, fournisseur_id: fournisseurId });
+      if (errCompte && typeof showToast === 'function') {
+        showToast('⚠️ Chantier créé, mais le compte matériaux du fournisseur a échoué : ' + errCompte.message, 'error');
+      }
+    }
+
+    await _logAdminAction('creation_chantier', nomChantier, '', 'client_id: ' + clientId);
+    if (typeof showToast === 'function') showToast('✅ Chantier créé', 'success');
+    dacFermerCreerChantier();
+    await dacInit();
+    if (typeof dacLoadChantiers === 'function') dacLoadChantiers();
+  } catch (e) {
+    _dacAfficherErreurChantier(e.message || 'Erreur lors de la création');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = btnLabel || 'Créer le chantier'; }
+  }
+}
+window.dacCreerChantier = dacCreerChantier;
+
+// ── Registre (sorties matériaux) par chantier ──
+async function dacOuvrirRegistre(chantierId) {
+  document.getElementById('modalDacRegistre').style.display = 'flex';
+  const chantier = _dacChantiersCache.find(c => String(c.id) === String(chantierId));
+  document.getElementById('dacRegistreTitre').textContent = '📋 Registre — ' + (chantier ? chantier.nom : 'Chantier');
+  document.getElementById('dacRegistreSous').textContent = 'Sorties matériaux enregistrées';
+  const contenu = document.getElementById('dacRegistreContenu');
+  contenu.innerHTML = 'Chargement...';
+
+  try {
+    const { data, error } = await sb.from('registre_transactions')
+      .select('id,created_at,type_operation,montant_gnf,materiau,quantite,unite')
+      .eq('chantier_id', chantierId)
+      .in('type_operation', ['sortie_demandee', 'sortie_confirmee', 'sortie_rejetee'])
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    const sorties = data || [];
+
+    // photo_sortie_url vient de 20260723_registre_transactions_photo_sortie.sql
+    // (brouillon, pas encore appliquée par défaut) : requête isolée, jamais
+    // bloquante pour le reste du registre si la colonne n'existe pas encore.
+    if (sorties.length) {
+      try {
+        const ids = sorties.map(s => s.id);
+        const { data: photosData, error: errPhotos } = await sb.from('registre_transactions').select('id,photo_sortie_url').in('id', ids);
+        if (errPhotos) throw errPhotos;
+        const photoParId = {};
+        (photosData || []).forEach(p => { photoParId[p.id] = p.photo_sortie_url; });
+        sorties.forEach(s => { s.photo_sortie_url = photoParId[s.id] || null; });
+      } catch (e) {
+        console.warn('[dac] photo_sortie_url indisponible (migration 20260723_registre_transactions_photo_sortie.sql pas encore appliquée ?):', e.message);
+      }
+    }
+
+    if (!sorties.length) {
+      contenu.innerHTML = '<p style="text-align:center;color:#9CA3AF;padding:24px;">Aucune sortie enregistrée pour ce chantier.</p>';
+      return;
+    }
+
+    const statutCfg = {
+      sortie_demandee: { label: 'En attente', bg: '#FFFBEB', color: '#D97706' },
+      sortie_confirmee: { label: 'Confirmée', bg: '#ECFDF5', color: '#059669' },
+      sortie_rejetee: { label: 'Rejetée', bg: '#FEF2F2', color: '#DC2626' }
+    };
+    let totalConfirme = 0;
+    const lignes = sorties.map(s => {
+      const cfg = statutCfg[s.type_operation] || { label: s.type_operation, bg: '#F3F4F6', color: '#374151' };
+      if (s.type_operation === 'sortie_confirmee') totalConfirme += Number(s.montant_gnf || 0);
+      const prixUnitaire = s.quantite ? Math.round(Number(s.montant_gnf || 0) / Number(s.quantite)) : null;
+      const date = s.created_at ? new Date(s.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+      // photo_sortie_url : présente uniquement sur les lignes sortie_confirmee
+      // (voir 20260723_registre_transactions_photo_sortie.sql).
+      const photo = s.photo_sortie_url
+        ? `<a href="${s.photo_sortie_url}" target="_blank" style="color:#059669;font-weight:600;text-decoration:none;">✔ Photo</a>`
+        : (s.type_operation === 'sortie_confirmee' ? '<span style="color:#D97706;">⏳ Manquante</span>' : '<span style="color:#9CA3AF;">—</span>');
+      return `<tr style="border-top:1px solid #F3F4F6;">
+        <td style="padding:8px 10px;font-size:12.5px;white-space:nowrap;">${date}</td>
+        <td style="padding:8px 10px;font-size:12.5px;">${s.materiau || '—'}</td>
+        <td style="padding:8px 10px;font-size:12.5px;white-space:nowrap;">${s.quantite || '—'} ${s.unite || ''}</td>
+        <td style="padding:8px 10px;font-size:12.5px;">${prixUnitaire ? dacFormatGNF(prixUnitaire) : '—'}</td>
+        <td style="padding:8px 10px;font-size:12.5px;font-weight:600;">${dacFormatGNF(s.montant_gnf)}</td>
+        <td style="padding:8px 10px;font-size:12px;">${photo}</td>
+        <td style="padding:8px 10px;"><span style="background:${cfg.bg};color:${cfg.color};font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;">${cfg.label}</span></td>
+      </tr>`;
+    }).join('');
+
+    const totalVerseChantier = (window._dacTotalVerseParChantier || {})[chantierId] || 0;
+    const commission = (typeof _commissionCalculer === 'function') ? _commissionCalculer(totalVerseChantier, chantier) : { montant: 0, taux: 5, color: '#374151' };
+
+    contenu.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="background:#F9FAFB;font-size:11px;color:#9CA3AF;text-transform:uppercase;">
+            <th style="padding:8px 10px;text-align:left;">Date</th>
+            <th style="padding:8px 10px;text-align:left;">Matériau</th>
+            <th style="padding:8px 10px;text-align:left;">Quantité</th>
+            <th style="padding:8px 10px;text-align:left;">Prix unitaire</th>
+            <th style="padding:8px 10px;text-align:left;">Total</th>
+            <th style="padding:8px 10px;text-align:left;">Photo</th>
+            <th style="padding:8px 10px;text-align:left;">Statut</th>
+          </tr></thead>
+          <tbody>${lignes}</tbody>
+        </table>
+      </div>
+      <div style="margin-top:16px;padding-top:14px;border-top:2px solid #F3F4F6;display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;justify-content:space-between;font-size:13.5px;"><span>Total sorties confirmées</span><strong>${dacFormatGNF(totalConfirme)}</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:13.5px;color:${commission.color || '#374151'};"><span>Commission YOUMMA (${commission.taux}% du total versé)</span><strong>${dacFormatGNF(commission.montant)}</strong></div>
+      </div>
+    `;
+  } catch (e) {
+    contenu.innerHTML = '<p style="text-align:center;color:#DC2626;padding:24px;">Erreur : ' + e.message + '</p>';
+  }
+}
+window.dacOuvrirRegistre = dacOuvrirRegistre;
+
+function dacFermerRegistre() {
+  document.getElementById('modalDacRegistre').style.display = 'none';
+}
+window.dacFermerRegistre = dacFermerRegistre;
+
+// ── Rapports journaliers par chantier ──
+async function dacOuvrirRapports(chantierId) {
+  document.getElementById('modalDacRapports').style.display = 'flex';
+  const chantier = _dacChantiersCache.find(c => String(c.id) === String(chantierId));
+  document.getElementById('dacRapportsTitre').textContent = '📊 Rapports — ' + (chantier ? chantier.nom : 'Chantier');
+  document.getElementById('dacRapportsSous').textContent = 'Rapports journaliers du superviseur';
+  const contenu = document.getElementById('dacRapportsContenu');
+  contenu.innerHTML = 'Chargement...';
+
+  try {
+    const { data: rapports, error } = await sb.from('rapports_journaliers')
+      .select('id,date_rapport,commentaire,created_at,superviseurs(nom,prenom)')
+      .eq('chantier_id', chantierId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    if (!rapports || !rapports.length) {
+      contenu.innerHTML = '<p style="text-align:center;color:#9CA3AF;padding:24px;">Aucun rapport pour ce chantier.</p>';
+      return;
+    }
+
+    let photosParRapport = {};
+    try {
+      const rapportIds = rapports.map(r => r.id);
+      const { data: photos, error: errPhotos } = await sb.from('rapport_journalier_photos').select('rapport_id,photo_url').in('rapport_id', rapportIds);
+      if (errPhotos) throw errPhotos;
+      (photos || []).forEach(p => { (photosParRapport[p.rapport_id] = photosParRapport[p.rapport_id] || []).push(p.photo_url); });
+    } catch (e) {
+      console.warn('[dac] photos rapports indisponibles:', e.message);
+    }
+
+    contenu.innerHTML = rapports.map(r => {
+      const date = r.date_rapport ? new Date(r.date_rapport).toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }) : '—';
+      const superviseurNom = r.superviseurs ? ((r.superviseurs.prenom ? r.superviseurs.prenom + ' ' : '') + r.superviseurs.nom) : null;
+      const photos = photosParRapport[r.id] || [];
+      const photosHtml = photos.length
+        ? photos.map(url => `<img src="${url}" style="width:48px;height:48px;border-radius:6px;object-fit:cover;" loading="lazy"/>`).join('')
+        : '<div style="width:48px;height:48px;border-radius:6px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;color:#D1D5DB;font-size:18px;">—</div>';
+      return `<div style="background:#F9FAFB;border-radius:12px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:13.5px;font-weight:700;color:#1A1A4E;text-transform:capitalize;">${date}</div>
+        ${superviseurNom ? `<div style="font-size:11.5px;color:#9CA3AF;margin-bottom:8px;">Par ${superviseurNom}</div>` : '<div style="margin-bottom:8px;"></div>'}
+        <div style="font-size:13px;color:#374151;line-height:1.5;margin-bottom:10px;">${r.commentaire || '—'}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">${photosHtml}</div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    contenu.innerHTML = '<p style="text-align:center;color:#DC2626;padding:24px;">Erreur : ' + e.message + '</p>';
+  }
+}
+window.dacOuvrirRapports = dacOuvrirRapports;
+
+function dacFermerRapports() {
+  document.getElementById('modalDacRapports').style.display = 'none';
+}
+window.dacFermerRapports = dacFermerRapports;
 </script>
 
 <!-- ══ ADMIN — GESTION DES COMPTES (création directe + suivi centralisé) ══
