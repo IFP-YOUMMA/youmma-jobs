@@ -11730,6 +11730,7 @@ async function chargerAvis() {
     <div onclick="showAdmin('equipe');_adminLoadEquipe();" id="amenu-equipe" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-users-gear" style="width:16px;"></i> Équipe</div>
     <div onclick="showAdmin('registre_chantier');_adminLoadRegistreChantier();" id="amenu-registre_chantier" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-clipboard-list" style="width:16px;flex-shrink:0;"></i> Registre chantier<span id="rcMenuBadge" style="display:none;margin-left:auto;background:#E53E3E;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center;line-height:1.4;animation:yjBadgePulse 2s ease-in-out infinite;"></span></div>
     <div onclick="showAdmin('construction_v2');if(typeof dacInit==='function')dacInit();" id="amenu-construction_v2" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-helmet-safety" style="width:16px;flex-shrink:0;"></i> Construire V2</div>
+    <div onclick="showAdmin('comptes');if(typeof adminCompteInit==='function')adminCompteInit();" id="amenu-comptes" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;"><i class="fa-solid fa-users" style="width:16px;flex-shrink:0;"></i> Gestion comptes</div>
   </div>
   <div style="padding:8px;border-top:1px solid rgba(255,255,255,.08);margin-top:10px;">
     <div onclick="logoutAdmin()" style="padding:10px 12px;border-radius:8px;color:#FCA5A5;font-size:13px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.1);"><i class="fa-solid fa-right-from-bracket" style="width:16px;"></i> Déconnexion</div>
@@ -12849,6 +12850,114 @@ async function chargerAvis() {
 
     </div>
 
+    <!-- ============================================ -->
+    <!-- GESTION DES COMPTES (admin)                 -->
+    <!-- ============================================ -->
+    <style>
+      .admin-compte-tab { padding: 6px 14px; border: 1px solid #ddd; border-radius: 8px; background: #f5f5f5; color: #666; font-size: 13px; cursor: pointer; }
+      .admin-compte-tab.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+      .admin-type-btn { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 8px; background: #f5f5f5; color: #555; font-size: 13px; cursor: pointer; }
+      .admin-type-btn.active { background: #D85A30; color: #fff; border-color: #D85A30; }
+      .admin-compte-badge { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+      .admin-compte-action-btn { border: none; background: #f4f6fb; border-radius: 6px; padding: 5px 8px; cursor: pointer; font-size: 12px; }
+    </style>
+    <div class="admin-section" id="admin-comptes">
+      <div class="admin-section-inner">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px;">
+          <div>
+            <h2 style="margin:0;font-size:20px;">Gestion des comptes</h2>
+            <p style="margin:4px 0 0;color:#888;font-size:13px;">Tous les comptes de la plateforme</p>
+          </div>
+          <button onclick="adminCompteOuvrirCreation()" style="background:#2563eb;color:#fff;border:none;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:14px;">
+            + Créer un compte
+          </button>
+        </div>
+
+        <div id="adminCompteFiltres" style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <button class="admin-compte-tab active" data-type="tous" onclick="adminCompteFiltrer('tous')">Tous</button>
+          <button class="admin-compte-tab" data-type="client" onclick="adminCompteFiltrer('client')">Clients</button>
+          <button class="admin-compte-tab" data-type="fournisseur" onclick="adminCompteFiltrer('fournisseur')">Fournisseurs</button>
+          <button class="admin-compte-tab" data-type="superviseur" onclick="adminCompteFiltrer('superviseur')">Superviseurs</button>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+          <input id="adminCompteSearch" type="text" placeholder="Rechercher nom ou téléphone..." oninput="adminCompteRendre()" style="flex:1;min-width:180px;padding:8px 12px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box;">
+          <select id="adminCompteStatutFilter" onchange="adminCompteRendre()" style="padding:8px 12px;border:1px solid #ddd;border-radius:8px;">
+            <option value="">Tous statuts</option>
+            <option value="actif">Actif</option>
+            <option value="suspendu">Suspendu</option>
+            <option value="inactif">Inactif</option>
+            <option value="en_attente">En attente</option>
+          </select>
+        </div>
+
+        <div style="background:#fff;border-radius:12px;border:1px solid #eee;overflow:auto;">
+          <table id="adminCompteTable" style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f9f9f9;font-size:12px;color:#888;">
+                <th style="padding:10px 14px;text-align:left;font-weight:500;">Nom</th>
+                <th style="padding:10px 14px;text-align:left;font-weight:500;">Téléphone</th>
+                <th style="padding:10px 14px;text-align:left;font-weight:500;">Type</th>
+                <th style="padding:10px 14px;text-align:left;font-weight:500;">Statut</th>
+                <th style="padding:10px 14px;text-align:left;font-weight:500;">Créé par</th>
+                <th style="padding:10px 14px;text-align:left;font-weight:500;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminCompteTbody">
+              <tr><td colspan="6" style="text-align:center;padding:32px;color:#aaa;">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal création compte (admin) -->
+    <div id="modalAdminCreerCompte" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:420px;margin:16px;box-sizing:border-box;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h3 style="margin:0;font-size:18px;">Créer un compte</h3>
+          <button onclick="adminComptesFermerModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;">&times;</button>
+        </div>
+
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:8px;">Type de compte *</label>
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button type="button" class="admin-type-btn active" data-type="client" onclick="adminCompteSelectType('client',this)">Client</button>
+          <button type="button" class="admin-type-btn" data-type="fournisseur" onclick="adminCompteSelectType('fournisseur',this)">Fournisseur</button>
+          <button type="button" class="admin-type-btn" data-type="superviseur" onclick="adminCompteSelectType('superviseur',this)">Superviseur</button>
+        </div>
+        <input type="hidden" id="adminCreerType" value="client">
+
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Nom complet *</label>
+        <input id="adminCreerNom" type="text" placeholder="Ex: Mamadou Diallo" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;margin-bottom:14px;box-sizing:border-box;">
+
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Téléphone *</label>
+        <input id="adminCreerTel" type="text" placeholder="224XXXXXXXXX" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;margin-bottom:14px;box-sizing:border-box;">
+
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Mot de passe temporaire *</label>
+        <input id="adminCreerMdp" type="text" placeholder="Ex: YOUMMA2026" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;margin-bottom:4px;box-sizing:border-box;">
+        <p style="font-size:11px;color:#aaa;margin:0 0 14px;">La personne devra le changer à sa première connexion.</p>
+
+        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Ville</label>
+        <input id="adminCreerVille" type="text" placeholder="Conakry" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;margin-bottom:20px;box-sizing:border-box;">
+
+        <div id="adminCreerErreur" style="color:red;font-size:13px;margin-bottom:10px;display:none;"></div>
+
+        <button id="adminCreerBtn" onclick="adminCompteCreer()" style="width:100%;padding:12px;background:#D85A30;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;">
+          Créer le compte
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal fiche détail compte (admin) -->
+    <div id="modalAdminFicheCompte" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:460px;margin:16px;max-height:90vh;overflow-y:auto;box-sizing:border-box;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h3 style="margin:0;font-size:18px;">Fiche compte</h3>
+          <button onclick="adminCompteFermerFiche()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;">&times;</button>
+        </div>
+        <div id="adminFicheContenu">Chargement...</div>
+      </div>
+    </div>
 
     <div class="admin-section" id="admin-en_attente">
       <div class="admin-section-inner">
@@ -17331,12 +17440,13 @@ function showAdmin(name) {
     activite: '<i class="fa-solid fa-chart-bar" style="color:#E85D04;margin-right:6px;"></i>Activité équipe',
     registre_chantier: '<i class="fa-solid fa-clipboard-list" style="color:#E8650A;margin-right:6px;"></i>Registre chantier',
     construction_v2: '<i class="fa-solid fa-helmet-safety" style="color:#E8650A;margin-right:6px;"></i>Construire V2',
+    comptes: '<i class="fa-solid fa-users" style="color:#E8650A;margin-right:6px;"></i>Gestion des comptes',
   };
   const tt = document.getElementById('adminTopbarTitle');
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','app_message','missions','missions_declarees','projets_clients','ambassadeurs','rapports','activite','notifications','equipe','registre_chantier','construction_v2'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','app_message','missions','missions_declarees','projets_clients','ambassadeurs','rapports','activite','notifications','equipe','registre_chantier','construction_v2','comptes'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (!el) return;
     // Ne pas réafficher un élément restreint à l'agent
@@ -17354,6 +17464,7 @@ function showAdmin(name) {
   else if (name==='activite') { _adminLoadActivite(); }
   else if (name==='registre_chantier') { _adminLoadRegistreChantier(); }
   else if (name==='construction_v2') { if (typeof dacInit === 'function') dacInit(); }
+  else if (name==='comptes') { if (typeof adminCompteInit === 'function') adminCompteInit(); }
   else if (name!=='dashboard') { if(typeof _adminLoadAll==='function') _adminLoadAll(); }
 }
 
@@ -28732,6 +28843,377 @@ function _cropEtUpload(input, aspectType, realCallback) {
   });
 }
 window._cropEtUpload = _cropEtUpload;
+</script>
+
+<!-- ══ ADMIN — GESTION DES COMPTES (création directe + suivi centralisé) ══
+     Tables réelles (voir supabase/migrations/20260803_admin_gestion_comptes.sql) :
+     clients, fournisseurs_materiaux (PAS "fournisseurs" — colonne nom =
+     nom_entreprise), superviseurs. Vocabulaire statut : actif/suspendu/
+     en_attente pour clients et fournisseurs_materiaux, actif/INACTIF/
+     en_attente pour superviseurs (pas "suspendu"). -->
+<script>
+let _adminCompteTypeFiltre = 'tous';
+let _adminComptesCache = [];
+let _adminFicheEnCours = null;
+
+function _adminCompteTable(type) {
+  return type === 'fournisseur' ? 'fournisseurs_materiaux' : type === 'superviseur' ? 'superviseurs' : 'clients';
+}
+// Valeur "compte suspendu" par type : superviseurs n'a pas de valeur
+// 'suspendu' dans sa contrainte CHECK (actif/inactif/en_attente).
+function _adminCompteStatutInactif(type) {
+  return type === 'superviseur' ? 'inactif' : 'suspendu';
+}
+function _adminCompteNomAffiche(item) {
+  if (item.type === 'fournisseur') return item.nom_entreprise || '—';
+  return ((item.prenom ? item.prenom + ' ' : '') + (item.nom || '')).trim() || '—';
+}
+
+// Colonnes created_by_admin/mot_de_passe/doit_changer_mdp/derniere_connexion
+// viennent de 20260803_admin_gestion_comptes.sql (brouillon, pas encore
+// appliquée par défaut) : requête de base + colonnes optionnelles isolées
+// dans un try/catch séparé, même pattern que dacInit()/acces_* — sans ces
+// colonnes le tableau reste utilisable (juste "Créé par"/"MDP modifié"/
+// dernière connexion non disponibles), jamais un plantage total.
+async function adminCompteInit() {
+  const tbody = document.getElementById('adminCompteTbody');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:#aaa;">Chargement...</td></tr>';
+  try {
+    const [cliRes, fourRes, supRes] = await Promise.all([
+      sb.from('clients').select('id,nom,prenom,telephone,ville,statut,created_at'),
+      sb.from('fournisseurs_materiaux').select('id,nom_entreprise,telephone,ville,statut,created_at'),
+      sb.from('superviseurs').select('id,nom,prenom,telephone,statut,created_at')
+    ]);
+    if (cliRes.error) throw cliRes.error;
+    if (fourRes.error) throw fourRes.error;
+    if (supRes.error) throw supRes.error;
+
+    _adminComptesCache = [
+      ...(cliRes.data || []).map(c => Object.assign({}, c, { type: 'client' })),
+      ...(fourRes.data || []).map(f => Object.assign({}, f, { type: 'fournisseur' })),
+      ...(supRes.data || []).map(s => Object.assign({}, s, { type: 'superviseur' }))
+    ];
+
+    try {
+      const extraCols = 'id,created_by_admin,doit_changer_mdp,derniere_connexion';
+      const [cliExtra, fourExtra, supExtra] = await Promise.all([
+        sb.from('clients').select(extraCols),
+        sb.from('fournisseurs_materiaux').select(extraCols),
+        sb.from('superviseurs').select(extraCols)
+      ]);
+      if (cliExtra.error) throw cliExtra.error;
+      if (fourExtra.error) throw fourExtra.error;
+      if (supExtra.error) throw supExtra.error;
+      const parId = {};
+      [...(cliExtra.data || []), ...(fourExtra.data || []), ...(supExtra.data || [])].forEach(r => { parId[r.id] = r; });
+      _adminComptesCache = _adminComptesCache.map(item => Object.assign({}, item, parId[item.id] || {}));
+    } catch (e) {
+      console.warn('[adminComptes] colonnes de suivi indisponibles (migration 20260803_admin_gestion_comptes.sql pas encore appliquée ?):', e.message);
+    }
+
+    adminCompteRendre();
+  } catch (e) {
+    console.error('[adminComptes] chargement:', e);
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:#DC2626;">Erreur de chargement : ' + (e.message || e) + '</td></tr>';
+  }
+}
+window.adminCompteInit = adminCompteInit;
+
+function _adminCompteBadgeType(type) {
+  const cfg = { client: ['#DBEAFE', '#1D4ED8', 'Client'], fournisseur: ['#DCFCE7', '#15803D', 'Fournisseur'], superviseur: ['#EDE9FE', '#6D28D9', 'Superviseur'] }[type] || ['#F3F4F6', '#374151', type];
+  return '<span class="admin-compte-badge" style="background:' + cfg[0] + ';color:' + cfg[1] + ';">' + cfg[2] + '</span>';
+}
+function _adminCompteBadgeStatut(statut) {
+  const cfg = { actif: ['#DCFCE7', '#15803D'], suspendu: ['#FFEDD5', '#C2410C'], inactif: ['#FFEDD5', '#C2410C'], en_attente: ['#F3F4F6', '#6B7280'] }[statut] || ['#F3F4F6', '#6B7280'];
+  return '<span class="admin-compte-badge" style="background:' + cfg[0] + ';color:' + cfg[1] + ';">' + (statut || '—') + '</span>';
+}
+
+function adminCompteRendre() {
+  const tbody = document.getElementById('adminCompteTbody');
+  if (!tbody) return;
+  const search = (document.getElementById('adminCompteSearch').value || '').trim().toLowerCase();
+  const statutFiltre = document.getElementById('adminCompteStatutFilter').value;
+
+  let rows = _adminComptesCache.slice();
+  if (_adminCompteTypeFiltre !== 'tous') rows = rows.filter(r => r.type === _adminCompteTypeFiltre);
+  if (statutFiltre) rows = rows.filter(r => r.statut === statutFiltre);
+  if (search) {
+    rows = rows.filter(r => _adminCompteNomAffiche(r).toLowerCase().includes(search) || (r.telephone || '').includes(search));
+  }
+  rows.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+  // Compteurs par type sur l'ensemble du cache (pas le filtre courant)
+  const compte = { tous: _adminComptesCache.length, client: 0, fournisseur: 0, superviseur: 0 };
+  _adminComptesCache.forEach(r => { compte[r.type] = (compte[r.type] || 0) + 1; });
+  const labels = { tous: 'Tous', client: 'Clients', fournisseur: 'Fournisseurs', superviseur: 'Superviseurs' };
+  document.querySelectorAll('#adminCompteFiltres .admin-compte-tab').forEach(btn => {
+    const t = btn.dataset.type;
+    btn.textContent = labels[t] + ' (' + (compte[t] || 0) + ')';
+  });
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:#aaa;">Aucun compte trouvé</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map(r => {
+    const nom = _adminCompteNomAffiche(r);
+    const statutInactif = _adminCompteStatutInactif(r.type);
+    const estActif = r.statut === 'actif';
+    return '<tr style="border-top:1px solid #F3F4F6;">'
+      + '<td style="padding:9px 14px;font-size:13px;font-weight:600;color:#1A1A4E;">' + nom + '</td>'
+      + '<td style="padding:9px 14px;font-size:13px;color:#374151;">' + (r.telephone || '—') + '</td>'
+      + '<td style="padding:9px 14px;">' + _adminCompteBadgeType(r.type) + '</td>'
+      + '<td style="padding:9px 14px;">' + _adminCompteBadgeStatut(r.statut) + '</td>'
+      + '<td style="padding:9px 14px;font-size:12.5px;color:#6B7280;">' + (r.created_by_admin ? 'Admin' : 'Inscription') + '</td>'
+      + '<td style="padding:9px 14px;white-space:nowrap;">'
+        + '<button class="admin-compte-action-btn" title="Voir" onclick="adminCompteVoirFiche(\'' + r.type + '\',\'' + r.id + '\')">👁</button> '
+        + '<button class="admin-compte-action-btn" title="Modifier" onclick="adminCompteVoirFiche(\'' + r.type + '\',\'' + r.id + '\');adminCompteModifier(\'' + r.type + '\',\'' + r.id + '\')">✏️</button> '
+        + '<button class="admin-compte-action-btn" title="Alerter" onclick="adminCompteAlerter(\'' + r.type + '\',\'' + r.id + '\')">⚠️</button> '
+        + '<button class="admin-compte-action-btn" title="' + (estActif ? 'Suspendre' : 'Réactiver') + '" onclick="adminCompteSuspendre(\'' + r.type + '\',\'' + r.id + '\',\'' + r.statut + '\')">' + (estActif ? '🔒' : '🔓') + '</button> '
+        + '<button class="admin-compte-action-btn" title="Supprimer" onclick="adminCompteSupprimer(\'' + r.type + '\',\'' + r.id + '\',\'' + nom.replace(/'/g, "\\'") + '\')">🗑</button>'
+      + '</td>'
+    + '</tr>';
+  }).join('');
+}
+window.adminCompteRendre = adminCompteRendre;
+
+function adminCompteFiltrer(type) {
+  _adminCompteTypeFiltre = type;
+  document.querySelectorAll('#adminCompteFiltres .admin-compte-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.type === type);
+  });
+  adminCompteRendre();
+}
+window.adminCompteFiltrer = adminCompteFiltrer;
+
+// ── Création d'un compte ──
+function adminCompteOuvrirCreation() {
+  ['adminCreerNom', 'adminCreerTel', 'adminCreerMdp', 'adminCreerVille'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('adminCreerType').value = 'client';
+  document.querySelectorAll('#modalAdminCreerCompte .admin-type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'client'));
+  const err = document.getElementById('adminCreerErreur');
+  if (err) { err.style.display = 'none'; err.textContent = ''; }
+  document.getElementById('modalAdminCreerCompte').style.display = 'flex';
+}
+window.adminCompteOuvrirCreation = adminCompteOuvrirCreation;
+
+function adminCompteSelectType(type, btn) {
+  document.getElementById('adminCreerType').value = type;
+  document.querySelectorAll('#modalAdminCreerCompte .admin-type-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+window.adminCompteSelectType = adminCompteSelectType;
+
+async function adminCompteCreer() {
+  const type = document.getElementById('adminCreerType').value;
+  const nom = (document.getElementById('adminCreerNom').value || '').trim();
+  const tel = (document.getElementById('adminCreerTel').value || '').trim();
+  const mdp = (document.getElementById('adminCreerMdp').value || '').trim();
+  const ville = (document.getElementById('adminCreerVille').value || '').trim();
+  const errEl = document.getElementById('adminCreerErreur');
+  if (errEl) errEl.style.display = 'none';
+
+  if (!nom || !tel || !mdp) { _admAfficherErreurCompte('adminCreerErreur', 'Remplissez tous les champs obligatoires (*).'); return; }
+  if (!_rcTelephoneValide(tel)) { _admAfficherErreurCompte('adminCreerErreur', 'Téléphone au format 224XXXXXXXXX.'); return; }
+
+  const table = _adminCompteTable(type);
+  const btn = document.getElementById('adminCreerBtn');
+  const btnLabel = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Création...'; }
+
+  try {
+    const { count, error: errCount } = await sb.from(table).select('id', { count: 'exact', head: true }).eq('telephone', tel);
+    if (errCount) throw errCount;
+    if (count > 0) { _admAfficherErreurCompte('adminCreerErreur', 'Ce numéro est déjà enregistré.'); return; }
+
+    const mdpHash = await hashPassword(mdp);
+    const payload = { telephone: tel, statut: 'actif', mot_de_passe: mdpHash, created_by_admin: true, doit_changer_mdp: true };
+    if (type === 'fournisseur') { payload.nom_entreprise = nom; if (ville) payload.ville = ville; }
+    else { payload.nom = nom; if (ville && type === 'client') payload.ville = ville; }
+
+    const { error } = await sb.from(table).insert(payload);
+    if (error) { if (error.code === '23505') { _admAfficherErreurCompte('adminCreerErreur', 'Ce numéro est déjà enregistré.'); return; } throw error; }
+
+    await _logAdminAction('creation_compte_' + type, nom, '', 'tel: ' + tel);
+    if (typeof showToast === 'function') showToast('✅ Compte ' + type + ' créé — téléphone ' + tel + ', mot de passe temporaire transmis', 'success');
+    document.getElementById('modalAdminCreerCompte').style.display = 'none';
+    adminCompteInit();
+  } catch (e) {
+    _admAfficherErreurCompte('adminCreerErreur', e.message || 'Erreur lors de la création');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = btnLabel || 'Créer le compte'; }
+  }
+}
+window.adminCompteCreer = adminCompteCreer;
+
+function adminComptesFermerModal() {
+  document.getElementById('modalAdminCreerCompte').style.display = 'none';
+}
+window.adminComptesFermerModal = adminComptesFermerModal;
+
+// ── Fiche détail ──
+function adminCompteVoirFiche(type, id) {
+  const item = _adminComptesCache.find(r => r.type === type && String(r.id) === String(id));
+  if (!item) return;
+  _adminFicheEnCours = { type, data: item };
+  const nom = _adminCompteNomAffiche(item);
+  const initiales = nom.split(' ').filter(Boolean).map(w => w[0]).join('').substring(0, 2).toUpperCase() || '?';
+  const couleurType = { client: '#1D4ED8', fournisseur: '#15803D', superviseur: '#6D28D9' }[type] || '#374151';
+  const dateInscription = item.created_at ? new Date(item.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+  const derniereConnexion = item.derniere_connexion ? new Date(item.derniere_connexion).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+  const estActif = item.statut === 'actif';
+
+  document.getElementById('adminFicheContenu').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="width:48px;height:48px;border-radius:50%;background:${couleurType};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0;">${initiales}</div>
+      <div style="min-width:0;">
+        <div style="font-size:16px;font-weight:700;color:#1A1A4E;">${nom}</div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:3px;">${_adminCompteBadgeType(type)}${_adminCompteBadgeStatut(item.statut)}</div>
+      </div>
+    </div>
+    <div style="font-size:13px;color:#374151;margin-bottom:4px;"><strong>Téléphone :</strong> ${item.telephone || '—'}</div>
+    ${item.ville ? `<div style="font-size:13px;color:#374151;margin-bottom:12px;"><strong>Ville :</strong> ${item.ville}</div>` : '<div style="margin-bottom:12px;"></div>'}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#F9FAFB;border-radius:10px;padding:12px;margin-bottom:16px;">
+      <div><div style="font-size:10.5px;color:#9CA3AF;text-transform:uppercase;">Créé par</div><div style="font-size:13px;font-weight:600;">${item.created_by_admin ? 'Admin' : 'Inscription'}</div></div>
+      <div><div style="font-size:10.5px;color:#9CA3AF;text-transform:uppercase;">Date inscription</div><div style="font-size:13px;font-weight:600;">${dateInscription}</div></div>
+      <div><div style="font-size:10.5px;color:#9CA3AF;text-transform:uppercase;">Dernière connexion</div><div style="font-size:13px;font-weight:600;">${derniereConnexion}</div></div>
+      <div><div style="font-size:10.5px;color:#9CA3AF;text-transform:uppercase;">MDP modifié</div><div style="font-size:13px;font-weight:600;">${item.doit_changer_mdp ? 'Non' : 'Oui'}</div></div>
+    </div>
+    <div id="adminFicheEditZone"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button onclick="adminCompteModifier('${type}','${id}')" style="padding:10px;background:#F3F4F6;color:#1A1A4E;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">✏️ Modifier infos</button>
+      <button onclick="adminCompteResetMdp('${type}','${id}')" style="padding:10px;background:#F3F4F6;color:#1A1A4E;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">🔑 Réinitialiser mot de passe</button>
+      <button onclick="adminCompteSuspendre('${type}','${id}','${item.statut}')" style="padding:10px;background:#FFF7ED;color:#C2410C;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">${estActif ? '🔒 Suspendre' : '🔓 Réactiver'}</button>
+      <button onclick="adminCompteAlerter('${type}','${id}')" style="padding:10px;background:#FFF7ED;color:#C2410C;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">⚠️ Alerter</button>
+      <button onclick="adminCompteSupprimer('${type}','${id}','${nom.replace(/'/g, "\\'")}')" style="padding:10px;background:#FEF2F2;color:#DC2626;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">🗑 Supprimer</button>
+    </div>
+  `;
+  document.getElementById('modalAdminFicheCompte').style.display = 'flex';
+}
+window.adminCompteVoirFiche = adminCompteVoirFiche;
+
+function adminCompteFermerFiche() {
+  document.getElementById('modalAdminFicheCompte').style.display = 'none';
+  _adminFicheEnCours = null;
+}
+window.adminCompteFermerFiche = adminCompteFermerFiche;
+
+function adminCompteModifier(type, id) {
+  const item = _adminComptesCache.find(r => r.type === type && String(r.id) === String(id));
+  if (!item) return;
+  const zone = document.getElementById('adminFicheEditZone');
+  if (!zone) return;
+  const nomActuel = type === 'fournisseur' ? (item.nom_entreprise || '') : (item.nom || '');
+  zone.innerHTML = `
+    <div style="background:#F9FAFB;border-radius:10px;padding:14px;margin-bottom:16px;">
+      <label style="font-size:12px;font-weight:600;display:block;margin-bottom:6px;">Nom</label>
+      <input id="adminEditNom" type="text" value="${nomActuel.replace(/"/g, '&quot;')}" style="width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;box-sizing:border-box;">
+      <label style="font-size:12px;font-weight:600;display:block;margin-bottom:6px;">Téléphone</label>
+      <input id="adminEditTel" type="text" value="${(item.telephone || '').replace(/"/g, '&quot;')}" style="width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;box-sizing:border-box;">
+      ${type !== 'superviseur' ? `<label style="font-size:12px;font-weight:600;display:block;margin-bottom:6px;">Ville</label>
+      <input id="adminEditVille" type="text" value="${(item.ville || '').replace(/"/g, '&quot;')}" style="width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;box-sizing:border-box;">` : ''}
+      <div id="adminEditErreur" style="color:red;font-size:12.5px;margin-bottom:8px;display:none;"></div>
+      <button onclick="_adminCompteEnregistrerModif('${type}','${id}')" style="width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Enregistrer</button>
+    </div>
+  `;
+}
+window.adminCompteModifier = adminCompteModifier;
+
+async function _adminCompteEnregistrerModif(type, id) {
+  const nom = (document.getElementById('adminEditNom').value || '').trim();
+  const tel = (document.getElementById('adminEditTel').value || '').trim();
+  const villeEl = document.getElementById('adminEditVille');
+  const ville = villeEl ? villeEl.value.trim() : '';
+  if (!nom) { _admAfficherErreurCompte('adminEditErreur', 'Le nom est obligatoire.'); return; }
+  if (!_rcTelephoneValide(tel)) { _admAfficherErreurCompte('adminEditErreur', 'Téléphone au format 224XXXXXXXXX.'); return; }
+
+  const table = _adminCompteTable(type);
+  const payload = { telephone: tel };
+  if (type === 'fournisseur') { payload.nom_entreprise = nom; payload.ville = ville || null; }
+  else { payload.nom = nom; if (type === 'client') payload.ville = ville || null; }
+
+  try {
+    const { error } = await sb.from(table).update(payload).eq('id', id);
+    if (error) throw error;
+    await _logAdminAction('modification_compte_' + type, nom, '', 'tel: ' + tel);
+    if (typeof showToast === 'function') showToast('✅ Modifications enregistrées', 'success');
+    await adminCompteInit();
+    adminCompteVoirFiche(type, id);
+  } catch (e) {
+    _admAfficherErreurCompte('adminEditErreur', e.message || 'Erreur lors de la modification');
+  }
+}
+window._adminCompteEnregistrerModif = _adminCompteEnregistrerModif;
+
+async function adminCompteResetMdp(type, id) {
+  const nouveauMdp = prompt('Nouveau mot de passe temporaire :');
+  if (!nouveauMdp || !nouveauMdp.trim()) return;
+  const table = _adminCompteTable(type);
+  try {
+    const hash = await hashPassword(nouveauMdp.trim());
+    const { error } = await sb.from(table).update({ mot_de_passe: hash, doit_changer_mdp: true }).eq('id', id);
+    if (error) throw error;
+    await _logAdminAction('reset_mdp_compte_' + type, '', '', 'id: ' + id);
+    if (typeof showToast === 'function') showToast('✅ Mot de passe réinitialisé', 'success');
+    await adminCompteInit();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('❌ ' + (e.message || 'Erreur lors de la réinitialisation'), 'error');
+  }
+}
+window.adminCompteResetMdp = adminCompteResetMdp;
+
+async function adminCompteSuspendre(type, id, statutActuel) {
+  const table = _adminCompteTable(type);
+  const estActif = statutActuel === 'actif';
+  const nouveauStatut = estActif ? _adminCompteStatutInactif(type) : 'actif';
+  try {
+    const { error } = await sb.from(table).update({ statut: nouveauStatut }).eq('id', id);
+    if (error) throw error;
+    await _logAdminAction(estActif ? 'suspension_compte_' + type : 'reactivation_compte_' + type, '', '', 'id: ' + id);
+    if (typeof showToast === 'function') showToast(estActif ? '🔒 Compte suspendu' : '🔓 Compte réactivé', 'success');
+    await adminCompteInit();
+    if (_adminFicheEnCours && _adminFicheEnCours.type === type && String(_adminFicheEnCours.data.id) === String(id)) adminCompteVoirFiche(type, id);
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('❌ ' + (e.message || 'Erreur'), 'error');
+  }
+}
+window.adminCompteSuspendre = adminCompteSuspendre;
+
+async function adminCompteAlerter(type, id) {
+  const message = prompt("Message d'alerte à enregistrer pour ce compte :");
+  if (!message || !message.trim()) return;
+  try {
+    const admin = (typeof adminData !== 'undefined') ? adminData : null;
+    const { error } = await sb.from('alertes_comptes').insert({
+      compte_type: type, compte_id: id, message: message.trim(),
+      envoye_par: admin ? (admin.id || admin.admin_id || null) : null
+    });
+    if (error) throw error;
+    await _logAdminAction('alerte_compte_' + type, '', '', 'id: ' + id + ' | message: ' + message.trim());
+    if (typeof showToast === 'function') showToast('✅ Alerte enregistrée', 'success');
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('❌ ' + (e.message || 'Erreur'), 'error');
+  }
+}
+window.adminCompteAlerter = adminCompteAlerter;
+
+async function adminCompteSupprimer(type, id, nom) {
+  if (!confirm('Supprimer définitivement le compte de ' + nom + ' ? Cette action est irréversible.')) return;
+  const table = _adminCompteTable(type);
+  try {
+    const { error } = await sb.from(table).delete().eq('id', id);
+    if (error) throw error;
+    await _logAdminAction('suppression_compte_' + type, nom, '', 'id: ' + id);
+    if (typeof showToast === 'function') showToast('✅ Compte supprimé', 'success');
+    document.getElementById('modalAdminFicheCompte').style.display = 'none';
+    document.getElementById('modalAdminCreerCompte').style.display = 'none';
+    await adminCompteInit();
+  } catch (e) {
+    if (typeof showToast === 'function') showToast('❌ ' + (e.message || 'Suppression impossible (données liées existantes ?)'), 'error');
+  }
+}
+window.adminCompteSupprimer = adminCompteSupprimer;
 </script>
 
 <!-- ══ SERVICE WORKER REGISTRATION ══ -->
