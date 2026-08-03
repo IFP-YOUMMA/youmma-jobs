@@ -20736,12 +20736,34 @@ async function dacInit() {
   try {
     const [chantiersRes, superviseursRes] = await Promise.all([
       sb.from('chantiers').select('id,nom,statut,date_debut,client_id,superviseur_id,commission_taux,commission_payee,commission_payee_le,clients(nom,prenom,telephone),superviseurs(nom,prenom,telephone),comptes_materiaux(id,solde_gnf,solde_reserve,fournisseur_id,fournisseurs_materiaux(nom_entreprise,telephone))').order('date_debut', { ascending: false }),
-      sb.from('superviseurs').select('id,nom,prenom,telephone,statut,acces_sorties,acces_rapports,acces_registre,acces_contact,score_admin,note_admin,chantiers(id,nom,statut)').order('nom')
+      sb.from('superviseurs').select('id,nom,prenom,telephone,statut,chantiers(id,nom,statut)').order('nom')
     ]);
     if (chantiersRes.error) throw chantiersRes.error;
     if (superviseursRes.error) throw superviseursRes.error;
     _dacChantiersCache = chantiersRes.data || [];
     _dacSuperviseursCache = superviseursRes.data || [];
+
+    // Colonnes de contrôle granulaire — requête ISOLÉE (migration
+    // 20260724_admin_construction_v2.sql pas encore appliquée par défaut :
+    // colonnes potentiellement absentes). Ne doit jamais faire échouer tout
+    // dacInit() : sans ces colonnes, les toggles d'accès retombent sur leur
+    // défaut "actif" (valeur !== false dans dacSuperviseurCardHtml), le
+    // reste du dashboard (chantiers, commission, alertes...) continue de
+    // charger normalement.
+    if (_dacSuperviseursCache.length) {
+      try {
+        const supIds = _dacSuperviseursCache.map(s => s.id);
+        const { data: accesData, error: errAcces } = await sb.from('superviseurs')
+          .select('id,acces_sorties,acces_rapports,acces_registre,acces_contact,score_admin,note_admin')
+          .in('id', supIds);
+        if (errAcces) throw errAcces;
+        const accesParId = {};
+        (accesData || []).forEach(a => { accesParId[a.id] = a; });
+        _dacSuperviseursCache = _dacSuperviseursCache.map(s => Object.assign({}, s, accesParId[s.id] || {}));
+      } catch (e) {
+        console.warn('[dac] contrôle granulaire superviseurs indisponible (migration 20260724_admin_construction_v2.sql pas encore appliquée ?):', e.message);
+      }
+    }
 
     const chantiersActifs = _dacChantiersCache.filter(c => c.statut === 'en_cours');
     document.getElementById('dacMetricChantiers').textContent = chantiersActifs.length;
