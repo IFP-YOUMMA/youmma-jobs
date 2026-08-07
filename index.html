@@ -17334,52 +17334,62 @@ let _pcFournisseursData = [];
 function _pcFournisseurCardHTML(f) {
   const nom = f.nom_entreprise || 'Fournisseur';
   const ini = _pcInitiales(nom);
-  const zone = f.ville || '';
-  const desc = f.description ? (f.description.length > 110 ? f.description.slice(0, 110) + '…' : f.description) : '';
-  const produitsDispo = (f.catalogue_produits || []).filter(function(p) { return p.disponible; }).sort(function(a, b) { return (a.ordre || 0) - (b.ordre || 0); });
-  const apercu = produitsDispo.slice(0, 3);
-  const reste = produitsDispo.length - apercu.length;
+  const zone = [f.ville, f.commune].filter(Boolean).join(' · ');
+  const desc = f.description ? (f.description.length > 80 ? f.description.slice(0, 80) + '…' : f.description) : '';
+  const nbProduitsDispo = (f.catalogue_produits || []).filter(function(p) { return p.disponible; }).length;
   const telWa = f.telephone ? String(f.telephone).replace(/\D/g, '') : '';
+  const estActif = f.statut === 'actif';
+  const estAbonne = !!(f.abonnement_fin && new Date(f.abonnement_fin) > new Date());
 
-  const apercuHtml = apercu.length
-    ? '<div style="border-top:1.5px solid var(--bordure);margin:14px 0;padding-top:12px;">'
-      + apercu.map(function(p) {
-          return '<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;">'
-            + '<span style="color:var(--texte);">' + (p.nom_produit || '') + '</span>'
-            + '<span style="font-weight:700;color:var(--orange);">' + (p.prix_gnf != null ? formatGNF(p.prix_gnf) : '—') + '</span>'
-            + '</div>';
-        }).join('')
-      + (reste > 0 ? '<div style="font-size:11.5px;color:var(--gris);margin-top:4px;">+ ' + reste + ' autre' + (reste > 1 ? 's' : '') + '</div>' : '')
-      + '</div>'
-    : '';
+  const couvertureStyle = f.photo_couverture_url
+    ? 'background-image:url(\'' + f.photo_couverture_url + '\');background-size:cover;background-position:center;'
+    : 'background:linear-gradient(135deg,#003366,#1A1A4E);';
 
-  // Couverture optionnelle (20260717_fournisseur_photo_couverture.sql) —
-  // même ratio 3:1 que dans le tableau de bord fournisseur (#espace). Si
-  // présente, l'avatar chevauche légèrement son bord bas (bordure blanche),
-  // même motif visuel que #espace ; sinon design actuel inchangé.
-  const couvertureHtml = f.photo_couverture_url
-    ? '<img src="' + f.photo_couverture_url + '" loading="lazy" alt="" style="width:100%;aspect-ratio:3/1;object-fit:cover;display:block;"/>'
-    : '';
-  const avatarStyleChevauche = f.photo_couverture_url ? 'margin-top:-40px;border:3px solid #fff;' : '';
+  const avatarHtml = f.photo_url
+    ? '<img src="' + f.photo_url + '" loading="lazy" alt="' + nom + '" style="width:100%;height:100%;object-fit:cover;display:block;"/>'
+    : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;background:var(--bleu);color:#fff;">' + ini + '</div>';
+
+  const badgesHtml = [
+    '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;color:#16A34A;background:#F0FDF4;white-space:nowrap;">✅ Vérifié YOUMMA JOBS</span>',
+    estActif ? '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;color:#16A34A;background:#F0FDF4;white-space:nowrap;">✓ Actif</span>' : '',
+    estAbonne ? '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;color:#D97706;background:#FFFBEB;white-space:nowrap;">🔒 Abonné</span>' : ''
+  ].filter(Boolean).join('');
 
   return '<div class="pc-fournisseur-card" style="padding:0;overflow:hidden;">'
-    + couvertureHtml
-    + '<div style="padding:22px;">'
-    + '<div onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="cursor:pointer;">'
-    + (f.photo_url
-        ? '<img src="' + f.photo_url + '" loading="lazy" alt="' + nom + '" style="width:52px;height:52px;border-radius:14px;object-fit:cover;margin-bottom:14px;display:block;' + avatarStyleChevauche + '"/>'
-        : '<div style="width:52px;height:52px;border-radius:14px;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-bottom:14px;' + avatarStyleChevauche + '">' + ini + '</div>')
-    + '<div style="font-size:16px;font-weight:700;color:var(--texte);margin-bottom:6px;">' + nom + '</div>'
-    + (zone ? '<div style="font-size:12.5px;color:var(--gris);margin-bottom:10px;">📍 ' + zone + '</div>' : '')
-    + (desc ? '<div style="font-size:12.5px;color:var(--texte);line-height:1.5;margin-bottom:10px;">' + desc + '</div>' : '')
-    + '<div style="margin-bottom:6px;"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#16A34A;background:#F0FDF4;padding:4px 11px;border-radius:20px;">✅ Vérifié YOUMMA JOBS</span></div>'
-    + apercuHtml
+    + '<div style="height:92px;position:relative;' + couvertureStyle + '">'
+    +   '<div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.6) 100%);"></div>'
+    +   '<div style="position:absolute;left:80px;right:12px;top:8px;bottom:8px;display:flex;flex-direction:column;justify-content:flex-end;cursor:pointer;" onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')">'
+    +     '<div style="font-size:15px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.5);">' + nom + '</div>'
+    +     (zone ? '<div style="font-size:11.5px;color:rgba(255,255,255,0.85);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.5);">📍 ' + zone + '</div>' : '')
+    +   '</div>'
+    +   '<div style="position:absolute;left:12px;bottom:-20px;width:56px;height:56px;border-radius:14px;border:3px solid #fff;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:2;cursor:pointer;" onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')">'
+    +     avatarHtml
+    +   '</div>'
     + '</div>'
-    + '<div style="display:flex;gap:8px;margin-top:14px;">'
-    +   '<button onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="flex:1;padding:11px;background:var(--bleu);border:none;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;cursor:pointer;">Catalogue complet</button>'
-    +   (telWa ? '<a href="https://wa.me/' + telWa + '" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;background:#25D366;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> Contacter</a>' : '')
-    + '</div>'
-    + '<button onclick="event.stopPropagation();declarerFournisseurDepuisVitrine(\'' + f.id + '\')" style="width:100%;margin-top:8px;padding:10px;background:#16a34a;border:none;color:#fff;border-radius:10px;font-weight:700;font-size:0.85rem;cursor:pointer;">🏗️ Choisir pour mon chantier</button>'
+    + '<div style="padding:28px 16px 16px;">'
+    +   '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;">' + badgesHtml + '</div>'
+    +   '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;">'
+    +     '<div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">'
+    +       '<div style="font-size:16px;font-weight:700;color:var(--texte);">' + nbProduitsDispo + '</div>'
+    +       '<div style="font-size:9px;color:var(--gris);margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Produits</div>'
+    +     '</div>'
+    +     '<div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">'
+    +       '<div style="font-size:12px;font-weight:700;color:var(--texte);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (f.ville || '—') + '</div>'
+    +       '<div style="font-size:9px;color:var(--gris);margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Zone</div>'
+    +     '</div>'
+    +     '<div style="text-align:center;padding:8px 4px;background:#f8fafc;border-radius:10px;border:1px solid #f1f5f9;">'
+    +       '<div style="font-size:10.5px;font-weight:600;color:var(--texte);line-height:1.3;">' + (desc || '—') + '</div>'
+    +       '<div style="font-size:9px;color:var(--gris);margin-top:2px;text-transform:uppercase;letter-spacing:.06em;">Description</div>'
+    +     '</div>'
+    +   '</div>'
+    +   (telWa
+    ?   '<div style="display:flex;gap:8px;margin-bottom:8px;">'
+    +     '<a href="https://wa.me/' + telWa + '" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;background:#25D366;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;text-decoration:none;"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>'
+    +     '<a href="tel:' + telWa + '" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;background:#fff;border:1.5px solid var(--orange);color:var(--orange);border-radius:10px;font-weight:700;font-size:12.5px;text-decoration:none;">📞 Appeler</a>'
+    +   '</div>'
+    : '')
+    +   '<button onclick="_pcOuvrirFournisseurModal(\'' + f.id + '\')" style="width:100%;margin-bottom:8px;padding:11px;background:var(--bleu);border:none;color:#fff;border-radius:10px;font-weight:700;font-size:12.5px;cursor:pointer;">📦 Catalogue complet</button>'
+    +   '<button onclick="event.stopPropagation();declarerFournisseurDepuisVitrine(\'' + f.id + '\')" style="width:100%;padding:10px;background:#16a34a;border:none;color:#fff;border-radius:10px;font-weight:700;font-size:0.85rem;cursor:pointer;">🏗️ Choisir pour mon chantier</button>'
     + '</div>'
     + '</div>';
 }
