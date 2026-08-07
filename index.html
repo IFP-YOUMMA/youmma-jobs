@@ -17349,9 +17349,12 @@ function _pcFournisseurCardHTML(f) {
     ? '<img src="' + f.photo_url + '" loading="lazy" alt="' + nom + '" style="width:100%;height:100%;object-fit:cover;display:block;"/>'
     : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;background:var(--bleu);color:#fff;">' + ini + '</div>';
 
+  // estActif est le seul signal réel de vérification disponible sur
+  // fournisseurs_materiaux (pas de colonne badge_verifie dédiée) : le badge
+  // "Vérifié" ne s'affiche donc que si le compte est réellement actif,
+  // jamais de façon inconditionnelle.
   const badgesHtml = [
-    '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;color:#16A34A;background:#F0FDF4;white-space:nowrap;">✅ Vérifié YOUMMA JOBS</span>',
-    estActif ? '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;color:#16A34A;background:#F0FDF4;white-space:nowrap;">✓ Actif</span>' : '',
+    estActif ? '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;color:#16A34A;background:#F0FDF4;white-space:nowrap;">✅ Vérifié YOUMMA JOBS</span>' : '',
     estAbonne ? '<span style="font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;color:#D97706;background:#FFFBEB;white-space:nowrap;">🔒 Abonné</span>' : ''
   ].filter(Boolean).join('');
 
@@ -17440,30 +17443,87 @@ async function _pcChargerFournisseurs() {
 function _pcOuvrirFournisseurModal(id) {
   const f = _pcFournisseursData.find(function(x) { return String(x.id) === String(id); });
   if (!f) return;
-  const ini = _pcInitiales(f.nom_entreprise);
+  const nom = f.nom_entreprise || 'Fournisseur';
+  const ini = _pcInitiales(nom);
   const titleEl = document.getElementById('pcCatalogueModalTitle');
-  if (titleEl) titleEl.textContent = f.nom_entreprise || 'Fournisseur';
+  if (titleEl) titleEl.textContent = nom;
 
-  const zone = [f.ville, f.commune].filter(Boolean).join(', ');
+  const zone = [f.ville, f.commune].filter(Boolean).join(' · ');
+  const telWa = f.telephone ? String(f.telephone).replace(/\D/g, '') : '';
+  // statut='actif' est déjà la condition de visibilité publique (_pcChargerFournisseurs
+  // filtre .eq('statut','actif')) : c'est le seul signal réel de vérification/activité
+  // disponible sur fournisseurs_materiaux (pas de colonne badge_verifie dédiée), donc le
+  // badge "Vérifié" et le statut "Actif" s'appuient tous deux sur cette même donnée réelle
+  // plutôt que d'afficher un badge de vérification fixe non lié à la base.
+  const estActif = f.statut === 'actif';
+  const nbProduitsDispo = (f.catalogue_produits || []).filter(function(p) { return p.disponible; }).length;
+
+  const avatarHtml = f.photo_url
+    ? '<img src="' + f.photo_url + '" alt="' + nom + '" style="width:100%;height:100%;object-fit:cover;display:block;"/>'
+    : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;background:var(--bleu);color:#fff;">' + ini + '</div>';
+
+  const badgesHtml = [
+    estActif ? '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#16A34A;background:#F0FDF4;padding:4px 11px;border-radius:20px;">✅ Vérifié YOUMMA JOBS</span>' : '',
+    estActif ? '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#16A34A;">🟢 Actif</span>' : '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--gris);">⚪ Indisponible actuellement</span>'
+  ].filter(Boolean).join('');
+
+  // Bloc section réutilisable : même grammaire visuelle que les sections du
+  // modal profil prestataire (_mpSection, cf. openModal) — titre gris
+  // uppercase + séparateur fin — pour rester cohérent avec le reste du site.
+  const _section = function(title, html) {
+    return '<div style="padding:16px 0;border-top:1px solid #E5E7EB;">'
+      +   '<div style="font-size:12px;text-transform:uppercase;color:var(--gris);font-weight:700;letter-spacing:.04em;margin-bottom:10px;">' + title + '</div>'
+      +   html
+      + '</div>';
+  };
+
   const body = document.getElementById('pcCatalogueModalBody');
   if (body) {
     body.innerHTML =
-      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">'
-      +   (f.photo_url
-            ? '<img src="' + f.photo_url + '" alt="' + (f.nom_entreprise || '') + '" style="width:64px;height:64px;border-radius:16px;object-fit:cover;flex-shrink:0;"/>'
-            : '<div style="width:64px;height:64px;border-radius:16px;background:var(--bleu);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;">' + ini + '</div>')
-      +   '<div>'
-      +     '<div style="font-size:17px;font-weight:700;color:var(--texte);">' + (f.nom_entreprise || '') + '</div>'
-      +     (zone ? '<div style="font-size:12.5px;color:var(--gris);margin-top:2px;">📍 ' + zone + '</div>' : '')
+      '<div style="text-align:center;margin-bottom:16px;">'
+      +   '<div style="width:72px;height:72px;border-radius:18px;overflow:hidden;margin:0 auto;box-shadow:0 2px 10px rgba(0,0,0,.12);">' + avatarHtml + '</div>'
+      +   '<div style="font-size:18px;font-weight:700;color:var(--texte);margin-top:12px;">' + nom + '</div>'
+      +   (zone ? '<div style="font-size:13px;color:var(--gris);margin-top:3px;">📍 ' + zone + '</div>' : '')
+      +   '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;margin-top:10px;">' + badgesHtml + '</div>'
+      + '</div>'
+
+      + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;">'
+      +   '<div style="background:#F7F8FA;border:1px solid #E5E7EB;border-radius:10px;padding:12px 6px;text-align:center;">'
+      +     '<div style="font-size:18px;font-weight:800;color:var(--texte);">' + nbProduitsDispo + '</div>'
+      +     '<div style="font-size:10.5px;color:var(--gris);margin-top:2px;">Produits</div>'
+      +   '</div>'
+      +   '<div style="background:#F7F8FA;border:1px solid #E5E7EB;border-radius:10px;padding:12px 6px;text-align:center;">'
+      +     '<div style="font-size:14px;font-weight:800;color:var(--texte);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (f.ville || '—') + '</div>'
+      +     '<div style="font-size:10.5px;color:var(--gris);margin-top:2px;">Zone</div>'
+      +   '</div>'
+      +   '<div style="background:#F7F8FA;border:1px solid #E5E7EB;border-radius:10px;padding:12px 6px;text-align:center;">'
+      +     '<div style="font-size:18px;font-weight:800;color:var(--texte);">—</div>'
+      +     '<div style="font-size:10.5px;color:var(--gris);margin-top:2px;">Avis</div>'
       +   '</div>'
       + '</div>'
-      + '<div style="margin-bottom:14px;"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#16A34A;background:#F0FDF4;padding:3px 10px;border-radius:20px;">✅ Vérifié YOUMMA JOBS</span></div>'
-      + (f.telephone ? '<div style="font-size:13.5px;color:var(--texte);margin-bottom:8px;">📞 ' + f.telephone + '</div>' : '')
-      + (f.description ? '<div style="font-size:13px;color:var(--gris);line-height:1.6;margin-bottom:10px;">📝 ' + f.description + '</div>' : '')
-      + '<div style="border-top:1.5px solid var(--bordure);margin-top:14px;padding-top:18px;">'
-      +   '<div style="font-size:14.5px;font-weight:700;color:var(--texte);margin-bottom:14px;">Catalogue de produits</div>'
-      +   '<div id="pcCatalogueList"><div style="text-align:center;padding:20px;color:var(--gris);font-size:13px;">Chargement…</div></div>'
-      + '</div>';
+
+      + (telWa
+        ? '<div style="display:flex;gap:10px;margin-top:14px;">'
+        +   '<a href="https://wa.me/' + telWa + '" target="_blank" rel="noopener" aria-label="Contacter ' + nom + ' sur WhatsApp" style="flex:1;min-width:0;height:46px;border-radius:12px;background:#25D366;color:#fff;border:none;font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;">'
+        +     '<i class="fa-brands fa-whatsapp"></i> WhatsApp'
+        +   '</a>'
+        +   '<a href="tel:' + telWa + '" aria-label="Appeler ' + nom + '" style="flex:1;min-width:0;height:46px;border-radius:12px;background:#fff;color:var(--orange);border:1.5px solid var(--orange);font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;">'
+        +     '<i class="fa-solid fa-phone"></i> Appeler'
+        +   '</a>'
+        + '</div>'
+        : '')
+
+      + '<button onclick="declarerFournisseurDepuisVitrine(\'' + f.id + '\')" aria-label="Ajouter ' + nom + ' à mon chantier" style="width:100%;margin-top:10px;padding:13px;background:#16a34a;border:none;color:#fff;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;">🏗️ Ajouter à mon chantier</button>'
+
+      + _section('À propos', f.description
+          ? '<div style="font-size:13.5px;color:var(--texte);line-height:1.6;">' + f.description + '</div>'
+          : '<div style="font-size:13px;color:var(--gris);">Ce fournisseur n\'a pas encore ajouté de présentation.</div>')
+
+      + _section('Catalogue de produits', '<div id="pcCatalogueList"><div style="text-align:center;padding:20px;color:var(--gris);font-size:13px;">Chargement…</div></div>')
+
+      + _section('Réalisations', '<div style="text-align:center;padding:16px;color:var(--gris);font-size:13px;background:#F7F8FA;border-radius:10px;">Les réalisations seront bientôt disponibles.</div>')
+
+      + _section('Avis clients', '<div style="text-align:center;padding:16px;color:var(--gris);font-size:13px;background:#F7F8FA;border-radius:10px;">⭐ Aucun avis pour le moment.</div>');
   }
 
   const overlay = document.getElementById('pcCatalogueOverlay');
