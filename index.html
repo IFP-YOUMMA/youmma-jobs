@@ -1709,7 +1709,7 @@ async function verifierSession() {
 </section>
 
 <!-- CTA Construire -->
-<div style="background:linear-gradient(135deg,#1A1A4E 0%,#0D0D2E 100%);padding:20px 16px;border-radius:16px;margin:12px 20px">
+<div id="pcCtaConstruireHome" style="background:linear-gradient(135deg,#1A1A4E 0%,#0D0D2E 100%);padding:20px 16px;border-radius:16px;margin:12px 20px">
   <p style="font-size:11px;font-weight:700;color:#D85A30;letter-spacing:.08em;margin:0 0 12px;text-transform:uppercase;text-align:center">SERVICE PREMIUM</p>
   <button onclick="showPageConstruire()" style="width:100%;padding:16px;background:#D85A30;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:inherit;box-shadow:0 4px 20px rgba(216,90,48,0.4)">
     🏗️ Construire votre maison →
@@ -17000,7 +17000,7 @@ window._realNavigate = navigate;
 /* ── PAGE "CONSTRUIRE AVEC YOUMMA JOBS" (#construire) ── */
 // Réutilise la navbar/footer réels : on cache les sections de la home au
 // lieu de dupliquer leur markup, puis on les restaure via hidePageConstruire().
-const _PC_HOMEPAGE_SECTIONS = ['accueil','disponibles-maintenant','prestataires','features','devenir','temoignages','tarifs','faq','contact'];
+const _PC_HOMEPAGE_SECTIONS = ['accueil','disponibles-maintenant','prestataires','features','devenir','temoignages','tarifs','faq','contact','pcCtaConstruireHome'];
 
 function showPageConstruire() {
   if (typeof _realNavigate === 'function') _realNavigate('home');
