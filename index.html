@@ -2133,6 +2133,15 @@ async function verifierSession() {
   </div>
 </section>
 
+<style>
+/* Modal profil public prestataire (#modalOverlay) — plein écran mobile uniquement, scopé par id pour ne pas affecter les autres modales (.modal-overlay/.modal génériques) ni le rendu desktop */
+@media(max-width:768px){
+  #modalOverlay{padding:0 !important;align-items:flex-start !important;overflow:hidden !important}
+  #modalOverlay .modal{width:100% !important;max-width:100% !important;margin:0 !important;border-radius:0 !important;left:0 !important;right:0 !important;top:0 !important;bottom:0 !important;height:100% !important;max-height:100% !important;overflow-y:auto !important}
+  #modalOverlay .modal-body{width:100% !important;max-width:100% !important;box-sizing:border-box !important;overflow-x:hidden !important}
+  #modalOverlay .modal-body button{width:100% !important;max-width:100% !important;box-sizing:border-box !important}
+}
+</style>
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-header">
