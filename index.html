@@ -1422,7 +1422,7 @@ async function annuaireChargerFournisseurs() {
 
   const { data, error } = await sb
     .from('fournisseurs_materiaux')
-    .select('id, nom_entreprise, telephone, ville')
+    .select('id, nom_entreprise, telephone, ville, commune, photo_url, photo_couverture_url, statut')
     .order('nom_entreprise', { ascending: true });
 
   if (error || !data || data.length === 0) {
@@ -1431,25 +1431,39 @@ async function annuaireChargerFournisseurs() {
   }
 
   container.innerHTML = data.map(f => `
-    <div onclick="voirProfilFournisseur('${f.id}')"
-      style="background:white;border-radius:14px;padding:16px;margin-bottom:12px;
+    <div onclick="voirProfilFournisseur('${f.id}')" style="
+      background:white;border-radius:14px;margin-bottom:12px;
       box-shadow:0 2px 8px rgba(0,0,0,0.08);cursor:pointer;
-      border-left:4px solid #E8622A;display:flex;align-items:center;gap:12px;">
-      <div style="width:48px;height:48px;border-radius:50%;background:#1A1A4E;
-        display:flex;align-items:center;justify-content:center;
-        color:white;font-weight:700;font-size:18px;flex-shrink:0;">
-        ${(f.nom_entreprise||'?')[0].toUpperCase()}
+      overflow:hidden;border:1px solid #F3F4F6;">
+
+      <div style="height:60px;background:${
+        f.photo_couverture_url
+          ? 'url(\''+f.photo_couverture_url+'\') center/cover no-repeat'
+          : 'linear-gradient(135deg,#1A1A4E,#2D2D6B)'
+      };position:relative;">
+        <div style="position:absolute;bottom:-20px;left:16px;
+          width:44px;height:44px;border-radius:50%;border:2px solid white;
+          background:${f.photo_url ? 'url(\''+f.photo_url+'\') center/cover' : '#1A1A4E'};
+          display:flex;align-items:center;justify-content:center;
+          color:white;font-weight:700;font-size:16px;overflow:hidden;">
+          ${f.photo_url ? '' : (f.nom_entreprise||'?')[0].toUpperCase()}
+        </div>
       </div>
-      <div style="flex:1;min-width:0;">
+
+      <div style="padding:28px 16px 12px;">
         <div style="font-weight:700;font-size:15px;color:#1A1A4E;
           white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
           ${f.nom_entreprise||'Sans nom'}
         </div>
-        <div style="font-size:13px;color:#666;margin-top:2px;">
-          📍 ${f.ville||'Conakry'}
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+          <div style="font-size:13px;color:#666;">
+            📍 ${[f.ville,f.commune].filter(Boolean).join(', ')||'Conakry'}
+          </div>
+          ${f.statut==='actif'
+            ? '<span style="font-size:11px;color:#166534;background:#F0FDF4;border:1px solid #BBF7D0;padding:2px 8px;border-radius:20px;font-weight:700;">✓ Vérifié</span>'
+            : ''}
         </div>
       </div>
-      <div style="color:#E8622A;font-size:20px;">›</div>
     </div>
   `).join('');
 }
@@ -1477,40 +1491,69 @@ async function voirProfilFournisseur(id) {
   const initiale = (f.nom_entreprise||'?')[0].toUpperCase();
   const tel = f.telephone ? '224' + f.telephone.replace(/^224/, '') : null;
   const waLink = tel ? `https://wa.me/${tel}` : null;
+  const estActif = f.statut === 'actif';
+  const lieu = f.commune ? `${f.ville||'Conakry'}, ${f.commune}` : (f.ville || 'Conakry');
+  const anneeInscription = f.created_at ? new Date(f.created_at).getFullYear() : null;
+  const nbProduits = catalogue ? catalogue.length : 0;
+
+  const couvertureStyle = f.photo_couverture_url
+    ? `background-image:url('${f.photo_couverture_url}');background-size:cover;background-position:center;`
+    : `background:linear-gradient(135deg,#1A1A4E,#0D0D2E);`;
+  const avatarHtml = f.photo_url
+    ? `<img src="${f.photo_url}" style="width:100%;height:100%;object-fit:cover;display:block;"/>`
+    : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#1A1A4E;color:#fff;font-size:28px;font-weight:700;">${initiale}</div>`;
 
   contenu.innerHTML = `
-    <div style="text-align:center;padding:24px 16px 16px;">
-      <div style="width:80px;height:80px;border-radius:50%;background:#1A1A4E;
-        display:flex;align-items:center;justify-content:center;
-        color:white;font-weight:700;font-size:32px;margin:0 auto 12px;">
-        ${initiale}
+    <div style="position:relative;height:140px;margin:-20px -20px 0;${couvertureStyle}">
+      <div style="position:absolute;bottom:-40px;left:16px;width:80px;height:80px;border-radius:50%;
+        border:3px solid #fff;overflow:hidden;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:2;">
+        ${avatarHtml}
       </div>
-      <div style="font-weight:700;font-size:20px;color:#1A1A4E;">${f.nom_entreprise||'Sans nom'}</div>
-      <div style="color:#666;font-size:14px;margin-top:4px;">📍 ${f.ville||'Conakry'}</div>
     </div>
 
-    <div style="display:flex;gap:10px;padding:0 16px 20px;">
+    <div style="padding:48px 0 0;">
+      <div style="font-size:20px;font-weight:700;color:#1A1A4E;">${f.nom_entreprise||'Sans nom'}</div>
+      <div style="color:#666;font-size:14px;margin-top:4px;">📍 ${lieu}</div>
+      ${estActif ? `<span style="display:inline-flex;align-items:center;gap:5px;margin-top:10px;background:#F0FDF4;border:1px solid #BBF7D0;color:#166534;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">✓ Vérifié YOUMMA</span>` : ''}
+    </div>
+
+    ${(waLink || tel) ? `
+    <div style="display:flex;gap:10px;padding:16px 0 4px;">
       ${waLink ? `
       <a href="${waLink}" target="_blank"
-        style="flex:1;background:#25D366;color:white;padding:12px;
+        style="flex:1;width:${tel ? 'auto' : '100%'};background:#25D366;color:white;padding:12px;
         border-radius:10px;text-align:center;font-weight:700;
         text-decoration:none;font-size:14px;">
         📱 WhatsApp
       </a>` : ''}
       ${tel ? `
       <a href="tel:+${tel}"
-        style="flex:1;background:white;color:#E8622A;padding:12px;
+        style="flex:1;width:${waLink ? 'auto' : '100%'};background:white;color:#E8622A;padding:12px;
         border-radius:10px;text-align:center;font-weight:700;
         text-decoration:none;font-size:14px;border:2px solid #E8622A;">
         📞 Appeler
       </a>` : ''}
+    </div>` : ''}
+
+    ${(f.description && f.description.trim()) ? `
+    <div style="padding:16px 0;border-top:1px solid #F3F4F6;">
+      <div style="font-weight:700;color:#E8622A;margin-bottom:8px;">📝 À propos</div>
+      <div style="color:#6B7280;font-size:14px;line-height:1.6;">${f.description}</div>
+    </div>` : ''}
+
+    <div style="padding:16px 0;border-top:1px solid #F3F4F6;">
+      <div style="font-weight:700;color:#1A1A4E;margin-bottom:10px;">ℹ️ Informations</div>
+      <div style="font-size:13.5px;color:#374151;margin-bottom:8px;">📍 Localisation : ${lieu}</div>
+      ${anneeInscription ? `<div style="font-size:13.5px;color:#374151;margin-bottom:8px;">🗓️ Membre depuis ${anneeInscription}</div>` : ''}
+      <div style="font-size:13.5px;color:#374151;">🟢 Statut : ${estActif ? 'Compte actif' : 'En attente de validation'}</div>
     </div>
 
-    <div style="padding:0 16px;">
+    <div style="padding:16px 0;border-top:1px solid #F3F4F6;">
       <div style="font-weight:700;font-size:16px;color:#1A1A4E;
-        margin-bottom:12px;border-bottom:2px solid #E8622A;padding-bottom:8px;">
+        margin-bottom:4px;border-bottom:2px solid #E8622A;padding-bottom:8px;">
         🏗️ Catalogue produits
       </div>
+      <div style="font-size:12px;color:#9CA3AF;margin:8px 0 12px;">${nbProduits} produit${nbProduits>1?'s':''} disponible${nbProduits>1?'s':''}</div>
       ${catalogue && catalogue.length > 0 ? catalogue.map(p => `
         <div style="background:#F8F9FA;border-radius:10px;padding:12px;
           margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
@@ -1527,7 +1570,24 @@ async function voirProfilFournisseur(id) {
         </div>
       `).join('') : '<p style="color:#888;text-align:center;padding:16px;">Aucun produit renseigné pour le moment.</p>'}
     </div>
+
+    <div style="padding:8px 0 24px;">
+      <button onclick="_fournisseurPartagerProfil('${f.id}')" style="background:white;border:1.5px solid #1A1A4E;color:#1A1A4E;border-radius:10px;padding:12px;width:100%;font-weight:700;font-size:14px;cursor:pointer;">📤 Partager ce profil</button>
+    </div>
   `;
+}
+
+function _fournisseurPartagerProfil(id) {
+  const url = window.location.origin + window.location.pathname + '#fournisseur=' + id;
+  if (navigator.share) {
+    navigator.share({ title: 'Profil fournisseur YOUMMA JOBS', url }).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => {
+      if (typeof showToast === 'function') showToast('🔗 Lien copié !', 'success');
+    }).catch(() => {
+      if (typeof showToast === 'function') showToast('Impossible de copier le lien', 'error');
+    });
+  }
 }
 
 function fermerProfilFournisseur() {
