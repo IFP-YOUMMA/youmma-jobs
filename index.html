@@ -1449,7 +1449,7 @@ async function annuaireChargerFournisseurs() {
   const catalogues = await Promise.all(
     fournisseurs.map(f =>
       sb.from('catalogue_produits')
-        .select('nom_produit, prix_gnf, unite, description')
+        .select('nom_produit, prix_gnf, unite, description, photo_url')
         .eq('fournisseur_id', f.id)
         .eq('disponible', true)
         .order('ordre', { ascending: true })
@@ -1560,20 +1560,45 @@ async function annuaireChargerFournisseurs() {
             </div>
             <div style="height:2px;background:#E8622A;border-radius:2px;margin-bottom:10px;"></div>
             ${catalogue.length > 0 ? catalogue.map(p => `
-              <div style="display:flex;justify-content:space-between;
-                align-items:center;padding:10px 0;
-                border-bottom:1px solid #F3F4F6;">
-                <div>
-                  <div style="font-weight:600;color:#1A1A4E;font-size:14px;">
+              <div style="display:flex;align-items:flex-start;gap:12px;
+                padding:12px 0;border-bottom:1px solid #F3F4F6;">
+
+                <div style="flex-shrink:0;width:64px;height:64px;border-radius:10px;
+                  overflow:hidden;background:#F3F4F6;display:flex;align-items:center;
+                  justify-content:center;">
+                  ${p.photo_url
+                    ? `<img src="${p.photo_url}" style="width:100%;height:100%;object-fit:cover;">`
+                    : `<span style="font-size:24px;">🏗️</span>`
+                  }
+                </div>
+
+                <div style="flex:1;min-width:0;">
+                  <div style="font-weight:700;color:#1A1A4E;font-size:14px;
+                    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                     ${p.nom_produit}
                   </div>
-                  ${p.description ? '<div style="font-size:12px;color:#9CA3AF;margin-top:2px;">'+p.description+'</div>' : ''}
-                </div>
-                <div style="text-align:right;flex-shrink:0;margin-left:16px;">
-                  <div style="font-weight:700;color:#E8622A;font-size:14px;white-space:nowrap;">
-                    ${p.prix_gnf ? Number(p.prix_gnf).toLocaleString('fr-FR')+' GNF' : 'Sur devis'}
+                  ${p.description
+                    ? `<div style="font-size:12px;color:#9CA3AF;margin-top:2px;
+                        line-height:1.4;">${p.description}</div>`
+                    : ''
+                  }
+                  <div style="margin-top:6px;display:flex;align-items:center;
+                    justify-content:space-between;">
+                    <div style="font-weight:700;color:#E8622A;font-size:15px;
+                      white-space:nowrap;">
+                      ${p.prix_gnf
+                        ? Number(p.prix_gnf).toLocaleString('fr-FR') + ' GNF'
+                        : 'Sur devis'
+                      }
+                    </div>
+                    ${p.unite
+                      ? `<div style="font-size:11px;color:#9CA3AF;
+                          background:#F9FAFB;padding:2px 8px;border-radius:20px;">
+                          / ${p.unite}
+                        </div>`
+                      : ''
+                    }
                   </div>
-                  ${p.unite ? '<div style="font-size:11px;color:#9CA3AF;">/ '+p.unite+'</div>' : ''}
                 </div>
               </div>
             `).join('') : '<p style="color:#9CA3AF;text-align:center;padding:16px 0;font-size:13px;">Aucun produit renseigné.</p>'}
@@ -3783,6 +3808,19 @@ if (typeof connexionPrestataire === 'undefined') {
               <div class="yd-field"><label>Statut</label><select id="dfoStatutProduit"><option value="en_stock">En stock</option><option value="rupture">Rupture</option></select></div>
             </div>
             <div class="yd-field"><label>Description (optionnel)</label><input id="dfoDescProduit" placeholder="Qualité A, origine locale..."></div>
+            <!-- Champ photo produit -->
+            <div style="margin-bottom:12px;">
+              <label style="font-size:13px;font-weight:600;color:#374151;
+                display:block;margin-bottom:6px;">Photo du produit (optionnel)</label>
+              <input type="file" id="dfoPhotoProduit" accept="image/*"
+                style="width:100%;font-size:13px;padding:8px;
+                border:1.5px solid #E5E7EB;border-radius:8px;
+                box-sizing:border-box;cursor:pointer;">
+              <div id="dfoPhotoProduitPreview" style="margin-top:8px;display:none;">
+                <img id="dfoPhotoProduitImg" style="width:80px;height:80px;
+                  object-fit:cover;border-radius:8px;border:1px solid #E5E7EB;">
+              </div>
+            </div>
             <div id="dfoAddProduitErreur" style="color:#DC2626;font-size:12px;margin-bottom:8px;display:none"></div>
             <div style="display:flex;gap:8px">
               <button class="yd-btn-wh" style="flex:1" onclick="dfoAnnulerProduit()">Annuler</button>
@@ -6707,6 +6745,10 @@ function dfoToggleAddProduit() {
   document.getElementById('dfoAddProduitTitre').textContent = 'Nouveau produit';
   const errEl = document.getElementById('dfoAddProduitErreur');
   if (errEl) errEl.style.display = 'none';
+  const photoInput = document.getElementById('dfoPhotoProduit');
+  if (photoInput) photoInput.value = '';
+  const photoPreview = document.getElementById('dfoPhotoProduitPreview');
+  if (photoPreview) photoPreview.style.display = 'none';
   const form = document.getElementById('dfoAddProduitForm');
   form.style.display = form.style.display === 'none' || !form.style.display ? 'block' : 'none';
 }
@@ -6724,6 +6766,16 @@ function dfoEditerProduit(id) {
   document.getElementById('dfoAddProduitTitre').textContent = 'Modifier le produit';
   const errEl = document.getElementById('dfoAddProduitErreur');
   if (errEl) errEl.style.display = 'none';
+  const photoInput = document.getElementById('dfoPhotoProduit');
+  if (photoInput) photoInput.value = '';
+  const photoPreview = document.getElementById('dfoPhotoProduitPreview');
+  const photoImg = document.getElementById('dfoPhotoProduitImg');
+  if (p.photo_url && photoPreview && photoImg) {
+    photoImg.src = p.photo_url;
+    photoPreview.style.display = 'block';
+  } else if (photoPreview) {
+    photoPreview.style.display = 'none';
+  }
   document.getElementById('dfoAddProduitForm').style.display = 'block';
 }
 window.dfoEditerProduit = dfoEditerProduit;
@@ -6732,6 +6784,18 @@ function dfoAnnulerProduit() {
   document.getElementById('dfoAddProduitForm').style.display = 'none';
 }
 window.dfoAnnulerProduit = dfoAnnulerProduit;
+
+const _dfoPhotoProduitInput = document.getElementById('dfoPhotoProduit');
+if (_dfoPhotoProduitInput) {
+  _dfoPhotoProduitInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const preview = document.getElementById('dfoPhotoProduitPreview');
+    const img = document.getElementById('dfoPhotoProduitImg');
+    img.src = URL.createObjectURL(file);
+    preview.style.display = 'block';
+  });
+}
 
 function _dfoAfficherErreurProduit(msg) {
   const el = document.getElementById('dfoAddProduitErreur');
@@ -6766,15 +6830,45 @@ async function dfoSauvegarderProduit() {
   // du produit (nom/unité/prix/disponibilité restent enregistrables).
   const payload = Object.assign({}, payloadBase, { description: description || null });
 
+  // photo_url vient de 20260817_catalogue_produits_photo.sql (brouillon, pas
+  // encore appliquée par défaut) : upload tenté seulement si un fichier est
+  // sélectionné, jamais bloquant pour le reste du produit si l'upload ou la
+  // colonne échoue (le produit s'enregistre quand même, juste sans photo).
+  const fournisseurId = window._dfoFournisseurId;
+  const photoFile = document.getElementById('dfoPhotoProduit')?.files?.[0];
+  if (photoFile) {
+    try {
+      const ext = photoFile.name.split('.').pop();
+      const path = 'catalogue/' + fournisseurId + '/' + Date.now() + '.' + ext;
+      const { error: upErr } = await sb.storage.from('Photos').upload(path, photoFile, { cacheControl: '3600', upsert: true });
+      if (!upErr) {
+        const { data: urlData } = sb.storage.from('Photos').getPublicUrl(path);
+        payload.photo_url = urlData.publicUrl;
+      } else {
+        console.warn('[dfo] upload photo produit échoué:', upErr.message);
+      }
+    } catch (eUp) {
+      console.warn('[dfo] upload photo produit échoué:', eUp.message);
+    }
+  }
+
   try {
     let { error } = id
       ? await sb.from('catalogue_produits').update(payload).eq('id', id)
-      : await sb.from('catalogue_produits').insert(Object.assign({ fournisseur_id: window._dfoFournisseurId }, payload));
+      : await sb.from('catalogue_produits').insert(Object.assign({ fournisseur_id: fournisseurId }, payload));
     if (error && (error.message || '').toLowerCase().includes('description')) {
       console.warn('[dfo] colonne description indisponible (migration 20260803_catalogue_produits.sql pas encore appliquée ?):', error.message);
+      delete payload.description;
       ({ error } = id
-        ? await sb.from('catalogue_produits').update(payloadBase).eq('id', id)
-        : await sb.from('catalogue_produits').insert(Object.assign({ fournisseur_id: window._dfoFournisseurId }, payloadBase)));
+        ? await sb.from('catalogue_produits').update(payload).eq('id', id)
+        : await sb.from('catalogue_produits').insert(Object.assign({ fournisseur_id: fournisseurId }, payload)));
+    }
+    if (error && (error.message || '').toLowerCase().includes('photo_url')) {
+      console.warn('[dfo] colonne photo_url indisponible (migration 20260817_catalogue_produits_photo.sql pas encore appliquée ?):', error.message);
+      delete payload.photo_url;
+      ({ error } = id
+        ? await sb.from('catalogue_produits').update(payload).eq('id', id)
+        : await sb.from('catalogue_produits').insert(Object.assign({ fournisseur_id: fournisseurId }, payload)));
     }
     if (error) throw error;
     if (typeof showToast === 'function') showToast(id ? '✅ Produit modifié' : '✅ Produit ajouté', 'success');
