@@ -1507,17 +1507,36 @@ async function annuaireChargerFournisseurs() {
           </div>
 
           <!-- BADGES -->
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
-            ${f.statut === 'actif' ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #BBF7D0;background:#F0FDF4;color:#166534;">✓ Vérifié</span>' : ''}
+          <div style="display:flex;flex-wrap:nowrap;overflow-x:auto;gap:8px;padding-bottom:4px;margin-bottom:14px;">
+            ${f.statut === 'actif' ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #BBF7D0;background:#F0FDF4;color:#166534;flex-shrink:0;">✓ Vérifié</span>' : ''}
             ${f.type_compte === 'particulier'
-              ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #E5E7EB;background:#F9FAFB;color:#374151;">👤 Particulier</span>'
+              ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #E5E7EB;background:#F9FAFB;color:#374151;flex-shrink:0;">👤 Particulier</span>'
               : f.type_compte === 'usine'
-              ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #FED7AA;background:#FFF7ED;color:#C2410C;">🏭 Usine & Fabricant</span>'
-              : '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1D4ED8;">🏢 Entreprise</span>'}
+              ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #FED7AA;background:#FFF7ED;color:#C2410C;flex-shrink:0;">🏭 Usine & Fabricant</span>'
+              : '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1D4ED8;flex-shrink:0;">🏢 Entreprise</span>'}
             ${f.note_moyenne && f.note_moyenne > 0
-              ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #FDE68A;background:#FFFBEB;color:#B45309;">⭐ ' + f.note_moyenne + '/5</span>'
-              : '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #DDD6FE;background:#F5F3FF;color:#7C3AED;">⭐ Nouveau</span>'}
+              ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #FDE68A;background:#FFFBEB;color:#B45309;flex-shrink:0;">⭐ ' + f.note_moyenne + '/5</span>'
+              : '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #DDD6FE;background:#F5F3FF;color:#7C3AED;flex-shrink:0;">⭐ Nouveau</span>'}
           </div>
+
+          <!-- BOUTONS CONTACT (visibles directement sur la carte) -->
+          ${tel ? `
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <a href="${waLink}" target="_blank"
+              style="flex:1;background:#25D366;color:white;padding:12px;
+              border-radius:12px;text-align:center;font-weight:700;
+              text-decoration:none;font-size:14px;display:flex;
+              align-items:center;justify-content:center;gap:6px;">
+              📱 WhatsApp
+            </a>
+            <a href="tel:+${tel}"
+              style="flex:1;background:#FFF5F0;color:#E8622A;padding:12px;
+              border-radius:12px;text-align:center;font-weight:700;
+              text-decoration:none;font-size:14px;border:1.5px solid #FDDDD0;
+              display:flex;align-items:center;justify-content:center;gap:6px;">
+              📞 Appeler
+            </a>
+          </div>` : ''}
 
           <!-- BOUTON VOIR CATALOGUE -->
           <button onclick="document.getElementById('${catalogueId}').style.display = document.getElementById('${catalogueId}').style.display === 'none' ? 'block' : 'none'"
