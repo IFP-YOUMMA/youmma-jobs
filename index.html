@@ -1430,6 +1430,21 @@ async function annuaireChargerFournisseurs() {
     return;
   }
 
+  // type_compte/note_moyenne : colonnes optionnelles (migration
+  // 20260815_fournisseur_type_compte_note.sql pas encore appliquée par
+  // défaut) — SELECT séparé et isolé pour ne pas faire échouer le SELECT de
+  // base si elles n'existent pas encore ; fusion par id, mêmes principes que
+  // partout ailleurs dans ce fichier pour les colonnes optionnelles.
+  try {
+    const { data: extra, error: errExtra } = await sb.from('fournisseurs_materiaux').select('id, type_compte, note_moyenne');
+    if (errExtra) throw errExtra;
+    const parId = {};
+    (extra || []).forEach(r => { parId[r.id] = r; });
+    fournisseurs.forEach(f => Object.assign(f, parId[f.id] || {}));
+  } catch (e) {
+    console.warn('[annuaire] type_compte/note_moyenne indisponibles (migration 20260815_fournisseur_type_compte_note.sql pas encore appliquée ?):', e.message);
+  }
+
   // Charger tous les catalogues en parallèle
   const catalogues = await Promise.all(
     fournisseurs.map(f =>
@@ -1447,8 +1462,6 @@ async function annuaireChargerFournisseurs() {
     const initiale = (f.nom_entreprise || '?')[0].toUpperCase();
     const tel = f.telephone ? '224' + f.telephone.replace(/^224/, '').replace(/\D/g, '') : null;
     const waLink = tel ? 'https://wa.me/' + tel : null;
-    const annee = new Date(f.created_at || Date.now()).getFullYear();
-    const isNouveau = (new Date().getFullYear() - annee) < 1;
     const catalogueId = 'foCat-' + f.id;
 
     const coverStyle = f.photo_couverture_url
@@ -1496,56 +1509,18 @@ async function annuaireChargerFournisseurs() {
           <!-- BADGES -->
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
             ${f.statut === 'actif' ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #BBF7D0;background:#F0FDF4;color:#166534;">✓ Vérifié</span>' : ''}
-            <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1D4ED8;">🏗️ Fournisseur</span>
-            ${isNouveau ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #DDD6FE;background:#F5F3FF;color:#7C3AED;">✦ Nouveau</span>' : ''}
-            <span style="font-size:12px;color:#9CA3AF;padding:5px 0;">Membre</span>
+            ${f.type_compte === 'particulier'
+              ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #E5E7EB;background:#F9FAFB;color:#374151;">👤 Particulier</span>'
+              : f.type_compte === 'usine'
+              ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #FED7AA;background:#FFF7ED;color:#C2410C;">🏭 Usine & Fabricant</span>'
+              : '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1D4ED8;">🏢 Entreprise</span>'}
+            ${f.note_moyenne && f.note_moyenne > 0
+              ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #FDE68A;background:#FFFBEB;color:#B45309;">⭐ ' + f.note_moyenne + '/5</span>'
+              : '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #DDD6FE;background:#F5F3FF;color:#7C3AED;">⭐ Nouveau</span>'}
           </div>
-
-          <!-- STATS -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;
-            text-align:center;background:#F9FAFB;border-radius:12px;
-            padding:12px;margin-bottom:14px;">
-            <div style="border-right:1px solid #E5E7EB;">
-              <div style="font-size:20px;font-weight:800;color:#1A1A4E;">
-                ${catalogue.length}
-              </div>
-              <div style="font-size:10px;font-weight:600;color:#9CA3AF;
-                text-transform:uppercase;margin-top:2px;">PRODUITS</div>
-            </div>
-            <div style="border-right:1px solid #E5E7EB;">
-              <div style="font-size:20px;">${f.statut === 'actif' ? '🟢' : '⏳'}</div>
-              <div style="font-size:10px;font-weight:600;color:#9CA3AF;
-                text-transform:uppercase;margin-top:2px;">STATUT</div>
-            </div>
-            <div>
-              <div style="font-size:20px;font-weight:800;color:#1A1A4E;">${annee}</div>
-              <div style="font-size:10px;font-weight:600;color:#9CA3AF;
-                text-transform:uppercase;margin-top:2px;">DEPUIS</div>
-            </div>
-          </div>
-
-          <!-- BOUTONS CONTACT -->
-          ${tel ? `
-          <div style="display:flex;gap:10px;margin-bottom:10px;">
-            <a href="${waLink}" target="_blank"
-              style="flex:1;background:#25D366;color:white;padding:13px;
-              border-radius:12px;text-align:center;font-weight:700;
-              text-decoration:none;font-size:14px;display:flex;
-              align-items:center;justify-content:center;gap:6px;">
-              📱 WhatsApp
-            </a>
-            <a href="tel:+${tel}"
-              style="flex:1;background:#FFF5F0;color:#E8622A;padding:13px;
-              border-radius:12px;text-align:center;font-weight:700;
-              text-decoration:none;font-size:14px;border:1.5px solid #FDDDD0;
-              display:flex;align-items:center;justify-content:center;gap:6px;">
-              📞 Appeler
-            </a>
-          </div>
-          ` : ''}
 
           <!-- BOUTON VOIR CATALOGUE -->
-          <button onclick="document.getElementById('${catalogueId}').scrollIntoView({behavior:'smooth'})"
+          <button onclick="document.getElementById('${catalogueId}').style.display = document.getElementById('${catalogueId}').style.display === 'none' ? 'block' : 'none'"
             style="width:100%;background:#1A1A4E;color:white;padding:13px;
             border:none;border-radius:12px;font-size:14px;font-weight:700;
             cursor:pointer;margin-bottom:10px;display:flex;
@@ -1553,22 +1528,8 @@ async function annuaireChargerFournisseurs() {
             🏗️ Voir le catalogue
           </button>
 
-          <!-- DESCRIPTION -->
-          ${f.description ? `
-          <div style="background:#F9FAFB;border-radius:10px;padding:14px;
-            margin-bottom:10px;">
-            <div style="font-size:11px;font-weight:700;color:#9CA3AF;
-              text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">
-              À PROPOS
-            </div>
-            <p style="font-size:13px;color:#374151;line-height:1.6;margin:0;">
-              ${f.description}
-            </p>
-          </div>
-          ` : ''}
-
-          <!-- CATALOGUE -->
-          <div id="${catalogueId}" style="margin-bottom:10px;">
+          <!-- CATALOGUE (masqué par défaut, revealed au clic) -->
+          <div id="${catalogueId}" style="display:none;margin-bottom:10px;">
             <div style="display:flex;align-items:center;
               justify-content:space-between;margin-bottom:4px;">
               <div style="font-size:15px;font-weight:700;color:#1A1A4E;">
@@ -1597,16 +1558,34 @@ async function annuaireChargerFournisseurs() {
                 </div>
               </div>
             `).join('') : '<p style="color:#9CA3AF;text-align:center;padding:16px 0;font-size:13px;">Aucun produit renseigné.</p>'}
-          </div>
 
-          <!-- PARTAGER -->
-          <button onclick="_fournisseurPartagerProfil('${f.id}')"
-            style="width:100%;background:white;color:#1A1A4E;padding:12px;
-            border:1.5px solid #E5E7EB;border-radius:12px;font-size:13px;
-            font-weight:600;cursor:pointer;display:flex;
-            align-items:center;justify-content:center;gap:6px;">
-            📤 Partager ce profil
-          </button>
+            <!-- CONTACT + PARTAGER (visibles uniquement dans le catalogue ouvert) -->
+            ${tel ? `
+            <div style="display:flex;gap:10px;margin-top:14px;">
+              <a href="${waLink}" target="_blank"
+                style="flex:1;background:#25D366;color:white;padding:12px;
+                border-radius:12px;text-align:center;font-weight:700;
+                text-decoration:none;font-size:14px;display:flex;
+                align-items:center;justify-content:center;gap:6px;">
+                📱 WhatsApp
+              </a>
+              <a href="tel:+${tel}"
+                style="flex:1;background:#FFF5F0;color:#E8622A;padding:12px;
+                border-radius:12px;text-align:center;font-weight:700;
+                text-decoration:none;font-size:14px;border:1.5px solid #FDDDD0;
+                display:flex;align-items:center;justify-content:center;gap:6px;">
+                📞 Appeler
+              </a>
+            </div>` : ''}
+
+            <button onclick="_fournisseurPartagerProfil('${f.id}')"
+              style="width:100%;background:white;color:#1A1A4E;padding:12px;
+              border:1.5px solid #E5E7EB;border-radius:12px;font-size:13px;
+              font-weight:600;cursor:pointer;margin-top:10px;display:flex;
+              align-items:center;justify-content:center;gap:6px;">
+              📤 Partager ce profil
+            </button>
+          </div>
 
         </div>
       </div>
