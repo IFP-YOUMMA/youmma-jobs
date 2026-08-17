@@ -1967,6 +1967,10 @@ async function verifierSession() {
     <div class="nav-ctas" style="display:flex;align-items:center;gap:8px;">
       <button class="btn-nav-ghost" onclick="(function(){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');p.style.display='';});var mc=document.getElementById('mainContent');var mn=document.getElementById('mainNav');document.body.classList.remove('on-home','on-dashboard','on-admin');if(mc)mc.style.cssText='display:none!important';if(mn)mn.style.cssText='display:none!important';var pl=document.getElementById('page-login');if(pl){pl.classList.add('active');pl.style.cssText='display:block!important';window.scrollTo(0,0);}})()"><i class="fa-solid fa-lock" style="font-size:12px;"></i> Connexion</button>
       <button class="btn-nav-ghost" onclick="(function(){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');p.style.display='';});var mc=document.getElementById('mainContent');var mn=document.getElementById('mainNav');document.body.classList.remove('on-home','on-dashboard','on-admin');if(mc)mc.style.cssText='display:none!important';if(mn)mn.style.cssText='display:none!important';var pi=document.getElementById('page-inscription');if(pi){pi.classList.add('active');pi.style.cssText='display:block!important';window.scrollTo(0,0);}})()"><i class="fa-solid fa-plus" style="font-size:11px;"></i> Devenir artisan</button>
+      <button class="btn-nav-ghost" onclick="ouvrirInscriptionFournisseur()"
+        style="border-color:#E8622A;color:#E8622A;">
+        🏗️ Fournisseur
+      </button>
       <button class="btn-nav-primary" onclick="document.getElementById('prestataires').scrollIntoView({behavior:'smooth'})">Trouver un artisan</button>
     </div>
 
@@ -1996,6 +2000,13 @@ async function verifierSession() {
     <div style="padding:14px 16px;display:flex;gap:8px;border-bottom:1px solid rgba(255,255,255,.08);">
       <button onclick="toggleMenu();(function(){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');p.style.display='';});var mc=document.getElementById('mainContent');var mn=document.getElementById('mainNav');document.body.classList.remove('on-home','on-dashboard','on-admin');if(mc)mc.style.cssText='display:none!important';if(mn)mn.style.cssText='display:none!important';var pl=document.getElementById('page-login');if(pl){pl.classList.add('active');pl.style.cssText='display:block!important';window.scrollTo(0,0);}})()" style="flex:1;padding:10px 8px;background:#E85D04;border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-lock" style="font-size:11px;"></i> Connexion</button>
       <button onclick="toggleMenu();(function(){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');p.style.display='';});var mc=document.getElementById('mainContent');var mn=document.getElementById('mainNav');document.body.classList.remove('on-home','on-dashboard','on-admin');if(mc)mc.style.cssText='display:none!important';if(mn)mn.style.cssText='display:none!important';var pi=document.getElementById('page-inscription');if(pi){pi.classList.add('active');pi.style.cssText='display:block!important';window.scrollTo(0,0);}})()" style="flex:1;padding:10px 8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-plus" style="font-size:11px;"></i> S'inscrire</button>
+      <button onclick="toggleMenu();ouvrirInscriptionFournisseur()"
+        style="flex:1;padding:10px 8px;background:rgba(232,98,42,.15);
+        border:1px solid rgba(232,98,42,.4);border-radius:10px;color:#E8622A;
+        font-size:13px;font-weight:600;cursor:pointer;display:flex;
+        align-items:center;justify-content:center;gap:6px;">
+        🏗️ Fournisseur
+      </button>
     </div>
 
     <!-- Liens navigation -->
@@ -2399,6 +2410,46 @@ async function verifierSession() {
       </div>
     </div>
   </div>
+</section>
+
+<section id="devenir-fournisseur"
+  style="background:linear-gradient(135deg,#1A1A4E 0%,#0D0D2E 100%);
+  padding:48px 5%;text-align:center;">
+  <p style="font-size:12px;font-weight:700;color:#E8622A;
+    letter-spacing:.1em;text-transform:uppercase;margin:0 0 8px;">
+    FOURNISSEURS DE MATÉRIAUX
+  </p>
+  <h2 style="font-size:26px;font-weight:800;color:white;
+    margin:0 0 12px;line-height:1.3;">
+    Vendez vos matériaux à des<br>milliers de chantiers en Guinée
+  </h2>
+  <p style="font-size:15px;color:rgba(255,255,255,0.7);
+    margin:0 0 24px;max-width:400px;margin-left:auto;margin-right:auto;">
+    Ciment, fer, bois, carrelage — référencez vos produits
+    et soyez contacté directement par les clients et artisans.
+  </p>
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;
+    gap:16px;margin-bottom:28px;">
+    <div style="display:flex;align-items:center;gap:8px;
+      color:rgba(255,255,255,0.8);font-size:14px;">
+      ✅ Profil gratuit
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;
+      color:rgba(255,255,255,0.8);font-size:14px;">
+      📦 Catalogue de produits
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;
+      color:rgba(255,255,255,0.8);font-size:14px;">
+      📱 Contact direct WhatsApp
+    </div>
+  </div>
+  <button onclick="ouvrirInscriptionFournisseur()"
+    style="background:#E8622A;color:white;border:none;
+    padding:16px 36px;border-radius:50px;font-size:16px;
+    font-weight:700;cursor:pointer;
+    box-shadow:0 8px 24px rgba(232,98,42,0.4);">
+    🏗️ Devenir fournisseur →
+  </button>
 </section>
 
 <section class="temo-bg" id="temoignages">
@@ -30868,6 +30919,264 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
 </div>
+
+<div id="inscrFournisseurOverlay"
+  style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);
+  z-index:10000;overflow-y:auto;padding:20px 0;">
+  <div style="background:white;max-width:480px;margin:0 auto;
+    border-radius:20px;overflow:hidden;">
+
+    <!-- Header -->
+    <div style="background:#1A1A4E;padding:20px;display:flex;
+      align-items:center;justify-content:space-between;">
+      <div>
+        <div style="color:white;font-weight:700;font-size:18px;">
+          🏗️ Devenir fournisseur
+        </div>
+        <div style="color:rgba(255,255,255,0.6);font-size:13px;margin-top:2px;">
+          Rejoignez YOUMMA JOBS — Gratuit
+        </div>
+      </div>
+      <button onclick="fermerInscriptionFournisseur()"
+        style="background:rgba(255,255,255,0.15);border:none;color:white;
+        width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;">
+        ×
+      </button>
+    </div>
+
+    <!-- Formulaire -->
+    <div style="padding:24px;">
+
+      <!-- Nom entreprise -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px;font-weight:600;color:#374151;
+          display:block;margin-bottom:6px;">
+          Nom de l'entreprise / boutique *
+        </label>
+        <input id="ifoNomEntreprise" type="text"
+          placeholder="Ex: Matériaux Conakry SARL"
+          style="width:100%;box-sizing:border-box;padding:12px;
+          border:1.5px solid #E5E7EB;border-radius:10px;
+          font-size:14px;outline:none;">
+      </div>
+
+      <!-- Téléphone -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px;font-weight:600;color:#374151;
+          display:block;margin-bottom:6px;">
+          Numéro WhatsApp *
+        </label>
+        <input id="ifoTelephone" type="tel"
+          placeholder="Ex: 622 00 00 00"
+          style="width:100%;box-sizing:border-box;padding:12px;
+          border:1.5px solid #E5E7EB;border-radius:10px;
+          font-size:14px;outline:none;">
+      </div>
+
+      <!-- Ville -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px;font-weight:600;color:#374151;
+          display:block;margin-bottom:6px;">
+          Ville *
+        </label>
+        <select id="ifoVille"
+          style="width:100%;box-sizing:border-box;padding:12px;
+          border:1.5px solid #E5E7EB;border-radius:10px;
+          font-size:14px;outline:none;background:white;">
+          <option value="">— Choisir une ville —</option>
+          <option value="Conakry">Conakry</option>
+          <option value="Kindia">Kindia</option>
+          <option value="Boké">Boké</option>
+          <option value="Labé">Labé</option>
+          <option value="Kankan">Kankan</option>
+          <option value="Nzérékoré">Nzérékoré</option>
+          <option value="Mamou">Mamou</option>
+          <option value="Faranah">Faranah</option>
+        </select>
+      </div>
+
+      <!-- Type compte -->
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px;font-weight:600;color:#374151;
+          display:block;margin-bottom:8px;">
+          Type de compte *
+        </label>
+        <div style="display:flex;gap:8px;">
+          <button type="button" onclick="ifoSelectType('entreprise', this)"
+            id="ifoTypeEntreprise"
+            style="flex:1;padding:10px 4px;border:2px solid #E8622A;
+            border-radius:10px;background:#E8622A;color:white;
+            font-size:12.5px;font-weight:700;cursor:pointer;">
+            🏢 Entreprise
+          </button>
+          <button type="button" onclick="ifoSelectType('particulier', this)"
+            id="ifoTypeParticulier"
+            style="flex:1;padding:10px 4px;border:2px solid #E5E7EB;
+            border-radius:10px;background:white;color:#374151;
+            font-size:12.5px;font-weight:700;cursor:pointer;">
+            👤 Particulier
+          </button>
+          <button type="button" onclick="ifoSelectType('usine', this)"
+            id="ifoTypeUsine"
+            style="flex:1;padding:10px 4px;border:2px solid #E5E7EB;
+            border-radius:10px;background:white;color:#374151;
+            font-size:12.5px;font-weight:700;cursor:pointer;">
+            🏭 Usine
+          </button>
+        </div>
+        <input type="hidden" id="ifoTypeCompte" value="entreprise">
+      </div>
+
+      <!-- PIN -->
+      <div style="margin-bottom:20px;">
+        <label style="font-size:13px;font-weight:600;color:#374151;
+          display:block;margin-bottom:6px;">
+          Code PIN (4 chiffres) *
+        </label>
+        <input id="ifoPIN" type="password" maxlength="4"
+          placeholder="••••"
+          style="width:100%;box-sizing:border-box;padding:12px;
+          border:1.5px solid #E5E7EB;border-radius:10px;
+          font-size:20px;letter-spacing:8px;outline:none;
+          text-align:center;">
+        <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">
+          Ce code vous servira à vous connecter
+        </div>
+      </div>
+
+      <!-- Message erreur -->
+      <div id="ifoErreur"
+        style="display:none;background:#FEF2F2;color:#DC2626;
+        padding:10px 14px;border-radius:8px;font-size:13px;
+        margin-bottom:16px;">
+      </div>
+
+      <!-- Bouton soumettre -->
+      <button id="ifoBtnSoumettre" onclick="soumettrInscriptionFournisseur()"
+        style="width:100%;background:#E8622A;color:white;padding:14px;
+        border:none;border-radius:12px;font-size:15px;font-weight:700;
+        cursor:pointer;">
+        🚀 Créer mon compte fournisseur
+      </button>
+
+      <div style="font-size:12px;color:#9CA3AF;text-align:center;
+        margin-top:12px;line-height:1.5;">
+        Votre compte sera vérifié par l'équipe YOUMMA.<br>
+        Vous serez contacté sur WhatsApp.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var _ifoTypeSelectionne = 'entreprise';
+
+function ouvrirInscriptionFournisseur() {
+  document.getElementById('inscrFournisseurOverlay').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  // Reset formulaire
+  document.getElementById('ifoNomEntreprise').value = '';
+  document.getElementById('ifoTelephone').value = '';
+  document.getElementById('ifoVille').value = '';
+  document.getElementById('ifoPIN').value = '';
+  document.getElementById('ifoErreur').style.display = 'none';
+  document.getElementById('ifoTypeCompte').value = 'entreprise';
+  _ifoTypeSelectionne = 'entreprise';
+  // Reset boutons type
+  ['entreprise','particulier','usine'].forEach(function(t) {
+    var btn = document.getElementById('ifoType' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (btn) {
+      btn.style.background = t === 'entreprise' ? '#E8622A' : 'white';
+      btn.style.color = t === 'entreprise' ? 'white' : '#374151';
+      btn.style.borderColor = t === 'entreprise' ? '#E8622A' : '#E5E7EB';
+    }
+  });
+}
+
+function fermerInscriptionFournisseur() {
+  document.getElementById('inscrFournisseurOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function ifoSelectType(type, el) {
+  _ifoTypeSelectionne = type;
+  document.getElementById('ifoTypeCompte').value = type;
+  ['entreprise','particulier','usine'].forEach(function(t) {
+    var btn = document.getElementById('ifoType' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (btn) {
+      var active = t === type;
+      btn.style.background = active ? '#E8622A' : 'white';
+      btn.style.color = active ? 'white' : '#374151';
+      btn.style.borderColor = active ? '#E8622A' : '#E5E7EB';
+    }
+  });
+}
+
+async function soumettrInscriptionFournisseur() {
+  var nom = (document.getElementById('ifoNomEntreprise').value || '').trim();
+  var tel = (document.getElementById('ifoTelephone').value || '').replace(/\D/g,'');
+  var ville = document.getElementById('ifoVille').value;
+  var type = document.getElementById('ifoTypeCompte').value || 'entreprise';
+  var pin = (document.getElementById('ifoPIN').value || '').trim();
+  var errDiv = document.getElementById('ifoErreur');
+  var btn = document.getElementById('ifoBtnSoumettre');
+
+  // Validation
+  if (!nom) { errDiv.textContent = 'Le nom de l\'entreprise est requis.'; errDiv.style.display='block'; return; }
+  if (!tel || tel.length < 8) { errDiv.textContent = 'Numéro de téléphone invalide.'; errDiv.style.display='block'; return; }
+  if (!ville) { errDiv.textContent = 'Veuillez choisir une ville.'; errDiv.style.display='block'; return; }
+  if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) { errDiv.textContent = 'Le code PIN doit contenir exactement 4 chiffres.'; errDiv.style.display='block'; return; }
+
+  errDiv.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Création en cours...';
+
+  try {
+    // Normaliser téléphone
+    var telNorm = tel.replace(/^224/, '');
+
+    // Vérifier si déjà inscrit
+    var { data: existing } = await sb.from('fournisseurs_materiaux')
+      .select('id').eq('telephone', telNorm).maybeSingle();
+    if (existing) {
+      errDiv.textContent = 'Ce numéro est déjà associé à un compte fournisseur.';
+      errDiv.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '🚀 Créer mon compte fournisseur';
+      return;
+    }
+
+    // Hacher le PIN
+    var pinHash = await hashPassword(pin);
+
+    // Insérer
+    var { error } = await sb.from('fournisseurs_materiaux').insert({
+      nom_entreprise: nom,
+      telephone: telNorm,
+      ville: ville,
+      type_compte: type,
+      mot_de_passe: pinHash,
+      statut: 'en_attente'
+    });
+
+    if (error) throw error;
+
+    fermerInscriptionFournisseur();
+    showToast('✅ Compte créé ! L\'équipe YOUMMA vous contactera sur WhatsApp.', 'success');
+
+  } catch(e) {
+    errDiv.textContent = 'Erreur : ' + (e.message || 'Réessayez.');
+    errDiv.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = '🚀 Créer mon compte fournisseur';
+  }
+}
+
+// Fermer sur clic overlay
+document.getElementById('inscrFournisseurOverlay').addEventListener('click', function(e) {
+  if (e.target === this) fermerInscriptionFournisseur();
+});
+</script>
 
 </body>
 </html>
