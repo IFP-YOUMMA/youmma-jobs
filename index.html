@@ -1420,52 +1420,198 @@ async function annuaireChargerFournisseurs() {
   const container = document.getElementById('annuaireFournisseurs');
   container.innerHTML = '<p style="text-align:center;color:#888;padding:32px;">Chargement...</p>';
 
-  const { data, error } = await sb
+  const { data: fournisseurs, error } = await sb
     .from('fournisseurs_materiaux')
-    .select('id, nom_entreprise, telephone, ville, commune, photo_url, photo_couverture_url, statut')
+    .select('id, nom_entreprise, telephone, ville, commune, statut, description, photo_url, photo_couverture_url, created_at')
     .order('nom_entreprise', { ascending: true });
 
-  if (error || !data || data.length === 0) {
+  if (error || !fournisseurs || fournisseurs.length === 0) {
     container.innerHTML = '<p style="text-align:center;color:#888;padding:32px;">Aucun fournisseur pour le moment.</p>';
     return;
   }
 
-  container.innerHTML = data.map(f => `
-    <div onclick="voirProfilFournisseur('${f.id}')" style="
-      background:white;border-radius:14px;margin-bottom:12px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.08);cursor:pointer;
-      overflow:hidden;border:1px solid #F3F4F6;">
+  // Charger tous les catalogues en parallèle
+  const catalogues = await Promise.all(
+    fournisseurs.map(f =>
+      sb.from('catalogue_produits')
+        .select('nom_produit, prix_gnf, unite, description')
+        .eq('fournisseur_id', f.id)
+        .eq('disponible', true)
+        .order('ordre', { ascending: true })
+        .then(r => r.data || [])
+    )
+  );
 
-      <div style="height:60px;background:${
-        f.photo_couverture_url
-          ? 'url(\''+f.photo_couverture_url+'\') center/cover no-repeat'
-          : 'linear-gradient(135deg,#1A1A4E,#2D2D6B)'
-      };position:relative;">
-        <div style="position:absolute;bottom:-20px;left:16px;
-          width:44px;height:44px;border-radius:50%;border:2px solid white;
-          background:${f.photo_url ? 'url(\''+f.photo_url+'\') center/cover' : '#1A1A4E'};
-          display:flex;align-items:center;justify-content:center;
-          color:white;font-weight:700;font-size:16px;overflow:hidden;">
-          ${f.photo_url ? '' : (f.nom_entreprise||'?')[0].toUpperCase()}
-        </div>
-      </div>
+  container.innerHTML = fournisseurs.map((f, i) => {
+    const catalogue = catalogues[i];
+    const initiale = (f.nom_entreprise || '?')[0].toUpperCase();
+    const tel = f.telephone ? '224' + f.telephone.replace(/^224/, '').replace(/\D/g, '') : null;
+    const waLink = tel ? 'https://wa.me/' + tel : null;
+    const annee = new Date(f.created_at || Date.now()).getFullYear();
+    const isNouveau = (new Date().getFullYear() - annee) < 1;
+    const catalogueId = 'foCat-' + f.id;
 
-      <div style="padding:28px 16px 12px;">
-        <div style="font-weight:700;font-size:15px;color:#1A1A4E;
-          white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-          ${f.nom_entreprise||'Sans nom'}
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
-          <div style="font-size:13px;color:#666;">
-            📍 ${[f.ville,f.commune].filter(Boolean).join(', ')||'Conakry'}
+    const coverStyle = f.photo_couverture_url
+      ? 'background:url(' + f.photo_couverture_url + ') center/cover no-repeat;'
+      : 'background:linear-gradient(135deg,#1A1A4E 0%,#0D0D2E 100%);';
+
+    const avatarContent = f.photo_url
+      ? '<img src="' + f.photo_url + '" style="width:100%;height:100%;object-fit:cover;">'
+      : '<span style="font-size:26px;font-weight:700;color:white;">' + initiale + '</span>';
+
+    const avatarBg = f.photo_url ? '' : 'background:#E8622A;';
+
+    return `
+      <div style="background:white;border-radius:16px;margin-bottom:20px;
+        box-shadow:0 2px 12px rgba(0,0,0,0.08);overflow:hidden;
+        border:1px solid #F3F4F6;">
+
+        <!-- HERO -->
+        <div style="position:relative;height:120px;${coverStyle}">
+          <div style="position:absolute;bottom:-28px;left:16px;
+            width:72px;height:72px;border-radius:14px;border:3px solid white;
+            overflow:hidden;display:flex;align-items:center;
+            justify-content:center;${avatarBg}">
+            ${avatarContent}
           </div>
-          ${f.statut==='actif'
-            ? '<span style="font-size:11px;color:#166534;background:#F0FDF4;border:1px solid #BBF7D0;padding:2px 8px;border-radius:20px;font-weight:700;">✓ Vérifié</span>'
-            : ''}
+          <div style="position:absolute;bottom:12px;left:104px;right:12px;">
+            <div style="font-size:17px;font-weight:700;color:white;
+              white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              ${f.nom_entreprise || 'Sans nom'}
+            </div>
+            <div style="font-size:13px;color:#E8622A;font-weight:600;">
+              Fournisseur de matériaux
+            </div>
+          </div>
+        </div>
+
+        <!-- BODY -->
+        <div style="padding:40px 16px 16px;">
+
+          <!-- Localisation -->
+          <div style="font-size:13px;color:#6B7280;margin-bottom:12px;">
+            📍 ${[f.ville, f.commune].filter(Boolean).join(', ') || 'Conakry'}
+          </div>
+
+          <!-- BADGES -->
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+            ${f.statut === 'actif' ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #BBF7D0;background:#F0FDF4;color:#166534;">✓ Vérifié</span>' : ''}
+            <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #BFDBFE;background:#EFF6FF;color:#1D4ED8;">🏗️ Fournisseur</span>
+            ${isNouveau ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #DDD6FE;background:#F5F3FF;color:#7C3AED;">✦ Nouveau</span>' : ''}
+            <span style="font-size:12px;color:#9CA3AF;padding:5px 0;">Membre</span>
+          </div>
+
+          <!-- STATS -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;
+            text-align:center;background:#F9FAFB;border-radius:12px;
+            padding:12px;margin-bottom:14px;">
+            <div style="border-right:1px solid #E5E7EB;">
+              <div style="font-size:20px;font-weight:800;color:#1A1A4E;">
+                ${catalogue.length}
+              </div>
+              <div style="font-size:10px;font-weight:600;color:#9CA3AF;
+                text-transform:uppercase;margin-top:2px;">PRODUITS</div>
+            </div>
+            <div style="border-right:1px solid #E5E7EB;">
+              <div style="font-size:20px;">${f.statut === 'actif' ? '🟢' : '⏳'}</div>
+              <div style="font-size:10px;font-weight:600;color:#9CA3AF;
+                text-transform:uppercase;margin-top:2px;">STATUT</div>
+            </div>
+            <div>
+              <div style="font-size:20px;font-weight:800;color:#1A1A4E;">${annee}</div>
+              <div style="font-size:10px;font-weight:600;color:#9CA3AF;
+                text-transform:uppercase;margin-top:2px;">DEPUIS</div>
+            </div>
+          </div>
+
+          <!-- BOUTONS CONTACT -->
+          ${tel ? `
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <a href="${waLink}" target="_blank"
+              style="flex:1;background:#25D366;color:white;padding:13px;
+              border-radius:12px;text-align:center;font-weight:700;
+              text-decoration:none;font-size:14px;display:flex;
+              align-items:center;justify-content:center;gap:6px;">
+              📱 WhatsApp
+            </a>
+            <a href="tel:+${tel}"
+              style="flex:1;background:#FFF5F0;color:#E8622A;padding:13px;
+              border-radius:12px;text-align:center;font-weight:700;
+              text-decoration:none;font-size:14px;border:1.5px solid #FDDDD0;
+              display:flex;align-items:center;justify-content:center;gap:6px;">
+              📞 Appeler
+            </a>
+          </div>
+          ` : ''}
+
+          <!-- BOUTON VOIR CATALOGUE -->
+          <button onclick="document.getElementById('${catalogueId}').scrollIntoView({behavior:'smooth'})"
+            style="width:100%;background:#1A1A4E;color:white;padding:13px;
+            border:none;border-radius:12px;font-size:14px;font-weight:700;
+            cursor:pointer;margin-bottom:10px;display:flex;
+            align-items:center;justify-content:center;gap:8px;">
+            🏗️ Voir le catalogue
+          </button>
+
+          <!-- DESCRIPTION -->
+          ${f.description ? `
+          <div style="background:#F9FAFB;border-radius:10px;padding:14px;
+            margin-bottom:10px;">
+            <div style="font-size:11px;font-weight:700;color:#9CA3AF;
+              text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">
+              À PROPOS
+            </div>
+            <p style="font-size:13px;color:#374151;line-height:1.6;margin:0;">
+              ${f.description}
+            </p>
+          </div>
+          ` : ''}
+
+          <!-- CATALOGUE -->
+          <div id="${catalogueId}" style="margin-bottom:10px;">
+            <div style="display:flex;align-items:center;
+              justify-content:space-between;margin-bottom:4px;">
+              <div style="font-size:15px;font-weight:700;color:#1A1A4E;">
+                🏗️ Catalogue produits
+              </div>
+              <div style="font-size:12px;color:#9CA3AF;">
+                ${catalogue.length} produit(s)
+              </div>
+            </div>
+            <div style="height:2px;background:#E8622A;border-radius:2px;margin-bottom:10px;"></div>
+            ${catalogue.length > 0 ? catalogue.map(p => `
+              <div style="display:flex;justify-content:space-between;
+                align-items:center;padding:10px 0;
+                border-bottom:1px solid #F3F4F6;">
+                <div>
+                  <div style="font-weight:600;color:#1A1A4E;font-size:14px;">
+                    ${p.nom_produit}
+                  </div>
+                  ${p.description ? '<div style="font-size:12px;color:#9CA3AF;margin-top:2px;">'+p.description+'</div>' : ''}
+                </div>
+                <div style="text-align:right;flex-shrink:0;margin-left:16px;">
+                  <div style="font-weight:700;color:#E8622A;font-size:14px;white-space:nowrap;">
+                    ${p.prix_gnf ? Number(p.prix_gnf).toLocaleString('fr-FR')+' GNF' : 'Sur devis'}
+                  </div>
+                  ${p.unite ? '<div style="font-size:11px;color:#9CA3AF;">/ '+p.unite+'</div>' : ''}
+                </div>
+              </div>
+            `).join('') : '<p style="color:#9CA3AF;text-align:center;padding:16px 0;font-size:13px;">Aucun produit renseigné.</p>'}
+          </div>
+
+          <!-- PARTAGER -->
+          <button onclick="_fournisseurPartagerProfil('${f.id}')"
+            style="width:100%;background:white;color:#1A1A4E;padding:12px;
+            border:1.5px solid #E5E7EB;border-radius:12px;font-size:13px;
+            font-weight:600;cursor:pointer;display:flex;
+            align-items:center;justify-content:center;gap:6px;">
+            📤 Partager ce profil
+          </button>
+
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 async function voirProfilFournisseur(id) {
