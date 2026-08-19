@@ -1449,11 +1449,10 @@ async function annuaireChargerFournisseurs() {
   const catalogues = await Promise.all(
     fournisseurs.map(f =>
       sb.from('catalogue_produits')
-        .select('nom_produit, prix_gnf, unite, description, photo_url')
+        .select('nom_produit, prix_gnf, unite, description, photo_url, disponible')
         .eq('fournisseur_id', f.id)
-        .eq('disponible', true)
         .order('ordre', { ascending: true })
-        .then(r => r.data || [])
+        .then(r => (r.data || []).filter(p => p.disponible !== false))
     )
   );
 
