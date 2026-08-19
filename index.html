@@ -12659,6 +12659,7 @@ async function chargerAvis() {
     <div onclick="showAdmin('valide')" id="amenu-valide" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-circle-check" style="width:16px;"></i> Validés</div>
     <div onclick="showAdmin('rejete')" id="amenu-rejete" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-circle-xmark" style="width:16px;"></i> Rejetés</div>
     <div onclick="showAdmin('suspendu')" id="amenu-suspendu" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-ban" style="width:16px;"></i> Suspendus</div>
+    <div onclick="showAdmin('fournisseurs');_adminLoadFournisseurs();" id="amenu-fournisseurs" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-truck" style="width:16px;"></i> Fournisseurs</div>
     <div class="super-admin-only" data-super-only="true" style="border-top:1px solid rgba(255,255,255,.12);margin:6px 0 8px;"></div>
     <div onclick="showAdmin('campagne');_campagneInit();" id="amenu-campagne" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullhorn" style="width:16px;"></i> Campagne SMS</div>
     <div style="border-top:1px solid rgba(255,255,255,.12);margin:8px 0 6px;"></div>
@@ -13965,6 +13966,70 @@ async function chargerAvis() {
           <input class="adm-search-input" id="searchSuspendu" placeholder="Matricule, nom, téléphone..." oninput="filterTable('suspendu',this.value)"/>
         </div>
         <div id="tableSuspendu"></div>
+      </div>
+    </div>
+
+
+    <!-- ══ FOURNISSEURS ══ -->
+    <div id="admin-fournisseurs" class="admin-section">
+      <div class="admin-section-inner">
+        <div class="adm-section-header">
+          <div class="adm-section-title"><i class="fa-solid fa-truck" style="color:#E8622A;"></i> Gestion des fournisseurs</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <!-- Filtres statut -->
+            <select id="adminFourFiltreStatut" onchange="_adminLoadFournisseurs()"
+              style="padding:8px 12px;border:1.5px solid #E5E7EB;border-radius:8px;
+              font-size:13px;cursor:pointer;">
+              <option value="">Tous les statuts</option>
+              <option value="en_attente">En attente</option>
+              <option value="actif">Actifs</option>
+              <option value="suspendu">Suspendus</option>
+            </select>
+            <!-- Filtre type -->
+            <select id="adminFourFiltreType" onchange="_adminLoadFournisseurs()"
+              style="padding:8px 12px;border:1.5px solid #E5E7EB;border-radius:8px;
+              font-size:13px;cursor:pointer;">
+              <option value="">Tous les types</option>
+              <option value="entreprise">🏢 Entreprise</option>
+              <option value="particulier">👤 Particulier</option>
+              <option value="usine">🏭 Usine</option>
+            </select>
+            <!-- Bouton créer (super_admin only) -->
+            <button data-super-only="true" onclick="_adminOuvrirCreerFournisseur()"
+              style="background:#E8622A;color:white;border:none;padding:8px 16px;
+              border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">
+              + Créer un fournisseur
+            </button>
+          </div>
+        </div>
+
+        <!-- Compteurs -->
+        <div id="adminFourCompteurs"
+          style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
+        </div>
+
+        <!-- Table -->
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead>
+              <tr style="background:#F9FAFB;border-bottom:2px solid #E5E7EB;">
+                <th style="padding:12px;text-align:left;">Entreprise</th>
+                <th style="padding:12px;text-align:left;">Téléphone</th>
+                <th style="padding:12px;text-align:left;">Ville</th>
+                <th style="padding:12px;text-align:left;">Type</th>
+                <th style="padding:12px;text-align:left;">Statut</th>
+                <th style="padding:12px;text-align:left;">Abonnement</th>
+                <th style="padding:12px;text-align:left;">Inscrit le</th>
+                <th style="padding:12px;text-align:left;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminFourTableBody">
+              <tr><td colspan="8" style="text-align:center;padding:32px;color:#9CA3AF;">
+                Chargement...
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -16971,7 +17036,7 @@ function _aboRenderTable(data) {
       +'<td style="padding:10px 12px;"><a href="'+wa+'" target="_blank" style="font-size:12px;color:#25D366;font-weight:600;text-decoration:none;white-space:nowrap;">📱 '+(p.telephone||'—')+'</a></td>'
       +'<td style="padding:10px 12px;white-space:nowrap;"><span style="font-size:12px;font-weight:700;color:'+s.color+';">'+s.badge+' '+s.label+'</span></td>'
       +'<td style="padding:10px 12px;font-size:12px;color:#6B7280;white-space:nowrap;">'+finStr+'</td>'
-      +'<td style="padding:10px 12px;"><button onclick="_aboRenouveler(\''+idSafe+'\',\''+nomSafe+'\',this)" class="super-admin-only" style="padding:6px 12px;background:#E8650A;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🔄 +30j</button></td>'
+      +'<td style="padding:10px 12px;white-space:nowrap;"><button onclick="_aboSetDateLibre(\''+idSafe+'\',\''+nomSafe+'\',\''+(p.abonnement_fin||'')+'\')" style="padding:4px 8px;background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;margin-right:6px;">📅 Date</button><button onclick="_aboRenouveler(\''+idSafe+'\',\''+nomSafe+'\',this)" class="super-admin-only" style="padding:6px 12px;background:#E8650A;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">🔄 +30j</button></td>'
       +'</tr>';
   }).join('');
   el.innerHTML='<table style="width:100%;border-collapse:collapse;min-width:600px;">'
@@ -17013,6 +17078,26 @@ async function _aboRenouveler(id, nom, btn) {
   } finally {
     if(btn){btn.disabled=false;btn.textContent='🔄 +30j';}
   }
+}
+
+function _aboSetDateLibre(id, nom, aboFinActuel) {
+  var date = prompt(
+    'Abonnement pour : ' + nom + '\nDate expiration (YYYY-MM-DD) :',
+    aboFinActuel ? aboFinActuel.substring(0,10) : new Date(Date.now()+30*864e5).toISOString().substring(0,10)
+  );
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    if (date !== null) showToast('Format invalide — utilise YYYY-MM-DD', 'error');
+    return;
+  }
+  sb.from('providers')
+    .update({ abonnement_actif: true, abonnement_fin: date + 'T23:59:59.000Z' })
+    .eq('id', id)
+    .then(function(r) {
+      if (r.error) { showToast('Erreur : ' + r.error.message, 'error'); return; }
+      if (typeof _logAdminAction === 'function') _logAdminAction('modification_abonnement', id, nom);
+      showToast('📅 Abonnement mis à jour : ' + date, 'success');
+      if (typeof _aboLoad === 'function') _aboLoad();
+    });
 }
 
 function _adminShowSection(name) {
@@ -18491,12 +18576,13 @@ function showAdmin(name) {
     registre_chantier: '<i class="fa-solid fa-clipboard-list" style="color:#E8650A;margin-right:6px;"></i>Registre chantier',
     construction_v2: '<i class="fa-solid fa-helmet-safety" style="color:#E8650A;margin-right:6px;"></i>Construire V2',
     comptes: '<i class="fa-solid fa-users" style="color:#E8650A;margin-right:6px;"></i>Gestion des comptes',
+    fournisseurs: '<i class="fa-solid fa-truck" style="color:#E8650A;margin-right:6px;"></i>Fournisseurs',
   };
   const tt = document.getElementById('adminTopbarTitle');
   if (tt && titles[name]) tt.innerHTML = titles[name];
   const NORMAL = 'padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;background:transparent;';
   const ACTIVE = 'padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:2px;background:rgba(232,93,4,.25);';
-  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','app_message','missions','missions_declarees','projets_clients','ambassadeurs','rapports','activite','notifications','equipe','registre_chantier','construction_v2','comptes'].forEach(s => {
+  ['dashboard','en_attente','valide','rejete','suspendu','campagne','carousel','app_message','missions','missions_declarees','projets_clients','ambassadeurs','rapports','activite','notifications','equipe','registre_chantier','construction_v2','comptes','fournisseurs'].forEach(s => {
     const el = document.getElementById('amenu-'+s);
     if (!el) return;
     // Ne pas réafficher un élément restreint à l'agent
@@ -31176,6 +31262,352 @@ async function soumettrInscriptionFournisseur() {
 document.getElementById('inscrFournisseurOverlay').addEventListener('click', function(e) {
   if (e.target === this) fermerInscriptionFournisseur();
 });
+</script>
+
+<script>
+// ── ADMIN FOURNISSEURS ──
+
+async function _adminLoadFournisseurs() {
+  const tbody = document.getElementById('adminFourTableBody');
+  const compteurs = document.getElementById('adminFourCompteurs');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:#9CA3AF;">Chargement...</td></tr>';
+
+  const filtreStatut = document.getElementById('adminFourFiltreStatut')?.value || '';
+  const filtreType = document.getElementById('adminFourFiltreType')?.value || '';
+
+  try {
+    let query = sb.from('fournisseurs_materiaux')
+      .select('id,nom_entreprise,telephone,ville,commune,statut,type_compte,abonnement_fin,created_at,photo_url')
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    if (filtreStatut) query = query.eq('statut', filtreStatut);
+    if (filtreType) query = query.eq('type_compte', filtreType);
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    // Compteurs
+    const total = data.length;
+    const enAttente = data.filter(f => f.statut === 'en_attente').length;
+    const actifs = data.filter(f => f.statut === 'actif').length;
+    const suspendus = data.filter(f => f.statut === 'suspendu').length;
+
+    if (compteurs) {
+      compteurs.innerHTML = [
+        { label: 'Total', val: total, color: '#1A1A4E' },
+        { label: 'En attente', val: enAttente, color: '#D97706' },
+        { label: 'Actifs', val: actifs, color: '#059669' },
+        { label: 'Suspendus', val: suspendus, color: '#DC2626' },
+      ].map(c => `
+        <div style="background:white;border-radius:10px;padding:12px 20px;
+          border-left:4px solid ${c.color};box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+          <div style="font-size:22px;font-weight:800;color:${c.color};">${c.val}</div>
+          <div style="font-size:11px;color:#9CA3AF;text-transform:uppercase;
+            font-weight:600;margin-top:2px;">${c.label}</div>
+        </div>
+      `).join('');
+    }
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:#9CA3AF;">Aucun fournisseur trouvé.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.map(f => {
+      const initiale = (f.nom_entreprise || '?')[0].toUpperCase();
+      const statutColor = f.statut === 'actif' ? '#059669' : f.statut === 'en_attente' ? '#D97706' : '#DC2626';
+      const statutLabel = f.statut === 'actif' ? 'Actif' : f.statut === 'en_attente' ? 'En attente' : 'Suspendu';
+      const typeLabel = f.type_compte === 'particulier' ? '👤 Particulier' : f.type_compte === 'usine' ? '🏭 Usine' : '🏢 Entreprise';
+      const aboFin = f.abonnement_fin ? new Date(f.abonnement_fin).toLocaleDateString('fr-FR') : '—';
+      const aboExpire = f.abonnement_fin && new Date(f.abonnement_fin) < new Date();
+      const inscritLe = f.created_at ? new Date(f.created_at).toLocaleDateString('fr-FR') : '—';
+
+      return `
+        <tr style="border-bottom:1px solid #F3F4F6;transition:background 0.15s;"
+          onmouseover="this.style.background='#F9FAFB'"
+          onmouseout="this.style.background=''">
+          <td style="padding:12px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              ${f.photo_url
+                ? `<img src="${f.photo_url}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">`
+                : `<div style="width:36px;height:36px;border-radius:8px;background:#E8622A;
+                    display:flex;align-items:center;justify-content:center;
+                    color:white;font-weight:700;font-size:14px;">${initiale}</div>`
+              }
+              <div style="font-weight:600;color:#1A1A4E;">${f.nom_entreprise || '—'}</div>
+            </div>
+          </td>
+          <td style="padding:12px;color:#374151;">${f.telephone || '—'}</td>
+          <td style="padding:12px;color:#374151;">${[f.ville,f.commune].filter(Boolean).join(', ') || '—'}</td>
+          <td style="padding:12px;">${typeLabel}</td>
+          <td style="padding:12px;">
+            <span style="background:${statutColor}20;color:${statutColor};
+              padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;">
+              ${statutLabel}
+            </span>
+          </td>
+          <td style="padding:12px;color:${aboExpire ? '#DC2626' : '#374151'};">
+            ${aboFin} ${aboExpire ? '⚠️' : ''}
+          </td>
+          <td style="padding:12px;color:#9CA3AF;">${inscritLe}</td>
+          <td style="padding:12px;">
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <!-- Valider -->
+              ${f.statut === 'en_attente' ? `
+              <button onclick="_adminFourValider('${f.id}','${(f.nom_entreprise||'').replace(/'/g,"\\'")}',this)"
+                style="background:#ECFDF5;color:#059669;border:1px solid #A7F3D0;
+                border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;">
+                ✓ Valider
+              </button>` : ''}
+              <!-- Suspendre (super_admin only) -->
+              ${f.statut === 'actif' ? `
+              <button data-super-only="true" onclick="_adminFourSuspendre('${f.id}','${(f.nom_entreprise||'').replace(/'/g,"\\'")}',this)"
+                style="background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;
+                border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;">
+                ⏸ Suspendre
+              </button>` : ''}
+              <!-- Réactiver -->
+              ${f.statut === 'suspendu' ? `
+              <button onclick="_adminFourReactiver('${f.id}','${(f.nom_entreprise||'').replace(/'/g,"\\'")}',this)"
+                style="background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;
+                border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;">
+                ▶ Réactiver
+              </button>` : ''}
+              <!-- Abonnement -->
+              <button onclick="_adminFourAbonnement('${f.id}','${(f.nom_entreprise||'').replace(/'/g,"\\'")}','${f.abonnement_fin||''}')"
+                style="background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA;
+                border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;">
+                💳 Abo
+              </button>
+              <!-- Type compte -->
+              <button onclick="_adminFourModifierType('${f.id}','${f.type_compte||'entreprise'}')"
+                style="background:#F5F3FF;color:#7C3AED;border:1px solid #DDD6FE;
+                border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;">
+                ✏️ Type
+              </button>
+              <!-- Voir profil -->
+              <button onclick="voirProfilFournisseur('${f.id}')"
+                style="background:#F9FAFB;color:#374151;border:1px solid #E5E7EB;
+                border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;">
+                👁 Profil
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:#DC2626;">Erreur : ' + e.message + '</td></tr>';
+  }
+}
+
+// Valider fournisseur
+async function _adminFourValider(id, nom, btn) {
+  if (!confirm('Valider le fournisseur "' + nom + '" ?')) return;
+  btn.disabled = true;
+  const { error } = await sb.from('fournisseurs_materiaux')
+    .update({ statut: 'actif' }).eq('id', id);
+  if (error) { showToast('Erreur : ' + error.message, 'error'); btn.disabled=false; return; }
+  _logAdminAction('validation_fournisseur', id, nom);
+  showToast('✅ Fournisseur validé', 'success');
+  _adminLoadFournisseurs();
+}
+
+// Suspendre fournisseur
+async function _adminFourSuspendre(id, nom, btn) {
+  if (!confirm('Suspendre "' + nom + '" ?')) return;
+  btn.disabled = true;
+  const { error } = await sb.from('fournisseurs_materiaux')
+    .update({ statut: 'suspendu' }).eq('id', id);
+  if (error) { showToast('Erreur : ' + error.message, 'error'); btn.disabled=false; return; }
+  _logAdminAction('suspension_fournisseur', id, nom);
+  showToast('⏸ Fournisseur suspendu', 'success');
+  _adminLoadFournisseurs();
+}
+
+// Réactiver fournisseur
+async function _adminFourReactiver(id, nom, btn) {
+  btn.disabled = true;
+  const { error } = await sb.from('fournisseurs_materiaux')
+    .update({ statut: 'actif' }).eq('id', id);
+  if (error) { showToast('Erreur : ' + error.message, 'error'); btn.disabled=false; return; }
+  _logAdminAction('reactivation_fournisseur', id, nom);
+  showToast('▶ Fournisseur réactivé', 'success');
+  _adminLoadFournisseurs();
+}
+
+// Gérer abonnement fournisseur (date libre)
+var _adminFourAboId = null;
+var _adminFourAboNom = '';
+
+function _adminFourAbonnement(id, nom, aboFinActuel) {
+  _adminFourAboId = id;
+  _adminFourAboNom = nom;
+  // Réutilise la modal existante _rcFourOuvrirAbonnementModal si disponible
+  if (typeof _rcFourOuvrirAbonnementModal === 'function') {
+    _rcFourOuvrirAbonnementModal(id);
+  } else {
+    // Fallback : prompt simple
+    var date = prompt('Date d\'expiration abonnement (YYYY-MM-DD) :', aboFinActuel ? aboFinActuel.substring(0,10) : '');
+    if (!date) return;
+    sb.from('fournisseurs_materiaux').update({ abonnement_fin: date }).eq('id', id)
+      .then(function(r) {
+        if (r.error) { showToast('Erreur', 'error'); return; }
+        _logAdminAction('modification_abonnement_fournisseur', id, nom);
+        showToast('💳 Abonnement mis à jour', 'success');
+        _adminLoadFournisseurs();
+      });
+  }
+}
+
+// Modifier type compte fournisseur
+async function _adminFourModifierType(id, typeActuel) {
+  var types = ['entreprise', 'particulier', 'usine'];
+  var labels = { entreprise: '🏢 Entreprise', particulier: '👤 Particulier', usine: '🏭 Usine' };
+  var choix = prompt(
+    'Type de compte actuel : ' + labels[typeActuel] + '\n\nChoisir :\n1 = Entreprise\n2 = Particulier\n3 = Usine',
+    types.indexOf(typeActuel) + 1
+  );
+  if (!choix) return;
+  var nouveau = types[parseInt(choix) - 1];
+  if (!nouveau) { showToast('Choix invalide', 'error'); return; }
+  const { error } = await sb.from('fournisseurs_materiaux')
+    .update({ type_compte: nouveau }).eq('id', id);
+  if (error) { showToast('Erreur : ' + error.message, 'error'); return; }
+  _logAdminAction('modification_type_fournisseur', id, nouveau);
+  showToast('✏️ Type mis à jour : ' + labels[nouveau], 'success');
+  _adminLoadFournisseurs();
+}
+
+// Créer fournisseur depuis admin
+var _adminFourCreerOverlayId = 'adminFourCreerOverlay';
+
+function _adminOuvrirCreerFournisseur() {
+  var overlay = document.getElementById(_adminFourCreerOverlayId);
+  if (overlay) { overlay.style.display = 'flex'; return; }
+  // Crée la modal dynamiquement
+  var modal = document.createElement('div');
+  modal.id = _adminFourCreerOverlayId;
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = `
+    <div style="background:white;border-radius:16px;padding:24px;
+      width:100%;max-width:440px;max-height:90vh;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="font-size:17px;font-weight:700;color:#1A1A4E;">
+          🏗️ Créer un fournisseur
+        </div>
+        <button onclick="document.getElementById('${_adminFourCreerOverlayId}').style.display='none'"
+          style="background:#F3F4F6;border:none;border-radius:50%;width:32px;height:32px;
+          font-size:16px;cursor:pointer;">×</button>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:5px;">
+          Nom entreprise *
+        </label>
+        <input id="adminFourCreerNom" type="text" placeholder="Ex: Matériaux SARL"
+          style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #E5E7EB;
+          border-radius:8px;font-size:14px;outline:none;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:5px;">
+          Téléphone *
+        </label>
+        <input id="adminFourCreerTel" type="tel" placeholder="622 00 00 00"
+          style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #E5E7EB;
+          border-radius:8px;font-size:14px;outline:none;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:5px;">
+          Ville
+        </label>
+        <select id="adminFourCreerVille"
+          style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #E5E7EB;
+          border-radius:8px;font-size:14px;outline:none;background:white;">
+          <option value="Conakry">Conakry</option>
+          <option value="Kindia">Kindia</option>
+          <option value="Boké">Boké</option>
+          <option value="Labé">Labé</option>
+          <option value="Kankan">Kankan</option>
+          <option value="Nzérékoré">Nzérékoré</option>
+          <option value="Mamou">Mamou</option>
+          <option value="Faranah">Faranah</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:5px;">
+          Type de compte
+        </label>
+        <select id="adminFourCreerType"
+          style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #E5E7EB;
+          border-radius:8px;font-size:14px;outline:none;background:white;">
+          <option value="entreprise">🏢 Entreprise</option>
+          <option value="particulier">👤 Particulier</option>
+          <option value="usine">🏭 Usine</option>
+        </select>
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:5px;">
+          Statut initial
+        </label>
+        <select id="adminFourCreerStatut"
+          style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #E5E7EB;
+          border-radius:8px;font-size:14px;outline:none;background:white;">
+          <option value="actif">✅ Actif directement</option>
+          <option value="en_attente">⏳ En attente</option>
+        </select>
+      </div>
+      <div id="adminFourCreerErreur"
+        style="display:none;background:#FEF2F2;color:#DC2626;
+        padding:8px 12px;border-radius:8px;font-size:13px;margin-bottom:14px;">
+      </div>
+      <button onclick="_adminFourCreerSauvegarder()"
+        style="width:100%;background:#E8622A;color:white;border:none;
+        padding:13px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">
+        ✅ Créer le compte
+      </button>
+      <div style="font-size:11px;color:#9CA3AF;text-align:center;margin-top:8px;">
+        PIN par défaut : 0000 (à changer lors de la première connexion)
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+async function _adminFourCreerSauvegarder() {
+  var nom = (document.getElementById('adminFourCreerNom')?.value || '').trim();
+  var tel = (document.getElementById('adminFourCreerTel')?.value || '').replace(/\D/g,'');
+  var ville = document.getElementById('adminFourCreerVille')?.value || 'Conakry';
+  var type = document.getElementById('adminFourCreerType')?.value || 'entreprise';
+  var statut = document.getElementById('adminFourCreerStatut')?.value || 'actif';
+  var errDiv = document.getElementById('adminFourCreerErreur');
+
+  if (!nom) { errDiv.textContent = 'Nom requis.'; errDiv.style.display='block'; return; }
+  if (!tel || tel.length < 8) { errDiv.textContent = 'Téléphone invalide.'; errDiv.style.display='block'; return; }
+  errDiv.style.display = 'none';
+
+  var telNorm = tel.replace(/^224/,'');
+  var pinHash = await hashPassword('0000');
+
+  const { error } = await sb.from('fournisseurs_materiaux').insert({
+    nom_entreprise: nom,
+    telephone: telNorm,
+    ville: ville,
+    type_compte: type,
+    statut: statut,
+    mot_de_passe: pinHash,
+    created_by_admin: true,
+    doit_changer_mdp: true
+  });
+
+  if (error) { errDiv.textContent = 'Erreur : ' + error.message; errDiv.style.display='block'; return; }
+  _logAdminAction('creation_fournisseur_admin', null, nom);
+  showToast('✅ Fournisseur créé — PIN : 0000', 'success');
+  document.getElementById(_adminFourCreerOverlayId).style.display = 'none';
+  _adminLoadFournisseurs();
+}
 </script>
 
 </body>
