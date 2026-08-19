@@ -3730,52 +3730,46 @@ if (typeof connexionPrestataire === 'undefined') {
             </div>
           </div>
 
-          <!-- STATS 2 colonnes -->
+          <!-- STATS -->
           <div style="display:grid;grid-template-columns:1fr 1fr;
             gap:12px;margin-bottom:16px;">
 
             <!-- Produits catalogue -->
-            <div style="background:white;border-radius:14px;padding:16px;
-              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;cursor:pointer;"
-              onclick="dfoSwitchTab('catalogue')">
+            <div onclick="dfoSwitchTab('catalogue')"
+              style="background:white;border-radius:14px;padding:16px;
+              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;
+              cursor:pointer;">
               <div style="font-size:24px;margin-bottom:4px;">📦</div>
-              <div id="dfoStatProduits"
+              <div id="dfoStatProduits2"
                 style="font-size:22px;font-weight:800;color:#1A1A4E;">—</div>
               <div style="font-size:11px;color:#9CA3AF;font-weight:600;
                 text-transform:uppercase;margin-top:2px;">MES PRODUITS</div>
             </div>
 
-            <!-- Sorties en attente -->
-            <div style="background:white;border-radius:14px;padding:16px;
-              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;cursor:pointer;"
-              onclick="dfoSwitchTab('sorties')">
-              <div style="font-size:24px;margin-bottom:4px;">📤</div>
-              <div id="dfoStatSorties"
-                style="font-size:22px;font-weight:800;color:#1A1A4E;">—</div>
-              <div style="font-size:11px;color:#9CA3AF;font-weight:600;
-                text-transform:uppercase;margin-top:2px;">SORTIES ATTENTE</div>
-            </div>
-
-            <!-- Total reçu -->
+            <!-- Abonnement -->
             <div style="background:white;border-radius:14px;padding:16px;
               box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;">
-              <div style="font-size:24px;margin-bottom:4px;">💰</div>
-              <div id="dfoStatTotal"
-                style="font-size:18px;font-weight:800;color:#1A1A4E;
-                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div>
+              <div style="font-size:24px;margin-bottom:4px;">💳</div>
+              <div id="dfoStatAbo"
+                style="font-size:14px;font-weight:700;color:#1A1A4E;">—</div>
               <div style="font-size:11px;color:#9CA3AF;font-weight:600;
-                text-transform:uppercase;margin-top:2px;">TOTAL REÇU</div>
+                text-transform:uppercase;margin-top:2px;">ABONNEMENT</div>
             </div>
 
-            <!-- Commission due -->
-            <div style="background:white;border-radius:14px;padding:16px;
-              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;">
-              <div style="font-size:24px;margin-bottom:4px;">📊</div>
-              <div id="dfoStatCommission"
-                style="font-size:18px;font-weight:800;color:#E8622A;
-                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div>
+            <!-- Visibilité -->
+            <div onclick="dfoSwitchTab('profil')"
+              style="background:white;border-radius:14px;padding:16px;
+              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;
+              cursor:pointer;grid-column:span 2;">
+              <div style="font-size:24px;margin-bottom:4px;">👁</div>
+              <div id="dfoStatVisibilite"
+                style="font-size:14px;font-weight:700;color:#059669;">
+                Visible dans l'annuaire
+              </div>
               <div style="font-size:11px;color:#9CA3AF;font-weight:600;
-                text-transform:uppercase;margin-top:2px;">COMMISSION DUE</div>
+                text-transform:uppercase;margin-top:2px;">
+                MON PROFIL PUBLIC
+              </div>
             </div>
 
           </div>
@@ -4011,12 +4005,178 @@ if (typeof connexionPrestataire === 'undefined') {
 
       <!-- ONGLET 7 : PROFIL -->
       <div class="dfo-panel" id="dfoPanel-profil">
-        <div class="dfo-card">
-          <div class="dfo-card-title">
-            <div class="dfo-card-title-left"><i class="fa-solid fa-user"></i> Mon profil</div>
+
+        <div id="dfoProfil-view">
+          <!-- Couverture + avatar -->
+          <div style="position:relative;height:120px;border-radius:14px;
+            overflow:hidden;margin-bottom:48px;" id="dfoCouverturePreview">
+            <!-- fond couverture -->
+            <div id="dfoCouvertureContainer"
+              style="width:100%;height:100%;
+              background:linear-gradient(135deg,#1A1A4E,#0D0D2E);">
+            </div>
+            <!-- avatar -->
+            <div id="dfoAvatarContainer"
+              style="position:absolute;bottom:-28px;left:16px;
+              width:72px;height:72px;border-radius:14px;
+              border:3px solid white;overflow:hidden;
+              background:#E8622A;display:flex;align-items:center;
+              justify-content:center;color:white;font-weight:700;font-size:26px;">
+            </div>
           </div>
-          <div id="dfoProfilDetail"></div>
+
+          <div style="padding:0 16px 16px;">
+            <div id="dfoProfil-nom"
+              style="font-size:20px;font-weight:700;color:#1A1A4E;"></div>
+            <div id="dfoProfil-localisation"
+              style="font-size:13px;color:#9CA3AF;margin-top:2px;"></div>
+            <div id="dfoProfil-statut" style="margin-top:8px;"></div>
+            <div id="dfoProfil-description"
+              style="font-size:14px;color:#374151;margin-top:12px;
+              line-height:1.6;"></div>
+
+            <button onclick="dfoProfilEditer()"
+              style="width:100%;margin-top:16px;background:#1A1A4E;color:white;
+              border:none;padding:13px;border-radius:12px;font-size:14px;
+              font-weight:700;cursor:pointer;">
+              ✏️ Modifier mon profil
+            </button>
+          </div>
         </div>
+
+        <div id="dfoProfil-edit" style="display:none;padding:16px;">
+
+          <div style="font-size:16px;font-weight:700;color:#1A1A4E;
+            margin-bottom:16px;">✏️ Modifier mon profil</div>
+
+          <!-- PHOTO DE COUVERTURE -->
+          <div style="margin-bottom:16px;">
+            <label style="font-size:13px;font-weight:600;color:#374151;
+              display:block;margin-bottom:6px;">
+              Photo de couverture
+            </label>
+            <div id="dfoCouvertureEditPreview"
+              style="width:100%;height:80px;border-radius:10px;
+              background:linear-gradient(135deg,#1A1A4E,#0D0D2E);
+              margin-bottom:6px;overflow:hidden;">
+            </div>
+            <input type="file" id="dfoCouvertureFile" accept="image/*"
+              onchange="dfoPreviewCouverture(this)"
+              style="width:100%;font-size:13px;padding:8px;
+              border:1.5px solid #E5E7EB;border-radius:8px;
+              box-sizing:border-box;cursor:pointer;">
+          </div>
+
+          <!-- PHOTO DE PROFIL -->
+          <div style="margin-bottom:16px;">
+            <label style="font-size:13px;font-weight:600;color:#374151;
+              display:block;margin-bottom:6px;">
+              Photo de profil
+            </label>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+              <div id="dfoAvatarEditPreview"
+                style="width:64px;height:64px;border-radius:12px;
+                background:#E8622A;display:flex;align-items:center;
+                justify-content:center;color:white;font-weight:700;
+                font-size:22px;overflow:hidden;flex-shrink:0;">
+              </div>
+              <input type="file" id="dfoAvatarFile" accept="image/*"
+                onchange="dfoPreviewAvatar(this)"
+                style="flex:1;font-size:13px;padding:8px;
+                border:1.5px solid #E5E7EB;border-radius:8px;
+                box-sizing:border-box;cursor:pointer;">
+            </div>
+          </div>
+
+          <!-- NOM ENTREPRISE -->
+          <div style="margin-bottom:14px;">
+            <label style="font-size:13px;font-weight:600;color:#374151;
+              display:block;margin-bottom:5px;">Nom entreprise *</label>
+            <input id="dfoProfilEditNom" type="text"
+              style="width:100%;box-sizing:border-box;padding:11px 12px;
+              border:1.5px solid #E5E7EB;border-radius:10px;
+              font-size:14px;outline:none;">
+          </div>
+
+          <!-- TÉLÉPHONE -->
+          <div style="margin-bottom:14px;">
+            <label style="font-size:13px;font-weight:600;color:#374151;
+              display:block;margin-bottom:5px;">Téléphone WhatsApp</label>
+            <input id="dfoEditTelephone" type="tel"
+              style="width:100%;box-sizing:border-box;padding:11px 12px;
+              border:1.5px solid #E5E7EB;border-radius:10px;
+              font-size:14px;outline:none;">
+          </div>
+
+          <!-- VILLE -->
+          <div style="margin-bottom:14px;">
+            <label style="font-size:13px;font-weight:600;color:#374151;
+              display:block;margin-bottom:5px;">Ville</label>
+            <select id="dfoProfilEditVille"
+              style="width:100%;box-sizing:border-box;padding:11px 12px;
+              border:1.5px solid #E5E7EB;border-radius:10px;
+              font-size:14px;outline:none;background:white;">
+              <option value="Conakry">Conakry</option>
+              <option value="Kindia">Kindia</option>
+              <option value="Boké">Boké</option>
+              <option value="Labé">Labé</option>
+              <option value="Kankan">Kankan</option>
+              <option value="Nzérékoré">Nzérékoré</option>
+              <option value="Mamou">Mamou</option>
+              <option value="Faranah">Faranah</option>
+            </select>
+          </div>
+
+          <!-- COMMUNE -->
+          <div style="margin-bottom:14px;">
+            <label style="font-size:13px;font-weight:600;color:#374151;
+              display:block;margin-bottom:5px;">Commune / Quartier</label>
+            <input id="dfoEditCommune" type="text"
+              placeholder="Ex: Matam, Lambanyi, Kaloum..."
+              style="width:100%;box-sizing:border-box;padding:11px 12px;
+              border:1.5px solid #E5E7EB;border-radius:10px;
+              font-size:14px;outline:none;">
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div style="margin-bottom:20px;">
+            <label style="font-size:13px;font-weight:600;color:#374151;
+              display:block;margin-bottom:5px;">
+              Description / À propos
+            </label>
+            <textarea id="dfoEditDescription" rows="4"
+              placeholder="Décrivez votre activité, vos produits, votre expérience..."
+              style="width:100%;box-sizing:border-box;padding:11px 12px;
+              border:1.5px solid #E5E7EB;border-radius:10px;
+              font-size:14px;outline:none;resize:vertical;
+              font-family:inherit;"></textarea>
+          </div>
+
+          <!-- ERREUR -->
+          <div id="dfoProfilEditErreur"
+            style="display:none;background:#FEF2F2;color:#DC2626;
+            padding:10px 14px;border-radius:8px;font-size:13px;
+            margin-bottom:14px;">
+          </div>
+
+          <!-- BOUTONS -->
+          <div style="display:flex;gap:10px;">
+            <button onclick="dfoProfilAnnuler()"
+              style="flex:1;background:white;color:#374151;
+              border:1.5px solid #E5E7EB;padding:13px;
+              border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">
+              Annuler
+            </button>
+            <button onclick="dfoProfilSauvegarder()" id="dfoBtnSauvegarder"
+              style="flex:2;background:#E8622A;color:white;border:none;
+              padding:13px;border-radius:12px;font-size:14px;
+              font-weight:700;cursor:pointer;">
+              💾 Enregistrer
+            </button>
+          </div>
+
+        </div>
+
       </div>
 
     </div>
@@ -6704,16 +6864,6 @@ async function dfoInit() {
       nomEl.textContent = _espaceSession.nom.split(' ')[0];
     }
 
-    // Stats du nouveau design : réutilise les valeurs déjà calculées ci-dessus
-    // (éléments legacy masqués dfoMetricSorties/dfoMetricTotal/dfoMetricCommission),
-    // pas de recalcul ni de requête supplémentaire.
-    const statSorties = document.getElementById('dfoStatSorties');
-    if (statSorties) statSorties.textContent = document.getElementById('dfoMetricSorties').textContent;
-    const statTotal = document.getElementById('dfoStatTotal');
-    if (statTotal) statTotal.textContent = document.getElementById('dfoMetricTotal').textContent;
-    const statCommission = document.getElementById('dfoStatCommission');
-    if (statCommission) statCommission.textContent = document.getElementById('dfoMetricCommission').textContent;
-
     // Abonnement (colonnes réelles vérifiées sur fournisseurs_materiaux)
     try {
       const { data: fo } = await sb.from('fournisseurs_materiaux')
@@ -6732,17 +6882,31 @@ async function dfoInit() {
           if (aboDateEl) aboDateEl.textContent = 'Contactez YOUMMA pour activer';
         }
         window._dfoProfilCache = fo;
+
+        // Carte "ABONNEMENT" (nouveau design overview)
+        const aboCard = document.getElementById('dfoStatAbo');
+        if (aboCard) {
+          if (fo.abonnement_fin) {
+            const finCard = new Date(fo.abonnement_fin);
+            const expireCard = finCard < new Date();
+            aboCard.textContent = expireCard ? '❌ Expiré' : '✅ Actif';
+            aboCard.style.color = expireCard ? '#DC2626' : '#059669';
+          } else {
+            aboCard.textContent = '🆓 Gratuit';
+            aboCard.style.color = '#9CA3AF';
+          }
+        }
       }
     } catch(e) {}
 
-    // Produits catalogue
+    // Produits catalogue (carte "MES PRODUITS" du nouveau design overview)
     try {
       const { count } = await sb.from('catalogue_produits')
         .select('id', { count: 'exact', head: true })
         .eq('fournisseur_id', window._dfoFournisseurId)
         .eq('disponible', true);
-      const elProduits = document.getElementById('dfoStatProduits');
-      if (elProduits) elProduits.textContent = count || 0;
+      const elProduits2 = document.getElementById('dfoStatProduits2');
+      if (elProduits2) elProduits2.textContent = count || 0;
     } catch(e) {}
 
   } catch(e) {
@@ -7193,29 +7357,194 @@ async function dfoSupprimerProduit(id, nom) {
 }
 window.dfoSupprimerProduit = dfoSupprimerProduit;
 
-// -- ONGLET PROFIL (fournisseurs_materiaux) --
+// -- ONGLET PROFIL (fournisseurs_materiaux) — lecture + édition inline ──
+var _dfoProfilData = null; // cache du profil chargé
+
 async function dfoLoadProfil() {
-  const el = document.getElementById('dfoProfilDetail');
   try {
-    const { data: f } = await sb.from('fournisseurs_materiaux').select('nom_entreprise,telephone,ville,commune,description').eq('id', window._dfoFournisseurId).single();
-    const nom = (f && f.nom_entreprise) || _espaceSession.nom || '—';
-    el.innerHTML = `
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
-        <div class="dfo-avatar" style="width:48px;height:48px;font-size:18px">${nom.substring(0,2).toUpperCase()}</div>
-        <div>
-          <div style="font-size:15px;font-weight:500;color:#0f172a">${nom}</div>
-          <div style="font-size:13px;color:#6b7280">${[f && f.ville, f && f.commune].filter(Boolean).join(', ') || 'Conakry'} · Fournisseur partenaire YOUMMA</div>
-        </div>
-      </div>
-      <div class="dfo-chantier-info">
-        <div class="dfo-info-row"><span class="dfo-info-lbl">Téléphone</span><span class="dfo-info-val">${(f && f.telephone) || _espaceSession.telephone || '—'}</span></div>
-        <div class="dfo-info-row"><span class="dfo-info-lbl">Statut</span><span class="dfo-info-val" style="color:#16a34a">Vérifié YOUMMA JOBS</span></div>
-      </div>`;
-  } catch(e) {
-    el.innerHTML = '<p class="dfo-empty">Profil indisponible.</p>';
-  }
+    const { data: f } = await sb.from('fournisseurs_materiaux')
+      .select('nom_entreprise,telephone,ville,commune,description,statut,photo_url,photo_couverture_url,type_compte,abonnement_fin')
+      .eq('id', window._dfoFournisseurId).single();
+    if (!f) return;
+    _dfoProfilData = f;
+    _dfoAfficherProfil(f);
+  } catch(e) { console.warn('dfoLoadProfil:', e.message); }
 }
 window.dfoLoadProfil = dfoLoadProfil;
+
+function _dfoAfficherProfil(f) {
+  // Couverture
+  const couv = document.getElementById('dfoCouvertureContainer');
+  if (couv) {
+    couv.style.background = f.photo_couverture_url
+      ? 'url(' + f.photo_couverture_url + ') center/cover no-repeat'
+      : 'linear-gradient(135deg,#1A1A4E,#0D0D2E)';
+  }
+  // Avatar
+  const av = document.getElementById('dfoAvatarContainer');
+  if (av) {
+    const initiale = (f.nom_entreprise||'?')[0].toUpperCase();
+    av.innerHTML = f.photo_url
+      ? '<img src="'+f.photo_url+'" style="width:100%;height:100%;object-fit:cover;">'
+      : initiale;
+    av.style.background = f.photo_url ? 'transparent' : '#E8622A';
+  }
+  // Nom
+  const nom = document.getElementById('dfoProfil-nom');
+  if (nom) nom.textContent = f.nom_entreprise || '—';
+  // Localisation
+  const loc = document.getElementById('dfoProfil-localisation');
+  if (loc) loc.textContent = '📍 ' + ([f.ville,f.commune].filter(Boolean).join(', ') || 'Conakry');
+  // Statut
+  const stat = document.getElementById('dfoProfil-statut');
+  if (stat) {
+    stat.innerHTML = f.statut === 'actif'
+      ? '<span style="background:#F0FDF4;border:1px solid #BBF7D0;color:#166534;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">✓ Vérifié YOUMMA</span>'
+      : '<span style="background:#FEF3C7;border:1px solid #FDE68A;color:#92400E;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">⏳ En attente de validation</span>';
+  }
+  // Description
+  const desc = document.getElementById('dfoProfil-description');
+  if (desc) desc.textContent = f.description || '';
+}
+
+function dfoProfilEditer() {
+  const f = _dfoProfilData || {};
+  // Pré-remplir les champs
+  const nom = document.getElementById('dfoProfilEditNom');
+  const tel = document.getElementById('dfoEditTelephone');
+  const ville = document.getElementById('dfoProfilEditVille');
+  const commune = document.getElementById('dfoEditCommune');
+  const desc = document.getElementById('dfoEditDescription');
+  if (nom) nom.value = f.nom_entreprise || '';
+  if (tel) tel.value = f.telephone || '';
+  if (ville) ville.value = f.ville || 'Conakry';
+  if (commune) commune.value = f.commune || '';
+  if (desc) desc.value = f.description || '';
+
+  // Preview couverture
+  const couvPreview = document.getElementById('dfoCouvertureEditPreview');
+  if (couvPreview && f.photo_couverture_url) {
+    couvPreview.style.backgroundImage = 'url(' + f.photo_couverture_url + ')';
+    couvPreview.style.backgroundSize = 'cover';
+    couvPreview.style.backgroundPosition = 'center';
+  }
+  // Preview avatar
+  const avPreview = document.getElementById('dfoAvatarEditPreview');
+  if (avPreview) {
+    const initiale = (f.nom_entreprise||'?')[0].toUpperCase();
+    avPreview.innerHTML = f.photo_url
+      ? '<img src="'+f.photo_url+'" style="width:100%;height:100%;object-fit:cover;">'
+      : initiale;
+    avPreview.style.background = f.photo_url ? 'transparent' : '#E8622A';
+  }
+
+  // Afficher édition, masquer lecture
+  const viewEl = document.getElementById('dfoProfil-view');
+  const editEl = document.getElementById('dfoProfil-edit');
+  if (viewEl) viewEl.style.display = 'none';
+  if (editEl) editEl.style.display = 'block';
+  document.getElementById('dfoProfilEditErreur').style.display = 'none';
+}
+window.dfoProfilEditer = dfoProfilEditer;
+
+function dfoProfilAnnuler() {
+  const viewEl = document.getElementById('dfoProfil-view');
+  const editEl = document.getElementById('dfoProfil-edit');
+  if (viewEl) viewEl.style.display = '';
+  if (editEl) editEl.style.display = 'none';
+}
+window.dfoProfilAnnuler = dfoProfilAnnuler;
+
+function dfoPreviewCouverture(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const preview = document.getElementById('dfoCouvertureEditPreview');
+  if (preview) {
+    preview.style.backgroundImage = 'url(' + URL.createObjectURL(file) + ')';
+    preview.style.backgroundSize = 'cover';
+    preview.style.backgroundPosition = 'center';
+  }
+}
+window.dfoPreviewCouverture = dfoPreviewCouverture;
+
+function dfoPreviewAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const preview = document.getElementById('dfoAvatarEditPreview');
+  if (preview) {
+    preview.innerHTML = '<img src="'+URL.createObjectURL(file)+'" style="width:100%;height:100%;object-fit:cover;">';
+    preview.style.background = 'transparent';
+  }
+}
+window.dfoPreviewAvatar = dfoPreviewAvatar;
+
+async function dfoProfilSauvegarder() {
+  const btn = document.getElementById('dfoBtnSauvegarder');
+  const errDiv = document.getElementById('dfoProfilEditErreur');
+  const nom = (document.getElementById('dfoProfilEditNom')?.value||'').trim();
+  if (!nom) {
+    errDiv.textContent = 'Le nom est requis.';
+    errDiv.style.display = 'block';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Enregistrement...';
+  errDiv.style.display = 'none';
+
+  try {
+    const payload = {
+      nom_entreprise: nom,
+      telephone: (document.getElementById('dfoEditTelephone')?.value||'').replace(/\D/g,''),
+      ville: document.getElementById('dfoProfilEditVille')?.value || 'Conakry',
+      commune: (document.getElementById('dfoEditCommune')?.value||'').trim(),
+      description: (document.getElementById('dfoEditDescription')?.value||'').trim()
+    };
+
+    // Upload photo de couverture
+    const couvFile = document.getElementById('dfoCouvertureFile')?.files?.[0];
+    if (couvFile) {
+      const ext = couvFile.name.split('.').pop();
+      const path = 'fournisseurs/' + window._dfoFournisseurId + '/couverture.' + ext;
+      const { error: upErr } = await sb.storage.from('Photos')
+        .upload(path, couvFile, { cacheControl:'3600', upsert:true });
+      if (!upErr) {
+        const { data: urlData } = sb.storage.from('Photos').getPublicUrl(path);
+        payload.photo_couverture_url = urlData.publicUrl;
+      }
+    }
+
+    // Upload photo de profil
+    const avatarFile = document.getElementById('dfoAvatarFile')?.files?.[0];
+    if (avatarFile) {
+      const ext = avatarFile.name.split('.').pop();
+      const path = 'fournisseurs/' + window._dfoFournisseurId + '/profil.' + ext;
+      const { error: upErr } = await sb.storage.from('Photos')
+        .upload(path, avatarFile, { cacheControl:'3600', upsert:true });
+      if (!upErr) {
+        const { data: urlData } = sb.storage.from('Photos').getPublicUrl(path);
+        payload.photo_url = urlData.publicUrl;
+      }
+    }
+
+    const { error } = await sb.from('fournisseurs_materiaux')
+      .update(payload).eq('id', window._dfoFournisseurId);
+    if (error) throw error;
+
+    // Mettre à jour le cache
+    _dfoProfilData = Object.assign(_dfoProfilData || {}, payload);
+    _dfoAfficherProfil(_dfoProfilData);
+    dfoProfilAnnuler();
+    showToast('✅ Profil mis à jour !', 'success');
+
+  } catch(e) {
+    errDiv.textContent = 'Erreur : ' + (e.message || 'Réessayez.');
+    errDiv.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 Enregistrer';
+  }
+}
+window.dfoProfilSauvegarder = dfoProfilSauvegarder;
 
 // -- SIGNALER UN PROBLÈME --
 // Ouvre directement WhatsApp (comme "Contacter le superviseur") plutôt que
