@@ -3669,7 +3669,7 @@ if (typeof connexionPrestataire === 'undefined') {
       </div>
     </div>
 
-    <div class="dfo-nav">
+    <div class="dfo-nav" style="display:none">
       <div class="dfo-tab active" data-tab="overview">Vue générale</div>
       <div class="dfo-tab" data-tab="sorties">Demandes de sortie</div>
       <div class="dfo-tab" data-tab="versements">Versements à confirmer</div>
@@ -3686,33 +3686,130 @@ if (typeof connexionPrestataire === 'undefined') {
 
     <div class="dfo-main">
 
-      <!-- ONGLET 1 : VUE GÉNÉRALE -->
+      <!-- ONGLET 1 : VUE GÉNÉRALE (redesign — stats/actions modernes ; le bloc masqué
+           en fin de panneau conserve tous les ids que dfoInit()/dfoLoadRapportOverview()
+           alimentent déjà, pour ne rien casser côté Sorties/Versements/Rapports) -->
       <div class="dfo-panel active" id="dfoPanel-overview">
 
-        <div class="dfo-metrics">
-          <div class="dfo-metric">
-            <div class="dfo-metric-lbl">Sorties en attente</div>
-            <div class="dfo-metric-val" id="dfoMetricSorties">0</div>
-            <div class="dfo-metric-sub">À confirmer maintenant</div>
+        <div style="padding:16px;padding-bottom:90px;">
+
+          <!-- SALUTATION -->
+          <div style="margin-bottom:16px;">
+            <h2 style="font-size:22px;font-weight:800;color:#1A1A4E;margin:0;">
+              Bonjour <span id="dfoNomAffiche">—</span> 👋
+            </h2>
+            <p style="font-size:13px;color:#9CA3AF;margin:4px 0 0;">
+              Bienvenue sur votre espace fournisseur
+            </p>
           </div>
-          <div class="dfo-metric">
-            <div class="dfo-metric-lbl">Versements à valider</div>
-            <div class="dfo-metric-val" id="dfoMetricVersements">0</div>
-            <div class="dfo-metric-sub">Déclaré par le client</div>
+
+          <!-- TÉLÉCHARGER BADGE PDF -->
+          <button onclick="dfoTelechargerBadge()"
+            style="width:100%;background:linear-gradient(135deg,#1A1A4E,#2D2D6B);
+            color:white;border:none;padding:14px;border-radius:14px;
+            font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;
+            display:flex;align-items:center;justify-content:center;gap:8px;">
+            🪪 Télécharger mon badge PDF
+          </button>
+
+          <!-- STATUT ABONNEMENT -->
+          <div id="dfoStatutAbonnement"
+            style="background:linear-gradient(135deg,#1A1A4E,#0D0D2E);
+            border-radius:14px;padding:16px;margin-bottom:16px;color:white;">
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);
+              text-transform:uppercase;font-weight:700;letter-spacing:0.05em;
+              margin-bottom:6px;">
+              YOUMMA FOURNISSEURS
+            </div>
+            <div id="dfoAboLabel"
+              style="font-size:16px;font-weight:700;">
+              Chargement...
+            </div>
+            <div id="dfoAboDate"
+              style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;">
+            </div>
           </div>
-          <div class="dfo-metric">
-            <div class="dfo-metric-lbl">Total reçu ce chantier</div>
-            <div class="dfo-metric-val" id="dfoMetricTotal">—</div>
-            <div class="dfo-metric-sub">GNF confirmés</div>
+
+          <!-- STATS 2 colonnes -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;
+            gap:12px;margin-bottom:16px;">
+
+            <!-- Produits catalogue -->
+            <div style="background:white;border-radius:14px;padding:16px;
+              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;cursor:pointer;"
+              onclick="dfoSwitchTab('catalogue')">
+              <div style="font-size:24px;margin-bottom:4px;">📦</div>
+              <div id="dfoStatProduits"
+                style="font-size:22px;font-weight:800;color:#1A1A4E;">—</div>
+              <div style="font-size:11px;color:#9CA3AF;font-weight:600;
+                text-transform:uppercase;margin-top:2px;">MES PRODUITS</div>
+            </div>
+
+            <!-- Sorties en attente -->
+            <div style="background:white;border-radius:14px;padding:16px;
+              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;cursor:pointer;"
+              onclick="dfoSwitchTab('sorties')">
+              <div style="font-size:24px;margin-bottom:4px;">📤</div>
+              <div id="dfoStatSorties"
+                style="font-size:22px;font-weight:800;color:#1A1A4E;">—</div>
+              <div style="font-size:11px;color:#9CA3AF;font-weight:600;
+                text-transform:uppercase;margin-top:2px;">SORTIES ATTENTE</div>
+            </div>
+
+            <!-- Total reçu -->
+            <div style="background:white;border-radius:14px;padding:16px;
+              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;">
+              <div style="font-size:24px;margin-bottom:4px;">💰</div>
+              <div id="dfoStatTotal"
+                style="font-size:18px;font-weight:800;color:#1A1A4E;
+                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div>
+              <div style="font-size:11px;color:#9CA3AF;font-weight:600;
+                text-transform:uppercase;margin-top:2px;">TOTAL REÇU</div>
+            </div>
+
+            <!-- Commission due -->
+            <div style="background:white;border-radius:14px;padding:16px;
+              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;">
+              <div style="font-size:24px;margin-bottom:4px;">📊</div>
+              <div id="dfoStatCommission"
+                style="font-size:18px;font-weight:800;color:#E8622A;
+                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div>
+              <div style="font-size:11px;color:#9CA3AF;font-weight:600;
+                text-transform:uppercase;margin-top:2px;">COMMISSION DUE</div>
+            </div>
+
           </div>
-          <div class="dfo-metric">
-            <div class="dfo-metric-lbl">Commission YOUMMA due</div>
-            <div class="dfo-metric-val" id="dfoMetricCommission">—</div>
-            <div class="dfo-metric-sub">GNF</div>
-          </div>
+
+          <!-- PARTAGER MON PROFIL -->
+          <button onclick="_fournisseurPartagerProfil(window._dfoFournisseurId)"
+            style="width:100%;background:white;color:#1A1A4E;border:1.5px solid #E5E7EB;
+            padding:13px;border-radius:12px;font-size:14px;font-weight:600;
+            cursor:pointer;margin-bottom:12px;display:flex;
+            align-items:center;justify-content:center;gap:8px;">
+            🔗 Partager mon profil
+          </button>
+
+          <!-- BESOIN D'AIDE -->
+          <a href="https://wa.me/224612525210" target="_blank"
+            style="display:flex;align-items:center;gap:10px;
+            background:#F0FFF4;border:1px solid #BBF7D0;border-radius:12px;
+            padding:14px;text-decoration:none;margin-bottom:12px;">
+            <span style="font-size:20px;">❓</span>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#166534;">
+                Besoin d'aide ?
+              </div>
+              <div style="font-size:12px;color:#166534;">
+                Écrivez-nous sur WhatsApp
+              </div>
+            </div>
+          </a>
+
         </div>
 
-        <!-- MODIFIER MES INFOS -->
+        <!-- MODIFIER MES INFOS — déclenché depuis le bouton du header (.yd-dash-hdr,
+             hors de ce panneau) : reste hors du bloc masqué ci-dessous pour rester
+             ouvrable (display:none sur un ancêtre rendrait le toggle invisible). -->
         <div id="dfoEditInfos" class="yd-edit-box" style="display:none">
           <p style="font-size:12px;font-weight:600;color:#D85A30;margin:0 0 12px">✏️ Modifier mes informations</p>
           <div class="yd-grid2">
@@ -3728,74 +3825,105 @@ if (typeof connexionPrestataire === 'undefined') {
           </div>
         </div>
 
-        <div class="dfo-two-col">
+        <!-- Conservé (masqué) : dfoInit()/dfoLoadRapportOverview() écrivent dans ces
+             ids exacts. Les supprimer ferait planter dfoInit() avant d'atteindre
+             dfoRenderSortiesOverview/dfoRenderVersementsOverview/dfoLoadRapportOverview,
+             cassant les onglets Sorties/Versements/Rapports. Remplacé visuellement
+             par le nouveau design ci-dessus. -->
+        <div style="display:none">
 
-          <div class="dfo-card">
-            <div class="dfo-card-title">
-              <div class="dfo-card-title-left"><i class="fa-solid fa-arrow-up"></i> Demandes de sortie</div>
-              <span class="dfo-count-badge neutral" id="dfoBadgeSorties">0 en attente</span>
+          <div class="dfo-metrics">
+            <div class="dfo-metric">
+              <div class="dfo-metric-lbl">Sorties en attente</div>
+              <div class="dfo-metric-val" id="dfoMetricSorties">0</div>
+              <div class="dfo-metric-sub">À confirmer maintenant</div>
             </div>
-            <div id="dfoSortiesOverview"></div>
+            <div class="dfo-metric">
+              <div class="dfo-metric-lbl">Versements à valider</div>
+              <div class="dfo-metric-val" id="dfoMetricVersements">0</div>
+              <div class="dfo-metric-sub">Déclaré par le client</div>
+            </div>
+            <div class="dfo-metric">
+              <div class="dfo-metric-lbl">Total reçu ce chantier</div>
+              <div class="dfo-metric-val" id="dfoMetricTotal">—</div>
+              <div class="dfo-metric-sub">GNF confirmés</div>
+            </div>
+            <div class="dfo-metric">
+              <div class="dfo-metric-lbl">Commission YOUMMA due</div>
+              <div class="dfo-metric-val" id="dfoMetricCommission">—</div>
+              <div class="dfo-metric-sub">GNF</div>
+            </div>
           </div>
 
-          <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="dfo-two-col">
 
             <div class="dfo-card">
               <div class="dfo-card-title">
-                <div class="dfo-card-title-left"><i class="fa-solid fa-money-bill"></i> Versement à confirmer</div>
-                <span class="dfo-count-badge neutral" id="dfoBadgeVers">0 en attente</span>
+                <div class="dfo-card-title-left"><i class="fa-solid fa-arrow-up"></i> Demandes de sortie</div>
+                <span class="dfo-count-badge neutral" id="dfoBadgeSorties">0 en attente</span>
               </div>
-              <div id="dfoVersementsOverview"></div>
+              <div id="dfoSortiesOverview"></div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px">
+
+              <div class="dfo-card">
+                <div class="dfo-card-title">
+                  <div class="dfo-card-title-left"><i class="fa-solid fa-money-bill"></i> Versement à confirmer</div>
+                  <span class="dfo-count-badge neutral" id="dfoBadgeVers">0 en attente</span>
+                </div>
+                <div id="dfoVersementsOverview"></div>
+              </div>
+
+              <div class="dfo-card">
+                <div class="dfo-card-title">
+                  <div class="dfo-card-title-left"><i class="fa-solid fa-list"></i> Derniers mouvements</div>
+                </div>
+                <div id="dfoMouvements"></div>
+              </div>
+
+              <div class="dfo-commission-card">
+                <div class="dfo-comm-title" id="dfoCommTitre">Commission YOUMMA</div>
+                <div class="dfo-comm-row"><span>Total reçu confirmé</span><span id="dfoCommTotal">—</span></div>
+                <div class="dfo-comm-row"><span>Commission due</span><span id="dfoCommDue">—</span></div>
+                <div class="dfo-comm-row"><span>Déjà payée</span><span id="dfoCommPayee">—</span></div>
+                <div class="dfo-comm-sep"></div>
+                <div class="dfo-comm-row dfo-comm-bold"><span>Reste à payer</span><span id="dfoCommReste">—</span></div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="dfo-two-col">
+
+            <div class="dfo-card">
+              <div class="dfo-card-title">
+                <div class="dfo-card-title-left"><i class="fa-solid fa-file-lines"></i> Rapport à cosigner</div>
+                <span class="dfo-count-badge neutral" id="dfoBadgeRapport">0 en attente</span>
+              </div>
+              <div id="dfoRapportAttenteOverview"></div>
             </div>
 
             <div class="dfo-card">
               <div class="dfo-card-title">
-                <div class="dfo-card-title-left"><i class="fa-solid fa-list"></i> Derniers mouvements</div>
+                <div class="dfo-card-title-left"><i class="fa-solid fa-shop"></i> Chantier actif</div>
+                <span class="dfo-stat-chip conf" id="dfoChantierStatutChip">En cours</span>
               </div>
-              <div id="dfoMouvements"></div>
-            </div>
-
-            <div class="dfo-commission-card">
-              <div class="dfo-comm-title" id="dfoCommTitre">Commission YOUMMA</div>
-              <div class="dfo-comm-row"><span>Total reçu confirmé</span><span id="dfoCommTotal">—</span></div>
-              <div class="dfo-comm-row"><span>Commission due</span><span id="dfoCommDue">—</span></div>
-              <div class="dfo-comm-row"><span>Déjà payée</span><span id="dfoCommPayee">—</span></div>
-              <div class="dfo-comm-sep"></div>
-              <div class="dfo-comm-row dfo-comm-bold"><span>Reste à payer</span><span id="dfoCommReste">—</span></div>
+              <div class="dfo-chantier-info" id="dfoChantierInfo"></div>
+              <hr class="dfo-divider">
+              <div class="dfo-contact-actions">
+                <button class="dfo-btn-whatsapp" id="dfoBtnWhatsapp">
+                  <i class="fa-brands fa-whatsapp"></i>
+                  Contacter le superviseur sur WhatsApp
+                </button>
+                <button class="dfo-btn-signaler" onclick="dfoSignalerProbleme()">
+                  <i class="fa-solid fa-circle-exclamation"></i>
+                  Signaler un problème à YOUMMA
+                </button>
+              </div>
             </div>
 
           </div>
-        </div>
-
-        <div class="dfo-two-col">
-
-          <div class="dfo-card">
-            <div class="dfo-card-title">
-              <div class="dfo-card-title-left"><i class="fa-solid fa-file-lines"></i> Rapport à cosigner</div>
-              <span class="dfo-count-badge neutral" id="dfoBadgeRapport">0 en attente</span>
-            </div>
-            <div id="dfoRapportAttenteOverview"></div>
-          </div>
-
-          <div class="dfo-card">
-            <div class="dfo-card-title">
-              <div class="dfo-card-title-left"><i class="fa-solid fa-shop"></i> Chantier actif</div>
-              <span class="dfo-stat-chip conf" id="dfoChantierStatutChip">En cours</span>
-            </div>
-            <div class="dfo-chantier-info" id="dfoChantierInfo"></div>
-            <hr class="dfo-divider">
-            <div class="dfo-contact-actions">
-              <button class="dfo-btn-whatsapp" id="dfoBtnWhatsapp">
-                <i class="fa-brands fa-whatsapp"></i>
-                Contacter le superviseur sur WhatsApp
-              </button>
-              <button class="dfo-btn-signaler" onclick="dfoSignalerProbleme()">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                Signaler un problème à YOUMMA
-              </button>
-            </div>
-          </div>
-
         </div>
       </div>
 
@@ -3890,6 +4018,46 @@ if (typeof connexionPrestataire === 'undefined') {
           <div id="dfoProfilDetail"></div>
         </div>
       </div>
+
+    </div>
+
+    <!-- BOTTOM NAV (remplace la barre d'onglets .dfo-nav, masquée ci-dessus) -->
+    <div style="position:fixed;bottom:0;left:0;right:0;
+      background:white;border-top:1px solid #F3F4F6;
+      display:flex;z-index:9000;padding-bottom:env(safe-area-inset-bottom);"
+      id="dfoBottomNav">
+
+      <button onclick="dfoSwitchTab('overview')" id="dfoNav-overview"
+        style="flex:1;padding:10px 4px;background:none;border:none;
+        display:flex;flex-direction:column;align-items:center;gap:3px;
+        cursor:pointer;color:#E8622A;">
+        <i class="fa-solid fa-house" style="font-size:18px;"></i>
+        <span style="font-size:10px;font-weight:600;">Accueil</span>
+      </button>
+
+      <button onclick="dfoSwitchTab('catalogue')" id="dfoNav-catalogue"
+        style="flex:1;padding:10px 4px;background:none;border:none;
+        display:flex;flex-direction:column;align-items:center;gap:3px;
+        cursor:pointer;color:#9CA3AF;">
+        <i class="fa-solid fa-box" style="font-size:18px;"></i>
+        <span style="font-size:10px;font-weight:600;">Catalogue</span>
+      </button>
+
+      <button onclick="dfoSwitchTab('sorties')" id="dfoNav-sorties"
+        style="flex:1;padding:10px 4px;background:none;border:none;
+        display:flex;flex-direction:column;align-items:center;gap:3px;
+        cursor:pointer;color:#9CA3AF;">
+        <i class="fa-solid fa-arrow-up" style="font-size:18px;"></i>
+        <span style="font-size:10px;font-weight:600;">Sorties</span>
+      </button>
+
+      <button onclick="dfoSwitchTab('profil')" id="dfoNav-profil"
+        style="flex:1;padding:10px 4px;background:none;border:none;
+        display:flex;flex-direction:column;align-items:center;gap:3px;
+        cursor:pointer;color:#9CA3AF;">
+        <i class="fa-solid fa-user" style="font-size:18px;"></i>
+        <span style="font-size:10px;font-weight:600;">Mon profil</span>
+      </button>
 
     </div>
   </div>
@@ -6386,6 +6554,37 @@ function dfoShowTab(tabName) {
 }
 window.dfoShowTab = dfoShowTab;
 
+// Bottom nav (nouveau design) — délègue à dfoShowTab() pour réutiliser
+// intégralement son chargement par onglet (dfoLoadSorties/dfoLoadVersements/
+// dfoLoadRegistre/dfoLoadRapports/dfoLoadCatalogue/dfoLoadProfil), puis met à
+// jour la couleur des boutons #dfoBottomNav. Ne réimplémente rien de
+// dfoShowTab pour ne rien casser sur les onglets existants.
+function dfoSwitchTab(tab) {
+  if (typeof dfoShowTab === 'function') dfoShowTab(tab);
+  document.querySelectorAll('#dfoBottomNav button').forEach(b => {
+    b.style.color = '#9CA3AF';
+  });
+  const activeBtn = document.getElementById('dfoNav-' + tab);
+  if (activeBtn) activeBtn.style.color = '#E8622A';
+}
+window.dfoSwitchTab = dfoSwitchTab;
+
+// Badge PDF fournisseur — aucun générateur dédié fournisseur n'existe à ce
+// jour (_genererBadgePDF() est conçu pour les artisans : metier/matricule,
+// absents sur fournisseurs_materiaux) : on ne l'appelle donc pas pour éviter
+// un PDF incorrect, on reste honnête tant qu'aucun générateur adapté n'existe.
+function dfoTelechargerBadge() {
+  showToast('🪪 Génération du badge en cours...', 'info');
+  if (typeof genererBadgePDF === 'function') {
+    genererBadgePDF();
+  } else if (typeof _espaceFournisseurTelechargerBadge === 'function') {
+    _espaceFournisseurTelechargerBadge();
+  } else {
+    showToast('Badge PDF bientôt disponible', 'info');
+  }
+}
+window.dfoTelechargerBadge = dfoTelechargerBadge;
+
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('#dashboardFournisseurV2 .dfo-tab').forEach(tab => {
     tab.addEventListener('click', () => dfoShowTab(tab.dataset.tab));
@@ -6495,6 +6694,56 @@ async function dfoInit() {
     dfoRenderVersementsOverview(versementsAttente);
     dfoRenderMouvements(allTrans.slice(0,5));
     await dfoLoadRapportOverview();
+
+    // ── Nouveau design "Vue générale" (ajouté après le chargement existant,
+    // rien retiré ci-dessus) ──
+
+    // Nom fournisseur
+    const nomEl = document.getElementById('dfoNomAffiche');
+    if (nomEl && _espaceSession && _espaceSession.nom) {
+      nomEl.textContent = _espaceSession.nom.split(' ')[0];
+    }
+
+    // Stats du nouveau design : réutilise les valeurs déjà calculées ci-dessus
+    // (éléments legacy masqués dfoMetricSorties/dfoMetricTotal/dfoMetricCommission),
+    // pas de recalcul ni de requête supplémentaire.
+    const statSorties = document.getElementById('dfoStatSorties');
+    if (statSorties) statSorties.textContent = document.getElementById('dfoMetricSorties').textContent;
+    const statTotal = document.getElementById('dfoStatTotal');
+    if (statTotal) statTotal.textContent = document.getElementById('dfoMetricTotal').textContent;
+    const statCommission = document.getElementById('dfoStatCommission');
+    if (statCommission) statCommission.textContent = document.getElementById('dfoMetricCommission').textContent;
+
+    // Abonnement (colonnes réelles vérifiées sur fournisseurs_materiaux)
+    try {
+      const { data: fo } = await sb.from('fournisseurs_materiaux')
+        .select('abonnement_fin, statut, nom_entreprise, telephone, ville, commune, description, photo_url, photo_couverture_url')
+        .eq('id', window._dfoFournisseurId).single();
+      if (fo) {
+        const aboEl = document.getElementById('dfoAboLabel');
+        const aboDateEl = document.getElementById('dfoAboDate');
+        if (fo.abonnement_fin) {
+          const fin = new Date(fo.abonnement_fin);
+          const expire = fin < new Date();
+          if (aboEl) aboEl.textContent = expire ? '❌ Abonnement expiré' : '✅ Abonnement actif';
+          if (aboDateEl) aboDateEl.textContent = 'Valide jusqu\'au ' + fin.toLocaleDateString('fr-FR');
+        } else {
+          if (aboEl) aboEl.textContent = '🆓 Compte gratuit';
+          if (aboDateEl) aboDateEl.textContent = 'Contactez YOUMMA pour activer';
+        }
+        window._dfoProfilCache = fo;
+      }
+    } catch(e) {}
+
+    // Produits catalogue
+    try {
+      const { count } = await sb.from('catalogue_produits')
+        .select('id', { count: 'exact', head: true })
+        .eq('fournisseur_id', window._dfoFournisseurId)
+        .eq('disponible', true);
+      const elProduits = document.getElementById('dfoStatProduits');
+      if (elProduits) elProduits.textContent = count || 0;
+    } catch(e) {}
 
   } catch(e) {
     console.error('dfoInit error:', e);
