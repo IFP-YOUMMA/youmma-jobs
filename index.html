@@ -1460,10 +1460,9 @@ async function annuaireChargerFournisseurs() {
     const catalogue = catalogues[i];
     const tel = f.telephone ? '224' + f.telephone.replace(/^224/, '').replace(/\D/g, '') : null;
     const waLink = tel ? 'https://wa.me/' + tel : null;
-    const catalogueId = 'foCat-' + f.id;
 
     return `
-      <div style="background:white;border-radius:16px;overflow:hidden;
+      <div id="foCard-${f.id}" style="background:white;border-radius:16px;overflow:hidden;
         box-shadow:0 2px 12px rgba(0,0,0,0.08);border:1px solid #F3F4F6;
         margin-bottom:16px;">
 
@@ -1503,9 +1502,6 @@ async function annuaireChargerFournisseurs() {
 
         <!-- BODY -->
         <div style="padding:32px 12px 12px;">
-
-          <!-- PROFIL (masqué quand le catalogue est ouvert) -->
-          <div id="foProfile-${f.id}">
 
           <!-- Localisation -->
           <div style="font-size:12px;color:#9CA3AF;margin-bottom:10px;">
@@ -1573,8 +1569,8 @@ async function annuaireChargerFournisseurs() {
 
           <!-- BOUTON VOIR CATALOGUE -->
           <button onclick="
-            document.getElementById('foProfile-${f.id}').style.display='none';
-            document.getElementById('${catalogueId}').style.display='block';"
+            document.getElementById('foCard-${f.id}').style.display='none';
+            document.getElementById('foCatFull-${f.id}').style.display='block';"
             style="width:100%;background:#1A1A4E;color:white;padding:12px;
             border:none;border-radius:10px;font-size:14px;font-weight:700;
             cursor:pointer;display:flex;align-items:center;
@@ -1582,92 +1578,92 @@ async function annuaireChargerFournisseurs() {
             🏗️ Voir le catalogue
           </button>
 
-          </div>
+        </div>
+      </div>
 
-          <!-- CATALOGUE (masqué par défaut, vue dédiée avec retour) -->
-          <div id="${catalogueId}" style="display:none;margin-top:10px;">
+      <!-- CATALOGUE PLEIN ÉCRAN (masqué par défaut, remplace toute la carte) -->
+      <div id="foCatFull-${f.id}" style="display:none;background:white;
+        border-radius:16px;margin-bottom:16px;
+        box-shadow:0 2px 12px rgba(0,0,0,0.08);overflow:hidden;">
 
-            <!-- Header catalogue avec retour -->
-            <div style="display:flex;align-items:center;gap:10px;
-              background:#1A1A4E;margin:-10px -12px 16px -12px;
-              padding:14px 16px;border-radius:10px 10px 0 0;">
-              <button onclick="
-                document.getElementById('foProfile-${f.id}').style.display='block';
-                document.getElementById('${catalogueId}').style.display='none';"
-                style="background:rgba(255,255,255,0.15);border:none;color:white;
-                width:32px;height:32px;border-radius:50%;font-size:16px;
-                cursor:pointer;display:flex;align-items:center;justify-content:center;
-                flex-shrink:0;">
-                ‹
-              </button>
-              <div style="flex:1;">
-                <div style="color:white;font-weight:700;font-size:14px;">
-                  ${f.nom_entreprise || 'Catalogue'}
-                </div>
-                <div style="color:rgba(255,255,255,0.6);font-size:12px;">
-                  ${catalogue ? catalogue.length : 0} produit(s) disponible(s)
-                </div>
-              </div>
-              ${f.photo_url
-                ? '<img src="' + f.photo_url + '" style="width:36px;height:36px;border-radius:8px;object-fit:cover;">'
-                : '<div style="width:36px;height:36px;border-radius:8px;background:#E8622A;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">' + ((f.nom_entreprise || '?')[0].toUpperCase()) + '</div>'
-              }
+        <!-- Header retour -->
+        <div style="background:#1A1A4E;padding:14px 16px;
+          display:flex;align-items:center;gap:12px;">
+          <button onclick="
+            document.getElementById('foCard-${f.id}').style.display='block';
+            document.getElementById('foCatFull-${f.id}').style.display='none';"
+            style="background:rgba(255,255,255,0.15);border:none;color:white;
+            width:34px;height:34px;border-radius:50%;font-size:18px;
+            cursor:pointer;display:flex;align-items:center;
+            justify-content:center;flex-shrink:0;">
+            ‹
+          </button>
+          <div style="flex:1;">
+            <div style="color:white;font-weight:700;font-size:15px;">
+              ${f.nom_entreprise || 'Catalogue'}
             </div>
+            <div style="color:rgba(255,255,255,0.6);font-size:12px;">
+              ${catalogue ? catalogue.length : 0} produit(s) disponible(s)
+            </div>
+          </div>
+          ${f.photo_url
+            ? '<img src="' + f.photo_url + '" style="width:38px;height:38px;border-radius:8px;object-fit:cover;">'
+            : '<div style="width:38px;height:38px;border-radius:8px;background:#E8622A;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:16px;">' + ((f.nom_entreprise || '?')[0].toUpperCase()) + '</div>'
+          }
+        </div>
 
-            ${catalogue && catalogue.length > 0 ? catalogue.map(p => `
-              <div style="display:flex;align-items:center;gap:12px;
-                padding:12px;margin-bottom:8px;background:#F9FAFB;
-                border-radius:12px;border:1px solid #F3F4F6;">
-                <!-- Photo produit -->
-                <div style="width:56px;height:56px;border-radius:10px;
-                  overflow:hidden;background:white;flex-shrink:0;
-                  display:flex;align-items:center;justify-content:center;
-                  box-shadow:0 1px 4px rgba(0,0,0,0.08);">
-                  ${p.photo_url
-                    ? '<img src="' + p.photo_url + '" style="width:100%;height:100%;object-fit:cover;">'
-                    : '<span style="font-size:24px;">🏗️</span>'}
+        <!-- Liste produits -->
+        <div style="padding:16px;">
+          ${catalogue && catalogue.length > 0 ? catalogue.map(p => `
+            <div style="display:flex;align-items:center;gap:12px;
+              padding:12px;margin-bottom:8px;background:#F9FAFB;
+              border-radius:12px;border:1px solid #F3F4F6;">
+              <div style="width:56px;height:56px;border-radius:10px;
+                overflow:hidden;background:white;flex-shrink:0;
+                display:flex;align-items:center;justify-content:center;
+                box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                ${p.photo_url
+                  ? '<img src="' + p.photo_url + '" style="width:100%;height:100%;object-fit:cover;">'
+                  : '<span style="font-size:24px;">🏗️</span>'}
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;color:#1A1A4E;font-size:14px;
+                  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  ${p.nom_produit}
                 </div>
-                <!-- Infos -->
-                <div style="flex:1;min-width:0;">
-                  <div style="font-weight:700;color:#1A1A4E;font-size:14px;
-                    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                    ${p.nom_produit}
-                  </div>
-                  ${p.description
-                    ? '<div style="font-size:11px;color:#9CA3AF;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + p.description + '</div>'
+                ${p.description
+                  ? '<div style="font-size:11px;color:#9CA3AF;margin-top:2px;">' + p.description + '</div>'
+                  : ''}
+                <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+                  <span style="font-weight:700;color:#E8622A;font-size:14px;">
+                    ${p.prix_gnf ? Number(p.prix_gnf).toLocaleString('fr-FR') + ' GNF' : 'Sur devis'}
+                  </span>
+                  ${p.unite
+                    ? '<span style="font-size:11px;color:#9CA3AF;background:white;padding:2px 6px;border-radius:10px;border:1px solid #E5E7EB;">/ ' + p.unite + '</span>'
                     : ''}
-                  <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-                    <span style="font-weight:700;color:#E8622A;font-size:14px;">
-                      ${p.prix_gnf ? Number(p.prix_gnf).toLocaleString('fr-FR') + ' GNF' : 'Sur devis'}
-                    </span>
-                    ${p.unite
-                      ? '<span style="font-size:11px;color:#9CA3AF;background:white;padding:2px 6px;border-radius:10px;border:1px solid #E5E7EB;">/ ' + p.unite + '</span>'
-                      : ''}
-                  </div>
                 </div>
               </div>
-            `).join('') : '<p style="color:#9CA3AF;text-align:center;padding:12px 0;font-size:13px;">Aucun produit renseigné.</p>'}
-
-            <div style="display:flex;gap:8px;margin-top:12px;padding-top:12px;
-              border-top:1px solid #F3F4F6;">
-              ${tel ? `
-              <a href="${waLink}" target="_blank"
-                style="flex:1;background:#25D366;color:white;padding:12px;
-                border-radius:10px;text-align:center;font-weight:700;
-                text-decoration:none;font-size:13px;display:flex;
-                align-items:center;justify-content:center;gap:6px;">
-                📱 Contacter
-              </a>` : ''}
-              <button onclick="_fournisseurPartagerProfil('${f.id}')"
-                style="flex:1;background:white;color:#1A1A4E;
-                border:1.5px solid #E5E7EB;padding:12px;border-radius:10px;
-                font-size:13px;font-weight:600;cursor:pointer;display:flex;
-                align-items:center;justify-content:center;gap:6px;">
-                📤 Partager
-              </button>
             </div>
-          </div>
+          `).join('') : '<p style="color:#9CA3AF;text-align:center;padding:24px 0;font-size:13px;">Aucun produit renseigné.</p>'}
 
+          <!-- Boutons contact -->
+          <div style="display:flex;gap:8px;margin-top:12px;padding-top:12px;
+            border-top:1px solid #F3F4F6;">
+            ${tel ? `
+            <a href="${waLink}" target="_blank"
+              style="flex:1;background:#25D366;color:white;padding:13px;
+              border-radius:10px;text-align:center;font-weight:700;
+              text-decoration:none;font-size:14px;display:flex;
+              align-items:center;justify-content:center;gap:6px;">
+              📱 Contacter
+            </a>` : ''}
+            <button onclick="_fournisseurPartagerProfil('${f.id}')"
+              style="flex:1;background:white;color:#1A1A4E;
+              border:1.5px solid #E5E7EB;padding:13px;border-radius:10px;
+              font-size:13px;font-weight:600;cursor:pointer;">
+              📤 Partager
+            </button>
+          </div>
         </div>
       </div>
     `;
