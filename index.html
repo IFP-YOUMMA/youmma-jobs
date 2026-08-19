@@ -3733,114 +3733,169 @@ if (typeof connexionPrestataire === 'undefined') {
            alimentent déjà, pour ne rien casser côté Sorties/Versements/Rapports) -->
       <div class="dfo-panel active" id="dfoPanel-overview">
 
-        <div style="padding:16px;padding-bottom:90px;">
+        <div style="padding:0 0 90px 0;">
 
-          <!-- SALUTATION -->
-          <div style="margin-bottom:16px;">
-            <h2 style="font-size:22px;font-weight:800;color:#1A1A4E;margin:0;">
-              Bonjour <span id="dfoNomAffiche">—</span> 👋
-            </h2>
-            <p style="font-size:13px;color:#9CA3AF;margin:4px 0 0;">
-              Bienvenue sur votre espace fournisseur
-            </p>
-          </div>
-
-          <!-- TÉLÉCHARGER BADGE PDF -->
-          <button onclick="dfoTelechargerBadge()"
-            style="width:100%;background:linear-gradient(135deg,#1A1A4E,#2D2D6B);
-            color:white;border:none;padding:14px;border-radius:14px;
-            font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;
-            display:flex;align-items:center;justify-content:center;gap:8px;">
-            🪪 Télécharger mon badge PDF
-          </button>
-
-          <!-- STATUT ABONNEMENT -->
-          <div id="dfoStatutAbonnement"
-            style="background:linear-gradient(135deg,#1A1A4E,#0D0D2E);
-            border-radius:14px;padding:16px;margin-bottom:16px;color:white;">
-            <div style="font-size:12px;color:rgba(255,255,255,0.6);
-              text-transform:uppercase;font-weight:700;letter-spacing:0.05em;
-              margin-bottom:6px;">
-              YOUMMA FOURNISSEURS
+          <!-- ═══ HERO CARD ═══ -->
+          <div style="position:relative;margin-bottom:16px;">
+            <!-- Couverture -->
+            <div id="dfoHeroCouverture"
+              style="height:120px;background:linear-gradient(135deg,#1A1A4E,#0D0D2E);
+              border-radius:0 0 20px 20px;overflow:hidden;">
             </div>
-            <div id="dfoAboLabel"
-              style="font-size:16px;font-weight:700;">
-              Chargement...
-            </div>
-            <div id="dfoAboDate"
-              style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;">
+            <!-- Avatar + infos superposés -->
+            <div style="position:absolute;bottom:-20px;left:16px;right:16px;
+              display:flex;align-items:flex-end;gap:12px;">
+              <div id="dfoHeroAvatar"
+                style="width:72px;height:72px;border-radius:14px;
+                border:3px solid white;overflow:hidden;flex-shrink:0;
+                background:#E8622A;display:flex;align-items:center;
+                justify-content:center;color:white;font-weight:700;font-size:26px;">
+              </div>
             </div>
           </div>
 
-          <!-- STATS -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;
-            gap:12px;margin-bottom:16px;">
-
-            <!-- Produits catalogue -->
-            <div onclick="dfoSwitchTab('catalogue')"
-              style="background:white;border-radius:14px;padding:16px;
-              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;
-              cursor:pointer;">
-              <div style="font-size:24px;margin-bottom:4px;">📦</div>
-              <div id="dfoStatProduits2"
-                style="font-size:22px;font-weight:800;color:#1A1A4E;">—</div>
-              <div style="font-size:11px;color:#9CA3AF;font-weight:600;
-                text-transform:uppercase;margin-top:2px;">MES PRODUITS</div>
-            </div>
-
-            <!-- Abonnement -->
-            <div style="background:white;border-radius:14px;padding:16px;
-              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;">
-              <div style="font-size:24px;margin-bottom:4px;">💳</div>
-              <div id="dfoStatAbo"
-                style="font-size:14px;font-weight:700;color:#1A1A4E;">—</div>
-              <div style="font-size:11px;color:#9CA3AF;font-weight:600;
-                text-transform:uppercase;margin-top:2px;">ABONNEMENT</div>
-            </div>
-
-            <!-- Visibilité -->
-            <div onclick="dfoSwitchTab('profil')"
-              style="background:white;border-radius:14px;padding:16px;
-              box-shadow:0 2px 8px rgba(0,0,0,0.06);border:1px solid #F3F4F6;
-              cursor:pointer;grid-column:span 2;">
-              <div style="font-size:24px;margin-bottom:4px;">👁</div>
-              <div id="dfoStatVisibilite"
-                style="font-size:14px;font-weight:700;color:#059669;">
-                Visible dans l'annuaire
+          <!-- Nom + matricule + statut -->
+          <div style="padding:28px 16px 0;">
+            <div style="display:flex;align-items:flex-start;
+              justify-content:space-between;margin-bottom:8px;">
+              <div>
+                <div id="dfoHeroNom"
+                  style="font-size:20px;font-weight:800;color:#1A1A4E;">—</div>
+                <div id="dfoHeroMatricule"
+                  style="font-size:12px;color:#9CA3AF;font-weight:600;
+                  letter-spacing:0.05em;margin-top:2px;">—</div>
+                <div id="dfoHeroCategorie"
+                  style="font-size:13px;color:#E8622A;font-weight:600;
+                  margin-top:2px;">—</div>
               </div>
-              <div style="font-size:11px;color:#9CA3AF;font-weight:600;
-                text-transform:uppercase;margin-top:2px;">
-                MON PROFIL PUBLIC
+              <div id="dfoHeroStatutBadge"
+                style="font-size:12px;font-weight:700;padding:5px 12px;
+                border-radius:20px;flex-shrink:0;"></div>
+            </div>
+
+            <!-- ═══ BANDEAU ABONNEMENT ═══ -->
+            <div id="dfoAboCard"
+              style="border-radius:14px;padding:14px 16px;margin-bottom:16px;">
+              <div style="display:flex;align-items:center;
+                justify-content:space-between;">
+                <div>
+                  <div style="font-size:11px;font-weight:700;
+                    text-transform:uppercase;letter-spacing:0.05em;
+                    margin-bottom:4px;opacity:0.7;" id="dfoAboLabel2">
+                    ABONNEMENT
+                  </div>
+                  <div style="font-size:16px;font-weight:700;"
+                    id="dfoAboStatut2">Chargement...</div>
+                  <div style="font-size:12px;opacity:0.7;margin-top:2px;"
+                    id="dfoAboDate2"></div>
+                </div>
+                <div style="font-size:32px;" id="dfoAboIcon">💳</div>
               </div>
             </div>
+
+            <!-- ═══ BARRE COMPLÉTION PROFIL ═══ -->
+            <div style="background:white;border-radius:14px;padding:14px;
+              margin-bottom:16px;border:1px solid #F3F4F6;
+              box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+              <div style="display:flex;justify-content:space-between;
+                align-items:center;margin-bottom:8px;">
+                <div style="font-size:13px;font-weight:700;color:#1A1A4E;">
+                  📋 Complétion du profil
+                </div>
+                <div id="dfoCompletion"
+                  style="font-size:14px;font-weight:800;color:#E8622A;">0%</div>
+              </div>
+              <div style="background:#F3F4F6;border-radius:10px;height:8px;
+                overflow:hidden;">
+                <div id="dfoCompletionBar"
+                  style="height:100%;background:linear-gradient(90deg,#E8622A,#F97316);
+                  border-radius:10px;transition:width 0.5s ease;width:0%;">
+                </div>
+              </div>
+              <div id="dfoCompletionTips"
+                style="font-size:12px;color:#9CA3AF;margin-top:6px;"></div>
+            </div>
+
+            <!-- ═══ 3 ACTIONS RAPIDES ═══ -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;
+              gap:10px;margin-bottom:16px;">
+
+              <button onclick="dfoSwitchTab('profil');setTimeout(()=>dfoProfilEditer(),300)"
+                style="background:white;border:1px solid #F3F4F6;border-radius:14px;
+                padding:14px 8px;cursor:pointer;text-align:center;
+                box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+                <div style="font-size:22px;margin-bottom:4px;">✏️</div>
+                <div style="font-size:11px;font-weight:700;color:#1A1A4E;">
+                  Mon profil
+                </div>
+              </button>
+
+              <button onclick="dfoSwitchTab('catalogue')"
+                style="background:white;border:1px solid #F3F4F6;border-radius:14px;
+                padding:14px 8px;cursor:pointer;text-align:center;
+                box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+                <div style="font-size:22px;margin-bottom:4px;">📦</div>
+                <div style="font-size:11px;font-weight:700;color:#1A1A4E;">
+                  Catalogue
+                </div>
+                <div id="dfoActionProduits"
+                  style="font-size:10px;color:#E8622A;font-weight:700;">
+                </div>
+              </button>
+
+              <button onclick="_fournisseurPartagerProfil(window._dfoFournisseurId)"
+                style="background:white;border:1px solid #F3F4F6;border-radius:14px;
+                padding:14px 8px;cursor:pointer;text-align:center;
+                box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+                <div style="font-size:22px;margin-bottom:4px;">🔗</div>
+                <div style="font-size:11px;font-weight:700;color:#1A1A4E;">
+                  Partager
+                </div>
+              </button>
+
+            </div>
+
+            <!-- ═══ STATS 2 colonnes ═══ -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;
+              gap:10px;margin-bottom:16px;">
+
+              <div style="background:white;border-radius:14px;padding:16px;
+                border:1px solid #F3F4F6;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+                <div style="font-size:26px;font-weight:800;color:#1A1A4E;"
+                  id="dfoStatProduits3">—</div>
+                <div style="font-size:10px;font-weight:700;color:#9CA3AF;
+                  text-transform:uppercase;margin-top:2px;">PRODUITS</div>
+              </div>
+
+              <div style="background:white;border-radius:14px;padding:16px;
+                border:1px solid #F3F4F6;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+                <div style="font-size:26px;font-weight:800;color:#059669;"
+                  id="dfoStatVisib">👁</div>
+                <div style="font-size:10px;font-weight:700;color:#9CA3AF;
+                  text-transform:uppercase;margin-top:2px;">VISIBILITÉ</div>
+              </div>
+
+            </div>
+
+            <!-- ═══ AIDE WHATSAPP ═══ -->
+            <a href="https://wa.me/224612525210?text=Bonjour+YOUMMA,+j'ai+besoin+d'aide"
+              target="_blank"
+              style="display:flex;align-items:center;gap:10px;
+              background:#F0FFF4;border:1px solid #BBF7D0;border-radius:12px;
+              padding:12px 14px;text-decoration:none;">
+              <span style="font-size:18px;">❓</span>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#166534;">
+                  Besoin d'aide ?
+                </div>
+                <div style="font-size:11px;color:#166534;">
+                  Écrivez-nous sur WhatsApp
+                </div>
+              </div>
+              <span style="margin-left:auto;color:#166534;font-size:16px;">›</span>
+            </a>
 
           </div>
-
-          <!-- PARTAGER MON PROFIL -->
-          <button onclick="_fournisseurPartagerProfil(window._dfoFournisseurId)"
-            style="width:100%;background:white;color:#1A1A4E;border:1.5px solid #E5E7EB;
-            padding:13px;border-radius:12px;font-size:14px;font-weight:600;
-            cursor:pointer;margin-bottom:12px;display:flex;
-            align-items:center;justify-content:center;gap:8px;">
-            🔗 Partager mon profil
-          </button>
-
-          <!-- BESOIN D'AIDE -->
-          <a href="https://wa.me/224612525210" target="_blank"
-            style="display:flex;align-items:center;gap:10px;
-            background:#F0FFF4;border:1px solid #BBF7D0;border-radius:12px;
-            padding:14px;text-decoration:none;margin-bottom:12px;">
-            <span style="font-size:20px;">❓</span>
-            <div>
-              <div style="font-size:14px;font-weight:700;color:#166534;">
-                Besoin d'aide ?
-              </div>
-              <div style="font-size:12px;color:#166534;">
-                Écrivez-nous sur WhatsApp
-              </div>
-            </div>
-          </a>
-
         </div>
 
         <!-- MODIFIER MES INFOS — déclenché depuis le bouton du header (.yd-dash-hdr,
@@ -6945,56 +7000,119 @@ async function dfoInit() {
     // ── Nouveau design "Vue générale" (ajouté après le chargement existant,
     // rien retiré ci-dessus) ──
 
-    // Nom fournisseur
-    const nomEl = document.getElementById('dfoNomAffiche');
-    if (nomEl && _espaceSession && _espaceSession.nom) {
-      nomEl.textContent = _espaceSession.nom.split(' ')[0];
-    }
-
-    // Abonnement (colonnes réelles vérifiées sur fournisseurs_materiaux)
+    // Profil + abonnement (colonnes réelles vérifiées sur fournisseurs_materiaux)
     try {
       const { data: fo } = await sb.from('fournisseurs_materiaux')
-        .select('abonnement_fin, statut, nom_entreprise, telephone, ville, commune, description, photo_url, photo_couverture_url')
+        .select('abonnement_fin, statut, nom_entreprise, telephone, ville, commune, description, photo_url, photo_couverture_url, matricule, categorie, horaires, zone_livraison')
         .eq('id', window._dfoFournisseurId).single();
       if (fo) {
-        const aboEl = document.getElementById('dfoAboLabel');
-        const aboDateEl = document.getElementById('dfoAboDate');
+        window._dfoProfilCache = fo;
+
+        // ── HERO ──
+        const heroCouv = document.getElementById('dfoHeroCouverture');
+        if (heroCouv && fo.photo_couverture_url) {
+          heroCouv.style.backgroundImage = 'url('+fo.photo_couverture_url+')';
+          heroCouv.style.backgroundSize = 'cover';
+          heroCouv.style.backgroundPosition = 'center';
+        }
+        const heroAv = document.getElementById('dfoHeroAvatar');
+        if (heroAv) {
+          const initiale = (fo.nom_entreprise||_espaceSession?.nom||'?')[0].toUpperCase();
+          heroAv.innerHTML = fo.photo_url
+            ? '<img src="'+fo.photo_url+'" style="width:100%;height:100%;object-fit:cover;">'
+            : initiale;
+          if (fo.photo_url) heroAv.style.background = 'transparent';
+        }
+        const heroNom = document.getElementById('dfoHeroNom');
+        if (heroNom) heroNom.textContent = fo.nom_entreprise || _espaceSession?.nom || '—';
+        const heroMat = document.getElementById('dfoHeroMatricule');
+        if (heroMat) heroMat.textContent = fo.matricule || '';
+        const heroCat = document.getElementById('dfoHeroCategorie');
+        if (heroCat) heroCat.textContent = fo.categorie || 'Fournisseur de matériaux';
+
+        // ── BADGE STATUT ──
+        const heroStatut = document.getElementById('dfoHeroStatutBadge');
+        if (heroStatut) {
+          if (fo.statut === 'actif') {
+            heroStatut.textContent = '✓ Vérifié';
+            heroStatut.style.cssText += 'background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;';
+          } else {
+            heroStatut.textContent = '⏳ En attente';
+            heroStatut.style.cssText += 'background:#FEF3C7;color:#92400E;border:1px solid #FDE68A;';
+          }
+        }
+
+        // ── ABONNEMENT ──
+        const aboCard = document.getElementById('dfoAboCard');
+        const aboStatut = document.getElementById('dfoAboStatut2');
+        const aboDate = document.getElementById('dfoAboDate2');
+        const aboIcon = document.getElementById('dfoAboIcon');
         if (fo.abonnement_fin) {
           const fin = new Date(fo.abonnement_fin);
           const expire = fin < new Date();
-          if (aboEl) aboEl.textContent = expire ? '❌ Abonnement expiré' : '✅ Abonnement actif';
-          if (aboDateEl) aboDateEl.textContent = 'Valide jusqu\'au ' + fin.toLocaleDateString('fr-FR');
-        } else {
-          if (aboEl) aboEl.textContent = '🆓 Compte gratuit';
-          if (aboDateEl) aboDateEl.textContent = 'Contactez YOUMMA pour activer';
-        }
-        window._dfoProfilCache = fo;
-
-        // Carte "ABONNEMENT" (nouveau design overview)
-        const aboCard = document.getElementById('dfoStatAbo');
-        if (aboCard) {
-          if (fo.abonnement_fin) {
-            const finCard = new Date(fo.abonnement_fin);
-            const expireCard = finCard < new Date();
-            aboCard.textContent = expireCard ? '❌ Expiré' : '✅ Actif';
-            aboCard.style.color = expireCard ? '#DC2626' : '#059669';
+          const joursRestants = Math.ceil((fin - new Date()) / (1000*60*60*24));
+          if (expire) {
+            if (aboCard) aboCard.style.cssText += 'background:linear-gradient(135deg,#FEF2F2,#FEE2E2);color:#991B1B;border:1px solid #FECACA;';
+            if (aboStatut) aboStatut.textContent = '❌ Abonnement expiré';
+            if (aboDate) aboDate.textContent = 'Expiré le ' + fin.toLocaleDateString('fr-FR');
+            if (aboIcon) aboIcon.textContent = '⚠️';
           } else {
-            aboCard.textContent = '🆓 Gratuit';
-            aboCard.style.color = '#9CA3AF';
+            if (aboCard) aboCard.style.cssText += 'background:linear-gradient(135deg,#F0FDF4,#DCFCE7);color:#166534;border:1px solid #BBF7D0;';
+            if (aboStatut) aboStatut.textContent = '✅ Abonnement actif';
+            if (aboDate) aboDate.textContent = joursRestants + ' jours restants · ' + fin.toLocaleDateString('fr-FR');
+            if (aboIcon) aboIcon.textContent = '💳';
           }
+        } else {
+          if (aboCard) aboCard.style.cssText += 'background:#F9FAFB;color:#374151;border:1px solid #E5E7EB;';
+          if (aboStatut) aboStatut.textContent = 'Compte gratuit — visibilité limitée';
+          if (aboDate) aboDate.textContent = 'Contactez YOUMMA pour activer';
+          if (aboIcon) aboIcon.textContent = '🆓';
+        }
+
+        // ── COMPLÉTION PROFIL ──
+        const criteres = [
+          { ok: !!fo.photo_url, tip: 'photo de profil' },
+          { ok: !!fo.photo_couverture_url, tip: 'photo de couverture' },
+          { ok: !!fo.description, tip: 'description' },
+          { ok: !!fo.categorie, tip: 'catégorie' },
+          { ok: !!fo.horaires, tip: 'horaires' },
+          { ok: !!fo.zone_livraison, tip: 'zone de livraison' },
+          { ok: !!fo.telephone, tip: 'téléphone' },
+        ];
+        const done = criteres.filter(c => c.ok).length;
+        const pct = Math.round(done / criteres.length * 100);
+        const completionEl = document.getElementById('dfoCompletion');
+        const barEl = document.getElementById('dfoCompletionBar');
+        const tipsEl = document.getElementById('dfoCompletionTips');
+        if (completionEl) completionEl.textContent = pct + '%';
+        if (barEl) barEl.style.width = pct + '%';
+        if (tipsEl) {
+          const manquants = criteres.filter(c => !c.ok).map(c => c.tip);
+          tipsEl.textContent = manquants.length > 0
+            ? 'À compléter : ' + manquants.slice(0,3).join(', ') + (manquants.length > 3 ? '...' : '')
+            : '✅ Profil complet !';
+        }
+
+        // ── STATS ──
+        const statVis = document.getElementById('dfoStatVisib');
+        if (statVis) {
+          statVis.textContent = fo.statut === 'actif' ? '🟢' : '⏳';
         }
       }
     } catch(e) {}
 
-    // Produits catalogue (carte "MES PRODUITS" du nouveau design overview)
+    // Produits (réutilise le count déjà chargé)
+    const prod3 = document.getElementById('dfoStatProduits3');
+    const actionProd = document.getElementById('dfoActionProduits');
     try {
       const { count } = await sb.from('catalogue_produits')
         .select('id', { count: 'exact', head: true })
-        .eq('fournisseur_id', window._dfoFournisseurId)
-        .eq('disponible', true);
-      const elProduits2 = document.getElementById('dfoStatProduits2');
-      if (elProduits2) elProduits2.textContent = count || 0;
-    } catch(e) {}
+        .eq('fournisseur_id', window._dfoFournisseurId);
+      if (prod3) prod3.textContent = count || 0;
+      if (actionProd) actionProd.textContent = (count||0) + ' produit(s)';
+    } catch(e) {
+      if (prod3) prod3.textContent = '—';
+    }
 
   } catch(e) {
     console.error('dfoInit error:', e);
