@@ -1411,7 +1411,25 @@ function annuaireOnglet(onglet) {
     btnFo.style.color = 'white';
     if (!foSection.dataset.loaded) {
       foSection.dataset.loaded = '1';
-      annuaireChargerFournisseurs();
+      // Annuaire fournisseurs réservé à l'admin connecté (window._adminRole,
+      // posé par le login admin réel — cf. connexionAdmin()/initAdmin() — et
+      // remis à null par logoutAdmin()) ; "Bientôt disponible" pour le public.
+      const estAdmin = !!window._adminRole;
+      if (estAdmin) {
+        annuaireChargerFournisseurs();
+      } else {
+        foSection.innerHTML = `
+          <div style="text-align:center;padding:60px 20px;">
+            <div style="font-size:48px;margin-bottom:16px;">🏗️</div>
+            <div style="font-weight:800;font-size:20px;color:#1A1A4E;
+              margin-bottom:8px;">Bientôt disponible</div>
+            <div style="font-size:14px;color:#6B7280;max-width:280px;
+              margin:0 auto;line-height:1.6;">
+              L'annuaire des fournisseurs de matériaux arrive très
+              prochainement. Revenez nous voir !
+            </div>
+          </div>`;
+      }
     }
   }
 }
