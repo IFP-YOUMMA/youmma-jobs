@@ -1466,65 +1466,62 @@ async function annuaireChargerFournisseurs() {
         box-shadow:0 2px 12px rgba(0,0,0,0.08);border:1px solid #F3F4F6;
         margin-bottom:16px;">
 
-        <!-- COUVERTURE -->
-        <div style="position:relative;height:130px;
-          background:linear-gradient(135deg,#1A1A4E,#2d2d7a);overflow:hidden;">
+        <!-- HEADER tout-en-un -->
+        <div style="position:relative;background:linear-gradient(135deg,#1A1A4E,#2d2d7a);
+          overflow:hidden;padding:12px 12px 10px;">
           ${f.photo_couverture_url
-            ? '<img src="' + f.photo_couverture_url + '" style="width:100%;height:100%;object-fit:cover;opacity:0.7;">'
+            ? '<img src="' + f.photo_couverture_url + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0.5;">'
             : ''}
-          <!-- Badge type -->
-          <span style="position:absolute;top:10px;right:10px;background:white;
-            border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;
-            color:#374151;">
-            ${f.type_compte === 'particulier' ? 'Particulier' : f.type_compte === 'usine' ? 'Usine' : 'Entreprise'}
-          </span>
-          <!-- Avatar -->
-          <div style="position:absolute;bottom:-28px;left:16px;
-            width:64px;height:64px;border-radius:14px;border:3px solid white;
-            overflow:hidden;background:#E8622A;display:flex;align-items:center;
-            justify-content:center;font-weight:800;font-size:22px;color:white;
-            box-shadow:0 2px 8px rgba(0,0,0,0.2);">
-            ${f.photo_url
-              ? '<img src="' + f.photo_url + '" style="width:100%;height:100%;object-fit:cover;">'
-              : (f.nom_entreprise || '?')[0].toUpperCase()
-            }
-          </div>
-        </div>
-
-        <!-- NOM -->
-        <div style="padding:36px 16px 12px 16px;">
-          <div style="font-weight:800;font-size:16px;color:#1A1A4E;
-            line-height:1.2;">
-            ${f.nom_entreprise || '—'}
-          </div>
-          <div style="color:#E8622A;font-weight:600;font-size:13px;margin-top:2px;">
-            ${f.categorie || 'Fournisseur de matériaux'}
-          </div>
-          <div style="font-size:12px;color:#9CA3AF;margin-top:4px;">
-            ${f.matricule ? f.matricule + ' • ' : ''}📍 ${[f.ville, f.commune].filter(Boolean).join(', ') || 'Conakry'}
+          <div style="position:relative;z-index:1;display:flex;align-items:center;gap:10px;">
+            <!-- Avatar -->
+            <div style="width:56px;height:56px;border-radius:12px;overflow:hidden;
+              background:#E8622A;flex-shrink:0;display:flex;align-items:center;
+              justify-content:center;font-weight:800;font-size:20px;color:white;">
+              ${f.photo_url
+                ? '<img src="' + f.photo_url + '" style="width:100%;height:100%;object-fit:cover;">'
+                : (f.nom_entreprise || '?')[0].toUpperCase()
+              }
+            </div>
+            <!-- Nom + catégorie + matricule/localisation -->
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:800;font-size:15px;color:white;
+                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                ${f.nom_entreprise || '—'}
+              </div>
+              <div style="color:#E8622A;font-weight:600;font-size:12px;margin-top:1px;">
+                ${f.categorie || 'Fournisseur de matériaux'}
+              </div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;">
+                ${f.matricule || ''} ${(f.ville || f.commune) ? '📍 ' + (f.ville || f.commune) : ''}
+              </div>
+            </div>
+            <!-- Badge type -->
+            <span style="background:white;border-radius:20px;padding:3px 9px;
+              font-size:11px;font-weight:600;color:#374151;flex-shrink:0;
+              align-self:flex-start;">
+              ${f.type_compte === 'particulier' ? 'Particulier' : f.type_compte === 'usine' ? 'Usine' : 'Entreprise'}
+            </span>
           </div>
         </div>
 
         <!-- BADGES -->
-        <div style="display:flex;align-items:center;gap:6px;padding:0 16px 12px;
-          flex-wrap:wrap;">
-          ${f.statut === 'actif' ? `
-          <span style="font-size:12px;color:#16A34A;font-weight:500;">✓ Vérifié</span>
-          <span style="color:#D1D5DB;">|</span>
-          <span style="font-size:12px;color:#2563EB;font-weight:500;">✦ Actif</span>
-          ` : `
-          <span style="font-size:12px;color:#D97706;font-weight:500;">⏳ En attente</span>
-          `}
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;
+          border-bottom:1px solid #F3F4F6;flex-wrap:wrap;">
+          ${f.statut === 'actif'
+            ? '<span style="font-size:12px;color:#16A34A;font-weight:500;">✓ Vérifié</span><span style="color:#D1D5DB;">|</span><span style="font-size:12px;color:#2563EB;font-weight:500;">✦ Actif</span>'
+            : '<span style="font-size:12px;color:#D97706;font-weight:500;">⏳ En attente</span>'
+          }
           <span style="color:#D1D5DB;">|</span>
           <span style="font-size:12px;color:#6B7280;">Membre</span>
+          <span style="margin-left:auto;font-size:18px;color:#D1D5DB;cursor:pointer;">♡</span>
         </div>
 
         <!-- STATS 3 colonnes -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;
-          gap:1px;background:#F3F4F6;margin:0 16px 12px;border-radius:12px;
+          gap:1px;background:#F3F4F6;margin:12px 14px;border-radius:12px;
           overflow:hidden;">
           <div style="background:white;padding:12px 8px;text-align:center;">
-            <div style="font-weight:800;font-size:18px;color:#1A1A4E;">
+            <div style="font-weight:800;font-size:18px;color:#111827;">
               ${catalogue ? catalogue.length : 0}
             </div>
             <div style="font-size:10px;color:#9CA3AF;font-weight:600;
@@ -1532,15 +1529,15 @@ async function annuaireChargerFournisseurs() {
           </div>
           <div style="background:white;padding:12px 8px;text-align:center;
             border-left:1px solid #F3F4F6;border-right:1px solid #F3F4F6;">
-            <div style="font-weight:800;font-size:18px;color:#1A1A4E;">
+            <div style="font-weight:800;font-size:18px;color:#111827;">
               ${f.note_moyenne ? Number(f.note_moyenne).toFixed(1) : '—'}
             </div>
             <div style="font-size:10px;color:#9CA3AF;font-weight:600;
               text-transform:uppercase;letter-spacing:0.5px;">Note</div>
           </div>
           <div style="background:white;padding:12px 8px;text-align:center;">
-            <div style="font-weight:800;font-size:18px;color:#1A1A4E;">
-              ${new Date(f.created_at || Date.now()).getFullYear()}
+            <div style="font-weight:800;font-size:18px;color:#111827;">
+              ${f.created_at ? new Date(f.created_at).getFullYear() : '—'}
             </div>
             <div style="font-size:10px;color:#9CA3AF;font-weight:600;
               text-transform:uppercase;letter-spacing:0.5px;">Depuis</div>
@@ -1548,26 +1545,25 @@ async function annuaireChargerFournisseurs() {
         </div>
 
         <!-- BOUTONS -->
-        <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:8px;">
-          ${tel ? `
+        <div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:8px;">
           <div style="display:flex;gap:8px;">
+            ${tel ? `
             <a href="${waLink}" target="_blank"
-              style="flex:1;background:#25D366;color:white;padding:11px;
+              style="flex:1;background:#25D366;color:white;padding:11px 8px;
               border-radius:10px;text-align:center;font-weight:700;
               text-decoration:none;font-size:13px;display:flex;
               align-items:center;justify-content:center;gap:5px;">
               📱 WhatsApp
             </a>
             <a href="tel:+${tel}"
-              style="flex:1;background:#FFF0ED;color:#E8622A;padding:11px;
+              style="flex:1;background:#FFF0ED;color:#E8622A;padding:11px 8px;
               border-radius:10px;text-align:center;font-weight:700;
               text-decoration:none;font-size:13px;display:flex;
               align-items:center;justify-content:center;gap:5px;
               border:1.5px solid #FECDC2;">
               📞 Appeler
-            </a>
+            </a>` : ''}
           </div>
-          ` : ''}
           <button onclick="
             document.getElementById('foCard-${f.id}').style.display='none';
             document.getElementById('foCatFull-${f.id}').style.display='block';"
