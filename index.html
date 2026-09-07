@@ -13468,16 +13468,6 @@ async function chargerAvis() {
     <div onclick="showAdmin('rejete')" id="amenu-rejete" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-circle-xmark" style="width:16px;"></i> Rejetés</div>
     <div onclick="showAdmin('suspendu')" id="amenu-suspendu" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-ban" style="width:16px;"></i> Suspendus</div>
     <div onclick="showAdmin('fournisseurs');_adminLoadFournisseurs();" id="amenu-fournisseurs" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-truck" style="width:16px;"></i> Fournisseurs</div>
-    <div id="amenu-center"
-      onclick="window.open('youmma-center.html','_blank')"
-      style="display:flex;align-items:center;gap:10px;
-      padding:10px;border-radius:8px;cursor:pointer;
-      color:#C6D1D6;font-weight:600;font-size:14px;"
-      onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='white'"
-      onmouseout="this.style.background='';this.style.color='#C6D1D6'">
-      <span style="font-size:18px;">🏪</span>
-      YOUMMA CENTER
-    </div>
     <div class="super-admin-only" data-super-only="true" style="border-top:1px solid rgba(255,255,255,.12);margin:6px 0 8px;"></div>
     <div onclick="showAdmin('campagne');_campagneInit();" id="amenu-campagne" class="super-admin-only" data-super-only="true" style="padding:10px 12px;border-radius:8px;color:rgba(255,255,255,.65);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:2px;"><i class="fa-solid fa-bullhorn" style="width:16px;"></i> Campagne SMS</div>
     <div style="border-top:1px solid rgba(255,255,255,.12);margin:8px 0 6px;"></div>
@@ -13501,6 +13491,20 @@ async function chargerAvis() {
   </div>
   <div style="padding:8px;border-top:1px solid rgba(255,255,255,.08);margin-top:10px;">
     <div onclick="logoutAdmin()" style="padding:10px 12px;border-radius:8px;color:#FCA5A5;font-size:13px;font-weight:600;cursor:pointer;background:rgba(239,68,68,.1);"><i class="fa-solid fa-right-from-bracket" style="width:16px;"></i> Déconnexion</div>
+  </div>
+  <div style="padding:0 8px 8px;">
+    <div style="border-top:1px solid rgba(255,255,255,0.1);
+      margin:8px 0;"></div>
+    <div id="amenu-center"
+      onclick="window.open('youmma-center.html','_blank')"
+      style="display:flex;align-items:center;gap:10px;
+      padding:10px;border-radius:8px;cursor:pointer;
+      color:#C6D1D6;font-weight:600;font-size:14px;"
+      onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='white'"
+      onmouseout="this.style.background='';this.style.color='#C6D1D6'">
+      <span style="font-size:18px;">🏪</span>
+      YOUMMA CENTER
+    </div>
   </div>
 </div>
 
