@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YOUMMA CENTER · Gestion — maquette</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D1B2A; --teal:#1B7F79; --teal-soft:#DDEFEC; --gold:#C9A227; --gold-soft:#FBF3D8;
+  --ink:#17232E; --muted:#66727C; --line:#E2E8E6; --surface:#F3F6F5; --white:#fff;
+  --ok:#2E8B57; --ok-soft:#DFF3E6; --danger:#C0392B; --danger-soft:#FBE3E0;
+  --r:10px; --rail:236px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink);font-family:Manrope,system-ui,sans-serif;font-size:15px;line-height:1.45}
+button{font:inherit;cursor:pointer}
+input,select{font:inherit}
+a{color:inherit}
+h1,h2,h3{margin:0;line-height:1.2}
+h1{font-size:26px;font-weight:800;letter-spacing:-.3px}
+h2{font-size:17px;font-weight:700}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+
+/* ---- shell ---- */
+.app{display:grid;grid-template-columns:var(--rail) 1fr;min-height:100vh}
+.rail{background:var(--navy);color:#fff;padding:18px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px}
+.brand .y{width:36px;height:36px;border-radius:9px;background:var(--teal);display:grid;place-items:center;font-weight:800;font-size:20px}
+.brand b{font-size:15px;display:block;line-height:1.1}
+.brand span{font-size:12px;color:var(--gold)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:10px;background:none;border:0;color:#C6D1D6;padding:10px 10px;border-radius:8px;text-align:left;width:100%;font-weight:600}
+.nav button svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button.on{background:rgba(255,255,255,.08);color:#fff}
+.nav button .cnt{margin-left:auto;background:var(--gold);color:var(--navy);font-size:11px;font-weight:800;border-radius:20px;padding:1px 7px}
+.nav button[hidden]{display:none}
+.rail .role{margin-top:auto;background:rgba(255,255,255,.06);border-radius:10px;padding:12px}
+.rail .role .who{font-weight:700;font-size:14px}
+.seg{display:flex;background:rgba(0,0,0,.35);border-radius:8px;padding:3px;margin-top:8px}
+.seg button{flex:1;border:0;background:none;color:#B9C6CC;padding:6px;border-radius:6px;font-weight:700;font-size:13px}
+.seg button.on{background:var(--teal);color:#fff}
+.main{padding:26px 30px 90px;max-width:1180px;width:100%}
+.topbar{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.topbar .date{color:var(--muted);font-weight:600}
+.btn{border:0;background:var(--teal);color:#fff;font-weight:700;padding:10px 16px;border-radius:9px;display:inline-flex;align-items:center;gap:8px}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.gold{background:var(--gold);color:var(--navy)}
+.btn.sm{padding:6px 10px;font-size:13px;border-radius:7px}
+.btn.danger{background:var(--danger-soft);color:var(--danger)}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card h2{margin-bottom:12px}
+.row{display:grid;gap:16px}
+.cols2{grid-template-columns:1fr 1fr}
+.cols3{grid-template-columns:1fr 1fr 1fr}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;color:var(--muted);text-align:left;font-weight:700;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--surface);color:var(--muted)}
+.tag.recu{background:#E9EEF0;color:#3D4C57}.tag.encours{background:var(--teal-soft);color:var(--teal)}.tag.pret{background:var(--gold-soft);color:#8A6A0C}.tag.livre,.tag.ok{background:var(--ok-soft);color:var(--ok)}
+.tag.attente{background:var(--gold-soft);color:#8A6A0C}.tag.retard{background:var(--danger-soft);color:var(--danger)}
+.field{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)}
+.field input,.field select{border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:#fff;color:var(--ink);font-weight:500;font-size:15px}
+.field input:focus,.field select:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:transparent}
+.gerant-only.hide{display:none!important}
+.locked{position:relative}
+.locked::after{content:"Réservé au gérant";position:absolute;inset:0;background:rgba(243,246,245,.85);display:grid;place-items:center;font-weight:700;color:var(--muted);border-radius:var(--r)}
+
+/* ---- Aujourd'hui ---- */
+.today{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.caisse-hero{background:var(--navy);color:#fff;border-radius:14px;padding:22px 24px}
+.caisse-hero .lbl{color:#B9C6CC;font-weight:600;font-size:13px}
+.caisse-hero .big{font-size:44px;font-weight:800;letter-spacing:-1px;line-height:1.05;margin:4px 0 14px}
+.caisse-hero .big small{font-size:16px;font-weight:600;color:var(--gold);margin-left:6px;letter-spacing:0}
+.split{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.split div{background:rgba(255,255,255,.07);border-radius:8px;padding:10px 12px}
+.split b{display:block;font-size:17px}
+.split span{font-size:12px;color:#B9C6CC}
+.list{display:flex;flex-direction:column}
+.list .it{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.list .it:last-child{border-bottom:0}
+.list .it b{display:block;font-size:14px}
+.list .it .sub{font-size:13px;color:var(--muted)}
+.list .it .end{margin-left:auto;text-align:right}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 6px}
+.quick button{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:700;font-size:13px;color:var(--ink)}
+.quick button svg{width:24px;height:24px;stroke:var(--teal);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.quick button:hover{border-color:var(--teal)}
+
+/* ---- Devis ---- */
+.devis-layout{display:grid;grid-template-columns:1fr 380px;gap:16px}
+.search{position:relative}
+.search input{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px 12px 11px 38px;font-size:15px}
+.search svg{position:absolute;left:12px;top:12px;width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2}
+.results{border:1px solid var(--line);border-radius:9px;margin-top:8px;max-height:260px;overflow:auto;background:#fff}
+.results button{display:flex;width:100%;border:0;background:none;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);gap:10px;align-items:center}
+.results button:last-child{border-bottom:0}
+.results button:hover{background:var(--surface)}
+.results .cat{font-size:11px;color:var(--muted);font-weight:700;background:var(--surface);padding:2px 6px;border-radius:5px}
+.results .p{margin-left:auto;font-weight:700;white-space:nowrap}
+.ticket{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ticket .head{padding:14px 16px;border-bottom:2px dashed var(--line);display:flex;justify-content:space-between;align-items:center}
+.ticket .head b{font-size:16px}
+.ticket .lines{padding:6px 16px}
+.ticket .ln{display:grid;grid-template-columns:1fr 84px 96px 22px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.ticket .ln:last-child{border-bottom:0}
+.ticket .ln input{width:100%;border:1px solid var(--line);border-radius:6px;padding:5px 6px;text-align:center}
+.ticket .ln .x{border:0;background:none;color:var(--muted);font-size:18px;line-height:1;padding:0}
+.ticket .tot{padding:12px 16px;border-top:2px dashed var(--line);background:var(--surface)}
+.ticket .tot div{display:flex;justify-content:space-between;padding:3px 0}
+.ticket .tot .grand{font-size:22px;font-weight:800;border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+.ticket .tot .ac{color:var(--teal);font-weight:700}
+.ticket .act{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap}
+.empty{padding:22px;text-align:center;color:var(--muted);font-size:14px}
+
+/* ---- Kanban ---- */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.col{background:#E9EEED;border-radius:12px;padding:10px;min-height:300px}
+.col h3{font-size:13px;font-weight:800;display:flex;align-items:center;gap:8px;padding:4px 6px 10px}
+.col h3 i{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+.col.c2 h3 i{background:var(--teal)}.col.c3 h3 i{background:var(--gold)}.col.c4 h3 i{background:var(--ok)}
+.col h3 span{margin-left:auto;color:var(--muted);font-weight:700}
+.kcard{background:#fff;border-radius:9px;padding:10px 12px;margin-bottom:8px;border:1px solid var(--line);font-size:13px}
+.kcard b{display:block;font-size:14px}
+.kcard .m{display:flex;justify-content:space-between;color:var(--muted);margin-top:6px;font-size:12px}
+.kcard .m .late{color:var(--danger);font-weight:700}
+.kcard .mv{margin-top:8px;border:1px solid var(--line);background:var(--surface);border-radius:6px;width:100%;padding:5px;font-size:12px;font-weight:700;color:var(--teal)}
+
+/* ---- Formations ---- */
+.tranche{display:flex;gap:4px}
+.tranche i{flex:1;height:8px;border-radius:4px;background:var(--line)}
+.tranche i.p{background:var(--teal)}
+.presence{display:grid;grid-template-columns:160px repeat(10,1fr);gap:4px;font-size:12px;align-items:center}
+.presence .h{color:var(--muted);text-align:center;font-weight:700}
+.presence .d{height:24px;border-radius:5px;background:var(--line)}
+.presence .d.p{background:var(--teal)}.presence .d.a{background:var(--danger-soft)}
+.presence .n{font-weight:600;font-size:13px}
+
+/* ---- Caisse ---- */
+.amt{font-weight:800;white-space:nowrap}
+.amt.in{color:var(--ok)}.amt.out{color:var(--danger)}
+
+/* ---- Campagnes ---- */
+.msgprev{background:#E7F8EF;border-radius:12px;padding:12px 14px;font-size:14px;max-width:320px;position:relative}
+.msgprev::before{content:"";position:absolute;left:-6px;top:12px;border:6px solid transparent;border-right-color:#E7F8EF}
+
+/* ---- Tabs in page ---- */
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:7px 14px;font-weight:700;font-size:13px;color:var(--muted)}
+.tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.page{display:none}.page.on{display:block}
+.pane{display:none}.pane.on{display:block}
+
+/* ---- mobile ---- */
+.bottom{display:none}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:9px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .rail{display:none}
+  .main{padding:16px 14px 90px}
+  .today,.devis-layout,.cols2,.cols3{grid-template-columns:1fr}
+  .kanban{grid-template-columns:1fr 1fr}
+  .quick{grid-template-columns:repeat(2,1fr)}
+  .caisse-hero .big{font-size:36px}
+  .bottom{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--navy);padding:6px 4px calc(6px + env(safe-area-inset-bottom));justify-content:space-around;z-index:5}
+  .bottom button{background:none;border:0;color:#B9C6CC;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:4px 6px;min-width:52px}
+  .bottom button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .bottom button.on{color:#fff}
+  .mobile-role{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff;border-radius:10px;padding:10px 12px;margin-bottom:14px}
+  .mobile-role .seg{margin:0;width:150px}
+  .presence{grid-template-columns:110px repeat(10,1fr)}
+  th,td{padding:8px 6px;font-size:13px}
+}
+@media (min-width:901px){.mobile-role{display:none}}
+@media (max-width:600px){.kanban{grid-template-columns:1fr}.col{min-height:0}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand"><div class="y">Y</div><div><b>YOUMMA CENTER</b><span>Dubréka · gestion</span></div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="role">
+      <div class="who" id="whoRail">Mamadou Bah</div>
+      <div class="small" style="color:#B9C6CC" id="whoSub">Gérant · tous les droits</div>
+      <div class="seg" id="segRail"><button class="on" data-role="gerant">Gérant</button><button data-role="agent">Agent</button></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="mobile-role"><div><b>YOUMMA CENTER</b><div class="small" style="color:#B9C6CC" id="whoMob">Mamadou Bah · Gérant</div></div><div class="seg" id="segMob"><button class="on" data-role="gerant">Gérant</button><button data-role="agent">Agent</button></div></div>
+
+    <!-- ================= AUJOURD'HUI ================= -->
+    <section class="page on" id="p-today">
+      <div class="topbar"><div><h1>Aujourd'hui</h1><div class="date">Lundi 7 septembre 2026</div></div><button class="btn" onclick="go('devis');newDevis()">+ Nouveau devis</button></div>
+      <div class="today">
+        <div>
+          <div class="caisse-hero">
+            <div class="lbl">Encaissé aujourd'hui</div>
+            <div class="big num">1 245 000<small>GNF</small></div>
+            <div class="split"><div><b class="num">845 000</b><span>Espèces</span></div><div><b class="num">400 000</b><span>Orange Money</span></div><div><b class="num">0</b><span>Dépenses</span></div></div>
+          </div>
+          <div class="quick">
+            <button onclick="go('devis');newDevis()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Devis</button>
+            <button onclick="go('caisse')"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>Encaisser</button>
+            <button onclick="go('formations')"><svg viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 012-2h12a2 2 0 012 2v13"/><path d="M8 8h8M8 12h5"/></svg>Inscrire</button>
+            <button onclick="go('clients')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>Client</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>À livrer aujourd'hui <span class="tag pret">3</span></h2>
+          <div class="list">
+            <div class="it"><div><b>Flyers A4 160 g × 200</b><div class="sub">Pharmacie Espoir · Aïssatou Diallo</div></div><div class="end"><span class="tag pret">Prêt</span><div class="small muted">Solde 175 000</div></div></div>
+            <div class="it"><div><b>T-shirts DTF Pilot × 12</b><div class="sub">Club de foot Dubréka</div></div><div class="end"><span class="tag encours">En cours</span><div class="small muted">Solde 480 000</div></div></div>
+            <div class="it"><div><b>Cartes de visite PVC × 100</b><div class="sub">Me Camara, avocat</div></div><div class="end"><span class="tag pret">Prêt</span><div class="small muted">Soldé</div></div></div>
+          </div>
+          <h2 style="margin-top:18px">À relancer</h2>
+          <div class="list">
+            <div class="it"><div><b>Devis DV-0142 · Bâche 3 m</b><div class="sub">Boutique Fatou · envoyé il y a 4 jours</div></div><div class="end"><button class="btn sm ghost">Relancer</button></div></div>
+            <div class="it"><div><b>Tranche 2 · Graphisme</b><div class="sub">Ibrahima Sow · échue le 5/09</div></div><div class="end"><span class="tag retard">Retard</span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DEVIS & FACTURES ================= -->
+    <section class="page" id="p-devis">
+      <div class="topbar"><div><h1>Devis & factures</h1><div class="date">Créer un devis depuis la grille tarifaire</div></div><div style="display:flex;gap:8px"><button class="btn ghost" onclick="showPane('devis','liste')">Liste</button><button class="btn" onclick="newDevis()">+ Nouveau devis</button></div></div>
+      <div class="pane on" id="devis-new">
+        <div class="devis-layout">
+          <div>
+            <div class="card">
+              <div class="row cols2" style="margin-bottom:14px">
+                <label class="field">Client<input id="dvClient" placeholder="Nom ou téléphone (base clients)" value="Pharmacie Espoir"></label>
+                <label class="field">Délai promis<input type="date" value="2026-09-10"></label>
+              </div>
+              <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="Tapez un article : flyer, t-shirt, site web…" oninput="searchCat(this.value)"></div>
+              <div class="results" id="res"></div>
+              <p class="small muted" style="margin:10px 0 0">Les prix viennent de la grille tarifaire (modifiable dans Paramètres). Un prix peut être ajusté ligne par ligne.</p>
+            </div>
+          </div>
+          <div class="ticket">
+            <div class="head"><b>Devis DV-0148</b><span class="tag attente">Brouillon</span></div>
+            <div class="lines" id="lines"></div>
+            <div class="tot">
+              <div><span>Sous-total</span><span class="num" id="st">0</span></div>
+              <div><span>Remise</span><span class="num">0</span></div>
+              <div class="grand"><span>Total</span><span class="num" id="gt">0 GNF</span></div>
+              <div class="ac"><span>Acompte 50 % à la commande</span><span class="num" id="ac">0</span></div>
+            </div>
+            <div class="act"><button class="btn" onclick="toast('Devis envoyé par WhatsApp')">Envoyer WhatsApp</button><button class="btn gold" onclick="toast('Facture FA-0093 créée · commande ajoutée')">Valider → facture</button><button class="btn ghost" onclick="toast('PDF généré')">PDF</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="pane" id="devis-liste">
+        <div class="tabs"><button class="on">Tous</button><button>Brouillons</button><button>Envoyés</button><button>Facturés</button><button>Payés</button></div>
+        <div class="card" style="padding:0 6px">
+          <table>
+            <tr><th>N°</th><th>Client</th><th>Objet</th><th class="r">Total</th><th class="r">Payé</th><th>Statut</th></tr>
+            <tr><td>FA-0092</td><td>Pharmacie Espoir</td><td>Flyers A4 160 g × 200</td><td class="r num">350 000</td><td class="r num">175 000</td><td><span class="tag attente">Acompte reçu</span></td></tr>
+            <tr><td>FA-0091</td><td>Club de foot Dubréka</td><td>T-shirts DTF Pilot × 12</td><td class="r num">960 000</td><td class="r num">480 000</td><td><span class="tag attente">Acompte reçu</span></td></tr>
+            <tr><td>FA-0090</td><td>Me Camara</td><td>Cartes de visite PVC × 100</td><td class="r num">100 000</td><td class="r num">100 000</td><td><span class="tag ok">Payé</span></td></tr>
+            <tr><td>DV-0142</td><td>Boutique Fatou</td><td>Bâche 3 m + logo</td><td class="r num">400 000</td><td class="r num">0</td><td><span class="tag recu">Envoyé</span></td></tr>
+            <tr><td>DV-0140</td><td>École Les Palmiers</td><td>Site web statique</td><td class="r num">3 000 000</td><td class="r num">0</td><td><span class="tag recu">Envoyé</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= COMMANDES ================= -->
+    <section class="page" id="p-commandes">
+      <div class="topbar"><div><h1>Commandes</h1><div class="date">Chaque facture validée devient une commande à suivre</div></div><div class="tabs" style="margin:0"><button class="on">Cette semaine</button><button>Toutes</button><button>En retard</button></div></div>
+      <div class="kanban">
+        <div class="col c1"><h3><i></i>Reçu <span>2</span></h3>
+          <div class="kcard"><b>Bâche 3 m + logo</b>Boutique Fatou<div class="m"><span>FA-0094</span><span>Livrer 11/09</span></div><button class="mv" onclick="toast('Commande → En cours')">Passer en cours</button></div>
+          <div class="kcard"><b>Badges PVC × 30</b>ONG Santé Plus<div class="m"><span>FA-0093</span><span>Livrer 12/09</span></div><button class="mv" onclick="toast('Commande → En cours')">Passer en cours</button></div>
+        </div>
+        <div class="col c2"><h3><i></i>En cours <span>2</span></h3>
+          <div class="kcard"><b>T-shirts DTF Pilot × 12</b>Club de foot Dubréka<div class="m"><span>Agent : Ousmane</span><span class="late">Livrer aujourd'hui</span></div><button class="mv" onclick="toast('Commande → Prêt')">Marquer prêt</button></div>
+          <div class="kcard"><b>Site web statique</b>École Les Palmiers<div class="m"><span>Agent : Mamadou</span><span>Livrer 25/09</span></div><button class="mv" onclick="toast('Commande → Prêt')">Marquer prêt</button></div>
+        </div>
+        <div class="col c3"><h3><i></i>Prêt <span>2</span></h3>
+          <div class="kcard"><b>Flyers A4 160 g × 200</b>Pharmacie Espoir<div class="m"><span>Solde 175 000</span><span>Client prévenu</span></div><button class="mv" onclick="toast('Encaissement solde → Caisse')">Livrer + encaisser solde</button></div>
+          <div class="kcard"><b>Cartes de visite PVC × 100</b>Me Camara<div class="m"><span>Soldé</span><span>Client prévenu</span></div><button class="mv" onclick="toast('Commande → Livré')">Livrer</button></div>
+        </div>
+        <div class="col c4"><h3><i></i>Livré <span>5</span></h3>
+          <div class="kcard"><b>Cachet professionnel</b>Cabinet Bah<div class="m"><span>4/09</span><span>150 000</span></div></div>
+          <div class="kcard"><b>Réinstallation Windows</b>Alpha Barry<div class="m"><span>4/09</span><span>100 000</span></div></div>
+          <div class="kcard"><b>Photos d'identité × 8</b>Kadiatou Sylla<div class="m"><span>3/09</span><span>30 000</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FORMATIONS ================= -->
+    <section class="page" id="p-formations">
+      <div class="topbar"><div><h1>Formations</h1><div class="date">Sessions, apprenants, paiements par tranche, présences</div></div><button class="btn" onclick="toast('Inscription enregistrée')">+ Inscrire un apprenant</button></div>
+      <div class="tabs"><button class="on" onclick="showPane('form','sessions',this)">Sessions en cours</button><button onclick="showPane('form','presences',this)">Présences du jour</button><button onclick="showPane('form','paiements',this)">Paiements en retard</button></div>
+      <div class="pane on" id="form-sessions">
+        <div class="row cols3">
+          <div class="card"><h2>Graphisme</h2><div class="small muted">Sept.–Oct. 2026 · Lun/Mer/Ven 9h · 8 apprenants</div>
+            <table style="margin-top:10px"><tr><th>Apprenant</th><th>Tranches</th><th class="r">Reste</th></tr>
+            <tr><td>Ibrahima Sow</td><td><div class="tranche"><i class="p"></i><i></i><i></i></div></td><td class="r num">1 000 000</td></tr>
+            <tr><td>Mariama Bah</td><td><div class="tranche"><i class="p"></i><i class="p"></i><i></i></div></td><td class="r num">500 000</td></tr>
+            <tr><td>Sékou Condé</td><td><div class="tranche"><i class="p"></i><i class="p"></i><i class="p"></i></div></td><td class="r"><span class="tag ok">Soldé</span></td></tr></table></div>
+          <div class="card"><h2>Informatique de base</h2><div class="small muted">Sept. 2026 · Mar/Jeu 15h · 12 apprenants</div>
+            <table style="margin-top:10px"><tr><th>Apprenant</th><th>Tranches</th><th class="r">Reste</th></tr>
+            <tr><td>Fatoumata Keïta</td><td><div class="tranche"><i class="p"></i><i class="p"></i></div></td><td class="r"><span class="tag ok">Soldé</span></td></tr>
+            <tr><td>Abdoulaye Touré</td><td><div class="tranche"><i class="p"></i><i></i></div></td><td class="r num">250 000</td></tr>
+            <tr><td>Hawa Camara</td><td><div class="tranche"><i class="p"></i><i></i></div></td><td class="r num">250 000</td></tr></table></div>
+          <div class="card"><h2>Marketing digital</h2><div class="small muted">Démarre le 14/09 · 5 inscrits / 10 places</div>
+            <div class="empty">5 places restantes<br><button class="btn sm" style="margin-top:10px" onclick="go('campagnes')">Lancer une campagne</button></div></div>
+        </div>
+      </div>
+      <div class="pane" id="form-presences">
+        <div class="card"><h2>Graphisme · séance du 7/09</h2>
+          <div class="presence"><div></div><div class="h">1</div><div class="h">2</div><div class="h">3</div><div class="h">4</div><div class="h">5</div><div class="h">6</div><div class="h">7</div><div class="h">8</div><div class="h">9</div><div class="h">10</div>
+            <div class="n">Ibrahima Sow</div><div class="d p"></div><div class="d p"></div><div class="d a"></div><div class="d p"></div><div class="d p"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div>
+            <div class="n">Mariama Bah</div><div class="d p"></div><div class="d p"></div><div class="d p"></div><div class="d p"></div><div class="d p"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div>
+            <div class="n">Sékou Condé</div><div class="d p"></div><div class="d a"></div><div class="d p"></div><div class="d p"></div><div class="d a"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div>
+          </div>
+          <p class="small muted" style="margin:12px 0 0">Vert = présent, rouge = absent. L'agent coche en un tap ; une attestation ne se génère qu'à 80 % de présence.</p>
+        </div>
+      </div>
+      <div class="pane" id="form-paiements">
+        <div class="card" style="padding:0 6px"><table><tr><th>Apprenant</th><th>Formation</th><th>Tranche</th><th class="r">Montant</th><th>Échéance</th><th></th></tr>
+          <tr><td>Ibrahima Sow</td><td>Graphisme</td><td>2/3</td><td class="r num">500 000</td><td><span class="tag retard">5/09</span></td><td class="r"><button class="btn sm ghost" onclick="toast('SMS de rappel envoyé')">Rappel SMS</button></td></tr>
+          <tr><td>Abdoulaye Touré</td><td>Informatique de base</td><td>2/2</td><td class="r num">250 000</td><td><span class="tag attente">10/09</span></td><td class="r"><button class="btn sm ghost">Rappel SMS</button></td></tr></table></div>
+      </div>
+    </section>
+
+    <!-- ================= CAISSE ================= -->
+    <section class="page" id="p-caisse">
+      <div class="topbar"><div><h1>Caisse</h1><div class="date">Lundi 7 septembre · ouverte à 8h12 par Ousmane</div></div><div style="display:flex;gap:8px"><button class="btn danger gerant-only" onclick="toast('Dépense enregistrée')">– Dépense</button><button class="btn" onclick="toast('Encaissement enregistré')">+ Encaisser</button></div></div>
+      <div class="row cols2">
+        <div class="card" style="padding:0 6px"><table>
+          <tr><th>Heure</th><th>Libellé</th><th>Mode</th><th class="r">Montant</th></tr>
+          <tr><td class="num">08:40</td><td>Photocopies × 20 · client de passage</td><td>Espèces</td><td class="r num amt in">+ 10 000</td></tr>
+          <tr><td class="num">09:15</td><td>Acompte FA-0093 · ONG Santé Plus</td><td>Orange Money</td><td class="r num amt in">+ 400 000</td></tr>
+          <tr><td class="num">10:02</td><td>Tranche 2 · Mariama Bah · Graphisme</td><td>Espèces</td><td class="r num amt in">+ 500 000</td></tr>
+          <tr><td class="num">11:30</td><td>Réinstallation Windows · Alpha Barry</td><td>Espèces</td><td class="r num amt in">+ 100 000</td></tr>
+          <tr><td class="num">12:10</td><td>Photos d'identité × 2</td><td>Espèces</td><td class="r num amt in">+ 30 000</td></tr>
+          <tr><td class="num">12:45</td><td>Encre imprimante (gérant)</td><td>Espèces</td><td class="r num amt out">– 85 000</td></tr>
+          <tr><td class="num">14:20</td><td>Plastification × 5</td><td>Espèces</td><td class="r num amt in">+ 25 000</td></tr>
+        </table></div>
+        <div>
+          <div class="card gerant-only"><h2>Clôture de la journée</h2>
+            <div class="list">
+              <div class="it"><div>Encaissements</div><div class="end num amt in">+ 1 245 000</div></div>
+              <div class="it"><div>Dépenses</div><div class="end num amt out">– 85 000</div></div>
+              <div class="it"><div>Espèces attendues en caisse</div><div class="end num" style="font-weight:800">760 000</div></div>
+              <div class="it"><div>Espèces comptées</div><div class="end"><input style="width:120px;border:1px solid var(--line);border-radius:6px;padding:6px;text-align:right" value="760 000"></div></div>
+            </div>
+            <button class="btn gold" style="margin-top:12px;width:100%" onclick="toast('Journée clôturée · rapport envoyé au gérant')">Clôturer et envoyer le rapport</button>
+            <p class="small muted" style="margin:10px 0 0">Le rapport journalier (encaissements par mode, dépenses, écart de caisse, commandes livrées) est envoyé par WhatsApp au gérant.</p>
+          </div>
+          <div class="card" style="margin-top:16px"><h2>Ce mois</h2>
+            <div class="split" style="grid-template-columns:1fr 1fr 1fr"><div style="background:var(--surface)"><b class="num" style="color:var(--ink)">6,4 M</b><span>Encaissé</span></div><div style="background:var(--surface)"><b class="num" style="color:var(--ink)">1,1 M</b><span>Dépenses</span></div><div style="background:var(--surface)"><b class="num" style="color:var(--ink)">2,3 M</b><span>À recouvrer</span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CLIENTS ================= -->
+    <section class="page" id="p-clients">
+      <div class="topbar"><div><h1>Clients</h1><div class="date">148 clients · 32 actifs ce mois</div></div><button class="btn" onclick="toast('Client ajouté')">+ Nouveau client</button></div>
+      <div class="card" style="padding:14px 6px 0">
+        <div style="padding:0 8px 12px" class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input placeholder="Rechercher un nom, un téléphone, une entreprise"></div>
+        <table><tr><th>Client</th><th>Téléphone</th><th>Type</th><th class="r">Commandes</th><th class="r">Total dépensé</th><th>Dernière visite</th></tr>
+          <tr><td><b>Pharmacie Espoir</b><div class="small muted">Aïssatou Diallo</div></td><td class="num">622 45 11 09</td><td><span class="tag">Entreprise</span></td><td class="r num">6</td><td class="r num">1 850 000</td><td>Aujourd'hui</td></tr>
+          <tr><td><b>Club de foot Dubréka</b><div class="small muted">Mohamed Soumah</div></td><td class="num">655 90 33 21</td><td><span class="tag">Association</span></td><td class="r num">2</td><td class="r num">1 260 000</td><td>3/09</td></tr>
+          <tr><td><b>Ibrahima Sow</b><div class="small muted">Apprenant · Graphisme</div></td><td class="num">628 77 40 15</td><td><span class="tag encours">Apprenant</span></td><td class="r num">1</td><td class="r num">500 000</td><td>2/09</td></tr>
+          <tr><td><b>École Les Palmiers</b><div class="small muted">Directeur Kaba</div></td><td class="num">664 12 88 30</td><td><span class="tag">Entreprise</span></td><td class="r num">3</td><td class="r num">4 200 000</td><td>28/08</td></tr>
+          <tr><td><b>Kadiatou Sylla</b></td><td class="num">621 30 05 77</td><td><span class="tag">Particulier</span></td><td class="r num">4</td><td class="r num">95 000</td><td>3/09</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= CAMPAGNES ================= -->
+    <section class="page" id="p-campagnes">
+      <div class="topbar"><div><h1>Campagnes & nouveautés</h1><div class="date">SMS et WhatsApp vers votre base clients</div></div><button class="btn" onclick="toast('Campagne programmée')">+ Nouvelle campagne</button></div>
+      <div class="row cols2">
+        <div class="card"><h2>Nouvelle campagne</h2>
+          <div class="row" style="gap:12px">
+            <label class="field">Envoyer à<select><option>Tous les clients (148)</option><option>Apprenants (34)</option><option>Entreprises (41)</option><option>Clients inactifs depuis 3 mois (57)</option></select></label>
+            <label class="field">Canal<select><option>SMS (Nimba)</option><option>WhatsApp</option></select></label>
+            <label class="field">Message<input value="Nouvelle session Marketing digital le 14/09 à YOUMMA CENTER Dubreka. 5 places. Inscription 620 83 60 81"></label>
+          </div>
+          <div style="margin:14px 0 6px" class="small muted">Aperçu</div>
+          <div class="msgprev">Nouvelle session Marketing digital le 14/09 à YOUMMA CENTER Dubreka. 5 places. Inscription 620 83 60 81</div>
+          <div class="small muted" style="margin-top:10px">142 caractères · 1 SMS · coût estimé 148 × 250 = <b class="num">37 000 GNF</b></div>
+        </div>
+        <div>
+          <div class="card"><h2>Campagnes récentes</h2>
+            <div class="list">
+              <div class="it"><div><b>Rentrée : –10 % sur les cartes de visite</b><div class="sub">SMS · 1/09 · 41 entreprises</div></div><div class="end"><b class="num">6</b><div class="small muted">devis créés</div></div></div>
+              <div class="it"><div><b>Nouveauté : impression DTF sur t-shirt</b><div class="sub">WhatsApp · 20/08 · 148 clients</div></div><div class="end"><b class="num">11</b><div class="small muted">devis créés</div></div></div>
+              <div class="it"><div><b>Rappel tranche formations</b><div class="sub">SMS automatique · chaque échéance</div></div><div class="end"><span class="tag ok">Actif</span></div></div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:16px"><h2>Messages automatiques</h2>
+            <div class="list">
+              <div class="it"><div><b>« Votre commande est prête »</b><div class="sub">quand une commande passe en Prêt</div></div><div class="end"><span class="tag ok">Actif</span></div></div>
+              <div class="it"><div><b>Rappel de solde à J+3</b><div class="sub">commande prête non récupérée</div></div><div class="end"><span class="tag ok">Actif</span></div></div>
+              <div class="it"><div><b>Anniversaire client</b><div class="sub">message de fidélisation</div></div><div class="end"><span class="tag recu">Inactif</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PARAMÈTRES ================= -->
+    <section class="page" id="p-params">
+      <div class="topbar"><div><h1>Paramètres</h1><div class="date">Agents, droits, grille tarifaire</div></div></div>
+      <div class="row cols2">
+        <div class="card"><h2>Agents et droits</h2>
+          <table><tr><th>Agent</th><th>Rôle</th><th>Peut</th><th></th></tr>
+            <tr><td><b>Mamadou Bah</b></td><td><span class="tag ok">Gérant</span></td><td class="small">Tout</td><td></td></tr>
+            <tr><td><b>Ousmane Diallo</b></td><td><span class="tag encours">Agent</span></td><td class="small">Devis, commandes, encaisser, présences</td><td class="r"><button class="btn sm ghost">Modifier</button></td></tr>
+            <tr><td><b>Aminata Camara</b></td><td><span class="tag encours">Agent</span></td><td class="small">Formations, présences, clients</td><td class="r"><button class="btn sm ghost">Modifier</button></td></tr>
+          </table>
+          <p class="small muted" style="margin:12px 0 0">Réservé au gérant : dépenses, clôture et rapport, suppression, modification des prix, campagnes.</p>
+          <button class="btn ghost sm" style="margin-top:8px" onclick="toast('Agent créé · code PIN envoyé par SMS')">+ Ajouter un agent</button>
+        </div>
+        <div class="card"><h2>Grille tarifaire</h2>
+          <div class="small muted" style="margin-bottom:10px">83 articles · 11 rubriques · dernière mise à jour 5/09/2026</div>
+          <table><tr><th>Article</th><th>Min.</th><th class="r">Prix</th></tr>
+            <tr><td>Flyer A4 – papier couché 160 g</td><td>100 pièces</td><td class="r num">350 000</td></tr>
+            <tr><td>T-shirt DTF (Pilot)</td><td>1 pièce</td><td class="r num">80 000</td></tr>
+            <tr><td>Formation Graphisme</td><td>1 apprenant</td><td class="r num">1 500 000</td></tr>
+            <tr><td>Site web statique</td><td>1 site</td><td class="r num">3 000 000</td></tr>
+          </table>
+          <button class="btn ghost sm" style="margin-top:12px">Voir et modifier les 83 articles</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="bottom" id="bottomNav"></nav>
+<div class="toast" id="toast"></div>
+
+<script>
+const NAV=[
+ ['today',"Aujourd'hui",'<path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>'],
+ ['devis','Devis & factures','<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>',3],
+ ['commandes','Commandes','<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M3 10h18"/>',6],
+ ['formations','Formations','<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>'],
+ ['caisse','Caisse','<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h3"/>'],
+ ['clients','Clients','<circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0114 0M16 4a3.5 3.5 0 010 7M22 20a7 7 0 00-5-6.7"/>'],
+ ['campagnes','Campagnes','<path d="M3 11v2a1 1 0 001 1h2l6 4V6L6 10H4a1 1 0 00-1 1z"/><path d="M15 9a4 4 0 010 6M18 6a8 8 0 010 12"/>','','gerant'],
+ ['params','Paramètres','<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 01-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 01-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 012.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 012.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z"/>','','gerant'],
+];
+const MOB=['today','devis','commandes','caisse','formations'];
+function icon(d){return `<svg viewBox="0 0 24 24">${d}</svg>`}
+document.getElementById('nav').innerHTML=NAV.map(n=>`<button data-p="${n[0]}" ${n[4]?'data-g="1"':''} onclick="go('${n[0]}')">${icon(n[2])}${n[1]}${n[3]?`<span class="cnt">${n[3]}</span>`:''}</button>`).join('');
+document.getElementById('bottomNav').innerHTML=MOB.map(id=>{const n=NAV.find(x=>x[0]===id);return `<button data-p="${id}" onclick="go('${id}')">${icon(n[2])}${n[1].replace(' & factures','')}</button>`}).join('');
+function go(p){document.querySelectorAll('.page').forEach(e=>e.classList.toggle('on',e.id==='p-'+p));document.querySelectorAll('[data-p]').forEach(b=>b.classList.toggle('on',b.dataset.p===p));window.scrollTo(0,0)}
+go('today');
+function showPane(g,id,btn){document.querySelectorAll(`[id^="${g}-"]`).forEach(e=>e.classList.toggle('on',e.id===g+'-'+id));if(btn){btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===btn))}}
+// role
+let role='gerant';
+function setRole(r){role=r;document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.role===r));
+ document.querySelectorAll('.gerant-only').forEach(e=>e.classList.toggle('hide',r==='agent'));
+ document.querySelectorAll('[data-g]').forEach(e=>e.hidden=(r==='agent'));
+ const who=r==='gerant'?'Mamadou Bah':'Ousmane Diallo';
+ document.getElementById('whoRail').textContent=who;document.getElementById('whoSub').textContent=r==='gerant'?'Gérant · tous les droits':'Agent · devis, commandes, encaisser';
+ document.getElementById('whoMob').textContent=who+' · '+(r==='gerant'?'Gérant':'Agent');
+ if(r==='agent'&&['campagnes','params'].some(p=>document.getElementById('p-'+p).classList.contains('on')))go('today');
+ toast(r==='gerant'?'Vue gérant':'Vue agent : dépenses, clôture, campagnes et paramètres masqués')}
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>setRole(b.dataset.role));
+// catalogue (extrait de la grille)
+const CAT=[["Formations","Informatique de base",500000,"apprenant"],["Formations","Graphisme",1500000,"apprenant"],["Formations","Marketing digital",1500000,"apprenant"],["Formations","Création de sites web",2000000,"apprenant"],
+["Bureautique","Photocopie A4",500,"page"],["Bureautique","Impression A4 couleur",3000,"page"],["Bureautique","Plastification",5000,"doc"],["Bureautique","Photo d'identité (×4)",15000,"lot"],["Bureautique","CV professionnel",25000,"CV"],
+["Imprimerie","Bâche publicitaire",100000,"m"],["Imprimerie","Kakémono",1000000,"pièce"],["Imprimerie","Logo professionnel",100000,"logo"],["Imprimerie","Cachet professionnel",150000,"pièce"],["Imprimerie","Carte de visite PVC (×100)",100000,"lot"],["Imprimerie","Facturier A5",40000,"carnet"],
+["Flyers","Flyer A4 160 g (×100)",350000,"lot"],["Flyers","Flyer A5 (×100)",200000,"lot"],["Flyers","Autocollant A4 160 g (×50)",300000,"lot"],
+["Textile","T-shirt sublimation KAF",30000,"pièce"],["Textile","T-shirt DTF Pilot",80000,"pièce"],["Textile","Casquette personnalisée",30000,"pièce"],["Textile","Tasse magique",60000,"pièce"],
+["Informatique","Réinstallation Windows",100000,"PC"],["Informatique","Pack Adobe",150000,"PC"],["Informatique","Caméra IP + installation",700000,"caméra"],
+["Digital","Page Facebook pro",300000,"page"],["Digital","Gestion page Facebook",500000,"mois"],["Digital","Spot vidéo",1500000,"spot"],["Digital","Site web statique",3000000,"site"],["Digital","Site web dynamique",7000000,"site"],
+["Événementiel","Couverture mariage",2500000,"événement"],["Événementiel","Couverture événementielle",1000000,"événement"]];
+let lines=[];
+const fmt=n=>n.toLocaleString('fr-FR');
+function searchCat(q){q=q.trim().toLowerCase();const r=document.getElementById('res');if(!q){r.innerHTML='';return}
+ const m=CAT.filter(c=>(c[0]+' '+c[1]).toLowerCase().includes(q)).slice(0,8);
+ r.innerHTML=m.map((c,i)=>`<button onclick="addLine(${CAT.indexOf(c)})"><span class="cat">${c[0]}</span>${c[1]}<span class="p num">${fmt(c[2])} <span class="muted small">/ ${c[3]}</span></span></button>`).join('')||'<div class="empty">Aucun article. Ajoutez-le dans Paramètres › Grille tarifaire.</div>'}
+function addLine(i){const c=CAT[i];const ex=lines.find(l=>l.i===i);if(ex)ex.q++;else lines.push({i,q:1,p:c[2]});render();document.getElementById('q').value='';document.getElementById('res').innerHTML=''}
+function render(){const L=document.getElementById('lines');
+ if(!lines.length){L.innerHTML='<div class="empty">Aucune ligne. Tapez un article ci-contre.</div>'}
+ else L.innerHTML=lines.map((l,k)=>{const c=CAT[l.i];return `<div class="ln"><div><b>${c[1]}</b><div class="small muted">${c[0]}</div></div><input type="number" min="1" value="${l.q}" onchange="lines[${k}].q=+this.value||1;render()"><input type="number" value="${l.p}" onchange="lines[${k}].p=+this.value||0;render()"><button class="x" onclick="lines.splice(${k},1);render()">×</button></div>`}).join('');
+ const t=lines.reduce((s,l)=>s+l.q*l.p,0);document.getElementById('st').textContent=fmt(t);document.getElementById('gt').textContent=fmt(t)+' GNF';document.getElementById('ac').textContent=fmt(Math.round(t/2))}
+function newDevis(){lines=[{i:15,q:2,p:350000},{i:11,q:1,p:100000}];render();showPane('devis','new')}
+newDevis();
+let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2200)}
+</script>
+</body>
+</html>
