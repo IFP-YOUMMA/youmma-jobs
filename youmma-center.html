@@ -316,6 +316,10 @@ h1,h2,h3{margin:0;}
           <div class="stat-card"><div class="stat-value" id="ajEnCours">—</div><div class="stat-label">En cours</div></div>
           <div class="stat-card"><div class="stat-value" id="ajALivrer">—</div><div class="stat-label">À livrer aujourd'hui</div></div>
         </div>
+        <div class="card">
+          <h3>🕒 Activité des agents aujourd'hui</h3>
+          <div id="ajActivite"></div>
+        </div>
         <div class="quick-actions">
           <button class="btn btn-primary" onclick="openModalTache()">+ Nouvelle tâche</button>
           <button class="btn btn-success" onclick="openModal('modalEncaisser')">+ Encaisser</button>
@@ -355,6 +359,7 @@ h1,h2,h3{margin:0;}
           <button class="btn btn-success" onclick="openModal('modalEncaisser')">+ Encaisser</button>
           <button class="btn btn-danger-outline restricted" onclick="openModal('modalDepense')">– Dépense</button>
           <button class="btn btn-ghost restricted" onclick="openModalCloture()">🔒 Clôturer la journée</button>
+          <button class="btn btn-ghost gerant-only" onclick="ouvrirHistoriqueCaisse()">📜 Historique complet</button>
         </div>
         <div class="card">
           <h3>Opérations du jour</h3>
@@ -364,7 +369,10 @@ h1,h2,h3{margin:0;}
 
       <!-- PAGE 4 : ORANGE MONEY -->
       <section id="page-om" class="page">
-        <div class="page-header"><h2>📱 Orange Money</h2></div>
+        <div class="page-header">
+          <h2>📱 Orange Money</h2>
+          <button class="btn btn-ghost gerant-only" onclick="ouvrirHistoriqueOM()">📜 Historique</button>
+        </div>
         <div id="omContent"></div>
       </section>
 
@@ -394,6 +402,10 @@ h1,h2,h3{margin:0;}
           <h3>Top 5 catégories</h3>
           <div id="rapTop5"></div>
         </div>
+        <div class="card">
+          <h3>🗒️ Journal des actions</h3>
+          <div id="rapJournal"></div>
+        </div>
       </section>
 
       <!-- PAGE 7 : AGENTS -->
@@ -422,7 +434,7 @@ h1,h2,h3{margin:0;}
 
 <div id="modalTache" class="modal-overlay">
   <div class="modal-card">
-    <div class="modal-header"><h3>Nouvelle tâche</h3><button class="modal-close" onclick="closeModal('modalTache')">×</button></div>
+    <div class="modal-header"><h3 id="tTitre">Nouvelle tâche</h3><button class="modal-close" onclick="closeModal('modalTache')">×</button></div>
     <div class="modal-body">
       <div class="form-row"><label>Client — nom *</label><input type="text" id="tNomClient"></div>
       <div class="form-row"><label>Client — téléphone</label><input type="tel" id="tTelClient"></div>
@@ -442,7 +454,7 @@ h1,h2,h3{margin:0;}
       <div class="form-row"><label>Notes</label><textarea id="tNotes" rows="2"></textarea></div>
       <div id="tErreur" class="form-error hidden"></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalTache')">Annuler</button><button class="btn btn-primary" onclick="creerTache()">Créer la tâche</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalTache')">Annuler</button><button class="btn btn-primary" id="tBtnSubmit" onclick="creerTache()">Créer la tâche</button></div>
   </div>
 </div>
 
@@ -521,6 +533,20 @@ h1,h2,h3{margin:0;}
   </div>
 </div>
 
+<div id="modalHistoriqueCaisse" class="modal-overlay">
+  <div class="modal-card modal-card-lg">
+    <div class="modal-header"><h3>Historique complet de la caisse</h3><button class="modal-close" onclick="closeModal('modalHistoriqueCaisse')">×</button></div>
+    <div class="modal-body"><div id="histCaisseListe"></div></div>
+  </div>
+</div>
+
+<div id="modalHistoriqueOM" class="modal-overlay">
+  <div class="modal-card modal-card-lg">
+    <div class="modal-header"><h3>Historique Orange Money</h3><button class="modal-close" onclick="closeModal('modalHistoriqueOM')">×</button></div>
+    <div class="modal-body"><div id="histOMListe"></div></div>
+  </div>
+</div>
+
 <div id="modalFormation" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-header"><h3>Nouvelle formation</h3><button class="modal-close" onclick="closeModal('modalFormation')">×</button></div>
@@ -576,17 +602,28 @@ h1,h2,h3{margin:0;}
 
 <div id="modalAgent" class="modal-overlay">
   <div class="modal-card">
-    <div class="modal-header"><h3>Ajouter un agent</h3><button class="modal-close" onclick="closeModal('modalAgent')">×</button></div>
+    <div class="modal-header"><h3 id="agTitre">Ajouter un agent</h3><button class="modal-close" onclick="closeModal('modalAgent')">×</button></div>
     <div class="modal-body">
       <div class="form-row"><label>Nom *</label><input type="text" id="agNom"></div>
       <div class="form-row"><label>Téléphone</label><input type="tel" id="agTel"></div>
       <div class="form-row"><label>Rôle *</label>
         <select id="agRole"><option value="agent">Agent</option><option value="comptable">Comptable</option><option value="gerant">Gérant</option></select>
       </div>
-      <div class="form-row"><label>PIN initial (4 chiffres) *</label><input type="password" id="agPin" maxlength="4" inputmode="numeric"></div>
+      <div class="form-row" id="agPinRow"><label>PIN initial (4 chiffres) *</label><input type="password" id="agPin" maxlength="4" inputmode="numeric"></div>
       <div id="agErreur" class="form-error hidden"></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalAgent')">Annuler</button><button class="btn btn-primary" onclick="creerAgent()">Ajouter</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalAgent')">Annuler</button><button class="btn btn-primary" id="agBtnSubmit" onclick="creerAgent()">Ajouter</button></div>
+  </div>
+</div>
+
+<div id="modalResetPin" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Réinitialiser le PIN</h3><button class="modal-close" onclick="closeModal('modalResetPin')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Nouveau PIN (4 chiffres) *</label><input type="password" id="rpNouveauPin" maxlength="4" inputmode="numeric"></div>
+      <div id="rpErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalResetPin')">Annuler</button><button class="btn btn-primary" onclick="confirmerResetPin()">Réinitialiser</button></div>
   </div>
 </div>
 
@@ -607,6 +644,10 @@ let omSessionToday = null;
 let omTransType = null;
 let caisseEntreesJour = 0;
 let caisseSortiesJour = 0;
+let tacheEnEdition = null;
+let agentsCache = [];
+let agentEnEdition = null;
+let agentPourResetPin = null;
 
 const ROLE_LABELS = { gerant: 'Gérant', agent: 'Agent', comptable: 'Comptable' };
 const TACHE_BADGES = {
@@ -635,6 +676,36 @@ async function hashPin(pin) {
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+}
+
+/* ── JOURNAL D'ACTIVITÉ (partagé entre "Aujourd'hui" et "Rapports") ── */
+function construireActionsCaisse(ops) {
+  return (ops || []).map(function(o) {
+    return {
+      horodatage: o.created_at || (o.date + 'T00:00:00'),
+      agent: o.agent_nom,
+      texte: (o.type === 'entree' ? '💰 a encaissé ' : '➖ a dépensé ') + fmt(o.montant) + (o.libelle ? ' — ' + o.libelle : ''),
+    };
+  });
+}
+function construireActionsTaches(taches) {
+  const actions = [];
+  (taches || []).forEach(function(tk) {
+    if (tk.date_creation) actions.push({ horodatage: tk.date_creation, agent: tk.agent_nom, texte: '📋 a créé la tâche de ' + tk.client_nom + ' (' + fmt(tk.montant) + ')' });
+    if (tk.date_debut) actions.push({ horodatage: tk.date_debut, agent: tk.agent_nom, texte: '🔧 a commencé la tâche de ' + tk.client_nom });
+    if (tk.date_fin) actions.push({ horodatage: tk.date_fin, agent: tk.agent_nom, texte: '✅ a terminé la tâche de ' + tk.client_nom });
+    if (tk.date_validation) actions.push({ horodatage: tk.date_validation, agent: tk.comptable_nom || tk.agent_nom, texte: '💳 a validé et payé la tâche de ' + tk.client_nom + ' (' + fmt(Number(tk.montant || 0) - Number(tk.acompte || 0)) + ')' });
+  });
+  return actions;
+}
+function renderJournal(containerId, actions, limite) {
+  actions.sort(function(a, b) { return new Date(b.horodatage) - new Date(a.horodatage); });
+  const top = actions.slice(0, limite);
+  const cont = document.getElementById(containerId);
+  cont.innerHTML = top.length ? top.map(function(a) {
+    const heure = new Date(a.horodatage).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    return '<div class="caisse-row"><div><div class="caisse-libelle">' + esc(a.agent || '—') + ' ' + esc(a.texte) + '</div></div><div class="caisse-meta" style="white-space:nowrap;">' + heure + '</div></div>';
+  }).join('') : '<div class="empty">Aucune activité récente.</div>';
 }
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -770,12 +841,14 @@ async function loadAujourdhui() {
   const finJour = t + 'T23:59:59';
   const debutJour = t + 'T00:00:00';
 
-  const [encaisseRes, attenteRes, enCoursRes, aLivrerRes, urgentesRes] = await Promise.all([
+  const [encaisseRes, attenteRes, enCoursRes, aLivrerRes, urgentesRes, caisseJourRes, tachesRecentRes] = await Promise.all([
     sb.from('yc_caisse').select('montant').eq('date', t).eq('type', 'entree'),
     sb.from('yc_taches').select('id').eq('statut', 'attente'),
     sb.from('yc_taches').select('id').eq('statut', 'en_cours'),
     sb.from('yc_taches').select('id').gte('date_livraison', debutJour).lte('date_livraison', finJour),
     sb.from('yc_taches').select('*').neq('statut', 'valide').lte('date_livraison', new Date().toISOString()).order('date_livraison', { ascending: true }),
+    sb.from('yc_caisse').select('*').eq('date', t),
+    sb.from('yc_taches').select('*').order('date_creation', { ascending: false }).limit(100),
   ]);
 
   const totalEncaisse = (encaisseRes.data || []).reduce(function(s, r) { return s + Number(r.montant || 0); }, 0);
@@ -784,6 +857,10 @@ async function loadAujourdhui() {
   document.getElementById('ajEnCours').textContent = (enCoursRes.data || []).length;
   document.getElementById('ajALivrer').textContent = (aLivrerRes.data || []).length;
   renderUrgentes(urgentesRes.data || []);
+
+  const actionsJour = construireActionsCaisse(caisseJourRes.data)
+    .concat(construireActionsTaches(tachesRecentRes.data).filter(function(a) { return a.horodatage && a.horodatage.slice(0, 10) === t; }));
+  renderJournal('ajActivite', actionsJour, 30);
 }
 
 function renderUrgentes(list) {
@@ -829,6 +906,10 @@ function renderTacheCard(t) {
   if (t.statut === 'attente' && peutAvancer) actions += '<button class="btn btn-sm" onclick="changerStatutTache(\'' + t.id + '\',\'en_cours\')">Commencer</button>';
   if (t.statut === 'en_cours' && peutAvancer) actions += '<button class="btn btn-sm" onclick="changerStatutTache(\'' + t.id + '\',\'termine\')">Terminer</button>';
   if (t.statut === 'termine' && peutValider) actions += '<button class="btn btn-sm btn-primary" onclick="validerPayerTache(\'' + t.id + '\')">Valider &amp; Payer</button>';
+  if (session.role === 'gerant') {
+    actions += '<button class="btn btn-sm btn-ghost" onclick="openModalTache(\'' + t.id + '\')">✏️ Modifier</button>';
+    actions += '<button class="btn btn-sm btn-danger-outline" onclick="supprimerTache(\'' + t.id + '\')">🗑️ Supprimer</button>';
+  }
   const dateStr = t.date_livraison ? new Date(t.date_livraison).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
   return '<div class="tache-card">'
     + '<div class="tache-top"><div><div class="tache-client">' + esc(t.client_nom) + '</div><div class="tache-tel">' + esc(t.client_telephone || '') + '</div></div>'
@@ -839,10 +920,18 @@ function renderTacheCard(t) {
     + '<div class="tache-actions">' + actions + '</div></div>';
 }
 
-function openModalTache() {
-  ['tNomClient', 'tTelClient', 'tDescription', 'tMontant', 'tDateLivraison', 'tNotes'].forEach(function(id) { document.getElementById(id).value = ''; });
-  document.getElementById('tType').value = '';
-  document.getElementById('tAcompte').value = 0;
+function openModalTache(tacheId) {
+  tacheEnEdition = tacheId ? (tachesCache.find(function(t) { return t.id === tacheId; }) || null) : null;
+  document.getElementById('tTitre').textContent = tacheEnEdition ? 'Modifier la tâche' : 'Nouvelle tâche';
+  document.getElementById('tBtnSubmit').textContent = tacheEnEdition ? 'Enregistrer' : 'Créer la tâche';
+  document.getElementById('tNomClient').value = tacheEnEdition ? tacheEnEdition.client_nom : '';
+  document.getElementById('tTelClient').value = tacheEnEdition ? (tacheEnEdition.client_telephone || '') : '';
+  document.getElementById('tType').value = tacheEnEdition ? tacheEnEdition.type_service : '';
+  document.getElementById('tDescription').value = tacheEnEdition ? tacheEnEdition.description : '';
+  document.getElementById('tMontant').value = tacheEnEdition ? tacheEnEdition.montant : '';
+  document.getElementById('tAcompte').value = tacheEnEdition ? tacheEnEdition.acompte : 0;
+  document.getElementById('tDateLivraison').value = tacheEnEdition && tacheEnEdition.date_livraison ? new Date(tacheEnEdition.date_livraison).toISOString().slice(0, 16) : '';
+  document.getElementById('tNotes').value = tacheEnEdition ? (tacheEnEdition.notes || '') : '';
   document.getElementById('tErreur').classList.add('hidden');
   openModal('modalTache');
 }
@@ -866,12 +955,29 @@ async function creerTache() {
     type_service: type, description, montant, acompte,
     date_livraison: new Date(dateLivraison).toISOString(),
     notes: document.getElementById('tNotes').value.trim() || null,
-    statut: 'attente', agent_nom: session.nom, date_creation: new Date().toISOString(),
   };
-  const { error } = await sb.from('yc_taches').insert(payload);
+  let error;
+  if (tacheEnEdition) {
+    ({ error } = await sb.from('yc_taches').update(payload).eq('id', tacheEnEdition.id));
+  } else {
+    payload.statut = 'attente';
+    payload.agent_nom = session.nom;
+    payload.date_creation = new Date().toISOString();
+    ({ error } = await sb.from('yc_taches').insert(payload));
+  }
   if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
   closeModal('modalTache');
-  showToast('Tâche créée ✅');
+  showToast(tacheEnEdition ? 'Tâche modifiée ✅' : 'Tâche créée ✅');
+  tacheEnEdition = null;
+  loadTaches();
+  if (document.getElementById('page-aujourdhui').classList.contains('active')) loadAujourdhui();
+}
+
+async function supprimerTache(id) {
+  if (!confirm('Supprimer définitivement cette tâche ?')) return;
+  const { error } = await sb.from('yc_taches').delete().eq('id', id);
+  if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
+  showToast('Tâche supprimée.');
   loadTaches();
   if (document.getElementById('page-aujourdhui').classList.contains('active')) loadAujourdhui();
 }
@@ -989,6 +1095,18 @@ function envoyerRapportWhatsapp() {
     + 'Espèces comptées: ' + fmt(compte) + '\n'
     + 'Écart: ' + (ecart === 0 ? '0 (juste)' : fmt(ecart));
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+async function ouvrirHistoriqueCaisse() {
+  const { data } = await sb.from('yc_caisse').select('*').order('created_at', { ascending: false }).limit(200);
+  const ops = data || [];
+  document.getElementById('histCaisseListe').innerHTML = ops.length ? ops.map(function(o) {
+    const isEntree = o.type === 'entree';
+    const dateStr = o.date ? new Date(o.date + 'T00:00:00').toLocaleDateString('fr-FR') : '—';
+    return '<div class="caisse-row"><div><div class="caisse-libelle">' + esc(o.libelle) + '</div><div class="caisse-meta">' + dateStr + ' · ' + esc(o.categorie || '') + ' · ' + esc(o.agent_nom || '') + '</div></div>'
+      + '<div class="caisse-montant ' + (isEntree ? 'text-success' : 'text-danger') + '">' + (isEntree ? '+ ' : '– ') + fmt(o.montant) + '</div></div>';
+  }).join('') : '<div class="empty">Aucune opération.</div>';
+  openModal('modalHistoriqueCaisse');
 }
 
 /* ── PAGE 4 : ORANGE MONEY ── */
@@ -1109,6 +1227,17 @@ async function cloturerOM() {
   closeModal('modalOMCloture');
   showToast('Journée Orange Money clôturée ✅');
   loadOM();
+}
+
+async function ouvrirHistoriqueOM() {
+  const { data } = await sb.from('yc_orange_money').select('*').order('date', { ascending: false }).limit(60);
+  const sessionsOM = data || [];
+  document.getElementById('histOMListe').innerHTML = sessionsOM.length ? sessionsOM.map(function(om) {
+    const statutLabel = om.statut === 'cloture' ? '✅ Clôturée' : '🔓 Ouverte';
+    return '<div class="caisse-row"><div><div class="caisse-libelle">' + new Date(om.date).toLocaleDateString('fr-FR') + ' — ' + esc(om.agent_nom) + '</div><div class="caisse-meta">' + statutLabel + '</div></div>'
+      + '<div class="caisse-montant text-success">' + fmt(om.benefice_jour) + '</div></div>';
+  }).join('') : '<div class="empty">Aucune session.</div>';
+  openModal('modalHistoriqueOM');
 }
 
 /* ── PAGE 5 : FORMATIONS ── */
@@ -1278,6 +1407,12 @@ async function loadRapports() {
   entrees.forEach(function(o) { const c = o.categorie || 'Autre'; parCategorie[c] = (parCategorie[c] || 0) + Number(o.montant || 0); });
   const top5 = Object.entries(parCategorie).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 5);
   renderTop5(top5);
+
+  const [{ data: caisseJournal }, { data: tachesJournal }] = await Promise.all([
+    sb.from('yc_caisse').select('*').order('created_at', { ascending: false }).limit(50),
+    sb.from('yc_taches').select('*').order('date_creation', { ascending: false }).limit(50),
+  ]);
+  renderJournal('rapJournal', construireActionsCaisse(caisseJournal).concat(construireActionsTaches(tachesJournal)), 50);
 }
 
 function renderGraphique(jours, valeurs) {
@@ -1299,20 +1434,42 @@ function renderTop5(top5) {
 /* ── PAGE 7 : AGENTS ── */
 async function loadAgents() {
   const { data } = await sb.from('yc_agents').select('*').order('nom');
-  const agents = data || [];
-  document.getElementById('agentsListe').innerHTML = agents.length ? agents.map(renderAgentRow).join('') : '<div class="empty">Aucun agent.</div>';
+  agentsCache = data || [];
+  document.getElementById('agentsListe').innerHTML = agentsCache.length ? agentsCache.map(renderAgentRow).join('') : '<div class="empty">Aucun agent.</div>';
 }
 
 function renderAgentRow(a) {
   const inactifBadge = a.actif === false ? '<span class="badge badge-muted">Inactif</span>' : '';
   const btnDesactiver = a.actif !== false ? '<button class="btn btn-sm btn-danger-outline" onclick="desactiverAgent(\'' + a.id + '\')">Désactiver</button>' : '';
   return '<div class="card agent-row"><div><div class="agent-nom">' + esc(a.nom) + ' ' + inactifBadge + '</div>'
-    + '<div class="agent-meta">' + esc(ROLE_LABELS[a.role] || a.role) + ' · ' + esc(a.telephone || '') + '</div></div>' + btnDesactiver + '</div>';
+    + '<div class="agent-meta">' + esc(ROLE_LABELS[a.role] || a.role) + ' · ' + esc(a.telephone || '') + '</div></div>'
+    + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
+    + '<button class="btn btn-sm btn-ghost" onclick="openModalAgentEdit(\'' + a.id + '\')">✏️ Modifier</button>'
+    + '<button class="btn btn-sm btn-ghost" onclick="ouvrirResetPin(\'' + a.id + '\')">🔑 Réinitialiser PIN</button>'
+    + btnDesactiver + '</div></div>';
 }
 
 function openModalAgent() {
+  agentEnEdition = null;
   ['agNom', 'agTel', 'agPin'].forEach(function(id) { document.getElementById(id).value = ''; });
   document.getElementById('agRole').value = 'agent';
+  document.getElementById('agPinRow').style.display = '';
+  document.getElementById('agTitre').textContent = 'Ajouter un agent';
+  document.getElementById('agBtnSubmit').textContent = 'Ajouter';
+  document.getElementById('agErreur').classList.add('hidden');
+  openModal('modalAgent');
+}
+
+function openModalAgentEdit(id) {
+  agentEnEdition = agentsCache.find(function(a) { return a.id === id; });
+  if (!agentEnEdition) return;
+  document.getElementById('agNom').value = agentEnEdition.nom;
+  document.getElementById('agTel').value = agentEnEdition.telephone || '';
+  document.getElementById('agRole').value = agentEnEdition.role;
+  document.getElementById('agPin').value = '';
+  document.getElementById('agPinRow').style.display = 'none';
+  document.getElementById('agTitre').textContent = 'Modifier l\'agent';
+  document.getElementById('agBtnSubmit').textContent = 'Enregistrer';
   document.getElementById('agErreur').classList.add('hidden');
   openModal('modalAgent');
 }
@@ -1321,8 +1478,20 @@ async function creerAgent() {
   const nom = document.getElementById('agNom').value.trim();
   const tel = document.getElementById('agTel').value.trim();
   const role = document.getElementById('agRole').value;
-  const pin = document.getElementById('agPin').value.trim();
   const errEl = document.getElementById('agErreur');
+
+  if (agentEnEdition) {
+    if (!nom || !role) { errEl.textContent = 'Nom et rôle requis.'; errEl.classList.remove('hidden'); return; }
+    const { error: errUpdate } = await sb.from('yc_agents').update({ nom: nom, telephone: tel || null, role: role }).eq('id', agentEnEdition.id);
+    if (errUpdate) { errEl.textContent = 'Erreur: ' + errUpdate.message; errEl.classList.remove('hidden'); return; }
+    closeModal('modalAgent');
+    showToast('Agent modifié ✅');
+    agentEnEdition = null;
+    loadAgents();
+    return;
+  }
+
+  const pin = document.getElementById('agPin').value.trim();
   if (!nom || !role || pin.length !== 4 || !/^\d{4}$/.test(pin)) { errEl.textContent = 'Nom et PIN à 4 chiffres requis.'; errEl.classList.remove('hidden'); return; }
   const pinHash = await hashPin(pin);
   const { error } = await sb.from('yc_agents').insert({ nom: nom, telephone: tel || null, role: role, pin_hash: pinHash, actif: true });
@@ -1337,6 +1506,26 @@ async function desactiverAgent(id) {
   await sb.from('yc_agents').update({ actif: false }).eq('id', id);
   showToast('Agent désactivé.');
   loadAgents();
+}
+
+function ouvrirResetPin(id) {
+  agentPourResetPin = agentsCache.find(function(a) { return a.id === id; });
+  if (!agentPourResetPin) return;
+  document.getElementById('rpNouveauPin').value = '';
+  document.getElementById('rpErreur').classList.add('hidden');
+  openModal('modalResetPin');
+}
+
+async function confirmerResetPin() {
+  const pin = document.getElementById('rpNouveauPin').value.trim();
+  const errEl = document.getElementById('rpErreur');
+  if (pin.length !== 4 || !/^\d{4}$/.test(pin)) { errEl.textContent = 'PIN à 4 chiffres requis.'; errEl.classList.remove('hidden'); return; }
+  const pinHash = await hashPin(pin);
+  const { error } = await sb.from('yc_agents').update({ pin_hash: pinHash }).eq('id', agentPourResetPin.id);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  closeModal('modalResetPin');
+  showToast('PIN réinitialisé ✅');
+  agentPourResetPin = null;
 }
 
 (async function() { console.log('Hash 0000:', await hashPin('0000')); })();
