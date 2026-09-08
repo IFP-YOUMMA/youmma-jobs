@@ -213,13 +213,55 @@ h1,h2,h3{margin:0;}
         <div class="login-sub">DUBRÉKA · GESTION</div>
       </div>
     </div>
-    <div id="loginAgentsList" class="login-agents"></div>
-    <div id="loginPinPanel" class="login-pin-panel hidden">
-      <button class="login-back" onclick="loginRetourListe()">‹ Retour</button>
-      <div class="login-pin-nom" id="loginPinNom"></div>
-      <input type="password" id="loginPinInput" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="••••" class="login-pin-input" onkeydown="if(event.key==='Enter')loginValiderPin()">
-      <div id="loginPinErreur" class="login-error hidden"></div>
-      <button class="btn btn-primary btn-block" onclick="loginValiderPin()">Se connecter</button>
+    <!-- Écran téléphone -->
+    <div id="loginTel" style="text-align:center;">
+      <p style="color:#9CA3AF;font-size:14px;margin-bottom:20px;">
+        Entrez votre numéro pour continuer
+      </p>
+      <input id="loginTelInput" type="tel"
+        placeholder="Ex: 620 00 00 00"
+        style="width:100%;box-sizing:border-box;padding:14px;
+        border:2px solid #E5E7EB;border-radius:12px;font-size:16px;
+        text-align:center;outline:none;margin-bottom:12px;"
+        onkeydown="if(event.key==='Enter') loginVerifierTel()">
+      <div id="loginTelErreur"
+        style="display:none;color:#DC2626;font-size:13px;margin-bottom:10px;">
+      </div>
+      <button onclick="loginVerifierTel()"
+        style="width:100%;background:#E8622A;color:white;border:none;
+        padding:14px;border-radius:12px;font-size:15px;font-weight:700;
+        cursor:pointer;">
+        Continuer →
+      </button>
+    </div>
+
+    <!-- Écran PIN (masqué par défaut) -->
+    <div id="loginPin" style="display:none;text-align:center;">
+      <div id="loginAgentNom"
+        style="font-size:18px;font-weight:800;color:#1A1A4E;margin-bottom:4px;">
+      </div>
+      <div id="loginAgentRole"
+        style="font-size:13px;color:#9CA3AF;margin-bottom:20px;"></div>
+      <input id="loginPinInput" type="password" maxlength="4"
+        placeholder="● ● ● ●"
+        style="width:100%;box-sizing:border-box;padding:14px;
+        border:2px solid #E5E7EB;border-radius:12px;font-size:24px;
+        text-align:center;letter-spacing:12px;outline:none;margin-bottom:12px;"
+        onkeydown="if(event.key==='Enter') loginVerifierPin()">
+      <div id="loginPinErreur"
+        style="display:none;color:#DC2626;font-size:13px;margin-bottom:10px;">
+      </div>
+      <button onclick="loginVerifierPin()"
+        style="width:100%;background:#E8622A;color:white;border:none;
+        padding:14px;border-radius:12px;font-size:15px;font-weight:700;
+        cursor:pointer;margin-bottom:10px;">
+        Se connecter
+      </button>
+      <button onclick="loginRetour()"
+        style="background:none;border:none;color:#9CA3AF;font-size:13px;
+        cursor:pointer;text-decoration:underline;">
+        ← Changer de numéro
+      </button>
     </div>
   </div>
 </div>
@@ -555,8 +597,7 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let session = null;
-let agentsListe = [];
-let agentSelectionne = null;
+let _loginAgent = null;
 let currentTacheFilter = 'tous';
 let tachesCache = [];
 let formationsCache = [];
@@ -608,72 +649,85 @@ async function initApp() {
   if (raw) {
     try { session = JSON.parse(raw); } catch (e) { session = null; }
   }
-  if (session) { showApp(); } else { await showLogin(); }
+  if (session) { showApp(); } else { showLoginEcranTel(); }
 }
 
-async function showLogin() {
+function showLoginEcranTel() {
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('appShell').classList.add('hidden');
-  document.getElementById('loginAgentsList').classList.remove('hidden');
-  document.getElementById('loginPinPanel').classList.add('hidden');
-  const { data, error } = await sb.from('yc_agents').select('*').eq('actif', true).order('nom');
-  console.log('agents:', data, 'error:', error);
-  agentsListe = data || [];
-  const cont = document.getElementById('loginAgentsList');
-  if (error || !agentsListe.length) {
-    cont.innerHTML = '<div class="empty">Aucun agent actif. Contactez le gérant.</div>';
+  _loginAgent = null;
+  document.getElementById('loginTel').style.display = 'block';
+  document.getElementById('loginPin').style.display = 'none';
+  document.getElementById('loginTelInput').value = '';
+  document.getElementById('loginTelErreur').style.display = 'none';
+}
+
+async function loginVerifierTel() {
+  const tel = (document.getElementById('loginTelInput').value || '').replace(/\D/g, '').replace(/^224/, '');
+  const errDiv = document.getElementById('loginTelErreur');
+  if (!tel || tel.length < 8) {
+    errDiv.textContent = 'Numéro invalide.';
+    errDiv.style.display = 'block';
     return;
   }
-  cont.innerHTML = agentsListe.map(function(a) {
-    return '<div class="login-agent-btn" onclick="loginChoisirAgent(\'' + a.id + '\')">'
-      + '<div class="login-agent-avatar">' + esc((a.nom || '?')[0].toUpperCase()) + '</div>'
-      + '<div class="login-agent-nom">' + esc(a.nom) + '</div>'
-      + '<div class="login-agent-role">' + esc(ROLE_LABELS[a.role] || a.role) + '</div>'
-      + '</div>';
-  }).join('');
-}
-
-function loginChoisirAgent(id) {
-  agentSelectionne = agentsListe.find(function(a) { return a.id === id; });
-  if (!agentSelectionne) return;
-  document.getElementById('loginAgentsList').classList.add('hidden');
-  document.getElementById('loginPinPanel').classList.remove('hidden');
-  document.getElementById('loginPinNom').textContent = agentSelectionne.nom;
+  errDiv.style.display = 'none';
+  const { data, error } = await sb.from('yc_agents')
+    .select('*')
+    .eq('actif', true)
+    .or('telephone.eq.' + tel + ',telephone.eq.224' + tel)
+    .maybeSingle();
+  if (error || !data) {
+    errDiv.textContent = 'Numéro non reconnu. Contactez le gérant.';
+    errDiv.style.display = 'block';
+    return;
+  }
+  _loginAgent = data;
+  const roleLabel = data.role === 'gerant' ? 'Gérant · tous les droits'
+    : data.role === 'comptable' ? 'Comptable'
+    : 'Agent';
+  document.getElementById('loginAgentNom').textContent = data.nom;
+  document.getElementById('loginAgentRole').textContent = roleLabel;
+  document.getElementById('loginTel').style.display = 'none';
+  document.getElementById('loginPin').style.display = 'block';
   document.getElementById('loginPinInput').value = '';
-  document.getElementById('loginPinErreur').classList.add('hidden');
-  document.getElementById('loginPinInput').focus();
+  document.getElementById('loginPinErreur').style.display = 'none';
+  setTimeout(function() { document.getElementById('loginPinInput').focus(); }, 100);
 }
 
-function loginRetourListe() {
-  agentSelectionne = null;
-  document.getElementById('loginAgentsList').classList.remove('hidden');
-  document.getElementById('loginPinPanel').classList.add('hidden');
-}
-
-async function loginValiderPin() {
-  const pin = document.getElementById('loginPinInput').value.trim();
-  const errEl = document.getElementById('loginPinErreur');
-  if (!agentSelectionne || pin.length !== 4) {
-    errEl.textContent = 'Saisissez les 4 chiffres du PIN.';
-    errEl.classList.remove('hidden');
+async function loginVerifierPin() {
+  const pin = (document.getElementById('loginPinInput').value || '').trim();
+  const errDiv = document.getElementById('loginPinErreur');
+  if (!pin || pin.length !== 4) {
+    errDiv.textContent = 'PIN 4 chiffres requis.';
+    errDiv.style.display = 'block';
     return;
   }
   const hash = await hashPin(pin);
-  if (hash !== agentSelectionne.pin_hash) {
-    errEl.textContent = '❌ PIN incorrect.';
-    errEl.classList.remove('hidden');
+  if (hash !== _loginAgent.pin_hash) {
+    errDiv.textContent = '❌ PIN incorrect. Réessayez.';
+    errDiv.style.display = 'block';
+    document.getElementById('loginPinInput').value = '';
     return;
   }
-  session = { id: agentSelectionne.id, nom: agentSelectionne.nom, role: agentSelectionne.role, telephone: agentSelectionne.telephone };
+  session = { id: _loginAgent.id, nom: _loginAgent.nom, role: _loginAgent.role, telephone: _loginAgent.telephone };
   sessionStorage.setItem('yc_session', JSON.stringify(session));
   showApp();
+}
+
+function loginRetour() {
+  _loginAgent = null;
+  document.getElementById('loginPin').style.display = 'none';
+  document.getElementById('loginTel').style.display = 'block';
+  document.getElementById('loginPinInput').value = '';
+  document.getElementById('loginPinErreur').style.display = 'none';
+  document.getElementById('loginTelInput').value = '';
 }
 
 function logout() {
   sessionStorage.removeItem('yc_session');
   session = null;
   document.getElementById('appShell').classList.add('hidden');
-  showLogin();
+  showLoginEcranTel();
 }
 
 function showApp() {
