@@ -617,6 +617,7 @@ async function showLogin() {
   document.getElementById('loginAgentsList').classList.remove('hidden');
   document.getElementById('loginPinPanel').classList.add('hidden');
   const { data, error } = await sb.from('yc_agents').select('*').eq('actif', true).order('nom');
+  console.log('agents:', data, 'error:', error);
   agentsListe = data || [];
   const cont = document.getElementById('loginAgentsList');
   if (error || !agentsListe.length) {
