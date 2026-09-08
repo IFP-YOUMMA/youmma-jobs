@@ -3,498 +3,1286 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>YOUMMA CENTER · Gestion — maquette</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>YOUMMA CENTER · Gestion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{
-  --navy:#0D1B2A; --teal:#1B7F79; --teal-soft:#DDEFEC; --gold:#C9A227; --gold-soft:#FBF3D8;
-  --ink:#17232E; --muted:#66727C; --line:#E2E8E6; --surface:#F3F6F5; --white:#fff;
-  --ok:#2E8B57; --ok-soft:#DFF3E6; --danger:#C0392B; --danger-soft:#FBE3E0;
-  --r:10px; --rail:236px;
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;font-family:'Inter',system-ui,sans-serif;background:#F9FAFB;color:#1A1A4E;}
+button,input,select,textarea{font-family:inherit;}
+h1,h2,h3{margin:0;}
+.hidden{display:none!important;}
+.text-success{color:#16A34A;}
+.text-danger{color:#DC2626;}
+
+/* ---- Login ---- */
+.login-screen{display:flex;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(135deg,#1A1A4E,#2d2d7a);padding:20px;}
+.login-card{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.login-logo-icon{width:48px;height:48px;border-radius:12px;background:#E8622A;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.login-title{font-size:20px;font-weight:800;color:#1A1A4E;}
+.login-title .accent{color:#E8622A;}
+.login-sub{font-size:12px;color:#9CA3AF;font-weight:600;}
+.login-agents{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+.login-agent-btn{display:flex;flex-direction:column;align-items:center;gap:6px;background:#F9FAFB;border:1.5px solid #F3F4F6;border-radius:14px;padding:14px 16px;cursor:pointer;width:100px;}
+.login-agent-btn:hover{border-color:#E8622A;background:#FFF5F0;}
+.login-agent-avatar{width:44px;height:44px;border-radius:10px;background:#1A1A4E;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;}
+.login-agent-nom{font-size:13px;font-weight:700;color:#1A1A4E;text-align:center;}
+.login-agent-role{font-size:10px;color:#9CA3AF;font-weight:600;text-transform:uppercase;}
+.login-pin-panel{text-align:center;}
+.login-back{background:none;border:none;color:#9CA3AF;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;padding:4px;}
+.login-pin-nom{font-size:16px;font-weight:800;color:#1A1A4E;margin-bottom:16px;}
+.login-pin-input{width:160px;text-align:center;font-size:28px;letter-spacing:12px;padding:12px;border:1.5px solid #E5E7EB;border-radius:12px;margin-bottom:12px;}
+.login-error{color:#DC2626;font-size:13px;font-weight:600;margin-bottom:12px;}
+.empty{color:#9CA3AF;text-align:center;padding:24px;font-size:13px;}
+
+/* ---- Shell ---- */
+.app-shell{display:flex;min-height:100vh;}
+.sidebar{width:240px;flex-shrink:0;background:#1A1A4E;color:#fff;display:flex;flex-direction:column;padding:18px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar-back{background:rgba(255,255,255,.08);border:none;color:#C6D1D6;font-size:12.5px;font-weight:600;padding:8px 10px;border-radius:8px;cursor:pointer;margin-bottom:16px;text-align:left;}
+.sidebar-back:hover{background:rgba(255,255,255,.15);color:#fff;}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:4px 6px 20px;}
+.sidebar-brand-icon{width:38px;height:38px;border-radius:10px;background:#E8622A;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.sidebar-brand-title{font-size:14px;font-weight:800;line-height:1.2;}
+.sidebar-brand-title .accent{color:#E8622A;}
+.sidebar-brand-sub{font-size:11px;color:rgba(255,255,255,.5);}
+.sidebar-nav{display:flex;flex-direction:column;gap:2px;flex:1;}
+.nav-item{display:flex;align-items:center;gap:10px;background:none;border:none;color:#C6D1D6;padding:10px 10px;border-radius:8px;text-align:left;font-weight:600;font-size:13.5px;cursor:pointer;width:100%;}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+.nav-item.active{background:rgba(232,93,4,.25);color:#fff;}
+.sidebar-user{border-top:1px solid rgba(255,255,255,.1);padding-top:14px;margin-top:10px;}
+.sidebar-user-nom{font-size:13.5px;font-weight:700;color:#fff;}
+.sidebar-user-role{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:10px;text-transform:uppercase;font-weight:600;}
+.sidebar-logout{width:100%;background:rgba(239,68,68,.12);color:#FCA5A5;border:none;padding:9px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;}
+.sidebar-logout:hover{background:rgba(239,68,68,.2);}
+
+.main{flex:1;padding:26px 30px 60px;overflow-y:auto;min-width:0;}
+.page{display:none;}
+.page.active{display:block;}
+.page-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
+.page-header h2{font-size:20px;font-weight:800;}
+
+.hero-banner{background:linear-gradient(135deg,#1A1A4E,#2d2d7a);border-radius:16px;padding:22px 24px;color:#fff;margin-bottom:20px;}
+.hero-title{font-size:22px;font-weight:800;}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.65);margin-top:4px;text-transform:capitalize;}
+
+.stats-grid{display:grid;gap:14px;margin-bottom:20px;}
+.stats-grid-3{grid-template-columns:repeat(3,1fr);}
+.stats-grid-4{grid-template-columns:repeat(4,1fr);}
+.stat-card{background:#fff;border:1px solid #F3F4F6;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.stat-value{font-size:22px;font-weight:800;color:#1A1A4E;}
+.stat-label{font-size:11px;color:#9CA3AF;font-weight:600;text-transform:uppercase;margin-top:4px;letter-spacing:.02em;}
+
+.quick-actions{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+
+.card{background:#fff;border:1px solid #F3F4F6;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.card h3{font-size:14px;font-weight:800;margin-bottom:12px;}
+
+.btn{border:none;background:#1A1A4E;color:#fff;font-weight:700;padding:10px 16px;border-radius:10px;font-size:13.5px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.btn:hover{opacity:.9;}
+.btn-primary{background:#E8622A;}
+.btn-ghost{background:#fff;color:#1A1A4E;border:1.5px solid #E5E7EB;}
+.btn-success{background:#16A34A;}
+.btn-danger-outline{background:#FEF2F2;color:#DC2626;border:1.5px solid #FECACA;}
+.btn-block{width:100%;justify-content:center;}
+.btn-sm{padding:6px 12px;font-size:12px;}
+
+.filtres{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.filtre-btn{background:#fff;border:1.5px solid #E5E7EB;color:#374151;padding:7px 14px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;}
+.filtre-btn.active{background:#1A1A4E;color:#fff;border-color:#1A1A4E;}
+
+.taches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.tache-card{background:#fff;border:1px solid #F3F4F6;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.tache-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px;}
+.tache-client{font-weight:800;font-size:14.5px;color:#1A1A4E;}
+.tache-tel{font-size:11.5px;color:#9CA3AF;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.badge-muted{background:#F3F4F6;color:#9CA3AF;margin-left:8px;}
+.tache-service{font-size:13px;color:#374151;margin-bottom:10px;}
+.tache-montants{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:#6B7280;margin-bottom:10px;}
+.tache-bottom{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#6B7280;margin-bottom:10px;}
+.tache-agent{font-weight:600;color:#9CA3AF;}
+.tache-actions{display:flex;gap:8px;}
+
+.caisse-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F3F4F6;}
+.caisse-row:last-child{border-bottom:none;}
+.caisse-libelle{font-weight:700;font-size:13.5px;color:#1A1A4E;}
+.caisse-meta{font-size:11.5px;color:#9CA3AF;text-transform:capitalize;}
+.caisse-montant{font-weight:800;font-size:14px;}
+
+.om-header{display:flex;gap:24px;flex-wrap:wrap;}
+.om-label{font-size:11px;color:#9CA3AF;font-weight:600;text-transform:uppercase;}
+.om-value{font-size:14px;font-weight:800;color:#1A1A4E;margin-top:2px;}
+.om-actions{display:flex;gap:10px;margin-bottom:20px;}
+.om-ouverture h3{font-size:15px;margin-bottom:16px;}
+
+.cloture-resume{background:#F9FAFB;border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+.cloture-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13.5px;}
+.cloture-row-bold{font-weight:800;border-top:1px solid #E5E7EB;margin-top:4px;padding-top:8px;}
+.cloture-ecart{font-weight:700;font-size:13.5px;padding:10px;border-radius:8px;background:#F9FAFB;margin-top:8px;}
+
+.formations-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.formation-titre{font-weight:800;font-size:15px;color:#1A1A4E;}
+.formation-dates{font-size:12px;color:#9CA3AF;margin-top:2px;}
+.formation-stats{display:flex;gap:14px;font-size:12.5px;color:#374151;margin:12px 0;flex-wrap:wrap;}
+
+.apprenant-row{border-bottom:1px solid #F3F4F6;padding:12px 0;}
+.apprenant-row:last-child{border-bottom:none;}
+.apprenant-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.apprenant-nom{font-weight:700;font-size:13.5px;color:#1A1A4E;}
+.apprenant-tel{font-size:11px;color:#9CA3AF;}
+.apprenant-presences{font-size:11.5px;color:#6B7280;font-weight:600;}
+.progress-bar{background:#F3F4F6;height:6px;border-radius:10px;overflow:hidden;margin-bottom:6px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#E8622A,#F97316);border-radius:10px;}
+.apprenant-montants{display:flex;gap:12px;font-size:12px;color:#6B7280;margin-bottom:8px;}
+.apprenant-actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+.bar-chart{display:flex;align-items:flex-end;gap:10px;height:160px;padding-top:20px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+.bar-val{font-size:10px;color:#9CA3AF;font-weight:700;margin-bottom:4px;}
+.bar{width:100%;background:linear-gradient(180deg,#E8622A,#1A1A4E);border-radius:6px 6px 0 0;min-height:2px;}
+.bar-label{font-size:11px;color:#9CA3AF;margin-top:6px;text-transform:capitalize;}
+
+.top5-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F3F4F6;font-size:13.5px;}
+.top5-row:last-child{border-bottom:none;}
+
+.agent-row{display:flex;justify-content:space-between;align-items:center;}
+.agent-nom{font-weight:700;font-size:14px;color:#1A1A4E;}
+.agent-meta{font-size:12px;color:#9CA3AF;text-transform:capitalize;margin-top:2px;}
+
+/* ---- Modals ---- */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(13,13,46,.55);z-index:9000;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal-card{background:#fff;border-radius:16px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;}
+.modal-card-lg{max-width:600px;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #F3F4F6;}
+.modal-header h3{font-size:16px;font-weight:800;}
+.modal-close{background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;}
+.modal-body{padding:18px 20px;}
+.modal-footer{display:flex;gap:10px;padding:16px 20px;border-top:1px solid #F3F4F6;}
+.modal-footer .btn{flex:1;justify-content:center;}
+
+.form-row{margin-bottom:14px;}
+.form-row label{display:block;font-size:12.5px;font-weight:700;color:#374151;margin-bottom:5px;}
+.form-row input,.form-row select,.form-row textarea{width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;font-family:inherit;}
+.form-row textarea{resize:vertical;}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-error{color:#DC2626;font-size:12.5px;font-weight:600;background:#FEF2F2;padding:8px 12px;border-radius:8px;margin-bottom:12px;}
+
+/* ---- Toast ---- */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A1A4E;color:#fff;padding:12px 22px;border-radius:10px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.25);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.error{background:#DC2626;}
+
+/* ---- Mobile ---- */
+.mobile-topbar{display:none;}
+.bottom-nav{display:none;}
+.sidebar-overlay{display:none;}
+
+@media (max-width: 768px){
+  .sidebar{position:fixed;left:-260px;top:0;height:100vh;width:240px;transition:left .25s;z-index:1000;}
+  .sidebar.open{left:0;}
+  .app-shell{flex-direction:column;}
+  .main{padding:16px 16px 90px;}
+  .mobile-topbar{display:flex;align-items:center;gap:12px;background:#1A1A4E;color:#fff;padding:14px 16px;position:sticky;top:0;z-index:500;}
+  .mobile-topbar button{background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;padding:6px 10px;border-radius:8px;cursor:pointer;}
+  .mobile-topbar-title{font-weight:800;font-size:14px;}
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #F3F4F6;z-index:900;padding-bottom:env(safe-area-inset-bottom);}
+  .bottom-nav-item{flex:1;background:none;border:none;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;color:#9CA3AF;cursor:pointer;font-size:10px;font-weight:600;}
+  .bottom-nav-item span{font-size:18px;}
+  .bottom-nav-item.active{color:#E8622A;}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;}
+  .sidebar-overlay.open{display:block;}
+  .stats-grid-3,.stats-grid-4{grid-template-columns:repeat(2,1fr);}
+  .form-row-2{grid-template-columns:1fr;}
 }
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--surface);color:var(--ink);font-family:Manrope,system-ui,sans-serif;font-size:15px;line-height:1.45}
-button{font:inherit;cursor:pointer}
-input,select{font:inherit}
-a{color:inherit}
-h1,h2,h3{margin:0;line-height:1.2}
-h1{font-size:26px;font-weight:800;letter-spacing:-.3px}
-h2{font-size:17px;font-weight:700}
-.num{font-variant-numeric:tabular-nums}
-.muted{color:var(--muted)}
-.small{font-size:13px}
-
-/* ---- shell ---- */
-.app{display:grid;grid-template-columns:var(--rail) 1fr;min-height:100vh}
-.rail{background:var(--navy);color:#fff;padding:18px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
-.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px}
-.brand .y{width:36px;height:36px;border-radius:9px;background:var(--teal);display:grid;place-items:center;font-weight:800;font-size:20px}
-.brand b{font-size:15px;display:block;line-height:1.1}
-.brand span{font-size:12px;color:var(--gold)}
-.nav{display:flex;flex-direction:column;gap:2px}
-.nav button{display:flex;align-items:center;gap:10px;background:none;border:0;color:#C6D1D6;padding:10px 10px;border-radius:8px;text-align:left;width:100%;font-weight:600}
-.nav button svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.nav button.on{background:rgba(255,255,255,.08);color:#fff}
-.nav button .cnt{margin-left:auto;background:var(--gold);color:var(--navy);font-size:11px;font-weight:800;border-radius:20px;padding:1px 7px}
-.nav button[hidden]{display:none}
-.rail .role{margin-top:auto;background:rgba(255,255,255,.06);border-radius:10px;padding:12px}
-.rail .role .who{font-weight:700;font-size:14px}
-.seg{display:flex;background:rgba(0,0,0,.35);border-radius:8px;padding:3px;margin-top:8px}
-.seg button{flex:1;border:0;background:none;color:#B9C6CC;padding:6px;border-radius:6px;font-weight:700;font-size:13px}
-.seg button.on{background:var(--teal);color:#fff}
-.main{padding:26px 30px 90px;max-width:1180px;width:100%}
-.topbar{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
-.topbar .date{color:var(--muted);font-weight:600}
-.btn{border:0;background:var(--teal);color:#fff;font-weight:700;padding:10px 16px;border-radius:9px;display:inline-flex;align-items:center;gap:8px}
-.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
-.btn.gold{background:var(--gold);color:var(--navy)}
-.btn.sm{padding:6px 10px;font-size:13px;border-radius:7px}
-.btn.danger{background:var(--danger-soft);color:var(--danger)}
-.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px}
-.card h2{margin-bottom:12px}
-.row{display:grid;gap:16px}
-.cols2{grid-template-columns:1fr 1fr}
-.cols3{grid-template-columns:1fr 1fr 1fr}
-table{width:100%;border-collapse:collapse}
-th{font-size:12px;color:var(--muted);text-align:left;font-weight:700;padding:6px 8px;border-bottom:1px solid var(--line)}
-td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
-tr:last-child td{border-bottom:0}
-td.r,th.r{text-align:right}
-.tag{display:inline-block;font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--surface);color:var(--muted)}
-.tag.recu{background:#E9EEF0;color:#3D4C57}.tag.encours{background:var(--teal-soft);color:var(--teal)}.tag.pret{background:var(--gold-soft);color:#8A6A0C}.tag.livre,.tag.ok{background:var(--ok-soft);color:var(--ok)}
-.tag.attente{background:var(--gold-soft);color:#8A6A0C}.tag.retard{background:var(--danger-soft);color:var(--danger)}
-.field{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--muted)}
-.field input,.field select{border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:#fff;color:var(--ink);font-weight:500;font-size:15px}
-.field input:focus,.field select:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:transparent}
-.gerant-only.hide{display:none!important}
-.locked{position:relative}
-.locked::after{content:"Réservé au gérant";position:absolute;inset:0;background:rgba(243,246,245,.85);display:grid;place-items:center;font-weight:700;color:var(--muted);border-radius:var(--r)}
-
-/* ---- Aujourd'hui ---- */
-.today{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
-.caisse-hero{background:var(--navy);color:#fff;border-radius:14px;padding:22px 24px}
-.caisse-hero .lbl{color:#B9C6CC;font-weight:600;font-size:13px}
-.caisse-hero .big{font-size:44px;font-weight:800;letter-spacing:-1px;line-height:1.05;margin:4px 0 14px}
-.caisse-hero .big small{font-size:16px;font-weight:600;color:var(--gold);margin-left:6px;letter-spacing:0}
-.split{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.split div{background:rgba(255,255,255,.07);border-radius:8px;padding:10px 12px}
-.split b{display:block;font-size:17px}
-.split span{font-size:12px;color:#B9C6CC}
-.list{display:flex;flex-direction:column}
-.list .it{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
-.list .it:last-child{border-bottom:0}
-.list .it b{display:block;font-size:14px}
-.list .it .sub{font-size:13px;color:var(--muted)}
-.list .it .end{margin-left:auto;text-align:right}
-.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 6px}
-.quick button{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:700;font-size:13px;color:var(--ink)}
-.quick button svg{width:24px;height:24px;stroke:var(--teal);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.quick button:hover{border-color:var(--teal)}
-
-/* ---- Devis ---- */
-.devis-layout{display:grid;grid-template-columns:1fr 380px;gap:16px}
-.search{position:relative}
-.search input{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px 12px 11px 38px;font-size:15px}
-.search svg{position:absolute;left:12px;top:12px;width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2}
-.results{border:1px solid var(--line);border-radius:9px;margin-top:8px;max-height:260px;overflow:auto;background:#fff}
-.results button{display:flex;width:100%;border:0;background:none;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);gap:10px;align-items:center}
-.results button:last-child{border-bottom:0}
-.results button:hover{background:var(--surface)}
-.results .cat{font-size:11px;color:var(--muted);font-weight:700;background:var(--surface);padding:2px 6px;border-radius:5px}
-.results .p{margin-left:auto;font-weight:700;white-space:nowrap}
-.ticket{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.ticket .head{padding:14px 16px;border-bottom:2px dashed var(--line);display:flex;justify-content:space-between;align-items:center}
-.ticket .head b{font-size:16px}
-.ticket .lines{padding:6px 16px}
-.ticket .ln{display:grid;grid-template-columns:1fr 84px 96px 22px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
-.ticket .ln:last-child{border-bottom:0}
-.ticket .ln input{width:100%;border:1px solid var(--line);border-radius:6px;padding:5px 6px;text-align:center}
-.ticket .ln .x{border:0;background:none;color:var(--muted);font-size:18px;line-height:1;padding:0}
-.ticket .tot{padding:12px 16px;border-top:2px dashed var(--line);background:var(--surface)}
-.ticket .tot div{display:flex;justify-content:space-between;padding:3px 0}
-.ticket .tot .grand{font-size:22px;font-weight:800;border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
-.ticket .tot .ac{color:var(--teal);font-weight:700}
-.ticket .act{padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap}
-.empty{padding:22px;text-align:center;color:var(--muted);font-size:14px}
-
-/* ---- Kanban ---- */
-.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.col{background:#E9EEED;border-radius:12px;padding:10px;min-height:300px}
-.col h3{font-size:13px;font-weight:800;display:flex;align-items:center;gap:8px;padding:4px 6px 10px}
-.col h3 i{width:9px;height:9px;border-radius:50%;background:var(--muted)}
-.col.c2 h3 i{background:var(--teal)}.col.c3 h3 i{background:var(--gold)}.col.c4 h3 i{background:var(--ok)}
-.col h3 span{margin-left:auto;color:var(--muted);font-weight:700}
-.kcard{background:#fff;border-radius:9px;padding:10px 12px;margin-bottom:8px;border:1px solid var(--line);font-size:13px}
-.kcard b{display:block;font-size:14px}
-.kcard .m{display:flex;justify-content:space-between;color:var(--muted);margin-top:6px;font-size:12px}
-.kcard .m .late{color:var(--danger);font-weight:700}
-.kcard .mv{margin-top:8px;border:1px solid var(--line);background:var(--surface);border-radius:6px;width:100%;padding:5px;font-size:12px;font-weight:700;color:var(--teal)}
-
-/* ---- Formations ---- */
-.tranche{display:flex;gap:4px}
-.tranche i{flex:1;height:8px;border-radius:4px;background:var(--line)}
-.tranche i.p{background:var(--teal)}
-.presence{display:grid;grid-template-columns:160px repeat(10,1fr);gap:4px;font-size:12px;align-items:center}
-.presence .h{color:var(--muted);text-align:center;font-weight:700}
-.presence .d{height:24px;border-radius:5px;background:var(--line)}
-.presence .d.p{background:var(--teal)}.presence .d.a{background:var(--danger-soft)}
-.presence .n{font-weight:600;font-size:13px}
-
-/* ---- Caisse ---- */
-.amt{font-weight:800;white-space:nowrap}
-.amt.in{color:var(--ok)}.amt.out{color:var(--danger)}
-
-/* ---- Campagnes ---- */
-.msgprev{background:#E7F8EF;border-radius:12px;padding:12px 14px;font-size:14px;max-width:320px;position:relative}
-.msgprev::before{content:"";position:absolute;left:-6px;top:12px;border:6px solid transparent;border-right-color:#E7F8EF}
-
-/* ---- Tabs in page ---- */
-.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
-.tabs button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:7px 14px;font-weight:700;font-size:13px;color:var(--muted)}
-.tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-.page{display:none}.page.on{display:block}
-.pane{display:none}.pane.on{display:block}
-
-/* ---- mobile ---- */
-.bottom{display:none}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:9px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s}
-.toast.show{opacity:1}
-@media (max-width:900px){
-  .app{grid-template-columns:1fr}
-  .rail{display:none}
-  .main{padding:16px 14px 90px}
-  .today,.devis-layout,.cols2,.cols3{grid-template-columns:1fr}
-  .kanban{grid-template-columns:1fr 1fr}
-  .quick{grid-template-columns:repeat(2,1fr)}
-  .caisse-hero .big{font-size:36px}
-  .bottom{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--navy);padding:6px 4px calc(6px + env(safe-area-inset-bottom));justify-content:space-around;z-index:5}
-  .bottom button{background:none;border:0;color:#B9C6CC;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:4px 6px;min-width:52px}
-  .bottom button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-  .bottom button.on{color:#fff}
-  .mobile-role{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff;border-radius:10px;padding:10px 12px;margin-bottom:14px}
-  .mobile-role .seg{margin:0;width:150px}
-  .presence{grid-template-columns:110px repeat(10,1fr)}
-  th,td{padding:8px 6px;font-size:13px}
-}
-@media (min-width:901px){.mobile-role{display:none}}
-@media (max-width:600px){.kanban{grid-template-columns:1fr}.col{min-height:0}}
 </style>
 </head>
 <body>
-<div class="app">
-  <aside class="rail">
-    <div class="brand"><div class="y">Y</div><div><b>YOUMMA CENTER</b><span>Dubréka · gestion</span></div></div>
-    <nav class="nav" id="nav"></nav>
-    <div class="role">
-      <div class="who" id="whoRail">Mamadou Bah</div>
-      <div class="small" style="color:#B9C6CC" id="whoSub">Gérant · tous les droits</div>
-      <div class="seg" id="segRail"><button class="on" data-role="gerant">Gérant</button><button data-role="agent">Agent</button></div>
+
+<div id="toast" class="toast"></div>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">🏪</div>
+      <div>
+        <div class="login-title">YOUMMA <span class="accent">CENTER</span></div>
+        <div class="login-sub">DUBRÉKA · GESTION</div>
+      </div>
+    </div>
+    <div id="loginAgentsList" class="login-agents"></div>
+    <div id="loginPinPanel" class="login-pin-panel hidden">
+      <button class="login-back" onclick="loginRetourListe()">‹ Retour</button>
+      <div class="login-pin-nom" id="loginPinNom"></div>
+      <input type="password" id="loginPinInput" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="••••" class="login-pin-input" onkeydown="if(event.key==='Enter')loginValiderPin()">
+      <div id="loginPinErreur" class="login-error hidden"></div>
+      <button class="btn btn-primary btn-block" onclick="loginValiderPin()">Se connecter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="appShell" class="app-shell hidden">
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <button class="sidebar-back" onclick="window.location.href='index.html'">← YOUMMA JOBS</button>
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">🏪</div>
+      <div>
+        <div class="sidebar-brand-title">YOUMMA <span class="accent">CENTER</span></div>
+        <div class="sidebar-brand-sub">Dubréka · gestion</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" data-nav="aujourdhui" onclick="navigate('aujourdhui')"><span>🏠</span> Aujourd'hui</button>
+      <button class="nav-item" data-nav="taches" onclick="navigate('taches')"><span>📋</span> Tâches</button>
+      <button class="nav-item" data-nav="caisse" onclick="navigate('caisse')"><span>💰</span> Caisse</button>
+      <button class="nav-item" data-nav="om" onclick="navigate('om')"><span>📱</span> Orange Money</button>
+      <button class="nav-item" data-nav="formations" onclick="navigate('formations')"><span>🎓</span> Formations</button>
+      <button class="nav-item restricted" data-nav="rapports" onclick="navigate('rapports')"><span>📊</span> Rapports</button>
+      <button class="nav-item restricted" data-nav="agents" onclick="navigate('agents')"><span>👥</span> Agents</button>
+    </nav>
+    <div class="sidebar-user">
+      <div class="sidebar-user-nom" id="sidebarNom">—</div>
+      <div class="sidebar-user-role" id="sidebarRole">—</div>
+      <button class="sidebar-logout" onclick="logout()">🚪 Déconnexion</button>
     </div>
   </aside>
 
-  <main class="main">
-    <div class="mobile-role"><div><b>YOUMMA CENTER</b><div class="small" style="color:#B9C6CC" id="whoMob">Mamadou Bah · Gérant</div></div><div class="seg" id="segMob"><button class="on" data-role="gerant">Gérant</button><button data-role="agent">Agent</button></div></div>
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
+    <div class="mobile-topbar">
+      <button onclick="toggleSidebar()">☰</button>
+      <div class="mobile-topbar-title">YOUMMA CENTER</div>
+    </div>
 
-    <!-- ================= AUJOURD'HUI ================= -->
-    <section class="page on" id="p-today">
-      <div class="topbar"><div><h1>Aujourd'hui</h1><div class="date">Lundi 7 septembre 2026</div></div><button class="btn" onclick="go('devis');newDevis()">+ Nouveau devis</button></div>
-      <div class="today">
-        <div>
-          <div class="caisse-hero">
-            <div class="lbl">Encaissé aujourd'hui</div>
-            <div class="big num">1 245 000<small>GNF</small></div>
-            <div class="split"><div><b class="num">845 000</b><span>Espèces</span></div><div><b class="num">400 000</b><span>Orange Money</span></div><div><b class="num">0</b><span>Dépenses</span></div></div>
-          </div>
-          <div class="quick">
-            <button onclick="go('devis');newDevis()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Devis</button>
-            <button onclick="go('caisse')"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>Encaisser</button>
-            <button onclick="go('formations')"><svg viewBox="0 0 24 24"><path d="M4 19V6a2 2 0 012-2h12a2 2 0 012 2v13"/><path d="M8 8h8M8 12h5"/></svg>Inscrire</button>
-            <button onclick="go('clients')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>Client</button>
-          </div>
+    <main class="main">
+
+      <!-- PAGE 1 : AUJOURD'HUI -->
+      <section id="page-aujourdhui" class="page active">
+        <div class="hero-banner">
+          <div id="ajBonjour" class="hero-title">Bonjour 👋</div>
+          <div id="ajDate" class="hero-sub"></div>
+        </div>
+        <div class="stats-grid stats-grid-4">
+          <div class="stat-card"><div class="stat-value text-success" id="ajTotalEncaisse">—</div><div class="stat-label">Encaissé aujourd'hui</div></div>
+          <div class="stat-card"><div class="stat-value" id="ajAttente">—</div><div class="stat-label">Tâches en attente</div></div>
+          <div class="stat-card"><div class="stat-value" id="ajEnCours">—</div><div class="stat-label">En cours</div></div>
+          <div class="stat-card"><div class="stat-value" id="ajALivrer">—</div><div class="stat-label">À livrer aujourd'hui</div></div>
+        </div>
+        <div class="quick-actions">
+          <button class="btn btn-primary" onclick="openModalTache()">+ Nouvelle tâche</button>
+          <button class="btn btn-success" onclick="openModal('modalEncaisser')">+ Encaisser</button>
+          <button class="btn btn-ghost" onclick="navigate('om')">+ Orange Money</button>
         </div>
         <div class="card">
-          <h2>À livrer aujourd'hui <span class="tag pret">3</span></h2>
-          <div class="list">
-            <div class="it"><div><b>Flyers A4 160 g × 200</b><div class="sub">Pharmacie Espoir · Aïssatou Diallo</div></div><div class="end"><span class="tag pret">Prêt</span><div class="small muted">Solde 175 000</div></div></div>
-            <div class="it"><div><b>T-shirts DTF Pilot × 12</b><div class="sub">Club de foot Dubréka</div></div><div class="end"><span class="tag encours">En cours</span><div class="small muted">Solde 480 000</div></div></div>
-            <div class="it"><div><b>Cartes de visite PVC × 100</b><div class="sub">Me Camara, avocat</div></div><div class="end"><span class="tag pret">Prêt</span><div class="small muted">Soldé</div></div></div>
-          </div>
-          <h2 style="margin-top:18px">À relancer</h2>
-          <div class="list">
-            <div class="it"><div><b>Devis DV-0142 · Bâche 3 m</b><div class="sub">Boutique Fatou · envoyé il y a 4 jours</div></div><div class="end"><button class="btn sm ghost">Relancer</button></div></div>
-            <div class="it"><div><b>Tranche 2 · Graphisme</b><div class="sub">Ibrahima Sow · échue le 5/09</div></div><div class="end"><span class="tag retard">Retard</span></div></div>
-          </div>
+          <h3>⚠️ Tâches urgentes</h3>
+          <div id="ajUrgentes"></div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ================= DEVIS & FACTURES ================= -->
-    <section class="page" id="p-devis">
-      <div class="topbar"><div><h1>Devis & factures</h1><div class="date">Créer un devis depuis la grille tarifaire</div></div><div style="display:flex;gap:8px"><button class="btn ghost" onclick="showPane('devis','liste')">Liste</button><button class="btn" onclick="newDevis()">+ Nouveau devis</button></div></div>
-      <div class="pane on" id="devis-new">
-        <div class="devis-layout">
-          <div>
-            <div class="card">
-              <div class="row cols2" style="margin-bottom:14px">
-                <label class="field">Client<input id="dvClient" placeholder="Nom ou téléphone (base clients)" value="Pharmacie Espoir"></label>
-                <label class="field">Délai promis<input type="date" value="2026-09-10"></label>
-              </div>
-              <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="Tapez un article : flyer, t-shirt, site web…" oninput="searchCat(this.value)"></div>
-              <div class="results" id="res"></div>
-              <p class="small muted" style="margin:10px 0 0">Les prix viennent de la grille tarifaire (modifiable dans Paramètres). Un prix peut être ajusté ligne par ligne.</p>
-            </div>
-          </div>
-          <div class="ticket">
-            <div class="head"><b>Devis DV-0148</b><span class="tag attente">Brouillon</span></div>
-            <div class="lines" id="lines"></div>
-            <div class="tot">
-              <div><span>Sous-total</span><span class="num" id="st">0</span></div>
-              <div><span>Remise</span><span class="num">0</span></div>
-              <div class="grand"><span>Total</span><span class="num" id="gt">0 GNF</span></div>
-              <div class="ac"><span>Acompte 50 % à la commande</span><span class="num" id="ac">0</span></div>
-            </div>
-            <div class="act"><button class="btn" onclick="toast('Devis envoyé par WhatsApp')">Envoyer WhatsApp</button><button class="btn gold" onclick="toast('Facture FA-0093 créée · commande ajoutée')">Valider → facture</button><button class="btn ghost" onclick="toast('PDF généré')">PDF</button></div>
-          </div>
+      <!-- PAGE 2 : TÂCHES -->
+      <section id="page-taches" class="page">
+        <div class="page-header">
+          <h2>📋 Tâches</h2>
+          <button class="btn btn-primary" onclick="openModalTache()">+ Nouvelle tâche</button>
         </div>
-      </div>
-      <div class="pane" id="devis-liste">
-        <div class="tabs"><button class="on">Tous</button><button>Brouillons</button><button>Envoyés</button><button>Facturés</button><button>Payés</button></div>
-        <div class="card" style="padding:0 6px">
-          <table>
-            <tr><th>N°</th><th>Client</th><th>Objet</th><th class="r">Total</th><th class="r">Payé</th><th>Statut</th></tr>
-            <tr><td>FA-0092</td><td>Pharmacie Espoir</td><td>Flyers A4 160 g × 200</td><td class="r num">350 000</td><td class="r num">175 000</td><td><span class="tag attente">Acompte reçu</span></td></tr>
-            <tr><td>FA-0091</td><td>Club de foot Dubréka</td><td>T-shirts DTF Pilot × 12</td><td class="r num">960 000</td><td class="r num">480 000</td><td><span class="tag attente">Acompte reçu</span></td></tr>
-            <tr><td>FA-0090</td><td>Me Camara</td><td>Cartes de visite PVC × 100</td><td class="r num">100 000</td><td class="r num">100 000</td><td><span class="tag ok">Payé</span></td></tr>
-            <tr><td>DV-0142</td><td>Boutique Fatou</td><td>Bâche 3 m + logo</td><td class="r num">400 000</td><td class="r num">0</td><td><span class="tag recu">Envoyé</span></td></tr>
-            <tr><td>DV-0140</td><td>École Les Palmiers</td><td>Site web statique</td><td class="r num">3 000 000</td><td class="r num">0</td><td><span class="tag recu">Envoyé</span></td></tr>
-          </table>
+        <div class="filtres" id="tachesFiltres">
+          <button class="filtre-btn active" data-filtre="tous" onclick="setTacheFilter('tous')">Tous</button>
+          <button class="filtre-btn" data-filtre="attente" onclick="setTacheFilter('attente')">En attente</button>
+          <button class="filtre-btn" data-filtre="en_cours" onclick="setTacheFilter('en_cours')">En cours</button>
+          <button class="filtre-btn" data-filtre="termine" onclick="setTacheFilter('termine')">Terminé</button>
+          <button class="filtre-btn" data-filtre="valide" onclick="setTacheFilter('valide')">Validé</button>
         </div>
-      </div>
-    </section>
+        <div id="tachesListe" class="taches-grid"></div>
+      </section>
 
-    <!-- ================= COMMANDES ================= -->
-    <section class="page" id="p-commandes">
-      <div class="topbar"><div><h1>Commandes</h1><div class="date">Chaque facture validée devient une commande à suivre</div></div><div class="tabs" style="margin:0"><button class="on">Cette semaine</button><button>Toutes</button><button>En retard</button></div></div>
-      <div class="kanban">
-        <div class="col c1"><h3><i></i>Reçu <span>2</span></h3>
-          <div class="kcard"><b>Bâche 3 m + logo</b>Boutique Fatou<div class="m"><span>FA-0094</span><span>Livrer 11/09</span></div><button class="mv" onclick="toast('Commande → En cours')">Passer en cours</button></div>
-          <div class="kcard"><b>Badges PVC × 30</b>ONG Santé Plus<div class="m"><span>FA-0093</span><span>Livrer 12/09</span></div><button class="mv" onclick="toast('Commande → En cours')">Passer en cours</button></div>
+      <!-- PAGE 3 : CAISSE -->
+      <section id="page-caisse" class="page">
+        <div class="page-header"><h2>💰 Caisse</h2></div>
+        <div class="stats-grid stats-grid-3">
+          <div class="stat-card"><div class="stat-value text-success" id="caisseEntrees">—</div><div class="stat-label">Entrées du jour</div></div>
+          <div class="stat-card"><div class="stat-value text-danger" id="caisseSorties">—</div><div class="stat-label">Sorties du jour</div></div>
+          <div class="stat-card"><div class="stat-value" id="caisseSolde">—</div><div class="stat-label">Solde net</div></div>
         </div>
-        <div class="col c2"><h3><i></i>En cours <span>2</span></h3>
-          <div class="kcard"><b>T-shirts DTF Pilot × 12</b>Club de foot Dubréka<div class="m"><span>Agent : Ousmane</span><span class="late">Livrer aujourd'hui</span></div><button class="mv" onclick="toast('Commande → Prêt')">Marquer prêt</button></div>
-          <div class="kcard"><b>Site web statique</b>École Les Palmiers<div class="m"><span>Agent : Mamadou</span><span>Livrer 25/09</span></div><button class="mv" onclick="toast('Commande → Prêt')">Marquer prêt</button></div>
+        <div class="quick-actions">
+          <button class="btn btn-success" onclick="openModal('modalEncaisser')">+ Encaisser</button>
+          <button class="btn btn-danger-outline restricted" onclick="openModal('modalDepense')">– Dépense</button>
+          <button class="btn btn-ghost restricted" onclick="openModalCloture()">🔒 Clôturer la journée</button>
         </div>
-        <div class="col c3"><h3><i></i>Prêt <span>2</span></h3>
-          <div class="kcard"><b>Flyers A4 160 g × 200</b>Pharmacie Espoir<div class="m"><span>Solde 175 000</span><span>Client prévenu</span></div><button class="mv" onclick="toast('Encaissement solde → Caisse')">Livrer + encaisser solde</button></div>
-          <div class="kcard"><b>Cartes de visite PVC × 100</b>Me Camara<div class="m"><span>Soldé</span><span>Client prévenu</span></div><button class="mv" onclick="toast('Commande → Livré')">Livrer</button></div>
+        <div class="card">
+          <h3>Opérations du jour</h3>
+          <div id="caisseListe"></div>
         </div>
-        <div class="col c4"><h3><i></i>Livré <span>5</span></h3>
-          <div class="kcard"><b>Cachet professionnel</b>Cabinet Bah<div class="m"><span>4/09</span><span>150 000</span></div></div>
-          <div class="kcard"><b>Réinstallation Windows</b>Alpha Barry<div class="m"><span>4/09</span><span>100 000</span></div></div>
-          <div class="kcard"><b>Photos d'identité × 8</b>Kadiatou Sylla<div class="m"><span>3/09</span><span>30 000</span></div></div>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- ================= FORMATIONS ================= -->
-    <section class="page" id="p-formations">
-      <div class="topbar"><div><h1>Formations</h1><div class="date">Sessions, apprenants, paiements par tranche, présences</div></div><button class="btn" onclick="toast('Inscription enregistrée')">+ Inscrire un apprenant</button></div>
-      <div class="tabs"><button class="on" onclick="showPane('form','sessions',this)">Sessions en cours</button><button onclick="showPane('form','presences',this)">Présences du jour</button><button onclick="showPane('form','paiements',this)">Paiements en retard</button></div>
-      <div class="pane on" id="form-sessions">
-        <div class="row cols3">
-          <div class="card"><h2>Graphisme</h2><div class="small muted">Sept.–Oct. 2026 · Lun/Mer/Ven 9h · 8 apprenants</div>
-            <table style="margin-top:10px"><tr><th>Apprenant</th><th>Tranches</th><th class="r">Reste</th></tr>
-            <tr><td>Ibrahima Sow</td><td><div class="tranche"><i class="p"></i><i></i><i></i></div></td><td class="r num">1 000 000</td></tr>
-            <tr><td>Mariama Bah</td><td><div class="tranche"><i class="p"></i><i class="p"></i><i></i></div></td><td class="r num">500 000</td></tr>
-            <tr><td>Sékou Condé</td><td><div class="tranche"><i class="p"></i><i class="p"></i><i class="p"></i></div></td><td class="r"><span class="tag ok">Soldé</span></td></tr></table></div>
-          <div class="card"><h2>Informatique de base</h2><div class="small muted">Sept. 2026 · Mar/Jeu 15h · 12 apprenants</div>
-            <table style="margin-top:10px"><tr><th>Apprenant</th><th>Tranches</th><th class="r">Reste</th></tr>
-            <tr><td>Fatoumata Keïta</td><td><div class="tranche"><i class="p"></i><i class="p"></i></div></td><td class="r"><span class="tag ok">Soldé</span></td></tr>
-            <tr><td>Abdoulaye Touré</td><td><div class="tranche"><i class="p"></i><i></i></div></td><td class="r num">250 000</td></tr>
-            <tr><td>Hawa Camara</td><td><div class="tranche"><i class="p"></i><i></i></div></td><td class="r num">250 000</td></tr></table></div>
-          <div class="card"><h2>Marketing digital</h2><div class="small muted">Démarre le 14/09 · 5 inscrits / 10 places</div>
-            <div class="empty">5 places restantes<br><button class="btn sm" style="margin-top:10px" onclick="go('campagnes')">Lancer une campagne</button></div></div>
-        </div>
-      </div>
-      <div class="pane" id="form-presences">
-        <div class="card"><h2>Graphisme · séance du 7/09</h2>
-          <div class="presence"><div></div><div class="h">1</div><div class="h">2</div><div class="h">3</div><div class="h">4</div><div class="h">5</div><div class="h">6</div><div class="h">7</div><div class="h">8</div><div class="h">9</div><div class="h">10</div>
-            <div class="n">Ibrahima Sow</div><div class="d p"></div><div class="d p"></div><div class="d a"></div><div class="d p"></div><div class="d p"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div>
-            <div class="n">Mariama Bah</div><div class="d p"></div><div class="d p"></div><div class="d p"></div><div class="d p"></div><div class="d p"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div>
-            <div class="n">Sékou Condé</div><div class="d p"></div><div class="d a"></div><div class="d p"></div><div class="d p"></div><div class="d a"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div>
-          </div>
-          <p class="small muted" style="margin:12px 0 0">Vert = présent, rouge = absent. L'agent coche en un tap ; une attestation ne se génère qu'à 80 % de présence.</p>
-        </div>
-      </div>
-      <div class="pane" id="form-paiements">
-        <div class="card" style="padding:0 6px"><table><tr><th>Apprenant</th><th>Formation</th><th>Tranche</th><th class="r">Montant</th><th>Échéance</th><th></th></tr>
-          <tr><td>Ibrahima Sow</td><td>Graphisme</td><td>2/3</td><td class="r num">500 000</td><td><span class="tag retard">5/09</span></td><td class="r"><button class="btn sm ghost" onclick="toast('SMS de rappel envoyé')">Rappel SMS</button></td></tr>
-          <tr><td>Abdoulaye Touré</td><td>Informatique de base</td><td>2/2</td><td class="r num">250 000</td><td><span class="tag attente">10/09</span></td><td class="r"><button class="btn sm ghost">Rappel SMS</button></td></tr></table></div>
-      </div>
-    </section>
+      <!-- PAGE 4 : ORANGE MONEY -->
+      <section id="page-om" class="page">
+        <div class="page-header"><h2>📱 Orange Money</h2></div>
+        <div id="omContent"></div>
+      </section>
 
-    <!-- ================= CAISSE ================= -->
-    <section class="page" id="p-caisse">
-      <div class="topbar"><div><h1>Caisse</h1><div class="date">Lundi 7 septembre · ouverte à 8h12 par Ousmane</div></div><div style="display:flex;gap:8px"><button class="btn danger gerant-only" onclick="toast('Dépense enregistrée')">– Dépense</button><button class="btn" onclick="toast('Encaissement enregistré')">+ Encaisser</button></div></div>
-      <div class="row cols2">
-        <div class="card" style="padding:0 6px"><table>
-          <tr><th>Heure</th><th>Libellé</th><th>Mode</th><th class="r">Montant</th></tr>
-          <tr><td class="num">08:40</td><td>Photocopies × 20 · client de passage</td><td>Espèces</td><td class="r num amt in">+ 10 000</td></tr>
-          <tr><td class="num">09:15</td><td>Acompte FA-0093 · ONG Santé Plus</td><td>Orange Money</td><td class="r num amt in">+ 400 000</td></tr>
-          <tr><td class="num">10:02</td><td>Tranche 2 · Mariama Bah · Graphisme</td><td>Espèces</td><td class="r num amt in">+ 500 000</td></tr>
-          <tr><td class="num">11:30</td><td>Réinstallation Windows · Alpha Barry</td><td>Espèces</td><td class="r num amt in">+ 100 000</td></tr>
-          <tr><td class="num">12:10</td><td>Photos d'identité × 2</td><td>Espèces</td><td class="r num amt in">+ 30 000</td></tr>
-          <tr><td class="num">12:45</td><td>Encre imprimante (gérant)</td><td>Espèces</td><td class="r num amt out">– 85 000</td></tr>
-          <tr><td class="num">14:20</td><td>Plastification × 5</td><td>Espèces</td><td class="r num amt in">+ 25 000</td></tr>
-        </table></div>
-        <div>
-          <div class="card gerant-only"><h2>Clôture de la journée</h2>
-            <div class="list">
-              <div class="it"><div>Encaissements</div><div class="end num amt in">+ 1 245 000</div></div>
-              <div class="it"><div>Dépenses</div><div class="end num amt out">– 85 000</div></div>
-              <div class="it"><div>Espèces attendues en caisse</div><div class="end num" style="font-weight:800">760 000</div></div>
-              <div class="it"><div>Espèces comptées</div><div class="end"><input style="width:120px;border:1px solid var(--line);border-radius:6px;padding:6px;text-align:right" value="760 000"></div></div>
-            </div>
-            <button class="btn gold" style="margin-top:12px;width:100%" onclick="toast('Journée clôturée · rapport envoyé au gérant')">Clôturer et envoyer le rapport</button>
-            <p class="small muted" style="margin:10px 0 0">Le rapport journalier (encaissements par mode, dépenses, écart de caisse, commandes livrées) est envoyé par WhatsApp au gérant.</p>
-          </div>
-          <div class="card" style="margin-top:16px"><h2>Ce mois</h2>
-            <div class="split" style="grid-template-columns:1fr 1fr 1fr"><div style="background:var(--surface)"><b class="num" style="color:var(--ink)">6,4 M</b><span>Encaissé</span></div><div style="background:var(--surface)"><b class="num" style="color:var(--ink)">1,1 M</b><span>Dépenses</span></div><div style="background:var(--surface)"><b class="num" style="color:var(--ink)">2,3 M</b><span>À recouvrer</span></div></div>
-          </div>
+      <!-- PAGE 5 : FORMATIONS -->
+      <section id="page-formations" class="page">
+        <div class="page-header">
+          <h2>🎓 Formations</h2>
+          <button class="btn btn-primary restricted" onclick="openModalFormation()">+ Nouvelle formation</button>
         </div>
-      </div>
-    </section>
+        <div id="formationsListe" class="formations-grid"></div>
+      </section>
 
-    <!-- ================= CLIENTS ================= -->
-    <section class="page" id="p-clients">
-      <div class="topbar"><div><h1>Clients</h1><div class="date">148 clients · 32 actifs ce mois</div></div><button class="btn" onclick="toast('Client ajouté')">+ Nouveau client</button></div>
-      <div class="card" style="padding:14px 6px 0">
-        <div style="padding:0 8px 12px" class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input placeholder="Rechercher un nom, un téléphone, une entreprise"></div>
-        <table><tr><th>Client</th><th>Téléphone</th><th>Type</th><th class="r">Commandes</th><th class="r">Total dépensé</th><th>Dernière visite</th></tr>
-          <tr><td><b>Pharmacie Espoir</b><div class="small muted">Aïssatou Diallo</div></td><td class="num">622 45 11 09</td><td><span class="tag">Entreprise</span></td><td class="r num">6</td><td class="r num">1 850 000</td><td>Aujourd'hui</td></tr>
-          <tr><td><b>Club de foot Dubréka</b><div class="small muted">Mohamed Soumah</div></td><td class="num">655 90 33 21</td><td><span class="tag">Association</span></td><td class="r num">2</td><td class="r num">1 260 000</td><td>3/09</td></tr>
-          <tr><td><b>Ibrahima Sow</b><div class="small muted">Apprenant · Graphisme</div></td><td class="num">628 77 40 15</td><td><span class="tag encours">Apprenant</span></td><td class="r num">1</td><td class="r num">500 000</td><td>2/09</td></tr>
-          <tr><td><b>École Les Palmiers</b><div class="small muted">Directeur Kaba</div></td><td class="num">664 12 88 30</td><td><span class="tag">Entreprise</span></td><td class="r num">3</td><td class="r num">4 200 000</td><td>28/08</td></tr>
-          <tr><td><b>Kadiatou Sylla</b></td><td class="num">621 30 05 77</td><td><span class="tag">Particulier</span></td><td class="r num">4</td><td class="r num">95 000</td><td>3/09</td></tr>
-        </table>
-      </div>
-    </section>
+      <!-- PAGE 6 : RAPPORTS -->
+      <section id="page-rapports" class="page">
+        <div class="page-header"><h2>📊 Rapports</h2></div>
+        <div class="stats-grid stats-grid-4">
+          <div class="stat-card"><div class="stat-value" id="rapCA">—</div><div class="stat-label">CA du mois</div></div>
+          <div class="stat-card"><div class="stat-value text-danger" id="rapDepenses">—</div><div class="stat-label">Dépenses du mois</div></div>
+          <div class="stat-card"><div class="stat-value text-success" id="rapBenefice">—</div><div class="stat-label">Bénéfice net estimé</div></div>
+          <div class="stat-card"><div class="stat-value" id="rapTaches">—</div><div class="stat-label">Tâches validées ce mois</div></div>
+        </div>
+        <div class="card">
+          <h3>CA des 7 derniers jours</h3>
+          <div id="rapGraphique" class="bar-chart"></div>
+        </div>
+        <div class="card">
+          <h3>Top 5 catégories</h3>
+          <div id="rapTop5"></div>
+        </div>
+      </section>
 
-    <!-- ================= CAMPAGNES ================= -->
-    <section class="page" id="p-campagnes">
-      <div class="topbar"><div><h1>Campagnes & nouveautés</h1><div class="date">SMS et WhatsApp vers votre base clients</div></div><button class="btn" onclick="toast('Campagne programmée')">+ Nouvelle campagne</button></div>
-      <div class="row cols2">
-        <div class="card"><h2>Nouvelle campagne</h2>
-          <div class="row" style="gap:12px">
-            <label class="field">Envoyer à<select><option>Tous les clients (148)</option><option>Apprenants (34)</option><option>Entreprises (41)</option><option>Clients inactifs depuis 3 mois (57)</option></select></label>
-            <label class="field">Canal<select><option>SMS (Nimba)</option><option>WhatsApp</option></select></label>
-            <label class="field">Message<input value="Nouvelle session Marketing digital le 14/09 à YOUMMA CENTER Dubreka. 5 places. Inscription 620 83 60 81"></label>
-          </div>
-          <div style="margin:14px 0 6px" class="small muted">Aperçu</div>
-          <div class="msgprev">Nouvelle session Marketing digital le 14/09 à YOUMMA CENTER Dubreka. 5 places. Inscription 620 83 60 81</div>
-          <div class="small muted" style="margin-top:10px">142 caractères · 1 SMS · coût estimé 148 × 250 = <b class="num">37 000 GNF</b></div>
+      <!-- PAGE 7 : AGENTS -->
+      <section id="page-agents" class="page">
+        <div class="page-header">
+          <h2>👥 Agents</h2>
+          <button class="btn btn-primary" onclick="openModalAgent()">+ Ajouter agent</button>
         </div>
-        <div>
-          <div class="card"><h2>Campagnes récentes</h2>
-            <div class="list">
-              <div class="it"><div><b>Rentrée : –10 % sur les cartes de visite</b><div class="sub">SMS · 1/09 · 41 entreprises</div></div><div class="end"><b class="num">6</b><div class="small muted">devis créés</div></div></div>
-              <div class="it"><div><b>Nouveauté : impression DTF sur t-shirt</b><div class="sub">WhatsApp · 20/08 · 148 clients</div></div><div class="end"><b class="num">11</b><div class="small muted">devis créés</div></div></div>
-              <div class="it"><div><b>Rappel tranche formations</b><div class="sub">SMS automatique · chaque échéance</div></div><div class="end"><span class="tag ok">Actif</span></div></div>
-            </div>
-          </div>
-          <div class="card" style="margin-top:16px"><h2>Messages automatiques</h2>
-            <div class="list">
-              <div class="it"><div><b>« Votre commande est prête »</b><div class="sub">quand une commande passe en Prêt</div></div><div class="end"><span class="tag ok">Actif</span></div></div>
-              <div class="it"><div><b>Rappel de solde à J+3</b><div class="sub">commande prête non récupérée</div></div><div class="end"><span class="tag ok">Actif</span></div></div>
-              <div class="it"><div><b>Anniversaire client</b><div class="sub">message de fidélisation</div></div><div class="end"><span class="tag recu">Inactif</span></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+        <div id="agentsListe"></div>
+      </section>
 
-    <!-- ================= PARAMÈTRES ================= -->
-    <section class="page" id="p-params">
-      <div class="topbar"><div><h1>Paramètres</h1><div class="date">Agents, droits, grille tarifaire</div></div></div>
-      <div class="row cols2">
-        <div class="card"><h2>Agents et droits</h2>
-          <table><tr><th>Agent</th><th>Rôle</th><th>Peut</th><th></th></tr>
-            <tr><td><b>Mamadou Bah</b></td><td><span class="tag ok">Gérant</span></td><td class="small">Tout</td><td></td></tr>
-            <tr><td><b>Ousmane Diallo</b></td><td><span class="tag encours">Agent</span></td><td class="small">Devis, commandes, encaisser, présences</td><td class="r"><button class="btn sm ghost">Modifier</button></td></tr>
-            <tr><td><b>Aminata Camara</b></td><td><span class="tag encours">Agent</span></td><td class="small">Formations, présences, clients</td><td class="r"><button class="btn sm ghost">Modifier</button></td></tr>
-          </table>
-          <p class="small muted" style="margin:12px 0 0">Réservé au gérant : dépenses, clôture et rapport, suppression, modification des prix, campagnes.</p>
-          <button class="btn ghost sm" style="margin-top:8px" onclick="toast('Agent créé · code PIN envoyé par SMS')">+ Ajouter un agent</button>
-        </div>
-        <div class="card"><h2>Grille tarifaire</h2>
-          <div class="small muted" style="margin-bottom:10px">83 articles · 11 rubriques · dernière mise à jour 5/09/2026</div>
-          <table><tr><th>Article</th><th>Min.</th><th class="r">Prix</th></tr>
-            <tr><td>Flyer A4 – papier couché 160 g</td><td>100 pièces</td><td class="r num">350 000</td></tr>
-            <tr><td>T-shirt DTF (Pilot)</td><td>1 pièce</td><td class="r num">80 000</td></tr>
-            <tr><td>Formation Graphisme</td><td>1 apprenant</td><td class="r num">1 500 000</td></tr>
-            <tr><td>Site web statique</td><td>1 site</td><td class="r num">3 000 000</td></tr>
-          </table>
-          <button class="btn ghost sm" style="margin-top:12px">Voir et modifier les 83 articles</button>
-        </div>
-      </div>
-    </section>
-  </main>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item" data-nav="aujourdhui" onclick="navigate('aujourdhui')"><span>🏠</span><small>Accueil</small></button>
+    <button class="bottom-nav-item" data-nav="taches" onclick="navigate('taches')"><span>📋</span><small>Tâches</small></button>
+    <button class="bottom-nav-item" data-nav="caisse" onclick="navigate('caisse')"><span>💰</span><small>Caisse</small></button>
+    <button class="bottom-nav-item" data-nav="om" onclick="navigate('om')"><span>📱</span><small>OM</small></button>
+    <button class="bottom-nav-item" data-nav="formations" onclick="navigate('formations')"><span>🎓</span><small>Form.</small></button>
+  </nav>
+
 </div>
 
-<nav class="bottom" id="bottomNav"></nav>
-<div class="toast" id="toast"></div>
+<!-- ═══ MODALS ═══ -->
+
+<div id="modalTache" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Nouvelle tâche</h3><button class="modal-close" onclick="closeModal('modalTache')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Client — nom *</label><input type="text" id="tNomClient"></div>
+      <div class="form-row"><label>Client — téléphone</label><input type="tel" id="tTelClient"></div>
+      <div class="form-row"><label>Type de service *</label>
+        <select id="tType">
+          <option value="">— Choisir —</option>
+          <option>Impression</option><option>Bureautique</option><option>Textile</option>
+          <option>Formation</option><option>Informatique</option><option>Événementiel</option><option>Autre</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Description *</label><textarea id="tDescription" rows="3"></textarea></div>
+      <div class="form-row-2">
+        <div class="form-row"><label>Montant total (GNF) *</label><input type="number" id="tMontant" min="0"></div>
+        <div class="form-row"><label>Acompte reçu (GNF)</label><input type="number" id="tAcompte" min="0" value="0"></div>
+      </div>
+      <div class="form-row"><label>Date de livraison *</label><input type="datetime-local" id="tDateLivraison"></div>
+      <div class="form-row"><label>Notes</label><textarea id="tNotes" rows="2"></textarea></div>
+      <div id="tErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalTache')">Annuler</button><button class="btn btn-primary" onclick="creerTache()">Créer la tâche</button></div>
+  </div>
+</div>
+
+<div id="modalEncaisser" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Encaisser</h3><button class="modal-close" onclick="closeModal('modalEncaisser')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Libellé *</label><input type="text" id="eLibelle"></div>
+      <div class="form-row"><label>Montant (GNF) *</label><input type="number" id="eMontant" min="0"></div>
+      <div class="form-row"><label>Mode de paiement</label>
+        <select id="eModePaiement"><option value="cash">Cash</option><option value="orange_money">Orange Money</option><option value="autre">Autre</option></select>
+      </div>
+      <div class="form-row"><label>Catégorie</label>
+        <select id="eCategorie"><option value="prestation">Prestation</option><option value="formation">Formation</option><option value="vente">Vente</option><option value="orange_money">Orange Money</option></select>
+      </div>
+      <div id="eErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalEncaisser')">Annuler</button><button class="btn btn-primary" onclick="enregistrerEncaissement()">Encaisser</button></div>
+  </div>
+</div>
+
+<div id="modalDepense" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Nouvelle dépense</h3><button class="modal-close" onclick="closeModal('modalDepense')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Libellé *</label><input type="text" id="dLibelle"></div>
+      <div class="form-row"><label>Montant (GNF) *</label><input type="number" id="dMontant" min="0"></div>
+      <div class="form-row"><label>Catégorie</label>
+        <select id="dCategorie"><option value="achat">Achat</option><option value="salaire">Salaire</option><option value="loyer">Loyer</option><option value="electricite">Électricité</option><option value="transport">Transport</option><option value="autre">Autre</option></select>
+      </div>
+      <div id="dErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalDepense')">Annuler</button><button class="btn btn-primary" onclick="enregistrerDepense()">Enregistrer</button></div>
+  </div>
+</div>
+
+<div id="modalClotureCaisse" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Clôturer la journée</h3><button class="modal-close" onclick="closeModal('modalClotureCaisse')">×</button></div>
+    <div class="modal-body">
+      <div class="cloture-resume">
+        <div class="cloture-row"><span>Entrées</span><span id="clotEntrees" class="text-success"></span></div>
+        <div class="cloture-row"><span>Sorties</span><span id="clotSorties" class="text-danger"></span></div>
+        <div class="cloture-row cloture-row-bold"><span>Solde</span><span id="clotSolde"></span></div>
+      </div>
+      <div class="form-row"><label>Espèces comptées (GNF)</label><input type="number" id="clotEspeces" min="0" oninput="calculerEcartCloture()"></div>
+      <div id="clotEcart" class="cloture-ecart hidden"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalClotureCaisse')">Fermer</button>
+      <button class="btn btn-primary" onclick="envoyerRapportWhatsapp()">📱 WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalOMTransaction" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3 id="omTransTitre">Dépôt</h3><button class="modal-close" onclick="closeModal('modalOMTransaction')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Montant (GNF) *</label><input type="number" id="omTransMontant" min="0"></div>
+      <div id="omTransErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalOMTransaction')">Annuler</button><button class="btn btn-primary" onclick="validerTransactionOM()">Valider</button></div>
+  </div>
+</div>
+
+<div id="modalOMCloture" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Clôturer Orange Money</h3><button class="modal-close" onclick="closeModal('modalOMCloture')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Solde OM final (GNF) *</label><input type="number" id="omClotSoldeOm"></div>
+      <div class="form-row"><label>Cash final (GNF) *</label><input type="number" id="omClotCash"></div>
+      <div id="omClotErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalOMCloture')">Annuler</button><button class="btn btn-primary" onclick="cloturerOM()">Clôturer</button></div>
+  </div>
+</div>
+
+<div id="modalFormation" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Nouvelle formation</h3><button class="modal-close" onclick="closeModal('modalFormation')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Intitulé *</label><input type="text" id="fIntitule"></div>
+      <div class="form-row-2">
+        <div class="form-row"><label>Nombre de séances *</label><input type="number" id="fNbSeances" min="1"></div>
+        <div class="form-row"><label>Prix total (GNF) *</label><input type="number" id="fPrixTotal" min="0"></div>
+      </div>
+      <div class="form-row"><label>Date de début *</label><input type="date" id="fDateDebut"></div>
+      <div id="fErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalFormation')">Annuler</button><button class="btn btn-primary" onclick="creerFormation()">Créer</button></div>
+  </div>
+</div>
+
+<div id="modalDetailsFormation" class="modal-overlay">
+  <div class="modal-card modal-card-lg">
+    <div class="modal-header"><h3 id="detFormTitre">Formation</h3><button class="modal-close" onclick="closeModal('modalDetailsFormation')">×</button></div>
+    <div class="modal-body">
+      <button class="btn btn-primary btn-sm" onclick="openModalInscrire()">+ Inscrire un apprenant</button>
+      <div id="detFormApprenants" style="margin-top:14px;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="modalInscrire" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Inscrire un apprenant</h3><button class="modal-close" onclick="closeModal('modalInscrire')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Nom *</label><input type="text" id="iNom"></div>
+      <div class="form-row"><label>Téléphone</label><input type="tel" id="iTel"></div>
+      <div class="form-row-2">
+        <div class="form-row"><label>Montant total (GNF) *</label><input type="number" id="iMontantTotal" min="0"></div>
+        <div class="form-row"><label>Acompte versé (GNF)</label><input type="number" id="iMontantPaye" min="0" value="0"></div>
+      </div>
+      <div id="iErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalInscrire')">Annuler</button><button class="btn btn-primary" onclick="inscrireApprenant()">Inscrire</button></div>
+  </div>
+</div>
+
+<div id="modalPaiement" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Enregistrer un paiement</h3><button class="modal-close" onclick="closeModal('modalPaiement')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Montant versé (GNF) *</label><input type="number" id="pMontant" min="0"></div>
+      <div id="pErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-primary" onclick="enregistrerPaiementApprenant()">Enregistrer</button></div>
+  </div>
+</div>
+
+<div id="modalAgent" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Ajouter un agent</h3><button class="modal-close" onclick="closeModal('modalAgent')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Nom *</label><input type="text" id="agNom"></div>
+      <div class="form-row"><label>Téléphone</label><input type="tel" id="agTel"></div>
+      <div class="form-row"><label>Rôle *</label>
+        <select id="agRole"><option value="agent">Agent</option><option value="comptable">Comptable</option><option value="gerant">Gérant</option></select>
+      </div>
+      <div class="form-row"><label>PIN initial (4 chiffres) *</label><input type="password" id="agPin" maxlength="4" inputmode="numeric"></div>
+      <div id="agErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalAgent')">Annuler</button><button class="btn btn-primary" onclick="creerAgent()">Ajouter</button></div>
+  </div>
+</div>
 
 <script>
-const NAV=[
- ['today',"Aujourd'hui",'<path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>'],
- ['devis','Devis & factures','<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>',3],
- ['commandes','Commandes','<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M3 10h18"/>',6],
- ['formations','Formations','<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>'],
- ['caisse','Caisse','<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h3"/>'],
- ['clients','Clients','<circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0114 0M16 4a3.5 3.5 0 010 7M22 20a7 7 0 00-5-6.7"/>'],
- ['campagnes','Campagnes','<path d="M3 11v2a1 1 0 001 1h2l6 4V6L6 10H4a1 1 0 00-1 1z"/><path d="M15 9a4 4 0 010 6M18 6a8 8 0 010 12"/>','','gerant'],
- ['params','Paramètres','<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 01-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 01-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 012.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 012.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z"/>','','gerant'],
-];
-const MOB=['today','devis','commandes','caisse','formations'];
-function icon(d){return `<svg viewBox="0 0 24 24">${d}</svg>`}
-document.getElementById('nav').innerHTML=NAV.map(n=>`<button data-p="${n[0]}" ${n[4]?'data-g="1"':''} onclick="go('${n[0]}')">${icon(n[2])}${n[1]}${n[3]?`<span class="cnt">${n[3]}</span>`:''}</button>`).join('');
-document.getElementById('bottomNav').innerHTML=MOB.map(id=>{const n=NAV.find(x=>x[0]===id);return `<button data-p="${id}" onclick="go('${id}')">${icon(n[2])}${n[1].replace(' & factures','')}</button>`}).join('');
-function go(p){document.querySelectorAll('.page').forEach(e=>e.classList.toggle('on',e.id==='p-'+p));document.querySelectorAll('[data-p]').forEach(b=>b.classList.toggle('on',b.dataset.p===p));window.scrollTo(0,0)}
-go('today');
-function showPane(g,id,btn){document.querySelectorAll(`[id^="${g}-"]`).forEach(e=>e.classList.toggle('on',e.id===g+'-'+id));if(btn){btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===btn))}}
-// role
-let role='gerant';
-function setRole(r){role=r;document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.role===r));
- document.querySelectorAll('.gerant-only').forEach(e=>e.classList.toggle('hide',r==='agent'));
- document.querySelectorAll('[data-g]').forEach(e=>e.hidden=(r==='agent'));
- const who=r==='gerant'?'Mamadou Bah':'Ousmane Diallo';
- document.getElementById('whoRail').textContent=who;document.getElementById('whoSub').textContent=r==='gerant'?'Gérant · tous les droits':'Agent · devis, commandes, encaisser';
- document.getElementById('whoMob').textContent=who+' · '+(r==='gerant'?'Gérant':'Agent');
- if(r==='agent'&&['campagnes','params'].some(p=>document.getElementById('p-'+p).classList.contains('on')))go('today');
- toast(r==='gerant'?'Vue gérant':'Vue agent : dépenses, clôture, campagnes et paramètres masqués')}
-document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>setRole(b.dataset.role));
-// catalogue (extrait de la grille)
-const CAT=[["Formations","Informatique de base",500000,"apprenant"],["Formations","Graphisme",1500000,"apprenant"],["Formations","Marketing digital",1500000,"apprenant"],["Formations","Création de sites web",2000000,"apprenant"],
-["Bureautique","Photocopie A4",500,"page"],["Bureautique","Impression A4 couleur",3000,"page"],["Bureautique","Plastification",5000,"doc"],["Bureautique","Photo d'identité (×4)",15000,"lot"],["Bureautique","CV professionnel",25000,"CV"],
-["Imprimerie","Bâche publicitaire",100000,"m"],["Imprimerie","Kakémono",1000000,"pièce"],["Imprimerie","Logo professionnel",100000,"logo"],["Imprimerie","Cachet professionnel",150000,"pièce"],["Imprimerie","Carte de visite PVC (×100)",100000,"lot"],["Imprimerie","Facturier A5",40000,"carnet"],
-["Flyers","Flyer A4 160 g (×100)",350000,"lot"],["Flyers","Flyer A5 (×100)",200000,"lot"],["Flyers","Autocollant A4 160 g (×50)",300000,"lot"],
-["Textile","T-shirt sublimation KAF",30000,"pièce"],["Textile","T-shirt DTF Pilot",80000,"pièce"],["Textile","Casquette personnalisée",30000,"pièce"],["Textile","Tasse magique",60000,"pièce"],
-["Informatique","Réinstallation Windows",100000,"PC"],["Informatique","Pack Adobe",150000,"PC"],["Informatique","Caméra IP + installation",700000,"caméra"],
-["Digital","Page Facebook pro",300000,"page"],["Digital","Gestion page Facebook",500000,"mois"],["Digital","Spot vidéo",1500000,"spot"],["Digital","Site web statique",3000000,"site"],["Digital","Site web dynamique",7000000,"site"],
-["Événementiel","Couverture mariage",2500000,"événement"],["Événementiel","Couverture événementielle",1000000,"événement"]];
-let lines=[];
-const fmt=n=>n.toLocaleString('fr-FR');
-function searchCat(q){q=q.trim().toLowerCase();const r=document.getElementById('res');if(!q){r.innerHTML='';return}
- const m=CAT.filter(c=>(c[0]+' '+c[1]).toLowerCase().includes(q)).slice(0,8);
- r.innerHTML=m.map((c,i)=>`<button onclick="addLine(${CAT.indexOf(c)})"><span class="cat">${c[0]}</span>${c[1]}<span class="p num">${fmt(c[2])} <span class="muted small">/ ${c[3]}</span></span></button>`).join('')||'<div class="empty">Aucun article. Ajoutez-le dans Paramètres › Grille tarifaire.</div>'}
-function addLine(i){const c=CAT[i];const ex=lines.find(l=>l.i===i);if(ex)ex.q++;else lines.push({i,q:1,p:c[2]});render();document.getElementById('q').value='';document.getElementById('res').innerHTML=''}
-function render(){const L=document.getElementById('lines');
- if(!lines.length){L.innerHTML='<div class="empty">Aucune ligne. Tapez un article ci-contre.</div>'}
- else L.innerHTML=lines.map((l,k)=>{const c=CAT[l.i];return `<div class="ln"><div><b>${c[1]}</b><div class="small muted">${c[0]}</div></div><input type="number" min="1" value="${l.q}" onchange="lines[${k}].q=+this.value||1;render()"><input type="number" value="${l.p}" onchange="lines[${k}].p=+this.value||0;render()"><button class="x" onclick="lines.splice(${k},1);render()">×</button></div>`}).join('');
- const t=lines.reduce((s,l)=>s+l.q*l.p,0);document.getElementById('st').textContent=fmt(t);document.getElementById('gt').textContent=fmt(t)+' GNF';document.getElementById('ac').textContent=fmt(Math.round(t/2))}
-function newDevis(){lines=[{i:15,q:2,p:350000},{i:11,q:1,p:100000}];render();showPane('devis','new')}
-newDevis();
-let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2200)}
+const SUPABASE_URL = 'https://slawwbhlakilnviwzyrb.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsYXd3YmhsYWtpbG52aXd6eXJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MjQxODAsImV4cCI6MjA5NjAwMDE4MH0.XgZRkUrkjCUzSlB0Nyp0QdJf4xZjMcTO5V1bKSDUHNg';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let session = null;
+let agentsListe = [];
+let agentSelectionne = null;
+let currentTacheFilter = 'tous';
+let tachesCache = [];
+let formationsCache = [];
+let formationCourante = null;
+let apprenantCourantPaiement = null;
+let omSessionToday = null;
+let omTransType = null;
+let caisseEntreesJour = 0;
+let caisseSortiesJour = 0;
+
+const ROLE_LABELS = { gerant: 'Gérant', agent: 'Agent', comptable: 'Comptable' };
+const TACHE_BADGES = {
+  attente: { label: '⏳ En attente', color: '#D97706', bg: '#FEF3C7' },
+  en_cours: { label: '🔧 En cours', color: '#2563EB', bg: '#EFF6FF' },
+  termine: { label: '✅ Terminé', color: '#16A34A', bg: '#F0FDF4' },
+  valide: { label: '💰 Validé', color: '#1A1A4E', bg: '#F3F4F6' },
+};
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+    return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c];
+  });
+}
+function fmt(n) { return Number(n || 0).toLocaleString('fr-FR') + ' GNF'; }
+function today() { return new Date().toISOString().split('T')[0]; }
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type === 'error' ? ' error' : '');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function() { t.className = 'toast'; }, 3000);
+}
+async function hashPin(pin) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
+  return Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+/* ── AUTH ── */
+async function initApp() {
+  const raw = sessionStorage.getItem('yc_session');
+  if (raw) {
+    try { session = JSON.parse(raw); } catch (e) { session = null; }
+  }
+  if (session) { showApp(); } else { await showLogin(); }
+}
+
+async function showLogin() {
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('appShell').classList.add('hidden');
+  document.getElementById('loginAgentsList').classList.remove('hidden');
+  document.getElementById('loginPinPanel').classList.add('hidden');
+  const { data, error } = await sb.from('yc_agents').select('*').eq('actif', true).order('nom');
+  agentsListe = data || [];
+  const cont = document.getElementById('loginAgentsList');
+  if (error || !agentsListe.length) {
+    cont.innerHTML = '<div class="empty">Aucun agent actif. Contactez le gérant.</div>';
+    return;
+  }
+  cont.innerHTML = agentsListe.map(function(a) {
+    return '<div class="login-agent-btn" onclick="loginChoisirAgent(\'' + a.id + '\')">'
+      + '<div class="login-agent-avatar">' + esc((a.nom || '?')[0].toUpperCase()) + '</div>'
+      + '<div class="login-agent-nom">' + esc(a.nom) + '</div>'
+      + '<div class="login-agent-role">' + esc(ROLE_LABELS[a.role] || a.role) + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function loginChoisirAgent(id) {
+  agentSelectionne = agentsListe.find(function(a) { return a.id === id; });
+  if (!agentSelectionne) return;
+  document.getElementById('loginAgentsList').classList.add('hidden');
+  document.getElementById('loginPinPanel').classList.remove('hidden');
+  document.getElementById('loginPinNom').textContent = agentSelectionne.nom;
+  document.getElementById('loginPinInput').value = '';
+  document.getElementById('loginPinErreur').classList.add('hidden');
+  document.getElementById('loginPinInput').focus();
+}
+
+function loginRetourListe() {
+  agentSelectionne = null;
+  document.getElementById('loginAgentsList').classList.remove('hidden');
+  document.getElementById('loginPinPanel').classList.add('hidden');
+}
+
+async function loginValiderPin() {
+  const pin = document.getElementById('loginPinInput').value.trim();
+  const errEl = document.getElementById('loginPinErreur');
+  if (!agentSelectionne || pin.length !== 4) {
+    errEl.textContent = 'Saisissez les 4 chiffres du PIN.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  const hash = await hashPin(pin);
+  if (hash !== agentSelectionne.pin_hash) {
+    errEl.textContent = '❌ PIN incorrect.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  session = { id: agentSelectionne.id, nom: agentSelectionne.nom, role: agentSelectionne.role, telephone: agentSelectionne.telephone };
+  sessionStorage.setItem('yc_session', JSON.stringify(session));
+  showApp();
+}
+
+function logout() {
+  sessionStorage.removeItem('yc_session');
+  session = null;
+  document.getElementById('appShell').classList.add('hidden');
+  showLogin();
+}
+
+function showApp() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appShell').classList.remove('hidden');
+  document.getElementById('sidebarNom').textContent = session.nom;
+  document.getElementById('sidebarRole').textContent = ROLE_LABELS[session.role] || session.role;
+  applyRoleVisibility();
+  navigate('aujourdhui');
+}
+
+function applyRoleVisibility() {
+  const estGerantOuComptable = session.role === 'gerant' || session.role === 'comptable';
+  document.querySelectorAll('.restricted').forEach(function(el) { el.style.display = estGerantOuComptable ? '' : 'none'; });
+  document.querySelectorAll('.gerant-only').forEach(function(el) { el.style.display = session.role === 'gerant' ? '' : 'none'; });
+}
+
+/* ── NAVIGATION ── */
+const PAGE_LOADERS = {
+  aujourdhui: loadAujourdhuiWrap, taches: loadTaches, caisse: loadCaisse,
+  om: loadOM, formations: loadFormations, rapports: loadRapports, agents: loadAgents,
+};
+function navigate(page) {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  const pageEl = document.getElementById('page-' + page);
+  if (pageEl) pageEl.classList.add('active');
+  document.querySelectorAll('[data-nav]').forEach(function(n) { n.classList.toggle('active', n.dataset.nav === page); });
+  if (PAGE_LOADERS[page]) PAGE_LOADERS[page]();
+}
+function loadAujourdhuiWrap() { loadAujourdhui(); }
+
+/* ── PAGE 1 : AUJOURD'HUI ── */
+async function loadAujourdhui() {
+  document.getElementById('ajBonjour').textContent = 'Bonjour ' + session.nom.split(' ')[0] + ' 👋';
+  document.getElementById('ajDate').textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  const t = today();
+  const finJour = t + 'T23:59:59';
+  const debutJour = t + 'T00:00:00';
+
+  const [encaisseRes, attenteRes, enCoursRes, aLivrerRes, urgentesRes] = await Promise.all([
+    sb.from('yc_caisse').select('montant').eq('date', t).eq('type', 'entree'),
+    sb.from('yc_taches').select('id').eq('statut', 'attente'),
+    sb.from('yc_taches').select('id').eq('statut', 'en_cours'),
+    sb.from('yc_taches').select('id').gte('date_livraison', debutJour).lte('date_livraison', finJour),
+    sb.from('yc_taches').select('*').neq('statut', 'valide').lte('date_livraison', new Date().toISOString()).order('date_livraison', { ascending: true }),
+  ]);
+
+  const totalEncaisse = (encaisseRes.data || []).reduce(function(s, r) { return s + Number(r.montant || 0); }, 0);
+  document.getElementById('ajTotalEncaisse').textContent = fmt(totalEncaisse);
+  document.getElementById('ajAttente').textContent = (attenteRes.data || []).length;
+  document.getElementById('ajEnCours').textContent = (enCoursRes.data || []).length;
+  document.getElementById('ajALivrer').textContent = (aLivrerRes.data || []).length;
+  renderUrgentes(urgentesRes.data || []);
+}
+
+function renderUrgentes(list) {
+  const cont = document.getElementById('ajUrgentes');
+  if (!list.length) { cont.innerHTML = '<div class="empty">Aucune tâche urgente 🎉</div>'; return; }
+  cont.innerHTML = list.map(function(t) {
+    const badge = TACHE_BADGES[t.statut] || { label: t.statut, color: '#6B7280', bg: '#F3F4F6' };
+    const dateStr = t.date_livraison ? new Date(t.date_livraison).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
+    return '<div class="caisse-row"><div><div class="caisse-libelle">' + esc(t.client_nom) + '</div><div class="caisse-meta">' + esc(t.type_service) + '</div></div>'
+      + '<div style="text-align:right;"><span class="badge" style="color:' + badge.color + ';background:' + badge.bg + ';">' + badge.label + '</span>'
+      + '<div class="text-danger" style="font-size:11.5px;font-weight:700;margin-top:4px;">' + dateStr + '</div></div></div>';
+  }).join('');
+}
+
+/* ── PAGE 2 : TÂCHES ── */
+function setTacheFilter(f) {
+  currentTacheFilter = f;
+  document.querySelectorAll('#tachesFiltres .filtre-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.filtre === f); });
+  loadTaches();
+}
+
+async function loadTaches() {
+  let query = sb.from('yc_taches').select('*').order('date_livraison', { ascending: true });
+  if (currentTacheFilter !== 'tous') query = query.eq('statut', currentTacheFilter);
+  const { data } = await query;
+  tachesCache = data || [];
+  renderTaches();
+}
+
+function renderTaches() {
+  const cont = document.getElementById('tachesListe');
+  if (!tachesCache.length) { cont.innerHTML = '<div class="empty">Aucune tâche.</div>'; return; }
+  cont.innerHTML = tachesCache.map(renderTacheCard).join('');
+}
+
+function renderTacheCard(t) {
+  const solde = Number(t.montant || 0) - Number(t.acompte || 0);
+  const enRetard = t.date_livraison && new Date(t.date_livraison) < new Date() && t.statut !== 'valide';
+  const badge = TACHE_BADGES[t.statut] || { label: t.statut, color: '#6B7280', bg: '#F3F4F6' };
+  let actions = '';
+  const peutAvancer = session.role === 'agent' || session.role === 'gerant';
+  const peutValider = session.role === 'comptable' || session.role === 'gerant';
+  if (t.statut === 'attente' && peutAvancer) actions += '<button class="btn btn-sm" onclick="changerStatutTache(\'' + t.id + '\',\'en_cours\')">Commencer</button>';
+  if (t.statut === 'en_cours' && peutAvancer) actions += '<button class="btn btn-sm" onclick="changerStatutTache(\'' + t.id + '\',\'termine\')">Terminer</button>';
+  if (t.statut === 'termine' && peutValider) actions += '<button class="btn btn-sm btn-primary" onclick="validerPayerTache(\'' + t.id + '\')">Valider &amp; Payer</button>';
+  const dateStr = t.date_livraison ? new Date(t.date_livraison).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
+  return '<div class="tache-card">'
+    + '<div class="tache-top"><div><div class="tache-client">' + esc(t.client_nom) + '</div><div class="tache-tel">' + esc(t.client_telephone || '') + '</div></div>'
+    + '<span class="badge" style="color:' + badge.color + ';background:' + badge.bg + ';">' + badge.label + '</span></div>'
+    + '<div class="tache-service">' + esc(t.type_service) + ' — ' + esc((t.description || '').slice(0, 60)) + '</div>'
+    + '<div class="tache-montants"><span>Total: ' + fmt(t.montant) + '</span><span>Acompte: ' + fmt(t.acompte) + '</span><span>Solde: ' + fmt(solde) + '</span></div>'
+    + '<div class="tache-bottom"><span class="' + (enRetard ? 'text-danger' : '') + '">📅 ' + dateStr + '</span><span class="tache-agent">' + esc(t.agent_nom || '') + '</span></div>'
+    + '<div class="tache-actions">' + actions + '</div></div>';
+}
+
+function openModalTache() {
+  ['tNomClient', 'tTelClient', 'tDescription', 'tMontant', 'tDateLivraison', 'tNotes'].forEach(function(id) { document.getElementById(id).value = ''; });
+  document.getElementById('tType').value = '';
+  document.getElementById('tAcompte').value = 0;
+  document.getElementById('tErreur').classList.add('hidden');
+  openModal('modalTache');
+}
+
+async function creerTache() {
+  const nom = document.getElementById('tNomClient').value.trim();
+  const type = document.getElementById('tType').value;
+  const description = document.getElementById('tDescription').value.trim();
+  const montant = Number(document.getElementById('tMontant').value || 0);
+  const acompte = Number(document.getElementById('tAcompte').value || 0);
+  const dateLivraison = document.getElementById('tDateLivraison').value;
+  const errEl = document.getElementById('tErreur');
+  if (!nom || !type || !description || !montant || !dateLivraison) {
+    errEl.textContent = 'Merci de remplir tous les champs obligatoires (*).';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  const payload = {
+    client_nom: nom,
+    client_telephone: document.getElementById('tTelClient').value.trim() || null,
+    type_service: type, description, montant, acompte,
+    date_livraison: new Date(dateLivraison).toISOString(),
+    notes: document.getElementById('tNotes').value.trim() || null,
+    statut: 'attente', agent_nom: session.nom, date_creation: new Date().toISOString(),
+  };
+  const { error } = await sb.from('yc_taches').insert(payload);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  closeModal('modalTache');
+  showToast('Tâche créée ✅');
+  loadTaches();
+  if (document.getElementById('page-aujourdhui').classList.contains('active')) loadAujourdhui();
+}
+
+async function changerStatutTache(id, statut) {
+  const payload = { statut: statut };
+  if (statut === 'en_cours') payload.date_debut = new Date().toISOString();
+  if (statut === 'termine') payload.date_fin = new Date().toISOString();
+  const { error } = await sb.from('yc_taches').update(payload).eq('id', id);
+  if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
+  showToast('Statut mis à jour ✅');
+  loadTaches();
+  if (document.getElementById('page-aujourdhui').classList.contains('active')) loadAujourdhui();
+}
+
+async function validerPayerTache(id) {
+  const t = tachesCache.find(function(x) { return x.id === id; });
+  if (!t) return;
+  if (!confirm('Valider et enregistrer le paiement de cette tâche ?')) return;
+  const payload = { statut: 'valide', date_validation: new Date().toISOString(), comptable_nom: session.nom };
+  const { error } = await sb.from('yc_taches').update(payload).eq('id', id);
+  if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
+  const solde = Number(t.montant || 0) - Number(t.acompte || 0);
+  await sb.from('yc_caisse').insert({
+    date: today(), libelle: 'Tâche: ' + t.client_nom, type: 'entree', montant: solde,
+    categorie: 'prestation', agent_nom: session.nom, tache_id: t.id,
+  });
+  showToast('Tâche validée et payée ✅');
+  loadTaches();
+}
+
+/* ── PAGE 3 : CAISSE ── */
+async function loadCaisse() {
+  const t = today();
+  const { data } = await sb.from('yc_caisse').select('*').eq('date', t).order('created_at', { ascending: false });
+  const ops = data || [];
+  caisseEntreesJour = ops.filter(function(o) { return o.type === 'entree'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+  caisseSortiesJour = ops.filter(function(o) { return o.type === 'sortie'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+  document.getElementById('caisseEntrees').textContent = fmt(caisseEntreesJour);
+  document.getElementById('caisseSorties').textContent = fmt(caisseSortiesJour);
+  document.getElementById('caisseSolde').textContent = fmt(caisseEntreesJour - caisseSortiesJour);
+  document.getElementById('caisseListe').innerHTML = ops.length ? ops.map(renderCaisseRow).join('') : '<div class="empty">Aucune opération aujourd\'hui.</div>';
+}
+
+function renderCaisseRow(o) {
+  const isEntree = o.type === 'entree';
+  return '<div class="caisse-row"><div><div class="caisse-libelle">' + esc(o.libelle) + '</div><div class="caisse-meta">' + esc(o.categorie || '') + ' · ' + esc(o.agent_nom || '') + '</div></div>'
+    + '<div class="caisse-montant ' + (isEntree ? 'text-success' : 'text-danger') + '">' + (isEntree ? '+ ' : '– ') + fmt(o.montant) + '</div></div>';
+}
+
+async function enregistrerEncaissement() {
+  const libelle = document.getElementById('eLibelle').value.trim();
+  const montant = Number(document.getElementById('eMontant').value || 0);
+  const errEl = document.getElementById('eErreur');
+  if (!libelle || !montant) { errEl.textContent = 'Libellé et montant requis.'; errEl.classList.remove('hidden'); return; }
+  const payload = {
+    date: today(), libelle: libelle, type: 'entree', montant: montant,
+    mode_paiement: document.getElementById('eModePaiement').value,
+    categorie: document.getElementById('eCategorie').value, agent_nom: session.nom,
+  };
+  const { error } = await sb.from('yc_caisse').insert(payload);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  closeModal('modalEncaisser');
+  document.getElementById('eLibelle').value = '';
+  document.getElementById('eMontant').value = '';
+  showToast('Encaissement enregistré ✅');
+  loadCaisse();
+  if (document.getElementById('page-aujourdhui').classList.contains('active')) loadAujourdhui();
+}
+
+async function enregistrerDepense() {
+  const libelle = document.getElementById('dLibelle').value.trim();
+  const montant = Number(document.getElementById('dMontant').value || 0);
+  const errEl = document.getElementById('dErreur');
+  if (!libelle || !montant) { errEl.textContent = 'Libellé et montant requis.'; errEl.classList.remove('hidden'); return; }
+  const payload = { date: today(), libelle: libelle, type: 'sortie', montant: montant, categorie: document.getElementById('dCategorie').value, agent_nom: session.nom };
+  const { error } = await sb.from('yc_caisse').insert(payload);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  closeModal('modalDepense');
+  document.getElementById('dLibelle').value = '';
+  document.getElementById('dMontant').value = '';
+  showToast('Dépense enregistrée ✅');
+  loadCaisse();
+  if (document.getElementById('page-aujourdhui').classList.contains('active')) loadAujourdhui();
+}
+
+function openModalCloture() {
+  document.getElementById('clotEntrees').textContent = fmt(caisseEntreesJour);
+  document.getElementById('clotSorties').textContent = fmt(caisseSortiesJour);
+  document.getElementById('clotSolde').textContent = fmt(caisseEntreesJour - caisseSortiesJour);
+  document.getElementById('clotEspeces').value = '';
+  document.getElementById('clotEcart').classList.add('hidden');
+  openModal('modalClotureCaisse');
+}
+
+function calculerEcartCloture() {
+  const compte = Number(document.getElementById('clotEspeces').value || 0);
+  const solde = caisseEntreesJour - caisseSortiesJour;
+  const ecart = compte - solde;
+  const el = document.getElementById('clotEcart');
+  el.classList.remove('hidden');
+  el.textContent = ecart === 0 ? '✅ Caisse juste (écart 0)' : (ecart > 0 ? '⚠️ Excédent de ' + fmt(ecart) : '⚠️ Manque de ' + fmt(Math.abs(ecart)));
+  el.className = 'cloture-ecart ' + (ecart === 0 ? 'text-success' : 'text-danger');
+}
+
+function envoyerRapportWhatsapp() {
+  const compte = Number(document.getElementById('clotEspeces').value || 0);
+  const solde = caisseEntreesJour - caisseSortiesJour;
+  const ecart = compte - solde;
+  const msg = 'Rapport de caisse YOUMMA CENTER — ' + new Date().toLocaleDateString('fr-FR') + '\n'
+    + 'Agent: ' + session.nom + '\n'
+    + 'Entrées: ' + fmt(caisseEntreesJour) + '\n'
+    + 'Sorties: ' + fmt(caisseSortiesJour) + '\n'
+    + 'Solde: ' + fmt(solde) + '\n'
+    + 'Espèces comptées: ' + fmt(compte) + '\n'
+    + 'Écart: ' + (ecart === 0 ? '0 (juste)' : fmt(ecart));
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+/* ── PAGE 4 : ORANGE MONEY ── */
+async function loadOM() {
+  const t = today();
+  const { data } = await sb.from('yc_orange_money').select('*').eq('date', t).order('id', { ascending: false }).limit(1);
+  omSessionToday = (data && data[0]) || null;
+  renderOM();
+}
+
+function renderOM() {
+  const cont = document.getElementById('omContent');
+  if (!omSessionToday) { cont.innerHTML = renderOMOuverture(); return; }
+  if (omSessionToday.statut === 'cloture') { cont.innerHTML = renderOMCloture(omSessionToday); return; }
+  cont.innerHTML = renderOMOuvert(omSessionToday);
+}
+
+function renderOMOuverture() {
+  return '<div class="card om-ouverture"><h3>🔓 Ouvrir la journée Orange Money</h3>'
+    + '<div class="form-row"><label>Nom de l\'agent</label><input type="text" id="omOuvAgent" value="' + esc(session.nom) + '"></div>'
+    + '<div class="form-row-2"><div class="form-row"><label>Solde OM de départ (GNF)</label><input type="number" id="omOuvSoldeOm" min="0" value="0"></div>'
+    + '<div class="form-row"><label>Cash de départ (GNF)</label><input type="number" id="omOuvCash" min="0" value="0"></div></div>'
+    + '<div class="form-row"><label>Taux de commission (%)</label><input type="number" id="omOuvTaux" min="0" step="0.1" value="1.5"></div>'
+    + '<div id="omOuvErreur" class="form-error hidden"></div>'
+    + '<button class="btn btn-primary btn-block" onclick="ouvrirJourneeOM()">Ouvrir la journée</button></div>';
+}
+
+async function ouvrirJourneeOM() {
+  const agentNom = document.getElementById('omOuvAgent').value.trim();
+  const soldeOm = Number(document.getElementById('omOuvSoldeOm').value || 0);
+  const cash = Number(document.getElementById('omOuvCash').value || 0);
+  const taux = Number(document.getElementById('omOuvTaux').value || 0);
+  const errEl = document.getElementById('omOuvErreur');
+  if (!agentNom) { errEl.textContent = 'Nom agent requis.'; errEl.classList.remove('hidden'); return; }
+  const payload = {
+    date: today(), agent_nom: agentNom, solde_ouverture_om: soldeOm, solde_ouverture_cash: cash,
+    total_depots: 0, total_retraits: 0, nb_transactions: 0, taux_commission: taux,
+    benefice_jour: 0, statut: 'ouvert',
+  };
+  const { error } = await sb.from('yc_orange_money').insert(payload);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  showToast('Journée Orange Money ouverte ✅');
+  loadOM();
+}
+
+function renderOMOuvert(om) {
+  const boutonCloture = session.role === 'gerant' ? '<button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="openModal(\'modalOMCloture\')">🔒 Clôturer la journée</button>' : '';
+  return '<div class="card om-header">'
+    + '<div><div class="om-label">Ouverte le</div><div class="om-value">' + new Date(om.date).toLocaleDateString('fr-FR') + ' — ' + esc(om.agent_nom) + '</div></div>'
+    + '<div><div class="om-label">Solde OM ouverture</div><div class="om-value">' + fmt(om.solde_ouverture_om) + '</div></div>'
+    + '<div><div class="om-label">Cash ouverture</div><div class="om-value">' + fmt(om.solde_ouverture_cash) + '</div></div></div>'
+    + '<div class="om-actions"><button class="btn btn-success" onclick="openModalOMTransaction(\'depot\')">+ Dépôt</button>'
+    + '<button class="btn btn-danger-outline" onclick="openModalOMTransaction(\'retrait\')">– Retrait</button></div>'
+    + '<div class="stats-grid stats-grid-4">'
+    + '<div class="stat-card"><div class="stat-value">' + fmt(om.total_depots) + '</div><div class="stat-label">Total dépôts</div></div>'
+    + '<div class="stat-card"><div class="stat-value">' + fmt(om.total_retraits) + '</div><div class="stat-label">Total retraits</div></div>'
+    + '<div class="stat-card"><div class="stat-value">' + (om.nb_transactions || 0) + '</div><div class="stat-label">Transactions</div></div>'
+    + '<div class="stat-card"><div class="stat-value text-success">' + fmt(om.benefice_jour) + '</div><div class="stat-label">Bénéfice estimé</div></div></div>'
+    + boutonCloture;
+}
+
+function renderOMCloture(om) {
+  return '<div class="card"><h3>✅ Journée clôturée</h3><div class="cloture-resume">'
+    + '<div class="cloture-row"><span>Solde OM fermeture</span><span>' + fmt(om.solde_fermeture_om) + '</span></div>'
+    + '<div class="cloture-row"><span>Cash fermeture</span><span>' + fmt(om.solde_fermeture_cash) + '</span></div>'
+    + '<div class="cloture-row"><span>Écart OM</span><span class="' + (Number(om.ecart_om) === 0 ? 'text-success' : 'text-danger') + '">' + fmt(om.ecart_om) + '</span></div>'
+    + '<div class="cloture-row"><span>Écart cash</span><span class="' + (Number(om.ecart_cash) === 0 ? 'text-success' : 'text-danger') + '">' + fmt(om.ecart_cash) + '</span></div>'
+    + '<div class="cloture-row cloture-row-bold"><span>Bénéfice du jour</span><span>' + fmt(om.benefice_jour) + '</span></div></div></div>';
+}
+
+function openModalOMTransaction(type) {
+  omTransType = type;
+  document.getElementById('omTransTitre').textContent = type === 'depot' ? '+ Dépôt' : '– Retrait';
+  document.getElementById('omTransMontant').value = '';
+  document.getElementById('omTransErreur').classList.add('hidden');
+  openModal('modalOMTransaction');
+}
+
+async function validerTransactionOM() {
+  const montant = Number(document.getElementById('omTransMontant').value || 0);
+  const errEl = document.getElementById('omTransErreur');
+  if (!montant || montant <= 0) { errEl.textContent = 'Montant requis.'; errEl.classList.remove('hidden'); return; }
+  const om = omSessionToday;
+  const payload = {
+    total_depots: omTransType === 'depot' ? Number(om.total_depots || 0) + montant : Number(om.total_depots || 0),
+    total_retraits: omTransType === 'retrait' ? Number(om.total_retraits || 0) + montant : Number(om.total_retraits || 0),
+    nb_transactions: Number(om.nb_transactions || 0) + 1,
+  };
+  payload.benefice_jour = Math.round((payload.total_depots + payload.total_retraits) * Number(om.taux_commission || 0) / 100);
+  const { error } = await sb.from('yc_orange_money').update(payload).eq('id', om.id);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  closeModal('modalOMTransaction');
+  showToast((omTransType === 'depot' ? 'Dépôt' : 'Retrait') + ' enregistré ✅');
+  loadOM();
+}
+
+async function cloturerOM() {
+  const om = omSessionToday;
+  const soldeOmFinal = Number(document.getElementById('omClotSoldeOm').value);
+  const cashFinal = Number(document.getElementById('omClotCash').value);
+  const errEl = document.getElementById('omClotErreur');
+  if (isNaN(soldeOmFinal) || isNaN(cashFinal)) { errEl.textContent = 'Merci de saisir les deux soldes finaux.'; errEl.classList.remove('hidden'); return; }
+  /* Dépôt = client remet du cash, l'agent crédite l'e-wallet du client : le solde
+     e-money de l'agent DIMINUE et son cash AUGMENTE. Retrait = l'inverse. */
+  const soldeOmTheorique = Number(om.solde_ouverture_om || 0) - Number(om.total_depots || 0) + Number(om.total_retraits || 0);
+  const soldeCashTheorique = Number(om.solde_ouverture_cash || 0) + Number(om.total_depots || 0) - Number(om.total_retraits || 0);
+  const ecart_om = soldeOmFinal - soldeOmTheorique;
+  const ecart_cash = cashFinal - soldeCashTheorique;
+  const payload = { solde_fermeture_om: soldeOmFinal, solde_fermeture_cash: cashFinal, ecart_om: ecart_om, ecart_cash: ecart_cash, statut: 'cloture' };
+  const { error } = await sb.from('yc_orange_money').update(payload).eq('id', om.id);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  if (Number(om.benefice_jour || 0) > 0) {
+    await sb.from('yc_caisse').insert({
+      date: today(), libelle: 'Bénéfice Orange Money du jour', type: 'entree',
+      montant: om.benefice_jour, categorie: 'orange_money', agent_nom: session.nom,
+    });
+  }
+  closeModal('modalOMCloture');
+  showToast('Journée Orange Money clôturée ✅');
+  loadOM();
+}
+
+/* ── PAGE 5 : FORMATIONS ── */
+async function loadFormations() {
+  const { data } = await sb.from('yc_formations').select('*').eq('statut', 'actif').order('date_debut', { ascending: false });
+  const base = data || [];
+  const withStats = await Promise.all(base.map(async function(f) {
+    const { data: apps } = await sb.from('yc_apprenants').select('montant_paye').eq('formation_id', f.id);
+    const ca = (apps || []).reduce(function(s, a) { return s + Number(a.montant_paye || 0); }, 0);
+    return Object.assign({}, f, { nbApprenants: (apps || []).length, ca: ca });
+  }));
+  formationsCache = withStats;
+  document.getElementById('formationsListe').innerHTML = withStats.length ? withStats.map(renderFormationCard).join('') : '<div class="empty">Aucune formation active.</div>';
+}
+
+function renderFormationCard(f) {
+  return '<div class="card formation-card"><div class="formation-titre">' + esc(f.intitule) + '</div>'
+    + '<div class="formation-dates">' + (f.date_debut ? new Date(f.date_debut).toLocaleDateString('fr-FR') : '—') + (f.date_fin ? ' → ' + new Date(f.date_fin).toLocaleDateString('fr-FR') : '') + '</div>'
+    + '<div class="formation-stats"><span>👥 ' + f.nbApprenants + ' apprenant(s)</span><span>💰 ' + fmt(f.ca) + '</span></div>'
+    + '<button class="btn btn-ghost btn-block" onclick="openFormationDetails(\'' + f.id + '\')">Voir détails</button></div>';
+}
+
+function openModalFormation() {
+  document.getElementById('fIntitule').value = '';
+  document.getElementById('fNbSeances').value = '';
+  document.getElementById('fPrixTotal').value = '';
+  document.getElementById('fDateDebut').value = '';
+  document.getElementById('fErreur').classList.add('hidden');
+  openModal('modalFormation');
+}
+
+async function creerFormation() {
+  const intitule = document.getElementById('fIntitule').value.trim();
+  const nbSeances = Number(document.getElementById('fNbSeances').value || 0);
+  const prixTotal = Number(document.getElementById('fPrixTotal').value || 0);
+  const dateDebut = document.getElementById('fDateDebut').value;
+  const errEl = document.getElementById('fErreur');
+  if (!intitule || !nbSeances || !prixTotal || !dateDebut) { errEl.textContent = 'Tous les champs sont requis.'; errEl.classList.remove('hidden'); return; }
+  const payload = { intitule: intitule, nb_seances: nbSeances, prix_total: prixTotal, date_debut: dateDebut, statut: 'actif' };
+  const { error } = await sb.from('yc_formations').insert(payload);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  closeModal('modalFormation');
+  showToast('Formation créée ✅');
+  loadFormations();
+}
+
+async function openFormationDetails(id) {
+  formationCourante = formationsCache.find(function(f) { return f.id === id; });
+  if (!formationCourante) return;
+  document.getElementById('detFormTitre').textContent = formationCourante.intitule;
+  await chargerApprenants();
+  openModal('modalDetailsFormation');
+}
+
+async function chargerApprenants() {
+  const { data } = await sb.from('yc_apprenants').select('*').eq('formation_id', formationCourante.id).order('nom');
+  const apprenants = data || [];
+  const cont = document.getElementById('detFormApprenants');
+  cont.innerHTML = apprenants.length ? apprenants.map(renderApprenantRow).join('') : '<div class="empty">Aucun apprenant inscrit.</div>';
+}
+
+function renderApprenantRow(a) {
+  const pct = a.montant_total ? Math.min(100, Math.round(Number(a.montant_paye || 0) / Number(a.montant_total) * 100)) : 0;
+  const reste = Number(a.montant_total || 0) - Number(a.montant_paye || 0);
+  return '<div class="apprenant-row"><div class="apprenant-top"><div><div class="apprenant-nom">' + esc(a.nom) + '</div><div class="apprenant-tel">' + esc(a.telephone || '') + '</div></div>'
+    + '<div class="apprenant-presences">' + (a.nb_presences || 0) + '/' + (a.nb_seances_total || 0) + ' présences</div></div>'
+    + '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%;"></div></div>'
+    + '<div class="apprenant-montants"><span>Payé: ' + fmt(a.montant_paye) + '</span><span>Reste: ' + fmt(reste) + '</span></div>'
+    + '<div class="apprenant-actions"><button class="btn btn-sm" onclick="marquerPresence(\'' + a.id + '\',1)">✓ Présent</button>'
+    + '<button class="btn btn-sm btn-ghost" onclick="marquerPresence(\'' + a.id + '\',-1)">Annuler</button>'
+    + '<button class="btn btn-sm btn-primary" onclick="openModalPaiement(\'' + a.id + '\')">+ Paiement</button></div></div>';
+}
+
+async function marquerPresence(id, delta) {
+  const { data: a } = await sb.from('yc_apprenants').select('nb_presences,nb_seances_total').eq('id', id).single();
+  if (!a) return;
+  let nb = Number(a.nb_presences || 0) + delta;
+  if (nb < 0) nb = 0;
+  if (a.nb_seances_total && nb > a.nb_seances_total) nb = a.nb_seances_total;
+  await sb.from('yc_apprenants').update({ nb_presences: nb }).eq('id', id);
+  chargerApprenants();
+}
+
+function openModalInscrire() {
+  document.getElementById('iNom').value = '';
+  document.getElementById('iTel').value = '';
+  document.getElementById('iMontantTotal').value = formationCourante.prix_total || '';
+  document.getElementById('iMontantPaye').value = 0;
+  document.getElementById('iErreur').classList.add('hidden');
+  openModal('modalInscrire');
+}
+
+async function inscrireApprenant() {
+  const nom = document.getElementById('iNom').value.trim();
+  const tel = document.getElementById('iTel').value.trim();
+  const montantTotal = Number(document.getElementById('iMontantTotal').value || 0);
+  const montantPaye = Number(document.getElementById('iMontantPaye').value || 0);
+  const errEl = document.getElementById('iErreur');
+  if (!nom || !montantTotal) { errEl.textContent = 'Nom et montant total requis.'; errEl.classList.remove('hidden'); return; }
+  const payload = {
+    formation_id: formationCourante.id, nom: nom, telephone: tel || null,
+    montant_total: montantTotal, montant_paye: montantPaye,
+    nb_presences: 0, nb_seances_total: formationCourante.nb_seances, statut: 'actif',
+  };
+  const { error } = await sb.from('yc_apprenants').insert(payload);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  if (montantPaye > 0) {
+    await sb.from('yc_caisse').insert({ date: today(), libelle: 'Formation: ' + nom, type: 'entree', montant: montantPaye, categorie: 'formation', agent_nom: session.nom });
+  }
+  closeModal('modalInscrire');
+  showToast('Apprenant inscrit ✅');
+  chargerApprenants();
+  loadFormations();
+}
+
+function openModalPaiement(id) {
+  apprenantCourantPaiement = id;
+  document.getElementById('pMontant').value = '';
+  document.getElementById('pErreur').classList.add('hidden');
+  openModal('modalPaiement');
+}
+
+async function enregistrerPaiementApprenant() {
+  const montant = Number(document.getElementById('pMontant').value || 0);
+  const errEl = document.getElementById('pErreur');
+  if (!montant || montant <= 0) { errEl.textContent = 'Montant requis.'; errEl.classList.remove('hidden'); return; }
+  const { data: a } = await sb.from('yc_apprenants').select('nom,montant_paye').eq('id', apprenantCourantPaiement).single();
+  if (!a) return;
+  const nouveauMontant = Number(a.montant_paye || 0) + montant;
+  const { error } = await sb.from('yc_apprenants').update({ montant_paye: nouveauMontant }).eq('id', apprenantCourantPaiement);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  await sb.from('yc_caisse').insert({ date: today(), libelle: 'Formation: ' + a.nom, type: 'entree', montant: montant, categorie: 'formation', agent_nom: session.nom });
+  closeModal('modalPaiement');
+  showToast('Paiement enregistré ✅');
+  chargerApprenants();
+  loadFormations();
+}
+
+/* ── PAGE 6 : RAPPORTS ── */
+async function loadRapports() {
+  const now = new Date();
+  const debutMois = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  const finMois = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+
+  const { data: caisseMois } = await sb.from('yc_caisse').select('*').gte('date', debutMois).lte('date', finMois);
+  const ops = caisseMois || [];
+  const entrees = ops.filter(function(o) { return o.type === 'entree'; });
+  const sorties = ops.filter(function(o) { return o.type === 'sortie'; });
+  const totalEntrees = entrees.reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+  const totalSorties = sorties.reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+  document.getElementById('rapCA').textContent = fmt(totalEntrees);
+  document.getElementById('rapDepenses').textContent = fmt(totalSorties);
+  document.getElementById('rapBenefice').textContent = fmt(totalEntrees - totalSorties);
+
+  const { data: tachesValidees } = await sb.from('yc_taches').select('id').eq('statut', 'valide').gte('date_validation', debutMois + 'T00:00:00').lte('date_validation', finMois + 'T23:59:59');
+  document.getElementById('rapTaches').textContent = (tachesValidees || []).length;
+
+  const jours = [];
+  for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); jours.push(d.toISOString().split('T')[0]); }
+  const { data: caisse7j } = await sb.from('yc_caisse').select('date,montant,type').gte('date', jours[0]).lte('date', jours[6]);
+  const parJour = jours.map(function(j) {
+    return (caisse7j || []).filter(function(o) { return o.date === j && o.type === 'entree'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+  });
+  renderGraphique(jours, parJour);
+
+  const parCategorie = {};
+  entrees.forEach(function(o) { const c = o.categorie || 'Autre'; parCategorie[c] = (parCategorie[c] || 0) + Number(o.montant || 0); });
+  const top5 = Object.entries(parCategorie).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 5);
+  renderTop5(top5);
+}
+
+function renderGraphique(jours, valeurs) {
+  const max = Math.max(1, Math.max.apply(null, valeurs));
+  document.getElementById('rapGraphique').innerHTML = jours.map(function(j, i) {
+    const h = Math.round(valeurs[i] / max * 100);
+    const label = new Date(j + 'T00:00:00').toLocaleDateString('fr-FR', { weekday: 'short' });
+    return '<div class="bar-col"><div class="bar-val">' + fmt(valeurs[i]) + '</div><div class="bar" style="height:' + h + '%;"></div><div class="bar-label">' + label + '</div></div>';
+  }).join('');
+}
+
+function renderTop5(top5) {
+  const cont = document.getElementById('rapTop5');
+  cont.innerHTML = top5.length ? top5.map(function(entry, i) {
+    return '<div class="top5-row"><span>' + (i + 1) + '. ' + esc(entry[0]) + '</span><span>' + fmt(entry[1]) + '</span></div>';
+  }).join('') : '<div class="empty">Aucune donnée.</div>';
+}
+
+/* ── PAGE 7 : AGENTS ── */
+async function loadAgents() {
+  const { data } = await sb.from('yc_agents').select('*').order('nom');
+  const agents = data || [];
+  document.getElementById('agentsListe').innerHTML = agents.length ? agents.map(renderAgentRow).join('') : '<div class="empty">Aucun agent.</div>';
+}
+
+function renderAgentRow(a) {
+  const inactifBadge = a.actif === false ? '<span class="badge badge-muted">Inactif</span>' : '';
+  const btnDesactiver = a.actif !== false ? '<button class="btn btn-sm btn-danger-outline" onclick="desactiverAgent(\'' + a.id + '\')">Désactiver</button>' : '';
+  return '<div class="card agent-row"><div><div class="agent-nom">' + esc(a.nom) + ' ' + inactifBadge + '</div>'
+    + '<div class="agent-meta">' + esc(ROLE_LABELS[a.role] || a.role) + ' · ' + esc(a.telephone || '') + '</div></div>' + btnDesactiver + '</div>';
+}
+
+function openModalAgent() {
+  ['agNom', 'agTel', 'agPin'].forEach(function(id) { document.getElementById(id).value = ''; });
+  document.getElementById('agRole').value = 'agent';
+  document.getElementById('agErreur').classList.add('hidden');
+  openModal('modalAgent');
+}
+
+async function creerAgent() {
+  const nom = document.getElementById('agNom').value.trim();
+  const tel = document.getElementById('agTel').value.trim();
+  const role = document.getElementById('agRole').value;
+  const pin = document.getElementById('agPin').value.trim();
+  const errEl = document.getElementById('agErreur');
+  if (!nom || !role || pin.length !== 4 || !/^\d{4}$/.test(pin)) { errEl.textContent = 'Nom et PIN à 4 chiffres requis.'; errEl.classList.remove('hidden'); return; }
+  const pinHash = await hashPin(pin);
+  const { error } = await sb.from('yc_agents').insert({ nom: nom, telephone: tel || null, role: role, pin_hash: pinHash, actif: true });
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  closeModal('modalAgent');
+  showToast('Agent ajouté ✅');
+  loadAgents();
+}
+
+async function desactiverAgent(id) {
+  if (!confirm('Désactiver cet agent ?')) return;
+  await sb.from('yc_agents').update({ actif: false }).eq('id', id);
+  showToast('Agent désactivé.');
+  loadAgents();
+}
+
+initApp();
 </script>
 </body>
 </html>
