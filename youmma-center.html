@@ -590,8 +590,10 @@ function showToast(msg, type) {
   window._toastTimer = setTimeout(function() { t.className = 'toast'; }, 3000);
 }
 async function hashPin(pin) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
-  return Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  const msgBuffer = new TextEncoder().encode(pin);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
 }
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -1282,6 +1284,7 @@ async function desactiverAgent(id) {
   loadAgents();
 }
 
+(async function() { console.log('Hash 0000:', await hashPin('0000')); })();
 initApp();
 </script>
 </body>
