@@ -147,6 +147,10 @@ h1,h2,h3{margin:0;}
 .doc-client-row{display:grid;grid-template-columns:2fr 1.2fr 1.3fr;gap:12px;}
 .doc-client-row > *{min-width:0;}
 .doc-client-row label i{margin-right:4px;}
+.doc-objet-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;}
+.doc-objet-row > *{min-width:0;}
+.doc-objet-row textarea{width:100%;min-width:0;box-sizing:border-box;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;}
+@media (max-width:600px){ .doc-objet-row{grid-template-columns:1fr;} }
 .doc-lines-head{display:grid;grid-template-columns:minmax(180px,1fr) 64px 110px 100px 28px;gap:8px;padding:0 4px 6px;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;}
 .doc-lines-head > *{min-width:0;}
 .doc-line-row{display:grid;grid-template-columns:minmax(180px,1fr) 64px 110px 100px 28px;gap:8px;align-items:center;padding:8px 4px;border-bottom:1px solid var(--border);}
@@ -616,8 +620,8 @@ h1,h2,h3{margin:0;}
         <div class="doc-filtres-row">
           <div class="filtres" id="docFiltres" style="margin-bottom:0;">
             <button class="filtre-btn active" data-filtre="tous" onclick="setDocFilter('tous')">Tous</button>
-            <button class="filtre-btn" data-filtre="devis" onclick="setDocFilter('devis')">Devis</button>
-            <button class="filtre-btn" data-filtre="facture" onclick="setDocFilter('facture')">Factures</button>
+            <button class="filtre-btn" data-filtre="devis" onclick="setDocFilter('devis')" id="docFiltreDevisBtn">Proforma</button>
+            <button class="filtre-btn" data-filtre="facture" onclick="setDocFilter('facture')" id="docFiltreFactureBtn">Facture</button>
           </div>
           <input type="text" class="doc-search-input" id="docRecherche" placeholder="Rechercher client ou numéro…" oninput="renderDocuments()">
         </div>
@@ -703,6 +707,7 @@ h1,h2,h3{margin:0;}
           <div class="card">
             <div class="param-grid-2">
               <div class="form-row"><label>Enseigne</label><input type="text" id="paramEnseigne" oninput="onParamFieldChange()"></div>
+              <div class="form-row"><label>Slogan / activités</label><input type="text" id="paramSlogan" oninput="onParamFieldChange()"></div>
               <div class="form-row"><label>Raison sociale</label><input type="text" id="paramRaisonSociale" oninput="onParamFieldChange()"></div>
               <div class="form-row"><label>Adresse</label><input type="text" id="paramAdresse" oninput="onParamFieldChange()"></div>
               <div class="form-row"><label>Téléphone</label><input type="tel" id="paramTelephone" oninput="onParamFieldChange()"></div>
@@ -728,12 +733,20 @@ h1,h2,h3{margin:0;}
                   <div class="form-row"><label>Préfixe devis</label><input type="text" id="paramPrefixeDevis" oninput="onParamFieldChange();actualiserApercuNumeros();"></div>
                   <div class="form-row"><label>Préfixe facture</label><input type="text" id="paramPrefixeFacture" oninput="onParamFieldChange();actualiserApercuNumeros();"></div>
                   <div class="form-row"><label>Validité devis (jours)</label><input type="number" id="paramValiditeDevis" min="0" oninput="onParamFieldChange()"></div>
+                  <div class="form-row"><label>Libellé du devis</label><input type="text" id="paramLibelleDevis" placeholder="FACTURE PROFORMA" oninput="onParamFieldChange()"></div>
+                  <div class="form-row"><label>Libellé de la facture</label><input type="text" id="paramLibelleFacture" placeholder="FACTURE" oninput="onParamFieldChange()"></div>
                 </div>
                 <div class="param-numero-preview" id="paramNumeroPreview">Prochain devis : … · Prochaine facture : …</div>
               </div>
               <div class="card">
                 <h3>Textes du document</h3>
-                <div class="form-row"><label>Conditions par défaut</label><textarea id="paramConditionsDefaut" rows="2" oninput="onParamFieldChange()"></textarea></div>
+                <div class="form-row"><label>Acompte à la commande (%)</label><input type="number" id="paramAcomptePct" min="0" max="100" oninput="onParamFieldChange()"></div>
+                <div class="form-row"><label>Conditions de paiement <small style="color:var(--text-light);font-weight:400;">(une par ligne, {acompte_pct} et {validite} remplacés)</small></label><textarea id="paramConditionsPaiement" rows="3" oninput="onParamFieldChange()"></textarea></div>
+                <div class="form-row"><label>Conditions générales <small style="color:var(--text-light);font-weight:400;">(une par ligne)</small></label><textarea id="paramConditionsGenerales" rows="3" oninput="onParamFieldChange()"></textarea></div>
+                <div class="form-row-2">
+                  <div class="form-row"><label>Signataire</label><input type="text" id="paramSignataireNom" oninput="onParamFieldChange()"></div>
+                  <div class="form-row"><label>Fonction du signataire</label><input type="text" id="paramSignataireTitre" oninput="onParamFieldChange()"></div>
+                </div>
                 <div class="form-row"><label>Modes de paiement acceptés</label><input type="text" id="paramModesPaiement" placeholder="Ex: Cash, Orange Money, Virement" oninput="onParamFieldChange()"></div>
                 <div class="form-row"><label>Message de remerciement</label><input type="text" id="paramRemerciement" oninput="onParamFieldChange()"></div>
                 <div class="form-row">
@@ -1016,7 +1029,7 @@ h1,h2,h3{margin:0;}
     <div class="doc-modal-header">
       <h3><i class="ti ti-file-invoice"></i> Nouveau document</h3>
       <div class="doc-toggle">
-        <button id="docToggleDevis" class="active" onclick="setDocType('devis')">Devis</button>
+        <button id="docToggleDevis" class="active" onclick="setDocType('devis')">Proforma</button>
         <button id="docToggleFacture" onclick="setDocType('facture')">Facture</button>
       </div>
       <button class="modal-close" onclick="closeModal('modalDocument')">×</button>
@@ -1033,6 +1046,13 @@ h1,h2,h3{margin:0;}
         <div class="form-row"><label><i class="ti ti-calendar"></i> Livraison prévue</label><input type="date" id="docDateLivraison"></div>
       </div>
       <div id="docDateLivraisonErreur" class="form-error hidden"></div>
+      <div class="form-row"><label>Adresse du client</label><input type="text" id="docClientAdresse"></div>
+
+      <div class="doc-objet-row">
+        <div class="form-row"><label>Objet *</label><input type="text" id="docObjet" placeholder="Ex: Impression de bâches publicitaires"></div>
+        <div class="form-row"><label>Détail de l'objet</label><textarea id="docObjetDetail" rows="2" placeholder="Ex: Conception, impression numérique haute résolution et finition"></textarea></div>
+      </div>
+      <div id="docObjetErreur" class="form-error hidden"></div>
 
       <div class="doc-lines-head">
         <div>Prestation</div><div style="text-align:right;">Qté</div><div style="text-align:right;">Prix unit.</div><div style="text-align:right;">Total</div><div></div>
@@ -1049,15 +1069,16 @@ h1,h2,h3{margin:0;}
 
       <div class="doc-bottom-grid">
         <div class="doc-notes">
-          <label style="display:block;font-size:12.5px;font-weight:700;color:#374151;margin-bottom:5px;">Notes / conditions</label>
-          <textarea id="docNotes">Acompte de 50 % à la commande, solde à la livraison.</textarea>
+          <label style="display:block;font-size:12.5px;font-weight:700;color:#374151;margin-bottom:5px;">Notes (ajoutées aux conditions générales)</label>
+          <textarea id="docNotes"></textarea>
         </div>
         <div class="doc-totals-box">
           <div class="doc-totals-row"><span>Sous-total</span><span id="docSousTotal">0</span></div>
           <div class="doc-totals-row"><span>Remise</span><span class="doc-totals-input-wrap"><input type="number" id="docRemise" min="0" value="0" oninput="recalculerTotauxDoc()"><small>GNF</small></span></div>
           <div class="doc-totals-row hidden" id="docTvaRow"><span id="docTvaLabel">TVA</span><span id="docTva">0</span></div>
           <div class="doc-totals-row total"><span>Total</span><span id="docTotal">0</span></div>
-          <div class="doc-totals-row"><span>Acompte reçu</span><span class="doc-totals-input-wrap"><input type="number" id="docAcompte" min="0" value="0" oninput="recalculerTotauxDoc()"><small>GNF</small></span></div>
+          <div class="doc-totals-row"><span id="docAcompteCommandeLabel">Acompte à la commande</span><span id="docAcompteCommande">0</span></div>
+          <div class="doc-totals-row"><span>Acompte reçu</span><span class="doc-totals-input-wrap"><input type="number" id="docAcompte" min="0" value="0" oninput="docAcompteModifieManuel=true;recalculerTotauxDoc();"><small>GNF</small></span></div>
           <div class="doc-totals-row reste"><span>Reste à payer</span><span id="docReste">0</span></div>
         </div>
       </div>
@@ -1066,7 +1087,7 @@ h1,h2,h3{margin:0;}
     <div class="modal-footer">
       <label class="doc-footer-check"><input type="checkbox" id="docCreerTache"> Créer aussi la tâche liée</label>
       <button class="btn btn-ghost" onclick="apercuDocumentBrouillon()"><i class="ti ti-printer"></i> Aperçu</button>
-      <button class="btn btn-primary" id="docBtnSubmit" onclick="saveDocument()">Enregistrer le devis</button>
+      <button class="btn btn-primary" id="docBtnSubmit" onclick="saveDocument()">Enregistrer la proforma</button>
     </div>
   </div>
 </div>
@@ -1712,6 +1733,29 @@ function couleurRubrique(rubrique) {
   return RUBRIQUE_COULEURS[(idx >= 0 ? idx : 0) % RUBRIQUE_COULEURS.length];
 }
 
+let docAcompteModifieManuel = false;
+
+function libelleCourtType(type) {
+  const brut = (type === 'facture' ? (PARAMS.libelle_facture || 'FACTURE') : (PARAMS.libelle_devis || 'FACTURE PROFORMA')).trim();
+  const mots = brut.split(/\s+/);
+  const mot = mots.length > 1 ? mots[mots.length - 1] : mots[0];
+  return mot.charAt(0).toUpperCase() + mot.slice(1).toLowerCase();
+}
+
+function pluraliserUnite(unite, qte) {
+  if (!unite) return '';
+  if (Number(qte) <= 1) return unite;
+  return unite.charAt(unite.length - 1).toLowerCase() === 's' ? unite : unite + 's';
+}
+
+function substituerPlaceholders(texte, doc, P) {
+  const pct = Number(P.acompte_pct || 50);
+  const validite = Number(doc.validite_jours || P.validite_devis_jours || 15);
+  return String(texte || '')
+    .replace(/\{acompte_pct\}/g, String(pct))
+    .replace(/\{validite\}/g, String(validite));
+}
+
 const DOC_STATUT_LABELS = { envoye: 'Envoyé', converti: 'Converti', payee: 'Payée', annule: 'Annulé' };
 
 async function chargerParametres() {
@@ -1722,7 +1766,7 @@ async function chargerParametres() {
 }
 
 async function calculerProchainNumero(type) {
-  const prefixe = type === 'facture' ? (PARAMS.prefixe_facture || 'FAC') : (PARAMS.prefixe_devis || 'DEV');
+  const prefixe = type === 'facture' ? (PARAMS.prefixe_facture || 'FAC') : (PARAMS.prefixe_devis || 'PF');
   const annee = new Date().getFullYear();
   const { data } = await sb.from('yc_documents').select('numero').eq('type', type);
   let max = 0;
@@ -1751,7 +1795,12 @@ function actualiserValiditeLigne() {
 }
 
 function actualiserBoutonSubmitDoc() {
-  document.getElementById('docBtnSubmit').textContent = docType === 'facture' ? 'Enregistrer la facture' : 'Enregistrer le devis';
+  document.getElementById('docBtnSubmit').textContent = 'Enregistrer la ' + libelleCourtType(docType).toLowerCase();
+}
+
+function actualiserLibellesToggle() {
+  document.getElementById('docToggleDevis').textContent = libelleCourtType('devis');
+  document.getElementById('docToggleFacture').textContent = libelleCourtType('facture');
 }
 
 function actualiserNumeroPreview() {
@@ -1770,19 +1819,26 @@ function setDocType(type) {
   actualiserValiditeLigne();
   actualiserBoutonSubmitDoc();
   actualiserNumeroPreview();
+  recalculerTotauxDoc();
 }
 
 async function ouvrirModalDocument(type, prefillFromDevis) {
   docConversionDevisId = prefillFromDevis ? prefillFromDevis.id : null;
   docType = prefillFromDevis ? 'facture' : type;
+  docAcompteModifieManuel = false;
+  actualiserLibellesToggle();
   document.getElementById('docToggleDevis').classList.toggle('active', docType === 'devis');
   document.getElementById('docToggleFacture').classList.toggle('active', docType === 'facture');
   document.getElementById('docToggleDevis').disabled = !!prefillFromDevis;
   document.getElementById('docToggleFacture').disabled = !!prefillFromDevis;
   document.getElementById('docClientNom').value = prefillFromDevis ? (prefillFromDevis.client_nom || '') : '';
   document.getElementById('docClientTel').value = prefillFromDevis ? (prefillFromDevis.client_tel || '') : '';
+  document.getElementById('docClientAdresse').value = prefillFromDevis ? (prefillFromDevis.client_adresse || '') : '';
+  document.getElementById('docObjet').value = prefillFromDevis ? (prefillFromDevis.objet || '') : '';
+  document.getElementById('docObjetDetail').value = prefillFromDevis ? (prefillFromDevis.objet_detail || '') : '';
+  document.getElementById('docObjetErreur').classList.add('hidden');
   docLignes = prefillFromDevis && prefillFromDevis.lignes ? JSON.parse(JSON.stringify(prefillFromDevis.lignes)) : [];
-  document.getElementById('docNotes').value = prefillFromDevis ? (prefillFromDevis.notes || '') : (PARAMS.conditions_defaut || 'Acompte de 50 % à la commande, solde à la livraison.');
+  document.getElementById('docNotes').value = prefillFromDevis ? (prefillFromDevis.notes || '') : '';
   document.getElementById('docRemise').value = prefillFromDevis ? (prefillFromDevis.remise || 0) : 0;
   document.getElementById('docAcompte').value = 0;
   document.getElementById('docCreerTache').checked = docType === 'facture' && PARAMS.tache_liee_defaut !== 'false';
@@ -1896,6 +1952,11 @@ function recalculerTotauxDoc() {
   const tauxTva = calculerTauxTva();
   const tvaMontant = tvaActive ? Math.round(baseTva * tauxTva / 100) : 0;
   const total = baseTva + tvaMontant;
+  const pctAcompte = Number(PARAMS.acompte_pct || 50);
+  const acompteCommande = Math.round(total * pctAcompte / 100);
+  if (docType === 'facture' && !docAcompteModifieManuel) {
+    document.getElementById('docAcompte').value = acompteCommande;
+  }
   const acompte = Number(document.getElementById('docAcompte').value || 0);
   const reste = Math.max(0, total - acompte);
   document.getElementById('docSousTotal').textContent = fmt(sousTotal);
@@ -1905,6 +1966,8 @@ function recalculerTotauxDoc() {
     document.getElementById('docTvaLabel').textContent = 'TVA ' + tauxTva + ' %';
     document.getElementById('docTva').textContent = fmt(tvaMontant);
   }
+  document.getElementById('docAcompteCommandeLabel').textContent = 'Acompte à la commande (' + pctAcompte + ' %)';
+  document.getElementById('docAcompteCommande').textContent = fmt(acompteCommande);
   document.getElementById('docTotal').textContent = fmt(total);
   document.getElementById('docReste').textContent = fmt(reste);
 }
@@ -1913,12 +1976,18 @@ async function saveDocument() {
   const errEl = document.getElementById('docErreur');
   const clientNom = document.getElementById('docClientNom').value.trim();
   const clientTel = document.getElementById('docClientTel').value.trim();
+  const clientAdresse = document.getElementById('docClientAdresse').value.trim();
+  const objet = document.getElementById('docObjet').value.trim();
+  const objetDetail = document.getElementById('docObjetDetail').value.trim();
   const lignesValides = docLignes.filter(function(l) { return (l.prestation || '').trim() && Number(l.prix) > 0; });
   const dateLivraison = document.getElementById('docDateLivraison').value;
   const creerTacheLiee = document.getElementById('docCreerTache').checked;
   const errDateEl = document.getElementById('docDateLivraisonErreur');
+  const errObjetEl = document.getElementById('docObjetErreur');
   errDateEl.classList.add('hidden');
+  errObjetEl.classList.add('hidden');
   if (!clientNom) { errEl.textContent = 'Le nom du client est requis.'; errEl.classList.remove('hidden'); return; }
+  if (!objet) { errObjetEl.textContent = 'L\'objet du document est requis.'; errObjetEl.classList.remove('hidden'); return; }
   if (!lignesValides.length) { errEl.textContent = 'Ajoutez au moins une ligne avec un prix supérieur à 0.'; errEl.classList.remove('hidden'); return; }
   if (creerTacheLiee && !dateLivraison) {
     errDateEl.textContent = 'La date de livraison prévue est requise pour créer la tâche liée.';
@@ -1945,7 +2014,8 @@ async function saveDocument() {
     const payload = {
       numero: numero, type: docType, date_doc: today(),
       validite_jours: docType === 'devis' ? Number(PARAMS.validite_devis_jours || 15) : null,
-      client_nom: clientNom, client_tel: clientTel || null,
+      client_nom: clientNom, client_tel: clientTel || null, client_adresse: clientAdresse || null,
+      objet: objet, objet_detail: objetDetail || null,
       date_livraison: dateLivraison || null,
       lignes: docLignes, sous_total: sousTotal, remise: remise,
       tva_taux: tvaActive ? tauxTva : 0, tva_montant: tvaMontant, total: total,
@@ -1985,7 +2055,7 @@ async function saveDocument() {
     }
 
     closeModal('modalDocument');
-    showToast((docType === 'facture' ? 'Facture ' : 'Devis ') + numero + (docType === 'facture' ? ' enregistrée' : ' enregistré') + ' ✅');
+    showToast(libelleCourtType(docType) + ' ' + numero + ' enregistrée ✅');
     docConversionDevisId = null;
     loadDocuments();
     loadTaches();
@@ -2006,6 +2076,8 @@ async function saveDocument() {
 async function loadDocuments() {
   const { data } = await sb.from('yc_documents').select('*').order('created_at', { ascending: false });
   docsCache = data || [];
+  document.getElementById('docFiltreDevisBtn').textContent = libelleCourtType('devis');
+  document.getElementById('docFiltreFactureBtn').textContent = libelleCourtType('facture');
   renderDocuments();
 }
 
@@ -2025,7 +2097,7 @@ function renderDocuments() {
     });
   }
   const cont = document.getElementById('docListe');
-  if (!liste.length) { cont.innerHTML = '<div class="priority-empty"><i class="ti ti-file-off"></i>Aucun document. Créez votre premier devis.</div>'; return; }
+  if (!liste.length) { cont.innerHTML = '<div class="priority-empty"><i class="ti ti-file-off"></i>Aucun document. Créez votre première ' + libelleCourtType('devis').toLowerCase() + '.</div>'; return; }
   cont.innerHTML = liste.map(renderDocRow).join('');
 }
 
@@ -2033,7 +2105,7 @@ function renderDocRow(d) {
   const dateStr = d.date_doc ? new Date(d.date_doc).toLocaleDateString('fr-FR') : '—';
   let actions = '<button class="doc-icon-btn" onclick="printDocument(\'' + d.id + '\')" title="Aperçu"><i class="ti ti-eye"></i></button>';
   if (d.type === 'devis' && d.statut === 'envoye') {
-    actions += '<button class="doc-icon-btn" onclick="convertirDevisEnFacture(\'' + d.id + '\')" title="Convertir en facture"><i class="ti ti-arrow-right"></i></button>';
+    actions += '<button class="doc-icon-btn" onclick="convertirDevisEnFacture(\'' + d.id + '\')" title="Convertir en ' + libelleCourtType('facture').toLowerCase() + '"><i class="ti ti-arrow-right"></i></button>';
   }
   if (d.type === 'facture' && d.statut !== 'payee' && d.statut !== 'annule') {
     actions += '<button class="doc-icon-btn" onclick="marquerPayee(\'' + d.id + '\')" title="Marquer payée"><i class="ti ti-check"></i></button>';
@@ -2043,7 +2115,7 @@ function renderDocRow(d) {
   }
   return '<div class="doc-table-row">'
     + '<div style="font-weight:500;">' + esc(d.numero) + '</div>'
-    + '<div><span class="doc-type-badge ' + d.type + '">' + (d.type === 'devis' ? 'Devis' : 'Facture') + '</span></div>'
+    + '<div><span class="doc-type-badge ' + d.type + '">' + libelleCourtType(d.type) + '</span></div>'
     + '<div>' + dateStr + '</div>'
     + '<div>' + esc(d.client_nom) + '</div>'
     + '<div class="doc-montant-col">' + fmt(d.total) + '</div>'
@@ -2118,6 +2190,8 @@ function apercuDocumentBrouillon() {
     numero: numeroAffiche, type: docType, date_doc: today(),
     validite_jours: docType === 'devis' ? Number(PARAMS.validite_devis_jours || 15) : null,
     client_nom: clientNom, client_tel: document.getElementById('docClientTel').value.trim(),
+    client_adresse: document.getElementById('docClientAdresse').value.trim(),
+    objet: document.getElementById('docObjet').value.trim(), objet_detail: document.getElementById('docObjetDetail').value.trim(),
     date_livraison: document.getElementById('docDateLivraison').value || null,
     lignes: docLignes, sous_total: sousTotal, remise: remise,
     tva_taux: tvaActive ? tauxTva : 0, tva_montant: tvaMontant, total: total, acompte: acompte, reste: reste,
@@ -2126,113 +2200,178 @@ function apercuDocumentBrouillon() {
   genererFenetreImpression(docTemp, true);
 }
 
-const STYLE_IMPRESSION = '@page{size:A4;margin:15mm;}'
+const STYLE_IMPRESSION = '@page{size:A4;margin:18mm 18mm 22mm;}'
   + '*{box-sizing:border-box;}'
-  + 'body{font-family:Inter,system-ui,sans-serif;color:#1F1F55;margin:0;font-size:13px;}'
+  + 'body{font-family:Inter,system-ui,sans-serif;color:#1F1F55;margin:0;font-size:11px;}'
   + '.watermark{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:100px;font-weight:700;color:rgba(220,38,38,.15);z-index:99;pointer-events:none;}'
   + '.entete{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;}'
   + '.entete-gauche{display:flex;gap:12px;align-items:flex-start;}'
-  + '.logo-yc{width:40px;height:40px;border-radius:8px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}'
-  + '.logo-yc img{width:100%;height:100%;object-fit:contain;}'
-  + '.enseigne{font-size:18px;font-weight:500;}'
-  + '.souslabel{font-size:11px;color:#6B6B8A;margin-top:2px;}'
-  + '.entete-droite{text-align:right;font-size:12px;color:#6B6B8A;}'
-  + '.titre-doc{font-size:24px;font-weight:700;margin-bottom:4px;}'
-  + '.filet{border-top:2px solid;margin:14px 0 16px;}'
-  + '.client-box{background:#F4F5F9;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;}'
-  + '.livraison-ligne{font-size:12px;color:#6B6B8A;margin-top:-10px;margin-bottom:16px;}'
-  + 'table.lignes{width:100%;border-collapse:collapse;margin-bottom:16px;}'
-  + 'table.lignes thead th{color:#fff;padding:8px 10px;font-size:11px;text-transform:uppercase;text-align:left;}'
+  + '.logo-yc{height:56px;min-width:56px;border-radius:8px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}'
+  + '.logo-yc img{height:100%;width:auto;object-fit:contain;}'
+  + '.enseigne{font-size:22px;font-weight:700;}'
+  + '.slogan{font-size:10px;font-style:italic;color:#6B6B8A;margin-top:2px;}'
+  + '.souslabel{font-size:10px;color:#444;margin-top:2px;}'
+  + '.entete-droite{text-align:right;font-size:11px;color:#333;}'
+  + '.entete-droite div{margin-top:3px;}'
+  + '.titre-doc{font-size:16px;font-weight:700;margin-bottom:6px;}'
+  + '.filet{border-top:2px solid;margin:12px 0 14px;}'
+  + '.client-objet-box{display:grid;grid-template-columns:1fr 1fr;gap:24px;background:#F4F5F9;padding:12px;border-radius:8px;margin-bottom:10px;}'
+  + '.section-titre{font-size:11px;font-weight:700;letter-spacing:.06em;margin-bottom:6px;}'
+  + '.client-objet-box div div{margin-top:2px;}'
+  + '.livraison-ligne{font-size:11px;color:#444;margin-bottom:14px;}'
+  + 'table.lignes{width:100%;border-collapse:collapse;margin-bottom:14px;}'
+  + 'table.lignes thead th{color:#fff;font-weight:700;padding:8px;font-size:11px;text-align:left;border:1px solid #D5D6E2;}'
+  + 'table.lignes td{padding:8px;border:1px solid #D5D6E2;font-size:11px;}'
   + 'table.lignes th.c,table.lignes td.c{text-align:center;}'
   + 'table.lignes th.r,table.lignes td.r{text-align:right;}'
-  + 'table.lignes td{padding:7px 10px;border-bottom:1px solid #E3E4EC;font-size:12.5px;}'
-  + 'table.lignes tr.alt{background:#FAFAFC;}'
-  + '.totaux{margin-left:auto;width:280px;margin-bottom:14px;}'
-  + '.tot-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12.5px;color:#6B6B8A;}'
-  + '.tot-total{padding:8px 10px;border-radius:6px;font-weight:700;color:#1F1F55;font-size:14px;margin:4px 0;}'
+  + '.totaux{margin-left:auto;width:300px;margin-bottom:14px;}'
+  + '.tot-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11.5px;color:#444;}'
+  + '.tot-total{color:#fff;font-weight:700;font-size:13px;padding:6px 14px;border-radius:4px;margin:4px 0;}'
+  + '.tot-total span{color:#fff;}'
   + '.tot-reste{font-weight:700;color:#A32D2D;}'
-  + '.en-lettres{font-size:11.5px;font-style:italic;color:#444;margin-bottom:14px;}'
-  + '.notes{font-size:11.5px;color:#444;margin-bottom:14px;}'
-  + '.modes-remerciement{font-size:11.5px;color:#444;margin-bottom:20px;}'
-  + '.signatures{display:flex;justify-content:space-between;gap:40px;margin-top:30px;}'
-  + '.sign-box{flex:1;border-top:1px solid #999;padding-top:6px;font-size:11px;color:#6B6B8A;height:50px;}'
-  + '.pied{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:10px;color:#9A9AB5;padding:8px 0;}';
+  + '.en-lettres{font-size:11px;font-style:italic;color:#333;margin-bottom:16px;}'
+  + '.section-conditions{margin-bottom:14px;}'
+  + '.section-titre-conditions{font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:4px;}'
+  + '.filet-fin{border-top:1px solid #D5D6E2;margin-bottom:6px;}'
+  + '.section-conditions ul{margin:0;padding-left:16px;list-style:none;}'
+  + '.section-conditions li{position:relative;padding-left:12px;font-size:10.5px;color:#333;margin-bottom:3px;}'
+  + '.section-conditions li:before{content:"•";position:absolute;left:0;}'
+  + '.signature-bloc{text-align:right;margin-top:40px;font-size:11px;}'
+  + '.signature-espace{height:50px;}'
+  + '.signature-nom{font-weight:700;}'
+  + '.signature-titre{font-style:italic;color:#444;margin-top:2px;}'
+  + '.pied{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:9px;color:#9A9AB5;padding:8px 0 0;border-top:1px solid #E3E4EC;}';
 
-function construireHtmlDocument(doc, brouillon, paramsSource) {
+function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpression) {
   const P = paramsSource || PARAMS;
   const enseigne = P.enseigne || 'YOUMMA CENTER';
-  const raisonSociale = P.raison_sociale || '';
+  const slogan = P.slogan || '';
   const adresse = P.adresse || '';
   const telephone = P.telephone || '';
   const email = P.email || '';
+  const rccm = P.rccm || '';
+  const nif = P.nif || '';
   const piedLegal = P.pied_legal || '';
   const devise = P.devise || 'GNF';
   const couleurPrincipale = P.couleur_principale || '#2D2D6B';
   const couleurAccent = P.couleur_accent || '#E85D04';
   const afficherLettres = P.montant_en_lettres !== 'false';
   const afficherSignatures = P.bloc_signatures !== 'false';
-  const modesPaiement = P.modes_paiement || '';
-  const remerciement = P.remerciement || '';
+  const libelle = doc.type === 'facture' ? (P.libelle_facture || 'FACTURE') : (P.libelle_devis || 'FACTURE PROFORMA');
+  const pctAcompte = Number(P.acompte_pct || 50);
+  const acompteCommande = Math.round(Number(doc.total || 0) * pctAcompte / 100);
   const dateDoc = doc.date_doc ? new Date(doc.date_doc) : new Date();
   const dateAffichee = dateDoc.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
   let validiteLigne = '';
-  if (doc.type === 'devis' && doc.validite_jours) {
+  if (doc.type === 'devis' && (doc.validite_jours || P.validite_devis_jours)) {
+    const jours = Number(doc.validite_jours || P.validite_devis_jours || 15);
     const dateValidite = new Date(dateDoc);
-    dateValidite.setDate(dateValidite.getDate() + Number(doc.validite_jours));
-    validiteLigne = '<div>Valable jusqu\'au ' + dateValidite.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div>';
+    dateValidite.setDate(dateValidite.getDate() + jours);
+    validiteLigne = '<div><strong>Validité :</strong> ' + jours + ' jours (jusqu\'au ' + dateValidite.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + ')</div>';
   }
+
+  const enseigneMots = enseigne.trim().split(/\s+/);
+  const enseigneHtml = enseigneMots.length > 1
+    ? esc(enseigneMots[0]) + ' <span style="color:' + couleurAccent + ';">' + esc(enseigneMots.slice(1).join(' ')) + '</span>'
+    : esc(enseigne);
+
   const lignesHtml = (doc.lignes || []).map(function(l, i) {
     const total = Number(l.qte || 0) * Number(l.prix || 0);
-    const qteAffichee = l.unite ? (l.qte + ' ' + l.unite) : l.qte;
-    return '<tr class="' + (i % 2 === 1 ? 'alt' : '') + '"><td>' + esc(l.prestation) + '</td><td class="c">' + esc(qteAffichee) + '</td><td class="r">' + fmtNombre(l.prix) + '</td><td class="r">' + fmtNombre(total) + '</td></tr>';
+    const qteAffichee = l.unite ? (l.qte + ' ' + pluraliserUnite(l.unite, l.qte)) : l.qte;
+    return '<tr><td class="c">' + (i + 1) + '</td><td>' + esc(l.prestation) + '</td><td class="c">' + esc(qteAffichee) + '</td><td class="r">' + fmtNombre(l.prix) + '</td><td class="r">' + fmtNombre(total) + '</td></tr>';
   }).join('');
-  const remiseLigne = Number(doc.remise) > 0 ? '<div class="tot-row"><span>Remise</span><span>-' + fmtNombre(doc.remise) + ' ' + devise + '</span></div>' : '';
+
   const tvaLigne = Number(doc.tva_montant) > 0 ? '<div class="tot-row"><span>TVA ' + fmtNombre(doc.tva_taux) + ' %</span><span>' + fmtNombre(doc.tva_montant) + ' ' + devise + '</span></div>' : '';
+  let totauxHtml = '<div class="totaux">';
+  if (Number(doc.remise) > 0) {
+    totauxHtml += '<div class="tot-row"><span>Sous-total</span><span>' + fmtNombre(doc.sous_total) + ' ' + devise + '</span></div>';
+    totauxHtml += '<div class="tot-row"><span>Remise</span><span>-' + fmtNombre(doc.remise) + ' ' + devise + '</span></div>';
+  }
+  totauxHtml += tvaLigne;
+  totauxHtml += '<div class="tot-row tot-total" style="background:' + couleurAccent + ';"><span>TOTAL</span><span>' + fmtNombre(doc.total) + ' ' + devise + '</span></div>';
+  totauxHtml += '<div class="tot-row"><span>Acompte à la commande (' + pctAcompte + ' %)</span><span>' + fmtNombre(acompteCommande) + ' ' + devise + '</span></div>';
+  if (doc.type === 'facture') {
+    totauxHtml += '<div class="tot-row"><span>Acompte reçu</span><span>' + fmtNombre(doc.acompte) + ' ' + devise + '</span></div>';
+    totauxHtml += '<div class="tot-row tot-reste"><span>Reste à payer</span><span>' + fmtNombre(doc.reste) + ' ' + devise + '</span></div>';
+  }
+  totauxHtml += '</div>';
+
+  const libelleMinuscule = libelle.toLowerCase();
+  const lettresHtml = afficherLettres
+    ? '<div class="en-lettres">Arrêtée la présente ' + esc(libelleMinuscule) + ' à la somme de : <strong>' + nombreEnLettres(doc.total) + '</strong>.</div>'
+    : '';
+
+  function puceListe(texte) {
+    return String(texte || '').split(/\n/).map(function(l) { return l.trim(); }).filter(Boolean);
+  }
+  const conditionsPaiementPuces = puceListe(substituerPlaceholders(P.conditions_paiement, doc, P));
+  const conditionsGeneralesPuces = puceListe(substituerPlaceholders(P.conditions_generales, doc, P));
+  if (doc.notes && doc.notes.trim()) conditionsGeneralesPuces.push(doc.notes.trim());
+  function sectionPuces(titre, puces) {
+    if (!puces.length) return '';
+    return '<div class="section-conditions"><div class="section-titre-conditions" style="color:' + couleurAccent + ';">' + titre + '</div><div class="filet-fin"></div><ul>' + puces.map(function(p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></div>';
+  }
+
   const logoHtml = P.logo_url
     ? '<div class="logo-yc"><img src="' + esc(P.logo_url) + '"></div>'
-    : '<div class="logo-yc" style="background:' + couleurAccent + ';">YC</div>';
-  const modesRemerciementHtml = (modesPaiement || remerciement)
-    ? '<div class="modes-remerciement">' + [modesPaiement ? 'Modes de paiement acceptés : ' + esc(modesPaiement) : '', remerciement ? esc(remerciement) : ''].filter(Boolean).join('<br>') + '</div>'
+    : '<div class="logo-yc" style="background:' + couleurAccent + ';width:56px;">YC</div>';
+
+  const signatureHtml = afficherSignatures
+    ? '<div class="signature-bloc"><div class="signature-espace"></div><div class="signature-nom">' + esc(P.signataire_nom || '') + '</div><div class="signature-titre">' + esc(P.signataire_titre || '') + '</div></div>'
     : '';
-  return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>' + esc(doc.numero) + '</title>'
+
+  const piedBas = [piedLegal ? esc(piedLegal) : '', telephone ? 'Tél. : ' + esc(telephone) : '', email ? esc(email) : ''].filter(Boolean).join(' · ');
+
+  return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>' + esc(libelle) + ' ' + esc(doc.numero) + ' — ' + esc(enseigne) + '</title>'
     + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">'
-    + '<style>' + STYLE_IMPRESSION + '</style></head><body>'
+    + '<style>' + STYLE_IMPRESSION + (avecBarreImpression ? BARRE_IMPRESSION_STYLE : '') + '</style></head><body>'
+    + (avecBarreImpression ? BARRE_IMPRESSION_HTML : '')
     + (brouillon ? '<div class="watermark">BROUILLON</div>' : '')
     + '<div class="entete">'
-    + '<div class="entete-gauche">' + logoHtml + '<div><div class="enseigne" style="color:' + couleurPrincipale + ';">' + esc(enseigne) + '</div>'
-    + (raisonSociale ? '<div class="souslabel">Agence de ' + esc(raisonSociale) + '</div>' : '')
+    + '<div class="entete-gauche">' + logoHtml + '<div><div class="enseigne" style="color:' + couleurPrincipale + ';">' + enseigneHtml + '</div>'
+    + (slogan ? '<div class="slogan">' + esc(slogan) + '</div>' : '')
     + (adresse ? '<div class="souslabel">' + esc(adresse) + '</div>' : '')
-    + '<div class="souslabel">' + [telephone ? 'Tél. ' + esc(telephone) : '', email].filter(Boolean).join(' · ') + '</div></div></div>'
-    + '<div class="entete-droite"><div class="titre-doc" style="color:' + couleurPrincipale + ';">' + (doc.type === 'facture' ? 'FACTURE' : 'DEVIS') + '</div>'
-    + '<div>N° ' + esc(doc.numero) + '</div><div>Date : ' + dateAffichee + '</div>' + validiteLigne + '</div>'
+    + (telephone ? '<div class="souslabel">Tél. : ' + esc(telephone) + '</div>' : '')
+    + (email ? '<div class="souslabel">E-mail : ' + esc(email) + '</div>' : '')
+    + ((rccm || nif) ? '<div class="souslabel">' + [rccm ? 'RCCM : ' + esc(rccm) : '', nif ? 'NIF : ' + esc(nif) : ''].filter(Boolean).join(' · ') + '</div>' : '')
+    + '</div></div>'
+    + '<div class="entete-droite"><div class="titre-doc" style="color:' + couleurPrincipale + ';">' + esc(libelle.toUpperCase()) + '</div>'
+    + '<div><strong>N° :</strong> ' + esc(doc.numero) + '</div><div><strong>Date :</strong> ' + dateAffichee + '</div>' + validiteLigne + '</div>'
     + '</div>'
     + '<div class="filet" style="border-color:' + couleurAccent + ';"></div>'
-    + '<div class="client-box"><div><strong>' + esc(doc.client_nom) + '</strong></div>' + (doc.client_tel ? '<div>' + esc(doc.client_tel) + '</div>' : '') + '</div>'
-    + (doc.date_livraison ? '<div class="livraison-ligne">Livraison : ' + new Date(doc.date_livraison + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div>' : '')
-    + '<table class="lignes"><thead><tr style="background:' + couleurPrincipale + ';"><th>Désignation</th><th class="c">Qté</th><th class="r">Prix unitaire (' + devise + ')</th><th class="r">Montant (' + devise + ')</th></tr></thead><tbody>' + lignesHtml + '</tbody></table>'
-    + '<div class="totaux">'
-    + '<div class="tot-row"><span>Sous-total</span><span>' + fmtNombre(doc.sous_total) + ' ' + devise + '</span></div>'
-    + remiseLigne + tvaLigne
-    + '<div class="tot-row tot-total" style="background:' + couleurAccent + '22;"><span>TOTAL</span><span>' + fmtNombre(doc.total) + ' ' + devise + '</span></div>'
-    + '<div class="tot-row"><span>Acompte reçu</span><span>' + fmtNombre(doc.acompte) + ' ' + devise + '</span></div>'
-    + '<div class="tot-row tot-reste"><span>Reste à payer</span><span>' + fmtNombre(doc.reste) + ' ' + devise + '</span></div>'
+    + '<div class="client-objet-box">'
+    + '<div><div class="section-titre" style="color:' + couleurAccent + ';">CLIENT</div><div><strong>' + esc(doc.client_nom) + '</strong></div>'
+    + (doc.client_adresse ? '<div>Adresse : ' + esc(doc.client_adresse) + '</div>' : '')
+    + (doc.client_tel ? '<div>Téléphone : ' + esc(doc.client_tel) + '</div>' : '') + '</div>'
+    + '<div><div class="section-titre" style="color:' + couleurAccent + ';">OBJET</div><div><strong>' + esc(doc.objet || '') + '</strong></div>'
+    + (doc.objet_detail ? '<div>' + esc(doc.objet_detail) + '</div>' : '') + '</div>'
     + '</div>'
-    + (afficherLettres ? '<div class="en-lettres">Arrêté le présent ' + (doc.type === 'facture' ? 'facture' : 'devis') + ' à la somme de : ' + nombreEnLettres(doc.total) + '.</div>' : '')
-    + (doc.notes ? '<div class="notes"><strong>Notes / conditions</strong><p>' + esc(doc.notes).replace(/\n/g, '<br>') + '</p></div>' : '')
-    + modesRemerciementHtml
-    + (afficherSignatures ? '<div class="signatures"><div class="sign-box"><div class="sign-label">Le client</div></div><div class="sign-box"><div class="sign-label">' + esc(enseigne) + '</div></div></div>' : '')
-    + '<div class="pied">' + esc(piedLegal) + '</div>'
+    + (doc.date_livraison ? '<div class="livraison-ligne">Livraison prévue : ' + new Date(doc.date_livraison + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div>' : '')
+    + '<table class="lignes"><thead><tr style="background:' + couleurPrincipale + ';"><th style="width:36px;" class="c">N°</th><th>Désignation</th><th style="width:56px;" class="c">Qté</th><th style="width:110px;" class="r">Prix unitaire</th><th style="width:120px;" class="r">Montant</th></tr></thead><tbody>' + lignesHtml + '</tbody></table>'
+    + totauxHtml
+    + lettresHtml
+    + sectionPuces('CONDITIONS DE PAIEMENT', conditionsPaiementPuces)
+    + sectionPuces('CONDITIONS GÉNÉRALES', conditionsGeneralesPuces)
+    + signatureHtml
+    + '<div class="pied">' + piedBas + '</div>'
     + '</body></html>';
 }
+
+const BARRE_IMPRESSION_STYLE = '.barre-impression{position:sticky;top:0;background:#1F1F55;color:#fff;padding:10px 18px;display:flex;align-items:center;gap:14px;font-family:Inter,system-ui,sans-serif;z-index:999;}'
+  + '.barre-impression button{background:#E85D04;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;}'
+  + '.barre-impression span{font-size:11.5px;color:#C6C6E0;}'
+  + '@media print{.barre-impression{display:none;}}';
+const BARRE_IMPRESSION_HTML = '<div class="barre-impression"><button onclick="window.print()">Imprimer / PDF</button>'
+  + '<span>Astuce : décochez « En-têtes et pieds de page » dans les options d\'impression.</span></div>';
 
 function genererFenetreImpression(doc, brouillon) {
   const win = window.open('', '_blank');
   if (!win) { showToast('Le navigateur a bloqué l\'ouverture de la fenêtre d\'aperçu.', 'error'); return; }
-  const html = construireHtmlDocument(doc, brouillon);
+  const html = construireHtmlDocument(doc, brouillon, null, true);
   win.document.open();
   win.document.write(html);
   win.document.close();
-  setTimeout(function() { win.focus(); win.print(); }, 350);
 }
 
 function nombreEnLettres(n) {
@@ -2318,6 +2457,7 @@ function setParamTab(tab) {
 
 function remplirFormulaireParametres() {
   document.getElementById('paramEnseigne').value = PARAMS.enseigne || '';
+  document.getElementById('paramSlogan').value = PARAMS.slogan || '';
   document.getElementById('paramRaisonSociale').value = PARAMS.raison_sociale || '';
   document.getElementById('paramAdresse').value = PARAMS.adresse || '';
   document.getElementById('paramTelephone').value = PARAMS.telephone || '';
@@ -2326,10 +2466,16 @@ function remplirFormulaireParametres() {
   document.getElementById('paramNif').value = PARAMS.nif || '';
   document.getElementById('paramPiedLegal').value = PARAMS.pied_legal || '';
   document.getElementById('paramPiedLegal2').value = PARAMS.pied_legal || '';
-  document.getElementById('paramPrefixeDevis').value = PARAMS.prefixe_devis || 'DEV';
+  document.getElementById('paramPrefixeDevis').value = PARAMS.prefixe_devis || 'PF';
   document.getElementById('paramPrefixeFacture').value = PARAMS.prefixe_facture || 'FAC';
   document.getElementById('paramValiditeDevis').value = PARAMS.validite_devis_jours || 15;
-  document.getElementById('paramConditionsDefaut').value = PARAMS.conditions_defaut || '';
+  document.getElementById('paramLibelleDevis').value = PARAMS.libelle_devis || 'FACTURE PROFORMA';
+  document.getElementById('paramLibelleFacture').value = PARAMS.libelle_facture || 'FACTURE';
+  document.getElementById('paramAcomptePct').value = PARAMS.acompte_pct || 50;
+  document.getElementById('paramConditionsPaiement').value = PARAMS.conditions_paiement || '';
+  document.getElementById('paramConditionsGenerales').value = PARAMS.conditions_generales || '';
+  document.getElementById('paramSignataireNom').value = PARAMS.signataire_nom || '';
+  document.getElementById('paramSignataireTitre').value = PARAMS.signataire_titre || '';
   document.getElementById('paramModesPaiement').value = PARAMS.modes_paiement || '';
   document.getElementById('paramRemerciement').value = PARAMS.remerciement || '';
   document.getElementById('paramMontantLettres').checked = PARAMS.montant_en_lettres !== 'false';
@@ -2376,7 +2522,7 @@ function genererPiedLegal() {
 }
 
 async function calculerNumeroAvecPrefixe(type, prefixeOverride) {
-  const prefixe = prefixeOverride || (type === 'facture' ? (PARAMS.prefixe_facture || 'FAC') : (PARAMS.prefixe_devis || 'DEV'));
+  const prefixe = prefixeOverride || (type === 'facture' ? (PARAMS.prefixe_facture || 'FAC') : (PARAMS.prefixe_devis || 'PF'));
   const annee = new Date().getFullYear();
   const { data } = await sb.from('yc_documents').select('numero').eq('type', type);
   let max = 0;
@@ -2388,7 +2534,7 @@ async function calculerNumeroAvecPrefixe(type, prefixeOverride) {
 }
 
 async function actualiserApercuNumeros() {
-  const prefD = document.getElementById('paramPrefixeDevis').value.trim() || 'DEV';
+  const prefD = document.getElementById('paramPrefixeDevis').value.trim() || 'PF';
   const prefF = document.getElementById('paramPrefixeFacture').value.trim() || 'FAC';
   const results = await Promise.all([calculerNumeroAvecPrefixe('devis', prefD), calculerNumeroAvecPrefixe('facture', prefF)]);
   document.getElementById('paramNumeroPreview').innerHTML = 'Prochain devis : <strong>' + esc(results[0]) + '</strong> · Prochaine facture : <strong>' + esc(results[1]) + '</strong>';
@@ -2443,16 +2589,27 @@ function syncColorFromHex(which) {
 function lireParamsDepuisFormulaire() {
   return {
     enseigne: document.getElementById('paramEnseigne').value,
+    slogan: document.getElementById('paramSlogan').value,
     raison_sociale: document.getElementById('paramRaisonSociale').value,
     adresse: document.getElementById('paramAdresse').value,
     telephone: document.getElementById('paramTelephone').value,
     email: document.getElementById('paramEmail').value,
+    rccm: document.getElementById('paramRccm').value,
+    nif: document.getElementById('paramNif').value,
     pied_legal: document.getElementById('paramPiedLegal2').value,
     devise: document.getElementById('paramDevise').value,
     couleur_principale: document.getElementById('paramCouleurPrincipale').value,
     couleur_accent: document.getElementById('paramCouleurAccent').value,
+    libelle_devis: document.getElementById('paramLibelleDevis').value,
+    libelle_facture: document.getElementById('paramLibelleFacture').value,
+    acompte_pct: document.getElementById('paramAcomptePct').value,
+    conditions_paiement: document.getElementById('paramConditionsPaiement').value,
+    conditions_generales: document.getElementById('paramConditionsGenerales').value,
+    signataire_nom: document.getElementById('paramSignataireNom').value,
+    signataire_titre: document.getElementById('paramSignataireTitre').value,
     montant_en_lettres: document.getElementById('paramMontantLettres').checked ? 'true' : 'false',
     bloc_signatures: document.getElementById('paramBlocSignatures').checked ? 'true' : 'false',
+    validite_devis_jours: document.getElementById('paramValiditeDevis').value,
     modes_paiement: document.getElementById('paramModesPaiement').value,
     remerciement: document.getElementById('paramRemerciement').value,
     logo_url: PARAMS.logo_url || null,
@@ -2462,22 +2619,23 @@ function lireParamsDepuisFormulaire() {
 function documentExemple() {
   return {
     numero: 'FAC-2026-0001', type: 'facture', date_doc: today(),
-    client_nom: 'Client Exemple', client_tel: '622000000',
+    client_nom: 'Client Exemple', client_tel: '622000000', client_adresse: 'Dubréka, Guinée',
+    objet: 'Impression de bâches publicitaires', objet_detail: 'Conception, impression numérique haute résolution et finition',
     lignes: [{ prestation: 'Carte de visite', rubrique: 'Imprimerie', unite: 'page', qte: 200, prix: 500 }],
     sous_total: 100000, remise: 0, tva_taux: 0, tva_montant: 0, total: 100000, acompte: 50000, reste: 50000,
-    notes: document.getElementById('paramConditionsDefaut') ? document.getElementById('paramConditionsDefaut').value : '',
+    notes: '',
   };
 }
 
 function regenererApercu() {
   const iframe = document.getElementById('paramApercuIframe');
   if (!iframe) return;
-  const html = construireHtmlDocument(documentExemple(), false, lireParamsDepuisFormulaire());
+  const html = construireHtmlDocument(documentExemple(), false, lireParamsDepuisFormulaire(), false);
   iframe.srcdoc = html;
 }
 
 function ouvrirApercuGrandFormat() {
-  const html = construireHtmlDocument(documentExemple(), false, lireParamsDepuisFormulaire());
+  const html = construireHtmlDocument(documentExemple(), false, lireParamsDepuisFormulaire(), true);
   const win = window.open('', '_blank');
   if (!win) { showToast('Fenêtre bloquée par le navigateur.', 'error'); return; }
   win.document.open();
@@ -2490,6 +2648,7 @@ async function saveParametres() {
   btn.disabled = true;
   const valeurs = {
     enseigne: document.getElementById('paramEnseigne').value.trim(),
+    slogan: document.getElementById('paramSlogan').value.trim(),
     raison_sociale: document.getElementById('paramRaisonSociale').value.trim(),
     adresse: document.getElementById('paramAdresse').value.trim(),
     telephone: document.getElementById('paramTelephone').value.trim(),
@@ -2497,10 +2656,16 @@ async function saveParametres() {
     rccm: document.getElementById('paramRccm').value.trim(),
     nif: document.getElementById('paramNif').value.trim(),
     pied_legal: document.getElementById('paramPiedLegal').value.trim(),
-    prefixe_devis: document.getElementById('paramPrefixeDevis').value.trim() || 'DEV',
+    prefixe_devis: document.getElementById('paramPrefixeDevis').value.trim() || 'PF',
     prefixe_facture: document.getElementById('paramPrefixeFacture').value.trim() || 'FAC',
     validite_devis_jours: String(Number(document.getElementById('paramValiditeDevis').value || 15)),
-    conditions_defaut: document.getElementById('paramConditionsDefaut').value.trim(),
+    libelle_devis: document.getElementById('paramLibelleDevis').value.trim() || 'FACTURE PROFORMA',
+    libelle_facture: document.getElementById('paramLibelleFacture').value.trim() || 'FACTURE',
+    acompte_pct: String(Number(document.getElementById('paramAcomptePct').value || 50)),
+    conditions_paiement: document.getElementById('paramConditionsPaiement').value.trim(),
+    conditions_generales: document.getElementById('paramConditionsGenerales').value.trim(),
+    signataire_nom: document.getElementById('paramSignataireNom').value.trim(),
+    signataire_titre: document.getElementById('paramSignataireTitre').value.trim(),
     modes_paiement: document.getElementById('paramModesPaiement').value.trim(),
     remerciement: document.getElementById('paramRemerciement').value.trim(),
     montant_en_lettres: document.getElementById('paramMontantLettres').checked ? 'true' : 'false',
