@@ -132,7 +132,8 @@ h1,h2,h3{margin:0;}
 .priority-empty i{font-size:32px;}
 
 /* ---- Module Devis & Factures ---- */
-.modal-card-xl{max-width:720px;}
+#modalDocument .modal-body{overflow-x:hidden;}
+#modalDocument input,#modalDocument textarea,#modalDocument select{box-sizing:border-box;}
 .doc-modal-header{background:var(--indigo);border-bottom:3px solid var(--orange);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#fff;flex-wrap:wrap;}
 .doc-modal-header h3{color:#fff;font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px;margin:0;}
 .doc-modal-header .modal-close{color:rgba(255,255,255,.7);}
@@ -143,14 +144,17 @@ h1,h2,h3{margin:0;}
 .doc-toggle button:disabled{opacity:.4;cursor:not-allowed;}
 .doc-info-row{display:flex;align-items:center;gap:12px;padding:14px 20px 0;flex-wrap:wrap;font-size:12.5px;color:var(--text-muted);}
 .doc-badge-num{display:inline-block;background:var(--violet-bg);color:var(--violet);font-size:12px;font-weight:500;padding:4px 10px;border-radius:8px;}
-.doc-client-row{display:grid;grid-template-columns:1fr 1fr 160px;gap:12px;}
+.doc-client-row{display:grid;grid-template-columns:2fr 1.2fr 1.3fr;gap:12px;}
+.doc-client-row > *{min-width:0;}
 .doc-client-row label i{margin-right:4px;}
-.doc-lines-head{display:grid;grid-template-columns:1fr 70px 110px 110px 34px;gap:8px;padding:0 4px 6px;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;}
-.doc-line-row{display:grid;grid-template-columns:1fr 70px 110px 110px 34px;gap:8px;align-items:center;padding:8px 4px;border-bottom:1px solid var(--border);}
+.doc-lines-head{display:grid;grid-template-columns:minmax(180px,1fr) 64px 110px 100px 28px;gap:8px;padding:0 4px 6px;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;}
+.doc-lines-head > *{min-width:0;}
+.doc-line-row{display:grid;grid-template-columns:minmax(180px,1fr) 64px 110px 100px 28px;gap:8px;align-items:center;padding:8px 4px;border-bottom:1px solid var(--border);}
+.doc-line-row > *{min-width:0;}
 .doc-line-row:last-child{border-bottom:none;}
 .doc-line-prestation{font-size:13px;font-weight:500;color:var(--text);}
 .doc-line-rubrique{font-size:11px;color:var(--text-muted);}
-.doc-line-row input{width:100%;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;text-align:right;}
+.doc-line-row input{width:100%;min-width:0;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;text-align:right;}
 .doc-line-total{font-size:13px;font-weight:500;text-align:right;}
 .doc-line-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:15px;padding:4px;}
 .doc-search-wrap{position:relative;margin-top:10px;}
@@ -163,14 +167,18 @@ h1,h2,h3{margin:0;}
 .doc-search-result-item:hover{background:var(--bg-page);}
 .doc-search-result-item small{display:block;color:var(--text-muted);font-size:11px;margin-top:1px;}
 .doc-empty-tarifs{font-size:12px;color:var(--text-light);margin-top:6px;}
-.doc-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
-.doc-notes textarea{width:100%;box-sizing:border-box;min-height:100px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;}
+.doc-bottom-grid{display:grid;grid-template-columns:1fr 260px;gap:16px;margin-top:16px;}
+.doc-bottom-grid > *{min-width:0;}
+.doc-notes textarea{width:100%;min-width:0;box-sizing:border-box;min-height:100px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;}
 .doc-totals-box{background:var(--bg-page);border-radius:10px;padding:14px 16px;}
-.doc-totals-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:13px;color:var(--text-muted);}
-.doc-totals-row input{width:110px;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;text-align:right;}
+.doc-totals-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:13px;color:var(--text-muted);gap:8px;}
+.doc-totals-row > span:first-child{white-space:nowrap;}
+.doc-totals-row input{width:110px;flex-shrink:0;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;text-align:right;}
 .doc-totals-row.total{font-size:15px;font-weight:500;color:var(--text);border-top:1px solid var(--border);margin-top:4px;padding-top:10px;}
 .doc-totals-row.reste{font-weight:500;color:var(--red);}
-.doc-footer-check{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);margin-right:auto;}
+.doc-totals-input-wrap{display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;}
+.doc-totals-input-wrap small{color:var(--text-light);font-size:11px;}
+.doc-footer-check{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);margin-right:auto;white-space:nowrap;}
 
 .doc-table-head{display:grid;grid-template-columns:130px 90px 90px 1fr 100px 90px 110px 90px;gap:10px;padding:0 14px 8px;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;}
 .doc-table-row{display:grid;grid-template-columns:130px 90px 90px 1fr 100px 90px 110px 90px;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid #EEEFF4;}
@@ -196,9 +204,16 @@ h1,h2,h3{margin:0;}
   .doc-table-head > :nth-child(3),.doc-table-row > :nth-child(3),
   .doc-table-head > :nth-child(6),.doc-table-row > :nth-child(6){display:none;}
 }
+#modalDocument .modal-footer{flex-wrap:nowrap;}
+#modalDocument .modal-footer .btn{white-space:nowrap;}
+@media (max-width:600px){
+  #modalDocument .modal-footer{flex-direction:column;align-items:stretch;}
+  #modalDocument .modal-footer .doc-footer-check{margin-right:0;margin-bottom:6px;}
+  #modalDocument .modal-footer .btn{flex:1;width:100%;}
+  .doc-client-row{grid-template-columns:1fr 1fr;}
+  .doc-client-row > :nth-child(1){grid-column:1 / -1;}
+}
 @media (max-width:700px){
-  .modal-card-xl{max-width:100%;}
-  .doc-client-row{grid-template-columns:1fr;}
   .doc-bottom-grid{grid-template-columns:1fr;}
   .doc-lines-head{display:none;}
   .doc-line-row{grid-template-columns:1fr auto;grid-template-areas:"prestation del" "qte qte" "prix prix" "total total";row-gap:4px;}
@@ -298,6 +313,7 @@ h1,h2,h3{margin:0;}
 .modal-overlay.open{display:flex;}
 .modal-card{background:#fff;border-radius:16px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;}
 .modal-card-lg{max-width:600px;}
+.modal-card-xl{max-width:760px;width:min(760px, calc(100vw - 32px));}
 .modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #F3F4F6;}
 .modal-header h3{font-size:16px;font-weight:800;}
 .modal-close{background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;}
@@ -864,9 +880,9 @@ h1,h2,h3{margin:0;}
         </div>
         <div class="doc-totals-box">
           <div class="doc-totals-row"><span>Sous-total</span><span id="docSousTotal">0</span></div>
-          <div class="doc-totals-row"><span>Remise (GNF)</span><input type="number" id="docRemise" min="0" value="0" oninput="recalculerTotauxDoc()"></div>
+          <div class="doc-totals-row"><span>Remise</span><span class="doc-totals-input-wrap"><input type="number" id="docRemise" min="0" value="0" oninput="recalculerTotauxDoc()"><small>GNF</small></span></div>
           <div class="doc-totals-row total"><span>Total</span><span id="docTotal">0</span></div>
-          <div class="doc-totals-row"><span>Acompte reçu (GNF)</span><input type="number" id="docAcompte" min="0" value="0" oninput="recalculerTotauxDoc()"></div>
+          <div class="doc-totals-row"><span>Acompte reçu</span><span class="doc-totals-input-wrap"><input type="number" id="docAcompte" min="0" value="0" oninput="recalculerTotauxDoc()"><small>GNF</small></span></div>
           <div class="doc-totals-row reste"><span>Reste à payer</span><span id="docReste">0</span></div>
         </div>
       </div>
@@ -1572,9 +1588,11 @@ function renderDocLignes() {
   if (!docLignes.length) { cont.innerHTML = '<div class="empty" style="padding:14px 0;">Aucune ligne. Ajoutez une prestation ci-dessous.</div>'; return; }
   cont.innerHTML = docLignes.map(function(l, i) {
     const total = Number(l.qte || 0) * Number(l.prix || 0);
+    const premiereColonne = l.rubrique
+      ? '<div class="doc-line-prestation">' + esc(l.prestation) + '</div><div class="doc-line-rubrique">' + esc(l.rubrique) + '</div>'
+      : '<input type="text" value="' + esc(l.prestation) + '" placeholder="Désignation de la prestation" oninput="modifierLignePrestation(' + i + ',this.value)" style="width:100%;min-width:0;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">';
     return '<div class="doc-line-row">'
-      + '<div><input type="text" value="' + esc(l.prestation) + '" placeholder="Prestation" oninput="modifierLignePrestation(' + i + ',this.value)" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">'
-      + (l.rubrique ? '<div class="doc-line-rubrique">' + esc(l.rubrique) + '</div>' : '') + '</div>'
+      + '<div>' + premiereColonne + '</div>'
       + '<input type="number" min="0" value="' + (l.qte != null ? l.qte : 1) + '" oninput="modifierLigneQte(' + i + ',this.value)">'
       + '<input type="number" min="0" value="' + (l.prix != null ? l.prix : 0) + '" oninput="modifierLignePrix(' + i + ',this.value)">'
       + '<div class="doc-line-total">' + fmtNombre(total) + '</div>'
