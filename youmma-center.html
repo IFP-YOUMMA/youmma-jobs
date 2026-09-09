@@ -16,6 +16,7 @@
   --green-bg:#EAF3DE; --green:#3B6D11;  --amber-bg:#FAEEDA; --amber:#854F0B;
   --blue-bg:#E6F1FB;  --blue:#185FA5;   --coral-bg:#FAECE7; --coral:#993C1D;
   --red-bg:#FCEBEB;   --red:#A32D2D;    --gray-bg:#F1EFE8;  --gray:#444441;
+  --violet-bg:#F1EAFB; --violet:#6D28D9;
   --radius: 12px;
 }
 *{box-sizing:border-box;}
@@ -129,6 +130,81 @@ h1,h2,h3{margin:0;}
 .priority-col-delai{font-size:12.5px;font-weight:500;color:var(--text-muted);text-align:right;}
 .priority-empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:32px 0;color:var(--text-light);font-size:13px;text-align:center;}
 .priority-empty i{font-size:32px;}
+
+/* ---- Module Devis & Factures ---- */
+.modal-card-xl{max-width:720px;}
+.doc-modal-header{background:var(--indigo);border-bottom:3px solid var(--orange);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#fff;flex-wrap:wrap;}
+.doc-modal-header h3{color:#fff;font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px;margin:0;}
+.doc-modal-header .modal-close{color:rgba(255,255,255,.7);}
+.doc-modal-header .modal-close:hover{color:#fff;}
+.doc-toggle{display:flex;background:rgba(255,255,255,.12);border-radius:8px;padding:3px;gap:2px;}
+.doc-toggle button{background:none;border:none;color:rgba(255,255,255,.7);font-size:12.5px;font-weight:500;padding:6px 14px;border-radius:6px;cursor:pointer;}
+.doc-toggle button.active{background:var(--orange);color:#fff;}
+.doc-toggle button:disabled{opacity:.4;cursor:not-allowed;}
+.doc-info-row{display:flex;align-items:center;gap:12px;padding:14px 20px 0;flex-wrap:wrap;font-size:12.5px;color:var(--text-muted);}
+.doc-badge-num{display:inline-block;background:var(--violet-bg);color:var(--violet);font-size:12px;font-weight:500;padding:4px 10px;border-radius:8px;}
+.doc-lines-head{display:grid;grid-template-columns:1fr 70px 110px 110px 34px;gap:8px;padding:0 4px 6px;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;}
+.doc-line-row{display:grid;grid-template-columns:1fr 70px 110px 110px 34px;gap:8px;align-items:center;padding:8px 4px;border-bottom:1px solid var(--border);}
+.doc-line-row:last-child{border-bottom:none;}
+.doc-line-prestation{font-size:13px;font-weight:500;color:var(--text);}
+.doc-line-rubrique{font-size:11px;color:var(--text-muted);}
+.doc-line-row input{width:100%;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;text-align:right;}
+.doc-line-total{font-size:13px;font-weight:500;text-align:right;}
+.doc-line-del{background:none;border:none;color:var(--red);cursor:pointer;font-size:15px;padding:4px;}
+.doc-search-wrap{position:relative;margin-top:10px;}
+.doc-search-wrap input{width:100%;box-sizing:border-box;padding:10px 12px 10px 34px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;}
+.doc-search-wrap i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-light);}
+.doc-search-results{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 6px 20px rgba(31,31,85,.12);max-height:220px;overflow-y:auto;z-index:20;display:none;}
+.doc-search-results.open{display:block;}
+.doc-search-result-item{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);}
+.doc-search-result-item:last-child{border-bottom:none;}
+.doc-search-result-item:hover{background:var(--bg-page);}
+.doc-search-result-item small{display:block;color:var(--text-muted);font-size:11px;margin-top:1px;}
+.doc-empty-tarifs{font-size:12px;color:var(--text-light);margin-top:6px;}
+.doc-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+.doc-notes textarea{width:100%;box-sizing:border-box;min-height:100px;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;resize:vertical;}
+.doc-totals-box{background:var(--bg-page);border-radius:10px;padding:14px 16px;}
+.doc-totals-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:13px;color:var(--text-muted);}
+.doc-totals-row input{width:110px;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;text-align:right;}
+.doc-totals-row.total{font-size:15px;font-weight:500;color:var(--text);border-top:1px solid var(--border);margin-top:4px;padding-top:10px;}
+.doc-totals-row.reste{font-weight:500;color:var(--red);}
+.doc-footer-check{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);margin-right:auto;}
+
+.doc-table-head{display:grid;grid-template-columns:130px 90px 90px 1fr 100px 90px 110px 90px;gap:10px;padding:0 14px 8px;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;}
+.doc-table-row{display:grid;grid-template-columns:130px 90px 90px 1fr 100px 90px 110px 90px;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid #EEEFF4;}
+.doc-table-row:last-child{border-bottom:none;}
+.doc-type-badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;}
+.doc-type-badge.devis{background:var(--violet-bg);color:var(--violet);}
+.doc-type-badge.facture{background:var(--blue-bg);color:var(--indigo);}
+.doc-statut-badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;}
+.doc-statut-badge.envoye{background:var(--amber-bg);color:var(--amber);}
+.doc-statut-badge.converti{background:var(--gray-bg);color:var(--gray);}
+.doc-statut-badge.payee{background:var(--green-bg);color:var(--green);}
+.doc-statut-badge.annule{background:var(--red-bg);color:var(--red);}
+.doc-montant-col{text-align:right;font-size:13px;font-weight:500;color:var(--text);}
+.doc-reste-col{text-align:right;font-size:13px;color:var(--text-muted);}
+.doc-actions-col{display:flex;gap:6px;justify-content:flex-end;}
+.doc-icon-btn{background:none;border:1.5px solid var(--border);color:var(--text-muted);width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;}
+.doc-icon-btn:hover{border-color:var(--orange);color:var(--orange);}
+.doc-filtres-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.doc-search-input{padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;min-width:220px;}
+
+@media (max-width:900px){
+  .doc-table-head,.doc-table-row{grid-template-columns:100px 70px 1fr 90px 90px;}
+  .doc-table-head > :nth-child(3),.doc-table-row > :nth-child(3),
+  .doc-table-head > :nth-child(6),.doc-table-row > :nth-child(6){display:none;}
+}
+@media (max-width:700px){
+  .modal-card-xl{max-width:100%;}
+  .doc-bottom-grid{grid-template-columns:1fr;}
+  .doc-lines-head{display:none;}
+  .doc-line-row{grid-template-columns:1fr auto;grid-template-areas:"prestation del" "qte qte" "prix prix" "total total";row-gap:4px;}
+  .doc-line-row > :nth-child(1){grid-area:prestation;}
+  .doc-line-row > :nth-child(2){grid-area:qte;}
+  .doc-line-row > :nth-child(3){grid-area:prix;}
+  .doc-line-row > :nth-child(4){grid-area:total;}
+  .doc-line-row > :nth-child(5){grid-area:del;}
+}
 
 .stats-grid{display:grid;gap:14px;margin-bottom:20px;}
 .stats-grid-3{grid-template-columns:repeat(3,1fr);}
@@ -353,6 +429,7 @@ h1,h2,h3{margin:0;}
       <button class="nav-item" data-nav="aujourdhui" onclick="navigate('aujourdhui')"><i class="ti ti-home"></i> Aujourd'hui</button>
       <button class="nav-item" data-nav="taches" onclick="navigate('taches')"><i class="ti ti-checklist"></i> Tâches<span class="sidebar-badge" id="sidebarBadgeTaches" style="display:none;">0</span></button>
       <button class="nav-item" data-nav="caisse" onclick="navigate('caisse')"><i class="ti ti-cash"></i> Caisse</button>
+      <button class="nav-item" data-nav="documents" onclick="navigate('documents')"><i class="ti ti-file-invoice"></i> Devis &amp; factures</button>
       <button class="nav-item" data-nav="om" onclick="navigate('om')"><i class="ti ti-device-mobile"></i> Orange Money</button>
       <button class="nav-item" data-nav="formations" onclick="navigate('formations')"><i class="ti ti-school"></i> Formations</button>
       <button class="nav-item restricted" data-nav="rapports" onclick="navigate('rapports')"><i class="ti ti-chart-bar"></i> Rapports</button>
@@ -459,6 +536,28 @@ h1,h2,h3{margin:0;}
         <div class="card">
           <h3>Opérations du jour</h3>
           <div id="caisseListe"></div>
+        </div>
+      </section>
+
+      <!-- PAGE : DEVIS & FACTURES -->
+      <section id="page-documents" class="page">
+        <div class="page-header">
+          <h2><i class="ti ti-file-invoice"></i> Devis &amp; factures</h2>
+          <button class="btn btn-primary" onclick="ouvrirModalDocument('devis')"><i class="ti ti-plus"></i> Nouveau</button>
+        </div>
+        <div class="doc-filtres-row">
+          <div class="filtres" id="docFiltres" style="margin-bottom:0;">
+            <button class="filtre-btn active" data-filtre="tous" onclick="setDocFilter('tous')">Tous</button>
+            <button class="filtre-btn" data-filtre="devis" onclick="setDocFilter('devis')">Devis</button>
+            <button class="filtre-btn" data-filtre="facture" onclick="setDocFilter('facture')">Factures</button>
+          </div>
+          <input type="text" class="doc-search-input" id="docRecherche" placeholder="Rechercher client ou numéro…" oninput="renderDocuments()">
+        </div>
+        <div class="priority-card">
+          <div class="doc-table-head">
+            <div>Numéro</div><div>Type</div><div>Date</div><div>Client</div><div style="text-align:right;">Total</div><div style="text-align:right;">Reste</div><div>Statut</div><div></div>
+          </div>
+          <div id="docListe"></div>
         </div>
       </section>
 
@@ -719,12 +818,59 @@ h1,h2,h3{margin:0;}
   </div>
 </div>
 
-<div id="modalDevisPlaceholder" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-header"><h3>Devis &amp; factures</h3><button class="modal-close" onclick="closeModal('modalDevisPlaceholder')">×</button></div>
-    <div class="modal-body" style="text-align:center;padding:30px 20px;">
-      <i class="ti ti-file-invoice" style="font-size:40px;color:var(--text-light);"></i>
-      <p style="margin-top:14px;color:var(--text-muted);font-size:14px;">Module devis &amp; factures — bientôt disponible.</p>
+<div id="modalDocument" class="modal-overlay">
+  <div class="modal-card modal-card-xl">
+    <div class="doc-modal-header">
+      <h3><i class="ti ti-file-invoice"></i> Nouveau document</h3>
+      <div class="doc-toggle">
+        <button id="docToggleDevis" class="active" onclick="setDocType('devis')">Devis</button>
+        <button id="docToggleFacture" onclick="setDocType('facture')">Facture</button>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalDocument')">×</button>
+    </div>
+    <div class="doc-info-row">
+      <span class="doc-badge-num" id="docNumeroPreview">N° —</span>
+      <span id="docDateAffichee"></span>
+      <span id="docValiditeLigne"></span>
+    </div>
+    <div class="modal-body">
+      <div class="form-row-2">
+        <div class="form-row"><label>Client — nom *</label><input type="text" id="docClientNom"></div>
+        <div class="form-row"><label>Téléphone</label><input type="tel" id="docClientTel"></div>
+      </div>
+
+      <div class="doc-lines-head">
+        <div>Prestation</div><div style="text-align:right;">Qté</div><div style="text-align:right;">Prix unit.</div><div style="text-align:right;">Total</div><div></div>
+      </div>
+      <div id="docLignesListe"></div>
+
+      <div class="doc-search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" id="docRechercheTarif" placeholder="Choisir une prestation dans la grille…" oninput="rechercherTarif()" onfocus="rechercherTarif()">
+        <div class="doc-search-results" id="docSearchResults"></div>
+      </div>
+      <div id="docEmptyTarifs" class="doc-empty-tarifs hidden">Grille tarifaire non renseignée — utilisez les lignes libres.</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="ajouterLigneLibre()"><i class="ti ti-plus"></i> Ligne libre</button>
+
+      <div class="doc-bottom-grid">
+        <div class="doc-notes">
+          <label style="display:block;font-size:12.5px;font-weight:700;color:#374151;margin-bottom:5px;">Notes / conditions</label>
+          <textarea id="docNotes">Acompte de 50 % à la commande, solde à la livraison.</textarea>
+        </div>
+        <div class="doc-totals-box">
+          <div class="doc-totals-row"><span>Sous-total</span><span id="docSousTotal">0</span></div>
+          <div class="doc-totals-row"><span>Remise (GNF)</span><input type="number" id="docRemise" min="0" value="0" oninput="recalculerTotauxDoc()"></div>
+          <div class="doc-totals-row total"><span>Total</span><span id="docTotal">0</span></div>
+          <div class="doc-totals-row"><span>Acompte reçu (GNF)</span><input type="number" id="docAcompte" min="0" value="0" oninput="recalculerTotauxDoc()"></div>
+          <div class="doc-totals-row reste"><span>Reste à payer</span><span id="docReste">0</span></div>
+        </div>
+      </div>
+      <div id="docErreur" class="form-error hidden" style="margin-top:14px;"></div>
+    </div>
+    <div class="modal-footer">
+      <label class="doc-footer-check"><input type="checkbox" id="docCreerTache"> Créer aussi la tâche liée</label>
+      <button class="btn btn-ghost" onclick="apercuDocumentBrouillon()"><i class="ti ti-printer"></i> Aperçu</button>
+      <button class="btn btn-primary" id="docBtnSubmit" onclick="saveDocument()">Enregistrer le devis</button>
     </div>
   </div>
 </div>
@@ -941,6 +1087,7 @@ function showApp() {
   document.getElementById('sidebarRole').textContent = ROLE_LABELS[session.role] || session.role;
   document.getElementById('sidebarAvatar').textContent = initiales(session.nom);
   applyRoleVisibility();
+  chargerParametres();
   navigate('aujourdhui');
 }
 
@@ -953,7 +1100,7 @@ async function updateSidebarBadge() {
   else { badge.style.display = 'none'; }
 }
 
-function openDevisPlaceholder() { openModal('modalDevisPlaceholder'); }
+function openDevisPlaceholder() { ouvrirModalDocument('devis'); }
 
 function applyRoleVisibility() {
   const estGerantOuComptable = session.role === 'gerant' || session.role === 'comptable';
@@ -963,7 +1110,7 @@ function applyRoleVisibility() {
 
 /* ── NAVIGATION ── */
 const PAGE_LOADERS = {
-  aujourdhui: loadAujourdhuiWrap, taches: loadTaches, caisse: loadCaisse,
+  aujourdhui: loadAujourdhuiWrap, taches: loadTaches, caisse: loadCaisse, documents: loadDocuments,
   om: loadOM, formations: loadFormations, rapports: loadRapports, agents: loadAgents,
 };
 function navigate(page) {
@@ -1302,6 +1449,517 @@ async function ouvrirHistoriqueCaisse() {
       + '<div class="caisse-montant ' + (isEntree ? 'text-success' : 'text-danger') + '">' + (isEntree ? '+ ' : '– ') + fmt(o.montant) + '</div></div>';
   }).join('') : '<div class="empty">Aucune opération.</div>';
   openModal('modalHistoriqueCaisse');
+}
+
+/* ── MODULE DEVIS & FACTURES ── */
+let PARAMS = {};
+let docType = 'devis';
+let docLignes = [];
+let docConversionDevisId = null;
+let docsCache = [];
+let currentDocFilter = 'tous';
+let _tarifsGrilleVide = null;
+let _tarifsRechercheTimer = null;
+
+const DOC_STATUT_LABELS = { envoye: 'Envoyé', converti: 'Converti', payee: 'Payée', annule: 'Annulé' };
+
+async function chargerParametres() {
+  try {
+    const { data } = await sb.from('yc_parametres').select('*');
+    (data || []).forEach(function(p) { PARAMS[p.cle] = p.valeur; });
+  } catch (e) {}
+}
+
+async function calculerProchainNumero(type) {
+  const prefixe = type === 'facture' ? 'FAC' : 'DEV';
+  const annee = new Date().getFullYear();
+  const { data } = await sb.from('yc_documents').select('numero').eq('type', type);
+  let max = 0;
+  (data || []).forEach(function(d) {
+    const m = new RegExp('^' + prefixe + '-' + annee + '-(\\d{4})$').exec(d.numero || '');
+    if (m) { const v = parseInt(m[1], 10); if (v > max) max = v; }
+  });
+  return prefixe + '-' + annee + '-' + String(max + 1).padStart(4, '0');
+}
+
+async function verifierGrilleTarifs() {
+  if (_tarifsGrilleVide === null) {
+    const { data } = await sb.from('yc_tarifs').select('id').eq('actif', true).limit(1);
+    _tarifsGrilleVide = !(data && data.length);
+  }
+  document.getElementById('docEmptyTarifs').classList.toggle('hidden', !_tarifsGrilleVide);
+}
+
+function actualiserValiditeLigne() {
+  const el = document.getElementById('docValiditeLigne');
+  if (docType === 'devis') {
+    el.textContent = 'Valable ' + Number(PARAMS.validite_devis_jours || 15) + ' jours';
+  } else {
+    el.textContent = '';
+  }
+}
+
+function actualiserBoutonSubmitDoc() {
+  document.getElementById('docBtnSubmit').textContent = docType === 'facture' ? 'Enregistrer la facture' : 'Enregistrer le devis';
+}
+
+function actualiserNumeroPreview() {
+  document.getElementById('docNumeroPreview').textContent = 'N° …';
+  calculerProchainNumero(docType).then(function(n) {
+    document.getElementById('docNumeroPreview').textContent = 'N° ' + n;
+  });
+}
+
+function setDocType(type) {
+  if (docConversionDevisId) return;
+  docType = type;
+  document.getElementById('docToggleDevis').classList.toggle('active', type === 'devis');
+  document.getElementById('docToggleFacture').classList.toggle('active', type === 'facture');
+  document.getElementById('docCreerTache').checked = type === 'facture';
+  actualiserValiditeLigne();
+  actualiserBoutonSubmitDoc();
+  actualiserNumeroPreview();
+}
+
+async function ouvrirModalDocument(type, prefillFromDevis) {
+  docConversionDevisId = prefillFromDevis ? prefillFromDevis.id : null;
+  docType = prefillFromDevis ? 'facture' : type;
+  document.getElementById('docToggleDevis').classList.toggle('active', docType === 'devis');
+  document.getElementById('docToggleFacture').classList.toggle('active', docType === 'facture');
+  document.getElementById('docToggleDevis').disabled = !!prefillFromDevis;
+  document.getElementById('docToggleFacture').disabled = !!prefillFromDevis;
+  document.getElementById('docClientNom').value = prefillFromDevis ? (prefillFromDevis.client_nom || '') : '';
+  document.getElementById('docClientTel').value = prefillFromDevis ? (prefillFromDevis.client_tel || '') : '';
+  docLignes = prefillFromDevis && prefillFromDevis.lignes ? JSON.parse(JSON.stringify(prefillFromDevis.lignes)) : [];
+  document.getElementById('docNotes').value = prefillFromDevis ? (prefillFromDevis.notes || '') : 'Acompte de 50 % à la commande, solde à la livraison.';
+  document.getElementById('docRemise').value = prefillFromDevis ? (prefillFromDevis.remise || 0) : 0;
+  document.getElementById('docAcompte').value = 0;
+  document.getElementById('docCreerTache').checked = docType === 'facture';
+  document.getElementById('docErreur').classList.add('hidden');
+  document.getElementById('docSearchResults').classList.remove('open');
+  document.getElementById('docRechercheTarif').value = '';
+
+  const dateBrute = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('docDateAffichee').textContent = dateBrute;
+
+  actualiserValiditeLigne();
+  actualiserBoutonSubmitDoc();
+  actualiserNumeroPreview();
+  renderDocLignes();
+  recalculerTotauxDoc();
+  await verifierGrilleTarifs();
+  openModal('modalDocument');
+}
+
+function renderDocLignes() {
+  const cont = document.getElementById('docLignesListe');
+  if (!docLignes.length) { cont.innerHTML = '<div class="empty" style="padding:14px 0;">Aucune ligne. Ajoutez une prestation ci-dessous.</div>'; return; }
+  cont.innerHTML = docLignes.map(function(l, i) {
+    const total = Number(l.qte || 0) * Number(l.prix || 0);
+    return '<div class="doc-line-row">'
+      + '<div><input type="text" value="' + esc(l.prestation) + '" placeholder="Prestation" oninput="modifierLignePrestation(' + i + ',this.value)" style="width:100%;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">'
+      + (l.rubrique ? '<div class="doc-line-rubrique">' + esc(l.rubrique) + '</div>' : '') + '</div>'
+      + '<input type="number" min="0" value="' + (l.qte != null ? l.qte : 1) + '" oninput="modifierLigneQte(' + i + ',this.value)">'
+      + '<input type="number" min="0" value="' + (l.prix != null ? l.prix : 0) + '" oninput="modifierLignePrix(' + i + ',this.value)">'
+      + '<div class="doc-line-total">' + fmtNombre(total) + '</div>'
+      + '<button class="doc-line-del" onclick="supprimerLigne(' + i + ')"><i class="ti ti-trash"></i></button>'
+      + '</div>';
+  }).join('');
+}
+
+function modifierLignePrestation(i, val) { if (docLignes[i]) docLignes[i].prestation = val; }
+function modifierLigneQte(i, val) { if (!docLignes[i]) return; docLignes[i].qte = Number(val || 0); majLigneTotalEtGlobal(i); }
+function modifierLignePrix(i, val) { if (!docLignes[i]) return; docLignes[i].prix = Number(val || 0); majLigneTotalEtGlobal(i); }
+
+function majLigneTotalEtGlobal(i) {
+  const rows = document.querySelectorAll('#docLignesListe .doc-line-row');
+  const row = rows[i];
+  if (row) {
+    const total = Number(docLignes[i].qte || 0) * Number(docLignes[i].prix || 0);
+    row.querySelector('.doc-line-total').textContent = fmtNombre(total);
+  }
+  recalculerTotauxDoc();
+}
+
+function supprimerLigne(i) { docLignes.splice(i, 1); renderDocLignes(); recalculerTotauxDoc(); }
+
+function ajouterLigneLibre() {
+  docLignes.push({ prestation: '', rubrique: '', qte: 1, prix: 0 });
+  renderDocLignes();
+}
+
+function rechercherTarif() {
+  clearTimeout(_tarifsRechercheTimer);
+  const q = document.getElementById('docRechercheTarif').value.trim();
+  const resultsEl = document.getElementById('docSearchResults');
+  if (!q) { resultsEl.classList.remove('open'); resultsEl.innerHTML = ''; return; }
+  _tarifsRechercheTimer = setTimeout(async function() {
+    const { data } = await sb.from('yc_tarifs').select('*').eq('actif', true).ilike('prestation', '%' + q + '%').limit(20);
+    const rows = data || [];
+    window._docTarifsResultats = rows;
+    if (!rows.length) {
+      resultsEl.innerHTML = '<div class="doc-search-result-item" style="color:var(--text-light);">Aucun résultat.</div>';
+      resultsEl.classList.add('open');
+      return;
+    }
+    resultsEl.innerHTML = rows.map(function(t, i) {
+      return '<div class="doc-search-result-item" onclick="choisirTarif(' + i + ')">' + esc(t.prestation)
+        + '<small>' + esc(t.rubrique || '') + ' · ' + fmt(t.prix) + '</small></div>';
+    }).join('');
+    resultsEl.classList.add('open');
+  }, 200);
+}
+
+function choisirTarif(i) {
+  const t = (window._docTarifsResultats || [])[i];
+  if (!t) return;
+  docLignes.push({ prestation: t.prestation, rubrique: t.rubrique || '', qte: 1, prix: Number(t.prix || 0) });
+  document.getElementById('docRechercheTarif').value = '';
+  document.getElementById('docSearchResults').classList.remove('open');
+  renderDocLignes();
+  recalculerTotauxDoc();
+}
+
+function recalculerTotauxDoc() {
+  const sousTotal = docLignes.reduce(function(s, l) { return s + Number(l.qte || 0) * Number(l.prix || 0); }, 0);
+  const remise = Number(document.getElementById('docRemise').value || 0);
+  const total = Math.max(0, sousTotal - remise);
+  const acompte = Number(document.getElementById('docAcompte').value || 0);
+  const reste = Math.max(0, total - acompte);
+  document.getElementById('docSousTotal').textContent = fmt(sousTotal);
+  document.getElementById('docTotal').textContent = fmt(total);
+  document.getElementById('docReste').textContent = fmt(reste);
+}
+
+async function saveDocument() {
+  const errEl = document.getElementById('docErreur');
+  const clientNom = document.getElementById('docClientNom').value.trim();
+  const clientTel = document.getElementById('docClientTel').value.trim();
+  const lignesValides = docLignes.filter(function(l) { return (l.prestation || '').trim() && Number(l.prix) > 0; });
+  if (!clientNom) { errEl.textContent = 'Le nom du client est requis.'; errEl.classList.remove('hidden'); return; }
+  if (!lignesValides.length) { errEl.textContent = 'Ajoutez au moins une ligne avec un prix supérieur à 0.'; errEl.classList.remove('hidden'); return; }
+  errEl.classList.add('hidden');
+
+  const sousTotal = docLignes.reduce(function(s, l) { return s + Number(l.qte || 0) * Number(l.prix || 0); }, 0);
+  const remise = Number(document.getElementById('docRemise').value || 0);
+  const total = Math.max(0, sousTotal - remise);
+  const acompte = Number(document.getElementById('docAcompte').value || 0);
+  const reste = Math.max(0, total - acompte);
+  const notes = document.getElementById('docNotes').value.trim();
+  const creerTacheLiee = document.getElementById('docCreerTache').checked;
+  const btn = document.getElementById('docBtnSubmit');
+  btn.disabled = true;
+
+  try {
+    const numero = await calculerProchainNumero(docType);
+    const payload = {
+      numero: numero, type: docType, date_doc: today(),
+      validite_jours: docType === 'devis' ? Number(PARAMS.validite_devis_jours || 15) : null,
+      client_nom: clientNom, client_tel: clientTel || null,
+      lignes: docLignes, sous_total: sousTotal, remise: remise, total: total,
+      acompte: acompte, reste: reste, notes: notes || null,
+      statut: 'envoye', document_source_id: docConversionDevisId || null,
+      cree_par: session.nom,
+    };
+    const { data, error } = await sb.from('yc_documents').insert(payload).select().single();
+    if (error) throw error;
+    const docId = data.id;
+
+    let tacheId = null;
+    if (creerTacheLiee) {
+      const descriptionTache = docLignes.map(function(l) { return l.prestation + ' x' + l.qte; }).join(', ') || ('Document ' + numero);
+      const { data: tacheData, error: errTache } = await sb.from('yc_taches').insert({
+        client_nom: clientNom, client_telephone: clientTel || null,
+        type_service: 'Autre', description: descriptionTache,
+        montant: total, acompte: acompte, priorite: 'normale',
+        date_livraison: new Date().toISOString(), statut: 'attente',
+        agent_nom: session.nom, date_creation: new Date().toISOString(),
+      }).select().single();
+      if (!errTache && tacheData) {
+        tacheId = tacheData.id;
+        await sb.from('yc_documents').update({ tache_id: tacheId }).eq('id', docId);
+      }
+    }
+
+    if (docType === 'facture' && acompte > 0) {
+      await sb.from('yc_caisse').insert({
+        date: today(), libelle: 'Acompte ' + numero + ' — ' + clientNom, type: 'entree',
+        montant: acompte, categorie: 'prestation', agent_nom: session.nom, tache_id: tacheId || null,
+      });
+    }
+
+    if (docConversionDevisId) {
+      await sb.from('yc_documents').update({ statut: 'converti' }).eq('id', docConversionDevisId);
+    }
+
+    closeModal('modalDocument');
+    showToast((docType === 'facture' ? 'Facture ' : 'Devis ') + numero + (docType === 'facture' ? ' enregistrée' : ' enregistré') + ' ✅');
+    docConversionDevisId = null;
+    loadDocuments();
+    loadTaches();
+    updateSidebarBadge();
+    if (document.getElementById('page-caisse').classList.contains('active')) loadCaisse();
+    if (document.getElementById('page-aujourdhui').classList.contains('active')) loadAujourdhui();
+    printDocument(docId);
+  } catch (e) {
+    errEl.textContent = 'Erreur: ' + e.message;
+    errEl.classList.remove('hidden');
+    showToast('Erreur: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ── PAGE : DEVIS & FACTURES (liste) ── */
+async function loadDocuments() {
+  const { data } = await sb.from('yc_documents').select('*').order('created_at', { ascending: false });
+  docsCache = data || [];
+  renderDocuments();
+}
+
+function setDocFilter(f) {
+  currentDocFilter = f;
+  document.querySelectorAll('#docFiltres .filtre-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.filtre === f); });
+  renderDocuments();
+}
+
+function renderDocuments() {
+  const recherche = (document.getElementById('docRecherche').value || '').trim().toLowerCase();
+  let liste = docsCache;
+  if (currentDocFilter !== 'tous') liste = liste.filter(function(d) { return d.type === currentDocFilter; });
+  if (recherche) {
+    liste = liste.filter(function(d) {
+      return (d.client_nom || '').toLowerCase().includes(recherche) || (d.numero || '').toLowerCase().includes(recherche);
+    });
+  }
+  const cont = document.getElementById('docListe');
+  if (!liste.length) { cont.innerHTML = '<div class="priority-empty"><i class="ti ti-file-off"></i>Aucun document. Créez votre premier devis.</div>'; return; }
+  cont.innerHTML = liste.map(renderDocRow).join('');
+}
+
+function renderDocRow(d) {
+  const dateStr = d.date_doc ? new Date(d.date_doc).toLocaleDateString('fr-FR') : '—';
+  let actions = '<button class="doc-icon-btn" onclick="printDocument(\'' + d.id + '\')" title="Aperçu"><i class="ti ti-eye"></i></button>';
+  if (d.type === 'devis' && d.statut === 'envoye') {
+    actions += '<button class="doc-icon-btn" onclick="convertirDevisEnFacture(\'' + d.id + '\')" title="Convertir en facture"><i class="ti ti-arrow-right"></i></button>';
+  }
+  if (d.type === 'facture' && d.statut !== 'payee' && d.statut !== 'annule') {
+    actions += '<button class="doc-icon-btn" onclick="marquerPayee(\'' + d.id + '\')" title="Marquer payée"><i class="ti ti-check"></i></button>';
+  }
+  if (d.statut !== 'annule') {
+    actions += '<button class="doc-icon-btn" onclick="annulerDocument(\'' + d.id + '\')" title="Annuler"><i class="ti ti-x"></i></button>';
+  }
+  return '<div class="doc-table-row">'
+    + '<div style="font-weight:500;">' + esc(d.numero) + '</div>'
+    + '<div><span class="doc-type-badge ' + d.type + '">' + (d.type === 'devis' ? 'Devis' : 'Facture') + '</span></div>'
+    + '<div>' + dateStr + '</div>'
+    + '<div>' + esc(d.client_nom) + '</div>'
+    + '<div class="doc-montant-col">' + fmt(d.total) + '</div>'
+    + '<div class="doc-reste-col">' + fmt(d.reste) + '</div>'
+    + '<div><span class="doc-statut-badge ' + d.statut + '">' + (DOC_STATUT_LABELS[d.statut] || d.statut) + '</span></div>'
+    + '<div class="doc-actions-col">' + actions + '</div>'
+    + '</div>';
+}
+
+async function convertirDevisEnFacture(id) {
+  const devis = docsCache.find(function(d) { return d.id === id; });
+  if (!devis) return;
+  await ouvrirModalDocument('facture', devis);
+}
+
+async function marquerPayee(id) {
+  const d = docsCache.find(function(x) { return x.id === id; });
+  if (!d) return;
+  try {
+    const resteAEncaisser = Number(d.reste || 0);
+    if (resteAEncaisser > 0) {
+      const { error } = await sb.from('yc_caisse').insert({
+        date: today(), libelle: 'Solde ' + d.numero + ' — ' + d.client_nom, type: 'entree',
+        montant: resteAEncaisser, categorie: 'prestation', agent_nom: session.nom, tache_id: d.tache_id || null,
+      });
+      if (error) throw error;
+    }
+    const { error: errDoc } = await sb.from('yc_documents').update({ statut: 'payee', acompte: d.total, reste: 0 }).eq('id', id);
+    if (errDoc) throw errDoc;
+    showToast('Facture ' + d.numero + ' marquée payée ✅');
+    loadDocuments();
+    if (document.getElementById('page-caisse').classList.contains('active')) loadCaisse();
+    if (document.getElementById('page-aujourdhui').classList.contains('active')) loadAujourdhui();
+  } catch (e) {
+    showToast('Erreur: ' + e.message, 'error');
+  }
+}
+
+async function annulerDocument(id) {
+  if (!confirm('Annuler ce document ?')) return;
+  const { error } = await sb.from('yc_documents').update({ statut: 'annule' }).eq('id', id);
+  if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
+  showToast('Document annulé.');
+  loadDocuments();
+}
+
+/* ── APERÇU IMPRIMABLE ── */
+async function printDocument(id) {
+  let doc = docsCache.find(function(d) { return d.id === id; });
+  if (!doc) {
+    const { data } = await sb.from('yc_documents').select('*').eq('id', id).single();
+    doc = data;
+  }
+  if (!doc) { showToast('Document introuvable.', 'error'); return; }
+  genererFenetreImpression(doc, false);
+}
+
+function apercuDocumentBrouillon() {
+  const clientNom = document.getElementById('docClientNom').value.trim();
+  if (!clientNom) { showToast('Renseignez au moins le nom du client pour l\'aperçu.', 'error'); return; }
+  const sousTotal = docLignes.reduce(function(s, l) { return s + Number(l.qte || 0) * Number(l.prix || 0); }, 0);
+  const remise = Number(document.getElementById('docRemise').value || 0);
+  const total = Math.max(0, sousTotal - remise);
+  const acompte = Number(document.getElementById('docAcompte').value || 0);
+  const reste = Math.max(0, total - acompte);
+  const numeroAffiche = document.getElementById('docNumeroPreview').textContent.replace('N° ', '');
+  const docTemp = {
+    numero: numeroAffiche, type: docType, date_doc: today(),
+    validite_jours: docType === 'devis' ? Number(PARAMS.validite_devis_jours || 15) : null,
+    client_nom: clientNom, client_tel: document.getElementById('docClientTel').value.trim(),
+    lignes: docLignes, sous_total: sousTotal, remise: remise, total: total, acompte: acompte, reste: reste,
+    notes: document.getElementById('docNotes').value.trim(),
+  };
+  genererFenetreImpression(docTemp, true);
+}
+
+const STYLE_IMPRESSION = '@page{size:A4;margin:15mm;}'
+  + '*{box-sizing:border-box;}'
+  + 'body{font-family:Inter,system-ui,sans-serif;color:#1F1F55;margin:0;font-size:13px;}'
+  + '.watermark{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:100px;font-weight:700;color:rgba(220,38,38,.15);z-index:99;pointer-events:none;}'
+  + '.entete{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;}'
+  + '.entete-gauche{display:flex;gap:12px;align-items:flex-start;}'
+  + '.logo-yc{width:40px;height:40px;border-radius:8px;background:#E85D04;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}'
+  + '.enseigne{font-size:18px;font-weight:500;color:#2D2D6B;}'
+  + '.souslabel{font-size:11px;color:#6B6B8A;margin-top:2px;}'
+  + '.entete-droite{text-align:right;font-size:12px;color:#6B6B8A;}'
+  + '.titre-doc{font-size:24px;font-weight:700;color:#2D2D6B;margin-bottom:4px;}'
+  + '.filet{border-top:2px solid #E85D04;margin:14px 0 16px;}'
+  + '.client-box{background:#F4F5F9;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;}'
+  + 'table.lignes{width:100%;border-collapse:collapse;margin-bottom:16px;}'
+  + 'table.lignes thead th{background:#2D2D6B;color:#fff;padding:8px 10px;font-size:11px;text-transform:uppercase;text-align:left;}'
+  + 'table.lignes th.c,table.lignes td.c{text-align:center;}'
+  + 'table.lignes th.r,table.lignes td.r{text-align:right;}'
+  + 'table.lignes td{padding:7px 10px;border-bottom:1px solid #E3E4EC;font-size:12.5px;}'
+  + 'table.lignes tr.alt{background:#FAFAFC;}'
+  + '.totaux{margin-left:auto;width:280px;margin-bottom:14px;}'
+  + '.tot-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12.5px;color:#6B6B8A;}'
+  + '.tot-total{background:#FDEEE3;padding:8px 10px;border-radius:6px;font-weight:700;color:#1F1F55;font-size:14px;margin:4px 0;}'
+  + '.tot-reste{font-weight:700;color:#A32D2D;}'
+  + '.en-lettres{font-size:11.5px;font-style:italic;color:#444;margin-bottom:14px;}'
+  + '.notes{font-size:11.5px;color:#444;margin-bottom:20px;}'
+  + '.signatures{display:flex;justify-content:space-between;gap:40px;margin-top:30px;}'
+  + '.sign-box{flex:1;border-top:1px solid #999;padding-top:6px;font-size:11px;color:#6B6B8A;height:50px;}'
+  + '.pied{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:10px;color:#9A9AB5;padding:8px 0;}';
+
+function genererFenetreImpression(doc, brouillon) {
+  const win = window.open('', '_blank');
+  if (!win) { showToast('Le navigateur a bloqué l\'ouverture de la fenêtre d\'aperçu.', 'error'); return; }
+  const enseigne = PARAMS.enseigne || 'YOUMMA CENTER';
+  const raisonSociale = PARAMS.raison_sociale || '';
+  const telephone = PARAMS.telephone || '';
+  const email = PARAMS.email || '';
+  const piedLegal = PARAMS.pied_legal || '';
+  const dateDoc = doc.date_doc ? new Date(doc.date_doc) : new Date();
+  const dateAffichee = dateDoc.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  let validiteLigne = '';
+  if (doc.type === 'devis' && doc.validite_jours) {
+    const dateValidite = new Date(dateDoc);
+    dateValidite.setDate(dateValidite.getDate() + Number(doc.validite_jours));
+    validiteLigne = '<div>Valable jusqu\'au ' + dateValidite.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div>';
+  }
+  const lignesHtml = (doc.lignes || []).map(function(l, i) {
+    const total = Number(l.qte || 0) * Number(l.prix || 0);
+    return '<tr class="' + (i % 2 === 1 ? 'alt' : '') + '"><td>' + esc(l.prestation) + '</td><td class="c">' + esc(l.qte) + '</td><td class="r">' + fmtNombre(l.prix) + '</td><td class="r">' + fmtNombre(total) + '</td></tr>';
+  }).join('');
+  const remiseLigne = Number(doc.remise) > 0 ? '<div class="tot-row"><span>Remise</span><span>-' + fmtNombre(doc.remise) + ' GNF</span></div>' : '';
+  const html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>' + esc(doc.numero) + '</title>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">'
+    + '<style>' + STYLE_IMPRESSION + '</style></head><body>'
+    + (brouillon ? '<div class="watermark">BROUILLON</div>' : '')
+    + '<div class="entete">'
+    + '<div class="entete-gauche"><div class="logo-yc">YC</div><div><div class="enseigne">' + esc(enseigne) + '</div>'
+    + (raisonSociale ? '<div class="souslabel">Agence de ' + esc(raisonSociale) + '</div>' : '')
+    + '<div class="souslabel">' + [telephone ? 'Tél. ' + esc(telephone) : '', email].filter(Boolean).join(' · ') + '</div></div></div>'
+    + '<div class="entete-droite"><div class="titre-doc">' + (doc.type === 'facture' ? 'FACTURE' : 'DEVIS') + '</div>'
+    + '<div>N° ' + esc(doc.numero) + '</div><div>Date : ' + dateAffichee + '</div>' + validiteLigne + '</div>'
+    + '</div>'
+    + '<div class="filet"></div>'
+    + '<div class="client-box"><div><strong>' + esc(doc.client_nom) + '</strong></div>' + (doc.client_tel ? '<div>' + esc(doc.client_tel) + '</div>' : '') + '</div>'
+    + '<table class="lignes"><thead><tr><th>Désignation</th><th class="c">Qté</th><th class="r">Prix unitaire (GNF)</th><th class="r">Montant (GNF)</th></tr></thead><tbody>' + lignesHtml + '</tbody></table>'
+    + '<div class="totaux">'
+    + '<div class="tot-row"><span>Sous-total</span><span>' + fmtNombre(doc.sous_total) + ' GNF</span></div>'
+    + remiseLigne
+    + '<div class="tot-row tot-total"><span>TOTAL</span><span>' + fmtNombre(doc.total) + ' GNF</span></div>'
+    + '<div class="tot-row"><span>Acompte reçu</span><span>' + fmtNombre(doc.acompte) + ' GNF</span></div>'
+    + '<div class="tot-row tot-reste"><span>Reste à payer</span><span>' + fmtNombre(doc.reste) + ' GNF</span></div>'
+    + '</div>'
+    + '<div class="en-lettres">Arrêté le présent ' + (doc.type === 'facture' ? 'facture' : 'devis') + ' à la somme de : ' + nombreEnLettres(doc.total) + '.</div>'
+    + (doc.notes ? '<div class="notes"><strong>Notes / conditions</strong><p>' + esc(doc.notes).replace(/\n/g, '<br>') + '</p></div>' : '')
+    + '<div class="signatures"><div class="sign-box"><div class="sign-label">Le client</div></div><div class="sign-box"><div class="sign-label">YOUMMA CENTER</div></div></div>'
+    + '<div class="pied">' + esc(piedLegal) + '</div>'
+    + '</body></html>';
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+  setTimeout(function() { win.focus(); win.print(); }, 350);
+}
+
+function nombreEnLettres(n) {
+  n = Math.round(Number(n) || 0);
+  if (n === 0) return 'Zéro franc guinéen';
+  const UNITES = ['zéro','un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze','douze','treize','quatorze','quinze','seize','dix-sept','dix-huit','dix-neuf'];
+  const DIZAINES = ['','','vingt','trente','quarante','cinquante','soixante','soixante-dix','quatre-vingt','quatre-vingt-dix'];
+
+  function deuxChiffres(num, followedByMultiplier) {
+    if (num < 20) return UNITES[num];
+    const d = Math.floor(num / 10);
+    const u = num % 10;
+    if (d === 7 || d === 9) {
+      const base = d === 7 ? 'soixante' : 'quatre-vingt';
+      if (u === 1 && d === 7) return base + ' et onze';
+      return base + '-' + UNITES[10 + u];
+    }
+    if (u === 0) {
+      if (d === 8) return followedByMultiplier ? 'quatre-vingt' : 'quatre-vingts';
+      return DIZAINES[d];
+    }
+    if (u === 1 && d !== 8) return DIZAINES[d] + ' et un';
+    return DIZAINES[d] + '-' + UNITES[u];
+  }
+
+  function troisChiffres(num, followedByMultiplier) {
+    const c = Math.floor(num / 100);
+    const reste = num % 100;
+    let mots = '';
+    if (c > 0) {
+      mots += (c === 1 ? 'cent' : UNITES[c] + ' cent');
+      if (c > 1 && reste === 0 && !followedByMultiplier) mots += 's';
+      if (reste > 0) mots += ' ';
+    }
+    if (reste > 0) mots += deuxChiffres(reste, followedByMultiplier);
+    return mots;
+  }
+
+  const milliard = Math.floor(n / 1000000000);
+  const million = Math.floor((n % 1000000000) / 1000000);
+  const mille = Math.floor((n % 1000000) / 1000);
+  const unite = n % 1000;
+
+  const parties = [];
+  if (milliard > 0) parties.push(troisChiffres(milliard, true) + (milliard > 1 ? ' milliards' : ' milliard'));
+  if (million > 0) parties.push(troisChiffres(million, true) + (million > 1 ? ' millions' : ' million'));
+  if (mille > 0) parties.push(mille === 1 ? 'mille' : troisChiffres(mille, true) + ' mille');
+  if (unite > 0 || parties.length === 0) parties.push(troisChiffres(unite, false));
+
+  let resultat = parties.join(' ');
+  resultat = resultat.charAt(0).toUpperCase() + resultat.slice(1);
+  return resultat + ' franc' + (n > 1 ? 's' : '') + ' guinéen' + (n > 1 ? 's' : '');
 }
 
 /* ── PAGE 4 : ORANGE MONEY ── */
