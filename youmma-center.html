@@ -143,6 +143,8 @@ h1,h2,h3{margin:0;}
 .doc-toggle button:disabled{opacity:.4;cursor:not-allowed;}
 .doc-info-row{display:flex;align-items:center;gap:12px;padding:14px 20px 0;flex-wrap:wrap;font-size:12.5px;color:var(--text-muted);}
 .doc-badge-num{display:inline-block;background:var(--violet-bg);color:var(--violet);font-size:12px;font-weight:500;padding:4px 10px;border-radius:8px;}
+.doc-client-row{display:grid;grid-template-columns:1fr 1fr 160px;gap:12px;}
+.doc-client-row label i{margin-right:4px;}
 .doc-lines-head{display:grid;grid-template-columns:1fr 70px 110px 110px 34px;gap:8px;padding:0 4px 6px;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;}
 .doc-line-row{display:grid;grid-template-columns:1fr 70px 110px 110px 34px;gap:8px;align-items:center;padding:8px 4px;border-bottom:1px solid var(--border);}
 .doc-line-row:last-child{border-bottom:none;}
@@ -196,6 +198,7 @@ h1,h2,h3{margin:0;}
 }
 @media (max-width:700px){
   .modal-card-xl{max-width:100%;}
+  .doc-client-row{grid-template-columns:1fr;}
   .doc-bottom-grid{grid-template-columns:1fr;}
   .doc-lines-head{display:none;}
   .doc-line-row{grid-template-columns:1fr auto;grid-template-areas:"prestation del" "qte qte" "prix prix" "total total";row-gap:4px;}
@@ -834,10 +837,12 @@ h1,h2,h3{margin:0;}
       <span id="docValiditeLigne"></span>
     </div>
     <div class="modal-body">
-      <div class="form-row-2">
+      <div class="doc-client-row">
         <div class="form-row"><label>Client — nom *</label><input type="text" id="docClientNom"></div>
         <div class="form-row"><label>Téléphone</label><input type="tel" id="docClientTel"></div>
+        <div class="form-row"><label><i class="ti ti-calendar"></i> Livraison prévue</label><input type="date" id="docDateLivraison"></div>
       </div>
+      <div id="docDateLivraisonErreur" class="form-error hidden"></div>
 
       <div class="doc-lines-head">
         <div>Prestation</div><div style="text-align:right;">Qté</div><div style="text-align:right;">Prix unit.</div><div style="text-align:right;">Total</div><div></div>
@@ -1536,8 +1541,19 @@ async function ouvrirModalDocument(type, prefillFromDevis) {
   document.getElementById('docAcompte').value = 0;
   document.getElementById('docCreerTache').checked = docType === 'facture';
   document.getElementById('docErreur').classList.add('hidden');
+  document.getElementById('docDateLivraisonErreur').classList.add('hidden');
   document.getElementById('docSearchResults').classList.remove('open');
   document.getElementById('docRechercheTarif').value = '';
+
+  if (prefillFromDevis && prefillFromDevis.date_livraison) {
+    document.getElementById('docDateLivraison').value = prefillFromDevis.date_livraison;
+  } else if (docType === 'facture') {
+    const dansDeuxJours = new Date();
+    dansDeuxJours.setDate(dansDeuxJours.getDate() + 2);
+    document.getElementById('docDateLivraison').value = dansDeuxJours.toISOString().slice(0, 10);
+  } else {
+    document.getElementById('docDateLivraison').value = '';
+  }
 
   const dateBrute = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   document.getElementById('docDateAffichee').textContent = dateBrute;
@@ -1636,8 +1652,17 @@ async function saveDocument() {
   const clientNom = document.getElementById('docClientNom').value.trim();
   const clientTel = document.getElementById('docClientTel').value.trim();
   const lignesValides = docLignes.filter(function(l) { return (l.prestation || '').trim() && Number(l.prix) > 0; });
+  const dateLivraison = document.getElementById('docDateLivraison').value;
+  const creerTacheLiee = document.getElementById('docCreerTache').checked;
+  const errDateEl = document.getElementById('docDateLivraisonErreur');
+  errDateEl.classList.add('hidden');
   if (!clientNom) { errEl.textContent = 'Le nom du client est requis.'; errEl.classList.remove('hidden'); return; }
   if (!lignesValides.length) { errEl.textContent = 'Ajoutez au moins une ligne avec un prix supérieur à 0.'; errEl.classList.remove('hidden'); return; }
+  if (creerTacheLiee && !dateLivraison) {
+    errDateEl.textContent = 'La date de livraison prévue est requise pour créer la tâche liée.';
+    errDateEl.classList.remove('hidden');
+    return;
+  }
   errEl.classList.add('hidden');
 
   const sousTotal = docLignes.reduce(function(s, l) { return s + Number(l.qte || 0) * Number(l.prix || 0); }, 0);
@@ -1646,7 +1671,6 @@ async function saveDocument() {
   const acompte = Number(document.getElementById('docAcompte').value || 0);
   const reste = Math.max(0, total - acompte);
   const notes = document.getElementById('docNotes').value.trim();
-  const creerTacheLiee = document.getElementById('docCreerTache').checked;
   const btn = document.getElementById('docBtnSubmit');
   btn.disabled = true;
 
@@ -1656,6 +1680,7 @@ async function saveDocument() {
       numero: numero, type: docType, date_doc: today(),
       validite_jours: docType === 'devis' ? Number(PARAMS.validite_devis_jours || 15) : null,
       client_nom: clientNom, client_tel: clientTel || null,
+      date_livraison: dateLivraison || null,
       lignes: docLignes, sous_total: sousTotal, remise: remise, total: total,
       acompte: acompte, reste: reste, notes: notes || null,
       statut: 'envoye', document_source_id: docConversionDevisId || null,
@@ -1672,7 +1697,7 @@ async function saveDocument() {
         client_nom: clientNom, client_telephone: clientTel || null,
         type_service: 'Autre', description: descriptionTache,
         montant: total, acompte: acompte, priorite: 'normale',
-        date_livraison: new Date().toISOString(), statut: 'attente',
+        date_livraison: new Date(dateLivraison).toISOString(), statut: 'attente',
         agent_nom: session.nom, date_creation: new Date().toISOString(),
       }).select().single();
       if (!errTache && tacheData) {
@@ -1822,6 +1847,7 @@ function apercuDocumentBrouillon() {
     numero: numeroAffiche, type: docType, date_doc: today(),
     validite_jours: docType === 'devis' ? Number(PARAMS.validite_devis_jours || 15) : null,
     client_nom: clientNom, client_tel: document.getElementById('docClientTel').value.trim(),
+    date_livraison: document.getElementById('docDateLivraison').value || null,
     lignes: docLignes, sous_total: sousTotal, remise: remise, total: total, acompte: acompte, reste: reste,
     notes: document.getElementById('docNotes').value.trim(),
   };
@@ -1841,6 +1867,7 @@ const STYLE_IMPRESSION = '@page{size:A4;margin:15mm;}'
   + '.titre-doc{font-size:24px;font-weight:700;color:#2D2D6B;margin-bottom:4px;}'
   + '.filet{border-top:2px solid #E85D04;margin:14px 0 16px;}'
   + '.client-box{background:#F4F5F9;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;}'
+  + '.livraison-ligne{font-size:12px;color:#6B6B8A;margin-top:-10px;margin-bottom:16px;}'
   + 'table.lignes{width:100%;border-collapse:collapse;margin-bottom:16px;}'
   + 'table.lignes thead th{background:#2D2D6B;color:#fff;padding:8px 10px;font-size:11px;text-transform:uppercase;text-align:left;}'
   + 'table.lignes th.c,table.lignes td.c{text-align:center;}'
@@ -1891,6 +1918,7 @@ function genererFenetreImpression(doc, brouillon) {
     + '</div>'
     + '<div class="filet"></div>'
     + '<div class="client-box"><div><strong>' + esc(doc.client_nom) + '</strong></div>' + (doc.client_tel ? '<div>' + esc(doc.client_tel) + '</div>' : '') + '</div>'
+    + (doc.date_livraison ? '<div class="livraison-ligne">Livraison : ' + new Date(doc.date_livraison + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div>' : '')
     + '<table class="lignes"><thead><tr><th>Désignation</th><th class="c">Qté</th><th class="r">Prix unitaire (GNF)</th><th class="r">Montant (GNF)</th></tr></thead><tbody>' + lignesHtml + '</tbody></table>'
     + '<div class="totaux">'
     + '<div class="tot-row"><span>Sous-total</span><span>' + fmtNombre(doc.sous_total) + ' GNF</span></div>'
