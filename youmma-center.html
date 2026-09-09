@@ -224,6 +224,54 @@ h1,h2,h3{margin:0;}
   .doc-line-row > :nth-child(5){grid-area:del;}
 }
 
+/* ---- Paramètres ---- */
+.param-tabs{display:flex;gap:24px;border-bottom:2px solid var(--border);margin-bottom:20px;flex-wrap:wrap;}
+.param-tab{background:none;border:none;padding:10px 2px;font-size:13.5px;color:var(--text-muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;}
+.param-tab.active{color:var(--text);border-bottom-color:var(--orange);font-weight:500;}
+.param-tab-badge{margin-left:6px;background:var(--gray-bg);color:var(--gray);font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;}
+.param-panel{display:none;}
+.param-panel.active{display:block;}
+.param-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.param-columns{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;}
+.param-columns > div{display:flex;flex-direction:column;gap:16px;min-width:0;}
+.param-option-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.param-option-row:last-child{border-bottom:none;}
+.param-option-row > span{font-size:13px;color:var(--text);}
+.toggle-switch{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-switch .track{position:absolute;inset:0;background:var(--border);border-radius:20px;transition:background .15s;cursor:pointer;}
+.toggle-switch .track:before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.2);}
+.toggle-switch input:checked + .track{background:var(--orange);}
+.toggle-switch input:checked + .track:before{transform:translateX(18px);}
+.param-numero-preview{background:var(--bg-page);border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--text-muted);margin-top:4px;}
+.param-numero-preview strong{color:var(--text);}
+.param-logo-zone{display:flex;align-items:center;gap:14px;}
+.param-logo-preview{width:64px;height:64px;border-radius:10px;background:var(--bg-page);border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;color:var(--text-light);font-size:11px;}
+.param-logo-preview img{width:100%;height:100%;object-fit:contain;}
+.param-color-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.param-color-row input[type=color]{width:36px;height:36px;border:1.5px solid var(--border);border-radius:8px;padding:2px;cursor:pointer;background:none;}
+.param-color-row input[type=text]{width:100px;box-sizing:border-box;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;}
+.param-apercu-frame{width:100%;max-width:480px;height:640px;overflow:hidden;border:1px solid var(--border);border-radius:8px;background:#fff;}
+.param-apercu-frame iframe{width:166.6667%;height:166.6667%;transform:scale(0.6);transform-origin:top left;border:none;}
+.param-apercu-link{font-size:12.5px;color:var(--orange);cursor:pointer;background:none;border:none;margin-top:8px;display:inline-flex;align-items:center;gap:4px;}
+
+.tarif-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.tarif-toolbar-right{display:flex;gap:8px;flex-wrap:wrap;}
+.tarif-table-head{display:grid;grid-template-columns:150px 1fr 90px 110px 70px 90px;gap:10px;padding:0 14px 8px;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;}
+.tarif-table-row{display:grid;grid-template-columns:150px 1fr 90px 110px 70px 90px;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid #EEEFF4;}
+.tarif-table-row:last-child{border-bottom:none;}
+.tarif-rubrique-badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:500;white-space:nowrap;}
+.tarif-prix-col{text-align:right;font-size:13px;font-weight:500;color:var(--text);}
+.tarif-actions-col{display:flex;gap:6px;justify-content:flex-end;}
+@media (max-width:900px){
+  .param-columns{grid-template-columns:1fr;}
+}
+@media (max-width:700px){
+  .param-grid-2{grid-template-columns:1fr;}
+  .tarif-table-head,.tarif-table-row{grid-template-columns:120px 1fr 90px 70px 90px;}
+  .tarif-table-head > :nth-child(3),.tarif-table-row > :nth-child(3){display:none;}
+}
+
 .stats-grid{display:grid;gap:14px;margin-bottom:20px;}
 .stats-grid-3{grid-template-columns:repeat(3,1fr);}
 .stats-grid-4{grid-template-columns:repeat(4,1fr);}
@@ -453,6 +501,7 @@ h1,h2,h3{margin:0;}
       <button class="nav-item" data-nav="formations" onclick="navigate('formations')"><i class="ti ti-school"></i> Formations</button>
       <button class="nav-item restricted" data-nav="rapports" onclick="navigate('rapports')"><i class="ti ti-chart-bar"></i> Rapports</button>
       <button class="nav-item restricted" data-nav="agents" onclick="navigate('agents')"><i class="ti ti-users"></i> Agents</button>
+      <button class="nav-item gerant-only" data-nav="parametres" onclick="navigate('parametres')"><i class="ti ti-settings"></i> Paramètres</button>
     </nav>
     <div class="sidebar-user">
       <div class="sidebar-user-avatar" id="sidebarAvatar">--</div>
@@ -628,6 +677,131 @@ h1,h2,h3{margin:0;}
           <button class="btn btn-primary" onclick="openModalAgent()">+ Ajouter agent</button>
         </div>
         <div id="agentsListe"></div>
+      </section>
+
+      <!-- PAGE : PARAMÈTRES -->
+      <section id="page-parametres" class="page">
+        <div class="page-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <i class="ti ti-settings" style="color:var(--orange);font-size:22px;"></i>
+            <div>
+              <h2>Paramètres</h2>
+              <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px;">Entreprise, documents et grille tarifaire</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="paramBtnEnregistrer" onclick="saveParametres()" disabled><i class="ti ti-device-floppy"></i> Enregistrer</button>
+        </div>
+
+        <div class="param-tabs">
+          <button class="param-tab active" data-param-tab="entreprise" onclick="setParamTab('entreprise')">Entreprise</button>
+          <button class="param-tab" data-param-tab="documents" onclick="setParamTab('documents')">Devis &amp; factures</button>
+          <button class="param-tab" data-param-tab="articles" onclick="setParamTab('articles')">Articles<span class="param-tab-badge" id="paramArticlesBadge">0</span></button>
+        </div>
+
+        <!-- ONGLET ENTREPRISE -->
+        <div class="param-panel active" id="paramPanel-entreprise">
+          <div class="card">
+            <div class="param-grid-2">
+              <div class="form-row"><label>Enseigne</label><input type="text" id="paramEnseigne" oninput="onParamFieldChange()"></div>
+              <div class="form-row"><label>Raison sociale</label><input type="text" id="paramRaisonSociale" oninput="onParamFieldChange()"></div>
+              <div class="form-row"><label>Adresse</label><input type="text" id="paramAdresse" oninput="onParamFieldChange()"></div>
+              <div class="form-row"><label>Téléphone</label><input type="tel" id="paramTelephone" oninput="onParamFieldChange()"></div>
+              <div class="form-row"><label>Email</label><input type="email" id="paramEmail" oninput="onParamFieldChange()"></div>
+              <div class="form-row"><label>RCCM</label><input type="text" id="paramRccm" oninput="onParamFieldChange()"></div>
+              <div class="form-row"><label>NIF</label><input type="text" id="paramNif" oninput="onParamFieldChange()"></div>
+            </div>
+            <div class="form-row">
+              <label>Pied de page légal</label>
+              <textarea id="paramPiedLegal" rows="2" oninput="syncPiedLegal('entreprise')"></textarea>
+              <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="genererPiedLegal()"><i class="ti ti-wand"></i> Générer depuis les champs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ONGLET DEVIS & FACTURES -->
+        <div class="param-panel" id="paramPanel-documents">
+          <div class="param-columns">
+            <div>
+              <div class="card">
+                <h3>Numérotation</h3>
+                <div class="param-grid-2">
+                  <div class="form-row"><label>Préfixe devis</label><input type="text" id="paramPrefixeDevis" oninput="onParamFieldChange();actualiserApercuNumeros();"></div>
+                  <div class="form-row"><label>Préfixe facture</label><input type="text" id="paramPrefixeFacture" oninput="onParamFieldChange();actualiserApercuNumeros();"></div>
+                  <div class="form-row"><label>Validité devis (jours)</label><input type="number" id="paramValiditeDevis" min="0" oninput="onParamFieldChange()"></div>
+                </div>
+                <div class="param-numero-preview" id="paramNumeroPreview">Prochain devis : … · Prochaine facture : …</div>
+              </div>
+              <div class="card">
+                <h3>Textes du document</h3>
+                <div class="form-row"><label>Conditions par défaut</label><textarea id="paramConditionsDefaut" rows="2" oninput="onParamFieldChange()"></textarea></div>
+                <div class="form-row"><label>Modes de paiement acceptés</label><input type="text" id="paramModesPaiement" placeholder="Ex: Cash, Orange Money, Virement" oninput="onParamFieldChange()"></div>
+                <div class="form-row"><label>Message de remerciement</label><input type="text" id="paramRemerciement" oninput="onParamFieldChange()"></div>
+                <div class="form-row">
+                  <label>Pied de page légal</label>
+                  <textarea id="paramPiedLegal2" rows="2" oninput="syncPiedLegal('documents')"></textarea>
+                </div>
+              </div>
+              <div class="card">
+                <h3>Options</h3>
+                <div class="param-option-row"><span>Afficher le montant en toutes lettres</span><label class="toggle-switch"><input type="checkbox" id="paramMontantLettres" onchange="onParamFieldChange()"><span class="track"></span></label></div>
+                <div class="param-option-row"><span>Bloc signatures</span><label class="toggle-switch"><input type="checkbox" id="paramBlocSignatures" onchange="onParamFieldChange()"><span class="track"></span></label></div>
+                <div class="param-option-row"><span>Appliquer une TVA</span><label class="toggle-switch"><input type="checkbox" id="paramTvaActive" onchange="toggleTvaTauxRow();onParamFieldChange();"><span class="track"></span></label></div>
+                <div class="form-row hidden" id="paramTvaTauxRow" style="margin-top:10px;"><label>Taux TVA (%)</label><input type="number" id="paramTvaTaux" min="0" max="100" step="0.1" oninput="onParamFieldChange()"></div>
+                <div class="param-option-row"><span>Créer la tâche liée par défaut (factures)</span><label class="toggle-switch"><input type="checkbox" id="paramTacheLieeDefaut" onchange="onParamFieldChange()"><span class="track"></span></label></div>
+              </div>
+            </div>
+            <div>
+              <div class="card">
+                <h3>Apparence</h3>
+                <div class="form-row">
+                  <label>Logo</label>
+                  <div class="param-logo-zone">
+                    <div class="param-logo-preview" id="paramLogoPreview">Aucun logo</div>
+                    <div>
+                      <input type="file" id="paramLogoFile" accept="image/png,image/jpeg" onchange="uploadLogo(this)" style="font-size:12px;">
+                      <button class="btn btn-ghost btn-sm" style="margin-top:6px;" onclick="retirerLogo()"><i class="ti ti-trash"></i> Retirer</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-row"><label>Couleur principale</label>
+                  <div class="param-color-row"><input type="color" id="paramCouleurPrincipale" oninput="syncColorHex('principale')"><input type="text" id="paramCouleurPrincipaleHex" oninput="syncColorFromHex('principale')"></div>
+                </div>
+                <div class="form-row"><label>Couleur d'accent</label>
+                  <div class="param-color-row"><input type="color" id="paramCouleurAccent" oninput="syncColorHex('accent')"><input type="text" id="paramCouleurAccentHex" oninput="syncColorFromHex('accent')"></div>
+                </div>
+                <div class="form-row"><label>Devise</label>
+                  <select id="paramDevise" onchange="onParamFieldChange()">
+                    <option value="GNF">GNF — Franc guinéen</option>
+                    <option value="XOF">XOF — Franc CFA</option>
+                    <option value="EUR">EUR — Euro</option>
+                    <option value="USD">USD — Dollar</option>
+                  </select>
+                </div>
+              </div>
+              <div class="card">
+                <h3>Aperçu en direct</h3>
+                <div class="param-apercu-frame"><iframe id="paramApercuIframe"></iframe></div>
+                <button class="param-apercu-link" onclick="ouvrirApercuGrandFormat()"><i class="ti ti-arrows-maximize"></i> Ouvrir en grand</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ONGLET ARTICLES -->
+        <div class="param-panel" id="paramPanel-articles">
+          <div class="tarif-toolbar">
+            <input type="text" class="doc-search-input" id="tarifRecherche" placeholder="Rechercher par nom ou rubrique…" oninput="renderTarifsAdmin()">
+            <div class="tarif-toolbar-right">
+              <input type="file" id="tarifImportFile" accept=".csv" style="display:none;" onchange="lireFichierCSV(this)">
+              <button class="btn btn-ghost" onclick="document.getElementById('tarifImportFile').click()"><i class="ti ti-file-import"></i> Importer CSV</button>
+              <button class="btn btn-primary" onclick="openModalArticleNouveau()"><i class="ti ti-plus"></i> Nouvel article</button>
+            </div>
+          </div>
+          <div class="priority-card">
+            <div class="tarif-table-head"><div>Rubrique</div><div>Prestation</div><div>Unité</div><div style="text-align:right;">Prix</div><div>Actif</div><div></div></div>
+            <div id="tarifsListe"></div>
+          </div>
+        </div>
       </section>
 
     </main>
@@ -881,6 +1055,7 @@ h1,h2,h3{margin:0;}
         <div class="doc-totals-box">
           <div class="doc-totals-row"><span>Sous-total</span><span id="docSousTotal">0</span></div>
           <div class="doc-totals-row"><span>Remise</span><span class="doc-totals-input-wrap"><input type="number" id="docRemise" min="0" value="0" oninput="recalculerTotauxDoc()"><small>GNF</small></span></div>
+          <div class="doc-totals-row hidden" id="docTvaRow"><span id="docTvaLabel">TVA</span><span id="docTva">0</span></div>
           <div class="doc-totals-row total"><span>Total</span><span id="docTotal">0</span></div>
           <div class="doc-totals-row"><span>Acompte reçu</span><span class="doc-totals-input-wrap"><input type="number" id="docAcompte" min="0" value="0" oninput="recalculerTotauxDoc()"><small>GNF</small></span></div>
           <div class="doc-totals-row reste"><span>Reste à payer</span><span id="docReste">0</span></div>
@@ -904,6 +1079,43 @@ h1,h2,h3{margin:0;}
       <div id="rpErreur" class="form-error hidden"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalResetPin')">Annuler</button><button class="btn btn-primary" onclick="confirmerResetPin()">Réinitialiser</button></div>
+  </div>
+</div>
+
+<div id="modalArticle" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3 id="tarifTitre">Nouvel article</h3><button class="modal-close" onclick="closeModal('modalArticle')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Rubrique *</label><select id="tarifRubrique">
+        <option>Imprimerie</option><option>Bureautique</option><option>Textile personnalisé</option>
+        <option>Maintenance informatique</option><option>Marketing digital</option><option>Sites web</option>
+        <option>Formations</option><option>Événementiel</option><option>Autre</option>
+      </select></div>
+      <div class="form-row"><label>Prestation *</label><input type="text" id="tarifPrestation"></div>
+      <div class="form-row-2">
+        <div class="form-row"><label>Unité</label><select id="tarifUnite">
+          <option value="unité">Unité</option><option value="page">Page</option><option value="pièce">Pièce</option>
+          <option value="heure">Heure</option><option value="jour">Jour</option><option value="forfait">Forfait</option>
+        </select></div>
+        <div class="form-row"><label>Prix (GNF) *</label><input type="number" id="tarifPrix" min="0"></div>
+      </div>
+      <div class="param-option-row"><span>Actif</span><label class="toggle-switch"><input type="checkbox" id="tarifActif" checked><span class="track"></span></label></div>
+      <div id="tarifErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalArticle')">Annuler</button><button class="btn btn-primary" id="tarifBtnSubmit" onclick="saveArticle()">Ajouter</button></div>
+  </div>
+</div>
+
+<div id="modalImportCSV" class="modal-overlay">
+  <div class="modal-card modal-card-lg">
+    <div class="modal-header"><h3>Importer des articles (CSV)</h3><button class="modal-close" onclick="closeModal('modalImportCSV')">×</button></div>
+    <div class="modal-body">
+      <p style="font-size:12.5px;color:var(--text-muted);margin-top:0;">Format attendu : <code>rubrique;prestation;prix[;unite]</code>, avec en-tête, séparateur <code>;</code> ou <code>,</code>.</p>
+      <button class="param-apercu-link" onclick="telechargerModeleCSV()"><i class="ti ti-download"></i> Télécharger le modèle CSV</button>
+      <div id="csvApercu" style="margin-top:14px;"></div>
+      <div id="csvErreur" class="form-error hidden" style="margin-top:10px;"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalImportCSV')">Annuler</button><button class="btn btn-primary" id="csvBtnImporter" onclick="importerCSV()" disabled>Importer</button></div>
   </div>
 </div>
 
@@ -1133,8 +1345,10 @@ function applyRoleVisibility() {
 const PAGE_LOADERS = {
   aujourdhui: loadAujourdhuiWrap, taches: loadTaches, caisse: loadCaisse, documents: loadDocuments,
   om: loadOM, formations: loadFormations, rapports: loadRapports, agents: loadAgents,
+  parametres: loadParametresPage,
 };
 function navigate(page) {
+  if (page === 'parametres' && session.role !== 'gerant') page = 'aujourdhui';
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarOverlay').classList.remove('open');
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
@@ -1481,6 +1695,22 @@ let docsCache = [];
 let currentDocFilter = 'tous';
 let _tarifsGrilleVide = null;
 let _tarifsRechercheTimer = null;
+let paramDirty = false;
+let tarifsCache = [];
+let tarifEnEdition = null;
+let _apercuTimer = null;
+
+const RUBRIQUES_FIXES = ['Imprimerie', 'Bureautique', 'Textile personnalisé', 'Maintenance informatique', 'Marketing digital', 'Sites web', 'Formations', 'Événementiel', 'Autre'];
+const RUBRIQUE_COULEURS = [
+  { bg: 'var(--blue-bg)', color: 'var(--blue)' }, { bg: 'var(--green-bg)', color: 'var(--green)' },
+  { bg: 'var(--amber-bg)', color: 'var(--amber)' }, { bg: 'var(--coral-bg)', color: 'var(--coral)' },
+  { bg: 'var(--violet-bg)', color: 'var(--violet)' }, { bg: 'var(--red-bg)', color: 'var(--red)' },
+  { bg: 'var(--gray-bg)', color: 'var(--gray)' },
+];
+function couleurRubrique(rubrique) {
+  const idx = RUBRIQUES_FIXES.indexOf(rubrique);
+  return RUBRIQUE_COULEURS[(idx >= 0 ? idx : 0) % RUBRIQUE_COULEURS.length];
+}
 
 const DOC_STATUT_LABELS = { envoye: 'Envoyé', converti: 'Converti', payee: 'Payée', annule: 'Annulé' };
 
@@ -1492,7 +1722,7 @@ async function chargerParametres() {
 }
 
 async function calculerProchainNumero(type) {
-  const prefixe = type === 'facture' ? 'FAC' : 'DEV';
+  const prefixe = type === 'facture' ? (PARAMS.prefixe_facture || 'FAC') : (PARAMS.prefixe_devis || 'DEV');
   const annee = new Date().getFullYear();
   const { data } = await sb.from('yc_documents').select('numero').eq('type', type);
   let max = 0;
@@ -1536,7 +1766,7 @@ function setDocType(type) {
   docType = type;
   document.getElementById('docToggleDevis').classList.toggle('active', type === 'devis');
   document.getElementById('docToggleFacture').classList.toggle('active', type === 'facture');
-  document.getElementById('docCreerTache').checked = type === 'facture';
+  document.getElementById('docCreerTache').checked = type === 'facture' && PARAMS.tache_liee_defaut !== 'false';
   actualiserValiditeLigne();
   actualiserBoutonSubmitDoc();
   actualiserNumeroPreview();
@@ -1552,10 +1782,10 @@ async function ouvrirModalDocument(type, prefillFromDevis) {
   document.getElementById('docClientNom').value = prefillFromDevis ? (prefillFromDevis.client_nom || '') : '';
   document.getElementById('docClientTel').value = prefillFromDevis ? (prefillFromDevis.client_tel || '') : '';
   docLignes = prefillFromDevis && prefillFromDevis.lignes ? JSON.parse(JSON.stringify(prefillFromDevis.lignes)) : [];
-  document.getElementById('docNotes').value = prefillFromDevis ? (prefillFromDevis.notes || '') : 'Acompte de 50 % à la commande, solde à la livraison.';
+  document.getElementById('docNotes').value = prefillFromDevis ? (prefillFromDevis.notes || '') : (PARAMS.conditions_defaut || 'Acompte de 50 % à la commande, solde à la livraison.');
   document.getElementById('docRemise').value = prefillFromDevis ? (prefillFromDevis.remise || 0) : 0;
   document.getElementById('docAcompte').value = 0;
-  document.getElementById('docCreerTache').checked = docType === 'facture';
+  document.getElementById('docCreerTache').checked = docType === 'facture' && PARAMS.tache_liee_defaut !== 'false';
   document.getElementById('docErreur').classList.add('hidden');
   document.getElementById('docDateLivraisonErreur').classList.add('hidden');
   document.getElementById('docSearchResults').classList.remove('open');
@@ -1593,7 +1823,8 @@ function renderDocLignes() {
       : '<input type="text" value="' + esc(l.prestation) + '" placeholder="Désignation de la prestation" oninput="modifierLignePrestation(' + i + ',this.value)" style="width:100%;min-width:0;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">';
     return '<div class="doc-line-row">'
       + '<div>' + premiereColonne + '</div>'
-      + '<input type="number" min="0" value="' + (l.qte != null ? l.qte : 1) + '" oninput="modifierLigneQte(' + i + ',this.value)">'
+      + '<div><input type="number" min="0" value="' + (l.qte != null ? l.qte : 1) + '" oninput="modifierLigneQte(' + i + ',this.value)" style="width:100%;min-width:0;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;text-align:right;">'
+      + (l.unite ? '<div style="font-size:9px;color:var(--text-muted);text-align:right;">' + esc(l.unite) + '</div>' : '') + '</div>'
       + '<input type="number" min="0" value="' + (l.prix != null ? l.prix : 0) + '" oninput="modifierLignePrix(' + i + ',this.value)">'
       + '<div class="doc-line-total">' + fmtNombre(total) + '</div>'
       + '<button class="doc-line-del" onclick="supprimerLigne(' + i + ')"><i class="ti ti-trash"></i></button>'
@@ -1647,20 +1878,33 @@ function rechercherTarif() {
 function choisirTarif(i) {
   const t = (window._docTarifsResultats || [])[i];
   if (!t) return;
-  docLignes.push({ prestation: t.prestation, rubrique: t.rubrique || '', qte: 1, prix: Number(t.prix || 0) });
+  docLignes.push({ prestation: t.prestation, rubrique: t.rubrique || '', unite: t.unite || '', qte: 1, prix: Number(t.prix || 0) });
   document.getElementById('docRechercheTarif').value = '';
   document.getElementById('docSearchResults').classList.remove('open');
   renderDocLignes();
   recalculerTotauxDoc();
 }
 
+function calculerTvaActive() { return PARAMS.tva_active === 'true'; }
+function calculerTauxTva() { return Number(PARAMS.tva_taux || 0); }
+
 function recalculerTotauxDoc() {
   const sousTotal = docLignes.reduce(function(s, l) { return s + Number(l.qte || 0) * Number(l.prix || 0); }, 0);
   const remise = Number(document.getElementById('docRemise').value || 0);
-  const total = Math.max(0, sousTotal - remise);
+  const baseTva = Math.max(0, sousTotal - remise);
+  const tvaActive = calculerTvaActive();
+  const tauxTva = calculerTauxTva();
+  const tvaMontant = tvaActive ? Math.round(baseTva * tauxTva / 100) : 0;
+  const total = baseTva + tvaMontant;
   const acompte = Number(document.getElementById('docAcompte').value || 0);
   const reste = Math.max(0, total - acompte);
   document.getElementById('docSousTotal').textContent = fmt(sousTotal);
+  const tvaRow = document.getElementById('docTvaRow');
+  tvaRow.classList.toggle('hidden', !tvaActive);
+  if (tvaActive) {
+    document.getElementById('docTvaLabel').textContent = 'TVA ' + tauxTva + ' %';
+    document.getElementById('docTva').textContent = fmt(tvaMontant);
+  }
   document.getElementById('docTotal').textContent = fmt(total);
   document.getElementById('docReste').textContent = fmt(reste);
 }
@@ -1685,7 +1929,11 @@ async function saveDocument() {
 
   const sousTotal = docLignes.reduce(function(s, l) { return s + Number(l.qte || 0) * Number(l.prix || 0); }, 0);
   const remise = Number(document.getElementById('docRemise').value || 0);
-  const total = Math.max(0, sousTotal - remise);
+  const baseTva = Math.max(0, sousTotal - remise);
+  const tvaActive = calculerTvaActive();
+  const tauxTva = calculerTauxTva();
+  const tvaMontant = tvaActive ? Math.round(baseTva * tauxTva / 100) : 0;
+  const total = baseTva + tvaMontant;
   const acompte = Number(document.getElementById('docAcompte').value || 0);
   const reste = Math.max(0, total - acompte);
   const notes = document.getElementById('docNotes').value.trim();
@@ -1699,7 +1947,8 @@ async function saveDocument() {
       validite_jours: docType === 'devis' ? Number(PARAMS.validite_devis_jours || 15) : null,
       client_nom: clientNom, client_tel: clientTel || null,
       date_livraison: dateLivraison || null,
-      lignes: docLignes, sous_total: sousTotal, remise: remise, total: total,
+      lignes: docLignes, sous_total: sousTotal, remise: remise,
+      tva_taux: tvaActive ? tauxTva : 0, tva_montant: tvaMontant, total: total,
       acompte: acompte, reste: reste, notes: notes || null,
       statut: 'envoye', document_source_id: docConversionDevisId || null,
       cree_par: session.nom,
@@ -1857,7 +2106,11 @@ function apercuDocumentBrouillon() {
   if (!clientNom) { showToast('Renseignez au moins le nom du client pour l\'aperçu.', 'error'); return; }
   const sousTotal = docLignes.reduce(function(s, l) { return s + Number(l.qte || 0) * Number(l.prix || 0); }, 0);
   const remise = Number(document.getElementById('docRemise').value || 0);
-  const total = Math.max(0, sousTotal - remise);
+  const baseTva = Math.max(0, sousTotal - remise);
+  const tvaActive = calculerTvaActive();
+  const tauxTva = calculerTauxTva();
+  const tvaMontant = tvaActive ? Math.round(baseTva * tauxTva / 100) : 0;
+  const total = baseTva + tvaMontant;
   const acompte = Number(document.getElementById('docAcompte').value || 0);
   const reste = Math.max(0, total - acompte);
   const numeroAffiche = document.getElementById('docNumeroPreview').textContent.replace('N° ', '');
@@ -1866,7 +2119,8 @@ function apercuDocumentBrouillon() {
     validite_jours: docType === 'devis' ? Number(PARAMS.validite_devis_jours || 15) : null,
     client_nom: clientNom, client_tel: document.getElementById('docClientTel').value.trim(),
     date_livraison: document.getElementById('docDateLivraison').value || null,
-    lignes: docLignes, sous_total: sousTotal, remise: remise, total: total, acompte: acompte, reste: reste,
+    lignes: docLignes, sous_total: sousTotal, remise: remise,
+    tva_taux: tvaActive ? tauxTva : 0, tva_montant: tvaMontant, total: total, acompte: acompte, reste: reste,
     notes: document.getElementById('docNotes').value.trim(),
   };
   genererFenetreImpression(docTemp, true);
@@ -1878,38 +2132,47 @@ const STYLE_IMPRESSION = '@page{size:A4;margin:15mm;}'
   + '.watermark{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:100px;font-weight:700;color:rgba(220,38,38,.15);z-index:99;pointer-events:none;}'
   + '.entete{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;}'
   + '.entete-gauche{display:flex;gap:12px;align-items:flex-start;}'
-  + '.logo-yc{width:40px;height:40px;border-radius:8px;background:#E85D04;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}'
-  + '.enseigne{font-size:18px;font-weight:500;color:#2D2D6B;}'
+  + '.logo-yc{width:40px;height:40px;border-radius:8px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}'
+  + '.logo-yc img{width:100%;height:100%;object-fit:contain;}'
+  + '.enseigne{font-size:18px;font-weight:500;}'
   + '.souslabel{font-size:11px;color:#6B6B8A;margin-top:2px;}'
   + '.entete-droite{text-align:right;font-size:12px;color:#6B6B8A;}'
-  + '.titre-doc{font-size:24px;font-weight:700;color:#2D2D6B;margin-bottom:4px;}'
-  + '.filet{border-top:2px solid #E85D04;margin:14px 0 16px;}'
+  + '.titre-doc{font-size:24px;font-weight:700;margin-bottom:4px;}'
+  + '.filet{border-top:2px solid;margin:14px 0 16px;}'
   + '.client-box{background:#F4F5F9;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;}'
   + '.livraison-ligne{font-size:12px;color:#6B6B8A;margin-top:-10px;margin-bottom:16px;}'
   + 'table.lignes{width:100%;border-collapse:collapse;margin-bottom:16px;}'
-  + 'table.lignes thead th{background:#2D2D6B;color:#fff;padding:8px 10px;font-size:11px;text-transform:uppercase;text-align:left;}'
+  + 'table.lignes thead th{color:#fff;padding:8px 10px;font-size:11px;text-transform:uppercase;text-align:left;}'
   + 'table.lignes th.c,table.lignes td.c{text-align:center;}'
   + 'table.lignes th.r,table.lignes td.r{text-align:right;}'
   + 'table.lignes td{padding:7px 10px;border-bottom:1px solid #E3E4EC;font-size:12.5px;}'
   + 'table.lignes tr.alt{background:#FAFAFC;}'
   + '.totaux{margin-left:auto;width:280px;margin-bottom:14px;}'
   + '.tot-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12.5px;color:#6B6B8A;}'
-  + '.tot-total{background:#FDEEE3;padding:8px 10px;border-radius:6px;font-weight:700;color:#1F1F55;font-size:14px;margin:4px 0;}'
+  + '.tot-total{padding:8px 10px;border-radius:6px;font-weight:700;color:#1F1F55;font-size:14px;margin:4px 0;}'
   + '.tot-reste{font-weight:700;color:#A32D2D;}'
   + '.en-lettres{font-size:11.5px;font-style:italic;color:#444;margin-bottom:14px;}'
-  + '.notes{font-size:11.5px;color:#444;margin-bottom:20px;}'
+  + '.notes{font-size:11.5px;color:#444;margin-bottom:14px;}'
+  + '.modes-remerciement{font-size:11.5px;color:#444;margin-bottom:20px;}'
   + '.signatures{display:flex;justify-content:space-between;gap:40px;margin-top:30px;}'
   + '.sign-box{flex:1;border-top:1px solid #999;padding-top:6px;font-size:11px;color:#6B6B8A;height:50px;}'
   + '.pied{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:10px;color:#9A9AB5;padding:8px 0;}';
 
-function genererFenetreImpression(doc, brouillon) {
-  const win = window.open('', '_blank');
-  if (!win) { showToast('Le navigateur a bloqué l\'ouverture de la fenêtre d\'aperçu.', 'error'); return; }
-  const enseigne = PARAMS.enseigne || 'YOUMMA CENTER';
-  const raisonSociale = PARAMS.raison_sociale || '';
-  const telephone = PARAMS.telephone || '';
-  const email = PARAMS.email || '';
-  const piedLegal = PARAMS.pied_legal || '';
+function construireHtmlDocument(doc, brouillon, paramsSource) {
+  const P = paramsSource || PARAMS;
+  const enseigne = P.enseigne || 'YOUMMA CENTER';
+  const raisonSociale = P.raison_sociale || '';
+  const adresse = P.adresse || '';
+  const telephone = P.telephone || '';
+  const email = P.email || '';
+  const piedLegal = P.pied_legal || '';
+  const devise = P.devise || 'GNF';
+  const couleurPrincipale = P.couleur_principale || '#2D2D6B';
+  const couleurAccent = P.couleur_accent || '#E85D04';
+  const afficherLettres = P.montant_en_lettres !== 'false';
+  const afficherSignatures = P.bloc_signatures !== 'false';
+  const modesPaiement = P.modes_paiement || '';
+  const remerciement = P.remerciement || '';
   const dateDoc = doc.date_doc ? new Date(doc.date_doc) : new Date();
   const dateAffichee = dateDoc.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   let validiteLigne = '';
@@ -1920,36 +2183,52 @@ function genererFenetreImpression(doc, brouillon) {
   }
   const lignesHtml = (doc.lignes || []).map(function(l, i) {
     const total = Number(l.qte || 0) * Number(l.prix || 0);
-    return '<tr class="' + (i % 2 === 1 ? 'alt' : '') + '"><td>' + esc(l.prestation) + '</td><td class="c">' + esc(l.qte) + '</td><td class="r">' + fmtNombre(l.prix) + '</td><td class="r">' + fmtNombre(total) + '</td></tr>';
+    const qteAffichee = l.unite ? (l.qte + ' ' + l.unite) : l.qte;
+    return '<tr class="' + (i % 2 === 1 ? 'alt' : '') + '"><td>' + esc(l.prestation) + '</td><td class="c">' + esc(qteAffichee) + '</td><td class="r">' + fmtNombre(l.prix) + '</td><td class="r">' + fmtNombre(total) + '</td></tr>';
   }).join('');
-  const remiseLigne = Number(doc.remise) > 0 ? '<div class="tot-row"><span>Remise</span><span>-' + fmtNombre(doc.remise) + ' GNF</span></div>' : '';
-  const html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>' + esc(doc.numero) + '</title>'
+  const remiseLigne = Number(doc.remise) > 0 ? '<div class="tot-row"><span>Remise</span><span>-' + fmtNombre(doc.remise) + ' ' + devise + '</span></div>' : '';
+  const tvaLigne = Number(doc.tva_montant) > 0 ? '<div class="tot-row"><span>TVA ' + fmtNombre(doc.tva_taux) + ' %</span><span>' + fmtNombre(doc.tva_montant) + ' ' + devise + '</span></div>' : '';
+  const logoHtml = P.logo_url
+    ? '<div class="logo-yc"><img src="' + esc(P.logo_url) + '"></div>'
+    : '<div class="logo-yc" style="background:' + couleurAccent + ';">YC</div>';
+  const modesRemerciementHtml = (modesPaiement || remerciement)
+    ? '<div class="modes-remerciement">' + [modesPaiement ? 'Modes de paiement acceptés : ' + esc(modesPaiement) : '', remerciement ? esc(remerciement) : ''].filter(Boolean).join('<br>') + '</div>'
+    : '';
+  return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>' + esc(doc.numero) + '</title>'
     + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">'
     + '<style>' + STYLE_IMPRESSION + '</style></head><body>'
     + (brouillon ? '<div class="watermark">BROUILLON</div>' : '')
     + '<div class="entete">'
-    + '<div class="entete-gauche"><div class="logo-yc">YC</div><div><div class="enseigne">' + esc(enseigne) + '</div>'
+    + '<div class="entete-gauche">' + logoHtml + '<div><div class="enseigne" style="color:' + couleurPrincipale + ';">' + esc(enseigne) + '</div>'
     + (raisonSociale ? '<div class="souslabel">Agence de ' + esc(raisonSociale) + '</div>' : '')
+    + (adresse ? '<div class="souslabel">' + esc(adresse) + '</div>' : '')
     + '<div class="souslabel">' + [telephone ? 'Tél. ' + esc(telephone) : '', email].filter(Boolean).join(' · ') + '</div></div></div>'
-    + '<div class="entete-droite"><div class="titre-doc">' + (doc.type === 'facture' ? 'FACTURE' : 'DEVIS') + '</div>'
+    + '<div class="entete-droite"><div class="titre-doc" style="color:' + couleurPrincipale + ';">' + (doc.type === 'facture' ? 'FACTURE' : 'DEVIS') + '</div>'
     + '<div>N° ' + esc(doc.numero) + '</div><div>Date : ' + dateAffichee + '</div>' + validiteLigne + '</div>'
     + '</div>'
-    + '<div class="filet"></div>'
+    + '<div class="filet" style="border-color:' + couleurAccent + ';"></div>'
     + '<div class="client-box"><div><strong>' + esc(doc.client_nom) + '</strong></div>' + (doc.client_tel ? '<div>' + esc(doc.client_tel) + '</div>' : '') + '</div>'
     + (doc.date_livraison ? '<div class="livraison-ligne">Livraison : ' + new Date(doc.date_livraison + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div>' : '')
-    + '<table class="lignes"><thead><tr><th>Désignation</th><th class="c">Qté</th><th class="r">Prix unitaire (GNF)</th><th class="r">Montant (GNF)</th></tr></thead><tbody>' + lignesHtml + '</tbody></table>'
+    + '<table class="lignes"><thead><tr style="background:' + couleurPrincipale + ';"><th>Désignation</th><th class="c">Qté</th><th class="r">Prix unitaire (' + devise + ')</th><th class="r">Montant (' + devise + ')</th></tr></thead><tbody>' + lignesHtml + '</tbody></table>'
     + '<div class="totaux">'
-    + '<div class="tot-row"><span>Sous-total</span><span>' + fmtNombre(doc.sous_total) + ' GNF</span></div>'
-    + remiseLigne
-    + '<div class="tot-row tot-total"><span>TOTAL</span><span>' + fmtNombre(doc.total) + ' GNF</span></div>'
-    + '<div class="tot-row"><span>Acompte reçu</span><span>' + fmtNombre(doc.acompte) + ' GNF</span></div>'
-    + '<div class="tot-row tot-reste"><span>Reste à payer</span><span>' + fmtNombre(doc.reste) + ' GNF</span></div>'
+    + '<div class="tot-row"><span>Sous-total</span><span>' + fmtNombre(doc.sous_total) + ' ' + devise + '</span></div>'
+    + remiseLigne + tvaLigne
+    + '<div class="tot-row tot-total" style="background:' + couleurAccent + '22;"><span>TOTAL</span><span>' + fmtNombre(doc.total) + ' ' + devise + '</span></div>'
+    + '<div class="tot-row"><span>Acompte reçu</span><span>' + fmtNombre(doc.acompte) + ' ' + devise + '</span></div>'
+    + '<div class="tot-row tot-reste"><span>Reste à payer</span><span>' + fmtNombre(doc.reste) + ' ' + devise + '</span></div>'
     + '</div>'
-    + '<div class="en-lettres">Arrêté le présent ' + (doc.type === 'facture' ? 'facture' : 'devis') + ' à la somme de : ' + nombreEnLettres(doc.total) + '.</div>'
+    + (afficherLettres ? '<div class="en-lettres">Arrêté le présent ' + (doc.type === 'facture' ? 'facture' : 'devis') + ' à la somme de : ' + nombreEnLettres(doc.total) + '.</div>' : '')
     + (doc.notes ? '<div class="notes"><strong>Notes / conditions</strong><p>' + esc(doc.notes).replace(/\n/g, '<br>') + '</p></div>' : '')
-    + '<div class="signatures"><div class="sign-box"><div class="sign-label">Le client</div></div><div class="sign-box"><div class="sign-label">YOUMMA CENTER</div></div></div>'
+    + modesRemerciementHtml
+    + (afficherSignatures ? '<div class="signatures"><div class="sign-box"><div class="sign-label">Le client</div></div><div class="sign-box"><div class="sign-label">' + esc(enseigne) + '</div></div></div>' : '')
     + '<div class="pied">' + esc(piedLegal) + '</div>'
     + '</body></html>';
+}
+
+function genererFenetreImpression(doc, brouillon) {
+  const win = window.open('', '_blank');
+  if (!win) { showToast('Le navigateur a bloqué l\'ouverture de la fenêtre d\'aperçu.', 'error'); return; }
+  const html = construireHtmlDocument(doc, brouillon);
   win.document.open();
   win.document.write(html);
   win.document.close();
@@ -2006,6 +2285,430 @@ function nombreEnLettres(n) {
   let resultat = parties.join(' ');
   resultat = resultat.charAt(0).toUpperCase() + resultat.slice(1);
   return resultat + ' franc' + (n > 1 ? 's' : '') + ' guinéen' + (n > 1 ? 's' : '');
+}
+
+/* ── PAGE : PARAMÈTRES ── */
+async function loadParametresPage() {
+  await chargerParametres();
+  remplirFormulaireParametres();
+  await actualiserApercuNumeros();
+  regenererApercu();
+  await loadTarifsAdmin();
+  paramDirty = false;
+  document.getElementById('paramBtnEnregistrer').disabled = true;
+}
+
+function onParamFieldChange() {
+  paramDirty = true;
+  document.getElementById('paramBtnEnregistrer').disabled = false;
+  debounceApercu();
+}
+
+function debounceApercu() {
+  clearTimeout(_apercuTimer);
+  _apercuTimer = setTimeout(regenererApercu, 300);
+}
+
+function setParamTab(tab) {
+  document.querySelectorAll('.param-tab').forEach(function(b) { b.classList.toggle('active', b.dataset.paramTab === tab); });
+  document.querySelectorAll('.param-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('paramPanel-' + tab).classList.add('active');
+  if (tab === 'documents') regenererApercu();
+}
+
+function remplirFormulaireParametres() {
+  document.getElementById('paramEnseigne').value = PARAMS.enseigne || '';
+  document.getElementById('paramRaisonSociale').value = PARAMS.raison_sociale || '';
+  document.getElementById('paramAdresse').value = PARAMS.adresse || '';
+  document.getElementById('paramTelephone').value = PARAMS.telephone || '';
+  document.getElementById('paramEmail').value = PARAMS.email || '';
+  document.getElementById('paramRccm').value = PARAMS.rccm || '';
+  document.getElementById('paramNif').value = PARAMS.nif || '';
+  document.getElementById('paramPiedLegal').value = PARAMS.pied_legal || '';
+  document.getElementById('paramPiedLegal2').value = PARAMS.pied_legal || '';
+  document.getElementById('paramPrefixeDevis').value = PARAMS.prefixe_devis || 'DEV';
+  document.getElementById('paramPrefixeFacture').value = PARAMS.prefixe_facture || 'FAC';
+  document.getElementById('paramValiditeDevis').value = PARAMS.validite_devis_jours || 15;
+  document.getElementById('paramConditionsDefaut').value = PARAMS.conditions_defaut || '';
+  document.getElementById('paramModesPaiement').value = PARAMS.modes_paiement || '';
+  document.getElementById('paramRemerciement').value = PARAMS.remerciement || '';
+  document.getElementById('paramMontantLettres').checked = PARAMS.montant_en_lettres !== 'false';
+  document.getElementById('paramBlocSignatures').checked = PARAMS.bloc_signatures !== 'false';
+  document.getElementById('paramTvaActive').checked = PARAMS.tva_active === 'true';
+  document.getElementById('paramTvaTaux').value = PARAMS.tva_taux || 0;
+  document.getElementById('paramTacheLieeDefaut').checked = PARAMS.tache_liee_defaut !== 'false';
+  document.getElementById('paramCouleurPrincipale').value = PARAMS.couleur_principale || '#2D2D6B';
+  document.getElementById('paramCouleurPrincipaleHex').value = PARAMS.couleur_principale || '#2D2D6B';
+  document.getElementById('paramCouleurAccent').value = PARAMS.couleur_accent || '#E85D04';
+  document.getElementById('paramCouleurAccentHex').value = PARAMS.couleur_accent || '#E85D04';
+  document.getElementById('paramDevise').value = PARAMS.devise || 'GNF';
+  afficherLogoPreview();
+  toggleTvaTauxRow();
+}
+
+function toggleTvaTauxRow() {
+  document.getElementById('paramTvaTauxRow').classList.toggle('hidden', !document.getElementById('paramTvaActive').checked);
+}
+
+function syncPiedLegal(source) {
+  if (source === 'entreprise') {
+    document.getElementById('paramPiedLegal2').value = document.getElementById('paramPiedLegal').value;
+  } else {
+    document.getElementById('paramPiedLegal').value = document.getElementById('paramPiedLegal2').value;
+  }
+  onParamFieldChange();
+}
+
+function genererPiedLegal() {
+  const raisonSociale = document.getElementById('paramRaisonSociale').value.trim();
+  const adresse = document.getElementById('paramAdresse').value.trim();
+  const rccm = document.getElementById('paramRccm').value.trim();
+  const nif = document.getElementById('paramNif').value.trim();
+  const texte = [
+    raisonSociale,
+    adresse ? 'Siège social : ' + adresse : '',
+    rccm ? 'RCCM : ' + rccm : '',
+    nif ? 'NIF : ' + nif : '',
+  ].filter(Boolean).join(' · ');
+  document.getElementById('paramPiedLegal').value = texte;
+  document.getElementById('paramPiedLegal2').value = texte;
+  onParamFieldChange();
+}
+
+async function calculerNumeroAvecPrefixe(type, prefixeOverride) {
+  const prefixe = prefixeOverride || (type === 'facture' ? (PARAMS.prefixe_facture || 'FAC') : (PARAMS.prefixe_devis || 'DEV'));
+  const annee = new Date().getFullYear();
+  const { data } = await sb.from('yc_documents').select('numero').eq('type', type);
+  let max = 0;
+  (data || []).forEach(function(d) {
+    const m = new RegExp('^' + prefixe + '-' + annee + '-(\\d{4})$').exec(d.numero || '');
+    if (m) { const v = parseInt(m[1], 10); if (v > max) max = v; }
+  });
+  return prefixe + '-' + annee + '-' + String(max + 1).padStart(4, '0');
+}
+
+async function actualiserApercuNumeros() {
+  const prefD = document.getElementById('paramPrefixeDevis').value.trim() || 'DEV';
+  const prefF = document.getElementById('paramPrefixeFacture').value.trim() || 'FAC';
+  const results = await Promise.all([calculerNumeroAvecPrefixe('devis', prefD), calculerNumeroAvecPrefixe('facture', prefF)]);
+  document.getElementById('paramNumeroPreview').innerHTML = 'Prochain devis : <strong>' + esc(results[0]) + '</strong> · Prochaine facture : <strong>' + esc(results[1]) + '</strong>';
+}
+
+async function uploadLogo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 500 * 1024) { showToast('Le logo doit faire moins de 500 Ko.', 'error'); input.value = ''; return; }
+  const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+  const path = 'logo.' + ext;
+  try {
+    const { error } = await sb.storage.from('yc-assets').upload(path, file, { upsert: true });
+    if (error) throw error;
+    const { data: urlData } = sb.storage.from('yc-assets').getPublicUrl(path);
+    PARAMS.logo_url = urlData.publicUrl + '?t=' + Date.now();
+    afficherLogoPreview();
+    onParamFieldChange();
+  } catch (e) {
+    showToast('Erreur upload logo: ' + e.message, 'error');
+  }
+}
+
+function afficherLogoPreview() {
+  const el = document.getElementById('paramLogoPreview');
+  if (PARAMS.logo_url) { el.innerHTML = '<img src="' + esc(PARAMS.logo_url) + '">'; }
+  else { el.textContent = 'Aucun logo'; }
+}
+
+function retirerLogo() {
+  PARAMS.logo_url = null;
+  afficherLogoPreview();
+  document.getElementById('paramLogoFile').value = '';
+  onParamFieldChange();
+}
+
+function syncColorHex(which) {
+  const suffixe = which === 'principale' ? 'Principale' : 'Accent';
+  document.getElementById('paramCouleur' + suffixe + 'Hex').value = document.getElementById('paramCouleur' + suffixe).value;
+  onParamFieldChange();
+}
+
+function syncColorFromHex(which) {
+  const suffixe = which === 'principale' ? 'Principale' : 'Accent';
+  const hexInput = document.getElementById('paramCouleur' + suffixe + 'Hex');
+  if (/^#[0-9A-Fa-f]{6}$/.test(hexInput.value)) {
+    document.getElementById('paramCouleur' + suffixe).value = hexInput.value;
+  }
+  onParamFieldChange();
+}
+
+function lireParamsDepuisFormulaire() {
+  return {
+    enseigne: document.getElementById('paramEnseigne').value,
+    raison_sociale: document.getElementById('paramRaisonSociale').value,
+    adresse: document.getElementById('paramAdresse').value,
+    telephone: document.getElementById('paramTelephone').value,
+    email: document.getElementById('paramEmail').value,
+    pied_legal: document.getElementById('paramPiedLegal2').value,
+    devise: document.getElementById('paramDevise').value,
+    couleur_principale: document.getElementById('paramCouleurPrincipale').value,
+    couleur_accent: document.getElementById('paramCouleurAccent').value,
+    montant_en_lettres: document.getElementById('paramMontantLettres').checked ? 'true' : 'false',
+    bloc_signatures: document.getElementById('paramBlocSignatures').checked ? 'true' : 'false',
+    modes_paiement: document.getElementById('paramModesPaiement').value,
+    remerciement: document.getElementById('paramRemerciement').value,
+    logo_url: PARAMS.logo_url || null,
+  };
+}
+
+function documentExemple() {
+  return {
+    numero: 'FAC-2026-0001', type: 'facture', date_doc: today(),
+    client_nom: 'Client Exemple', client_tel: '622000000',
+    lignes: [{ prestation: 'Carte de visite', rubrique: 'Imprimerie', unite: 'page', qte: 200, prix: 500 }],
+    sous_total: 100000, remise: 0, tva_taux: 0, tva_montant: 0, total: 100000, acompte: 50000, reste: 50000,
+    notes: document.getElementById('paramConditionsDefaut') ? document.getElementById('paramConditionsDefaut').value : '',
+  };
+}
+
+function regenererApercu() {
+  const iframe = document.getElementById('paramApercuIframe');
+  if (!iframe) return;
+  const html = construireHtmlDocument(documentExemple(), false, lireParamsDepuisFormulaire());
+  iframe.srcdoc = html;
+}
+
+function ouvrirApercuGrandFormat() {
+  const html = construireHtmlDocument(documentExemple(), false, lireParamsDepuisFormulaire());
+  const win = window.open('', '_blank');
+  if (!win) { showToast('Fenêtre bloquée par le navigateur.', 'error'); return; }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+}
+
+async function saveParametres() {
+  const btn = document.getElementById('paramBtnEnregistrer');
+  btn.disabled = true;
+  const valeurs = {
+    enseigne: document.getElementById('paramEnseigne').value.trim(),
+    raison_sociale: document.getElementById('paramRaisonSociale').value.trim(),
+    adresse: document.getElementById('paramAdresse').value.trim(),
+    telephone: document.getElementById('paramTelephone').value.trim(),
+    email: document.getElementById('paramEmail').value.trim(),
+    rccm: document.getElementById('paramRccm').value.trim(),
+    nif: document.getElementById('paramNif').value.trim(),
+    pied_legal: document.getElementById('paramPiedLegal').value.trim(),
+    prefixe_devis: document.getElementById('paramPrefixeDevis').value.trim() || 'DEV',
+    prefixe_facture: document.getElementById('paramPrefixeFacture').value.trim() || 'FAC',
+    validite_devis_jours: String(Number(document.getElementById('paramValiditeDevis').value || 15)),
+    conditions_defaut: document.getElementById('paramConditionsDefaut').value.trim(),
+    modes_paiement: document.getElementById('paramModesPaiement').value.trim(),
+    remerciement: document.getElementById('paramRemerciement').value.trim(),
+    montant_en_lettres: document.getElementById('paramMontantLettres').checked ? 'true' : 'false',
+    bloc_signatures: document.getElementById('paramBlocSignatures').checked ? 'true' : 'false',
+    tva_active: document.getElementById('paramTvaActive').checked ? 'true' : 'false',
+    tva_taux: String(Number(document.getElementById('paramTvaTaux').value || 0)),
+    tache_liee_defaut: document.getElementById('paramTacheLieeDefaut').checked ? 'true' : 'false',
+    couleur_principale: document.getElementById('paramCouleurPrincipale').value,
+    couleur_accent: document.getElementById('paramCouleurAccent').value,
+    devise: document.getElementById('paramDevise').value,
+    logo_url: PARAMS.logo_url || '',
+  };
+  const rows = Object.keys(valeurs).map(function(cle) { return { cle: cle, valeur: valeurs[cle] }; });
+  try {
+    const { error } = await sb.from('yc_parametres').upsert(rows, { onConflict: 'cle' });
+    if (error) throw error;
+    await chargerParametres();
+    paramDirty = false;
+    showToast('Paramètres enregistrés ✅');
+  } catch (e) {
+    showToast('Erreur: ' + e.message, 'error');
+    btn.disabled = false;
+  }
+}
+
+/* ── ARTICLES (grille tarifaire) ── */
+async function loadTarifsAdmin() {
+  const { data } = await sb.from('yc_tarifs').select('*').order('rubrique').order('prestation');
+  tarifsCache = data || [];
+  const nbActifs = tarifsCache.filter(function(t) { return t.actif; }).length;
+  document.getElementById('paramArticlesBadge').textContent = nbActifs;
+  renderTarifsAdmin();
+  _tarifsGrilleVide = !tarifsCache.some(function(t) { return t.actif; });
+}
+
+function renderTarifsAdmin() {
+  const q = (document.getElementById('tarifRecherche').value || '').trim().toLowerCase();
+  let liste = tarifsCache;
+  if (q) liste = liste.filter(function(t) { return (t.prestation || '').toLowerCase().indexOf(q) >= 0 || (t.rubrique || '').toLowerCase().indexOf(q) >= 0; });
+  const cont = document.getElementById('tarifsListe');
+  if (!liste.length) { cont.innerHTML = '<div class="priority-empty"><i class="ti ti-package-off"></i>Aucun article. Ajoutez votre première prestation ou importez un CSV.</div>'; return; }
+  cont.innerHTML = liste.map(renderTarifRow).join('');
+}
+
+function renderTarifRow(t) {
+  const c = couleurRubrique(t.rubrique);
+  return '<div class="tarif-table-row">'
+    + '<div><span class="tarif-rubrique-badge" style="background:' + c.bg + ';color:' + c.color + ';">' + esc(t.rubrique) + '</span></div>'
+    + '<div>' + esc(t.prestation) + '</div>'
+    + '<div>' + esc(t.unite || '—') + '</div>'
+    + '<div class="tarif-prix-col">' + fmt(t.prix) + '</div>'
+    + '<div><label class="toggle-switch"><input type="checkbox" ' + (t.actif ? 'checked' : '') + ' onchange="toggleArticleActif(\'' + t.id + '\',this.checked)"><span class="track"></span></label></div>'
+    + '<div class="tarif-actions-col">'
+    + '<button class="doc-icon-btn" onclick="openModalArticleEdit(\'' + t.id + '\')"><i class="ti ti-pencil"></i></button>'
+    + '<button class="doc-icon-btn" onclick="supprimerArticle(\'' + t.id + '\')"><i class="ti ti-trash"></i></button>'
+    + '</div></div>';
+}
+
+function openModalArticleNouveau() {
+  tarifEnEdition = null;
+  document.getElementById('tarifTitre').textContent = 'Nouvel article';
+  document.getElementById('tarifBtnSubmit').textContent = 'Ajouter';
+  document.getElementById('tarifRubrique').value = 'Imprimerie';
+  document.getElementById('tarifPrestation').value = '';
+  document.getElementById('tarifUnite').value = 'unité';
+  document.getElementById('tarifPrix').value = '';
+  document.getElementById('tarifActif').checked = true;
+  document.getElementById('tarifErreur').classList.add('hidden');
+  openModal('modalArticle');
+}
+
+function openModalArticleEdit(id) {
+  tarifEnEdition = tarifsCache.find(function(t) { return t.id === id; });
+  if (!tarifEnEdition) return;
+  document.getElementById('tarifTitre').textContent = 'Modifier l\'article';
+  document.getElementById('tarifBtnSubmit').textContent = 'Enregistrer';
+  document.getElementById('tarifRubrique').value = tarifEnEdition.rubrique;
+  document.getElementById('tarifPrestation').value = tarifEnEdition.prestation;
+  document.getElementById('tarifUnite').value = tarifEnEdition.unite || 'unité';
+  document.getElementById('tarifPrix').value = tarifEnEdition.prix;
+  document.getElementById('tarifActif').checked = tarifEnEdition.actif !== false;
+  document.getElementById('tarifErreur').classList.add('hidden');
+  openModal('modalArticle');
+}
+
+async function saveArticle() {
+  const prestation = document.getElementById('tarifPrestation').value.trim();
+  const prix = Number(document.getElementById('tarifPrix').value || 0);
+  const errEl = document.getElementById('tarifErreur');
+  if (!prestation || prix <= 0) { errEl.textContent = 'Prestation et prix (> 0) requis.'; errEl.classList.remove('hidden'); return; }
+  const payload = {
+    rubrique: document.getElementById('tarifRubrique').value,
+    prestation: prestation,
+    unite: document.getElementById('tarifUnite').value,
+    prix: prix,
+    actif: document.getElementById('tarifActif').checked,
+  };
+  try {
+    let error;
+    if (tarifEnEdition) {
+      ({ error } = await sb.from('yc_tarifs').update(payload).eq('id', tarifEnEdition.id));
+    } else {
+      ({ error } = await sb.from('yc_tarifs').insert(payload));
+    }
+    if (error) throw error;
+    closeModal('modalArticle');
+    showToast(tarifEnEdition ? 'Article modifié ✅' : 'Article ajouté ✅');
+    tarifEnEdition = null;
+    _tarifsGrilleVide = null;
+    loadTarifsAdmin();
+  } catch (e) {
+    errEl.textContent = 'Erreur: ' + e.message;
+    errEl.classList.remove('hidden');
+  }
+}
+
+async function toggleArticleActif(id, checked) {
+  await sb.from('yc_tarifs').update({ actif: checked }).eq('id', id);
+  _tarifsGrilleVide = null;
+  loadTarifsAdmin();
+}
+
+async function supprimerArticle(id) {
+  if (!confirm('Supprimer définitivement cet article ?')) return;
+  const { error } = await sb.from('yc_tarifs').delete().eq('id', id);
+  if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
+  showToast('Article supprimé.');
+  _tarifsGrilleVide = null;
+  loadTarifsAdmin();
+}
+
+function telechargerModeleCSV() {
+  const contenu = 'rubrique;prestation;prix;unite\nImprimerie;Carte de visite (boite de 100);80000;pièce\n';
+  const blob = new Blob([contenu], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'modele_articles.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+}
+
+function lireFichierCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const texte = String(e.target.result || '');
+    const lignes = texte.split(/\r?\n/).filter(function(l) { return l.trim(); });
+    if (lignes.length < 2) { showToast('Fichier CSV vide ou invalide.', 'error'); return; }
+    const sep = lignes[0].indexOf(';') >= 0 ? ';' : ',';
+    const entetes = lignes[0].split(sep).map(function(h) { return h.trim().toLowerCase(); });
+    const idxRubrique = entetes.indexOf('rubrique');
+    const idxPrestation = entetes.indexOf('prestation');
+    const idxPrix = entetes.indexOf('prix');
+    const idxUnite = entetes.indexOf('unite');
+    if (idxPrestation < 0 || idxPrix < 0) { showToast('Colonnes prestation/prix introuvables dans l\'en-tête.', 'error'); return; }
+    const rubriquesMinuscules = RUBRIQUES_FIXES.map(function(r) { return r.toLowerCase(); });
+    const lignesParsees = lignes.slice(1).map(function(l) {
+      const cols = l.split(sep);
+      const rubriqueBrute = (idxRubrique >= 0 ? (cols[idxRubrique] || '') : '').trim();
+      const idxMatch = rubriquesMinuscules.indexOf(rubriqueBrute.toLowerCase());
+      return {
+        rubrique: idxMatch >= 0 ? RUBRIQUES_FIXES[idxMatch] : 'Autre',
+        prestation: (cols[idxPrestation] || '').trim(),
+        prix: Number((cols[idxPrix] || '0').trim().replace(',', '.')) || 0,
+        unite: idxUnite >= 0 ? (cols[idxUnite] || '').trim() : '',
+        actif: true,
+      };
+    }).filter(function(l) { return l.prestation; });
+    window._csvLignesParsees = lignesParsees;
+    const apercuEl = document.getElementById('csvApercu');
+    if (!lignesParsees.length) {
+      apercuEl.innerHTML = '<div class="empty">Aucune ligne valide trouvée.</div>';
+      document.getElementById('csvBtnImporter').disabled = true;
+    } else {
+      const cinq = lignesParsees.slice(0, 5);
+      apercuEl.innerHTML = '<div style="font-size:12.5px;color:var(--text-muted);margin-bottom:8px;">' + lignesParsees.length + ' ligne(s) détectée(s) — aperçu des 5 premières :</div>'
+        + '<div class="tarif-table-head" style="grid-template-columns:130px 1fr 90px 100px;"><div>Rubrique</div><div>Prestation</div><div>Unité</div><div style="text-align:right;">Prix</div></div>'
+        + cinq.map(function(l) { return '<div class="tarif-table-row" style="grid-template-columns:130px 1fr 90px 100px;"><div>' + esc(l.rubrique) + '</div><div>' + esc(l.prestation) + '</div><div>' + esc(l.unite || '—') + '</div><div class="tarif-prix-col">' + fmt(l.prix) + '</div></div>'; }).join('');
+      document.getElementById('csvBtnImporter').disabled = false;
+    }
+    document.getElementById('csvErreur').classList.add('hidden');
+    openModal('modalImportCSV');
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+async function importerCSV() {
+  const lignes = window._csvLignesParsees || [];
+  if (!lignes.length) return;
+  const btn = document.getElementById('csvBtnImporter');
+  btn.disabled = true;
+  try {
+    const { error } = await sb.from('yc_tarifs').insert(lignes);
+    if (error) throw error;
+    closeModal('modalImportCSV');
+    showToast(lignes.length + ' article(s) importé(s) ✅');
+    _tarifsGrilleVide = null;
+    loadTarifsAdmin();
+  } catch (e) {
+    document.getElementById('csvErreur').textContent = 'Erreur: ' + e.message;
+    document.getElementById('csvErreur').classList.remove('hidden');
+    btn.disabled = false;
+  }
 }
 
 /* ── PAGE 4 : ORANGE MONEY ── */
