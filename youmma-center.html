@@ -255,6 +255,9 @@ h1,h2,h3{margin:0;}
 .param-color-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .param-color-row input[type=color]{width:36px;height:36px;border:1.5px solid var(--border);border-radius:8px;padding:2px;cursor:pointer;background:none;}
 .param-color-row input[type=text]{width:100px;box-sizing:border-box;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;}
+.param-apercu-type-switch{display:flex;gap:6px;margin-bottom:10px;}
+.param-apercu-type-btn{flex:1;padding:6px 10px;border:1px solid var(--border);background:#fff;border-radius:7px;font-size:12.5px;cursor:pointer;color:var(--text-light);}
+.param-apercu-type-btn.active{background:var(--orange);border-color:var(--orange);color:#fff;font-weight:600;}
 .param-apercu-frame{width:100%;max-width:480px;height:640px;overflow:hidden;border:1px solid var(--border);border-radius:8px;background:#fff;}
 .param-apercu-frame iframe{width:166.6667%;height:166.6667%;transform:scale(0.6);transform-origin:top left;border:none;}
 .param-apercu-link{font-size:12.5px;color:var(--orange);cursor:pointer;background:none;border:none;margin-top:8px;display:inline-flex;align-items:center;gap:4px;}
@@ -741,8 +744,13 @@ h1,h2,h3{margin:0;}
               <div class="card">
                 <h3>Textes du document</h3>
                 <div class="form-row"><label>Acompte à la commande (%)</label><input type="number" id="paramAcomptePct" min="0" max="100" oninput="onParamFieldChange()"></div>
+                <div style="font-weight:700;font-size:11.5px;letter-spacing:.04em;color:var(--text-light);margin:14px 0 6px;text-transform:uppercase;">Proforma</div>
                 <div class="form-row"><label>Conditions de paiement <small style="color:var(--text-light);font-weight:400;">(une par ligne, {acompte_pct} et {validite} remplacés)</small></label><textarea id="paramConditionsPaiement" rows="3" oninput="onParamFieldChange()"></textarea></div>
                 <div class="form-row"><label>Conditions générales <small style="color:var(--text-light);font-weight:400;">(une par ligne)</small></label><textarea id="paramConditionsGenerales" rows="3" oninput="onParamFieldChange()"></textarea></div>
+                <div style="font-weight:700;font-size:11.5px;letter-spacing:.04em;color:var(--text-light);margin:14px 0 6px;text-transform:uppercase;">Facture</div>
+                <div class="form-row"><label>Conditions de paiement <small style="color:var(--text-light);font-weight:400;">(une par ligne, {acompte_pct}, {validite}, {acompte}, {reste}, {total} remplacés)</small></label><textarea id="paramConditionsPaiementFacture" rows="3" oninput="onParamFieldChange()"></textarea></div>
+                <div class="form-row"><label>Conditions générales <small style="color:var(--text-light);font-weight:400;">(une par ligne)</small></label><textarea id="paramConditionsGeneralesFacture" rows="3" oninput="onParamFieldChange()"></textarea></div>
+                <div class="form-row"><label>Mention facture acquittée <small style="color:var(--text-light);font-weight:400;">(affichée sur une facture au statut « Payée »)</small></label><textarea id="paramMentionAcquittee" rows="2" oninput="onParamFieldChange()"></textarea></div>
                 <div class="form-row-2">
                   <div class="form-row"><label>Signataire</label><input type="text" id="paramSignataireNom" oninput="onParamFieldChange()"></div>
                   <div class="form-row"><label>Fonction du signataire</label><input type="text" id="paramSignataireTitre" oninput="onParamFieldChange()"></div>
@@ -793,6 +801,10 @@ h1,h2,h3{margin:0;}
               </div>
               <div class="card">
                 <h3>Aperçu en direct</h3>
+                <div class="param-apercu-type-switch">
+                  <button type="button" class="param-apercu-type-btn active" id="paramApercuTypeProforma" onclick="changerApercuType('devis')">Proforma</button>
+                  <button type="button" class="param-apercu-type-btn" id="paramApercuTypeFacture" onclick="changerApercuType('facture')">Facture</button>
+                </div>
                 <div class="param-apercu-frame"><iframe id="paramApercuIframe"></iframe></div>
                 <button class="param-apercu-link" onclick="ouvrirApercuGrandFormat()"><i class="ti ti-arrows-maximize"></i> Ouvrir en grand</button>
               </div>
@@ -1189,7 +1201,7 @@ function esc(s) {
 }
 function fmt(n) { return Number(n || 0).toLocaleString('fr-FR') + ' GNF'; }
 function fmtNombre(n) { return Number(n || 0).toLocaleString('fr-FR'); }
-function fmtMontant(n) { return Math.round(Number(n) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+function fmtMontant(n) { return Math.round(Number(n) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
 function fmtAvecUnite(n) { return Number(n || 0).toLocaleString('fr-FR') + ' <small>GNF</small>'; }
 function today() { return new Date().toISOString().split('T')[0]; }
 function initiales(nom) {
@@ -1752,9 +1764,13 @@ function pluraliserUnite(unite, qte) {
 function substituerPlaceholders(texte, doc, P) {
   const pct = Number(P.acompte_pct || 50);
   const validite = Number(doc.validite_jours || P.validite_devis_jours || 15);
+  const devise = P.devise || 'GNF';
   return String(texte || '')
     .replace(/\{acompte_pct\}/g, String(pct))
-    .replace(/\{validite\}/g, String(validite));
+    .replace(/\{validite\}/g, String(validite))
+    .replace(/\{acompte\}/g, fmtMontant(doc.acompte) + ' ' + devise)
+    .replace(/\{reste\}/g, fmtMontant(doc.reste) + ' ' + devise)
+    .replace(/\{total\}/g, fmtMontant(doc.total) + ' ' + devise);
 }
 
 const DOC_STATUT_LABELS = { envoye: 'Envoyé', converti: 'Converti', payee: 'Payée', annule: 'Annulé' };
@@ -1980,7 +1996,7 @@ async function saveDocument() {
   const clientAdresse = document.getElementById('docClientAdresse').value.trim();
   const objet = document.getElementById('docObjet').value.trim();
   const objetDetail = document.getElementById('docObjetDetail').value.trim();
-  const lignesValides = docLignes.filter(function(l) { return (l.prestation || '').trim() && Number(l.prix) > 0; });
+  docLignes = docLignes.filter(function(l) { return (l.prestation || '').trim() || Number(l.prix) > 0; });
   const dateLivraison = document.getElementById('docDateLivraison').value;
   const creerTacheLiee = document.getElementById('docCreerTache').checked;
   const errDateEl = document.getElementById('docDateLivraisonErreur');
@@ -1989,6 +2005,14 @@ async function saveDocument() {
   errObjetEl.classList.add('hidden');
   if (!clientNom) { errEl.textContent = 'Le nom du client est requis.'; errEl.classList.remove('hidden'); return; }
   if (!objet) { errObjetEl.textContent = 'L\'objet du document est requis.'; errObjetEl.classList.remove('hidden'); return; }
+  const ligneDesignationManquante = docLignes.findIndex(function(l) { return !(l.prestation || '').trim() && Number(l.prix) > 0; });
+  if (ligneDesignationManquante !== -1) {
+    renderDocLignes();
+    errEl.textContent = 'Désignation manquante sur la ligne ' + (ligneDesignationManquante + 1) + '.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  const lignesValides = docLignes.filter(function(l) { return (l.prestation || '').trim() && Number(l.prix) > 0; });
   if (!lignesValides.length) { errEl.textContent = 'Ajoutez au moins une ligne avec un prix supérieur à 0.'; errEl.classList.remove('hidden'); return; }
   if (creerTacheLiee && !dateLivraison) {
     errDateEl.textContent = 'La date de livraison prévue est requise pour créer la tâche liée.';
@@ -2175,8 +2199,20 @@ async function printDocument(id) {
 }
 
 function apercuDocumentBrouillon() {
+  const errEl = document.getElementById('docErreur');
   const clientNom = document.getElementById('docClientNom').value.trim();
   if (!clientNom) { showToast('Renseignez au moins le nom du client pour l\'aperçu.', 'error'); return; }
+  docLignes = docLignes.filter(function(l) { return (l.prestation || '').trim() || Number(l.prix) > 0; });
+  const ligneDesignationManquante = docLignes.findIndex(function(l) { return !(l.prestation || '').trim() && Number(l.prix) > 0; });
+  if (ligneDesignationManquante !== -1) {
+    renderDocLignes();
+    errEl.textContent = 'Désignation manquante sur la ligne ' + (ligneDesignationManquante + 1) + '.';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  const lignesValides = docLignes.filter(function(l) { return (l.prestation || '').trim() && Number(l.prix) > 0; });
+  if (!lignesValides.length) { errEl.textContent = 'Ajoutez au moins une ligne avec un prix supérieur à 0.'; errEl.classList.remove('hidden'); return; }
+  errEl.classList.add('hidden');
   const sousTotal = docLignes.reduce(function(s, l) { return s + Number(l.qte || 0) * Number(l.prix || 0); }, 0);
   const remise = Number(document.getElementById('docRemise').value || 0);
   const baseTva = Math.max(0, sousTotal - remise);
@@ -2232,6 +2268,8 @@ const STYLE_IMPRESSION = '@page{size:A4;margin:18mm 18mm 22mm;}'
   + '.tot-total-label{font-weight:700;font-size:13px;}'
   + '.tot-total-value{color:#fff;font-weight:700;padding:6px 14px;border-radius:4px;font-size:13px;}'
   + '.tot-reste{font-weight:700;color:#A32D2D;}'
+  + '.tot-reste-paye{font-weight:700;color:#1E7D32;}'
+  + '.banniere-acquittee{background:#E7F6EC;color:#1E7D32;border-radius:8px;padding:10px 14px;font-size:11.5px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;}'
   + '.en-lettres{font-size:11px;font-style:italic;color:#333;margin-bottom:16px;}'
   + '.section-conditions{margin-bottom:14px;}'
   + '.section-titre-conditions{font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:4px;}'
@@ -2287,6 +2325,7 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
     return '<tr><td class="c">' + (i + 1) + '</td><td>' + esc(l.prestation) + '</td><td class="c">' + esc(qteAffichee) + '</td><td class="r">' + fmtMontant(l.prix) + '</td><td class="r">' + fmtMontant(total) + '</td></tr>';
   }).join('');
 
+  const facturePayee = doc.type === 'facture' && doc.statut === 'payee';
   const tvaLigne = Number(doc.tva_montant) > 0 ? '<div class="tot-row"><span>TVA ' + fmtMontant(doc.tva_taux) + ' %</span><span>' + fmtMontant(doc.tva_montant) + ' ' + devise + '</span></div>' : '';
   let totauxHtml = '<div class="totaux">';
   if (Number(doc.remise) > 0) {
@@ -2295,14 +2334,21 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
   }
   totauxHtml += tvaLigne;
   totauxHtml += '<div class="tot-row tot-total-row"><span class="tot-total-label" style="color:' + couleurPrincipale + ';">TOTAL</span><span class="tot-total-value" style="background:' + couleurAccent + ';">' + fmtMontant(doc.total) + ' ' + devise + '</span></div>';
-  totauxHtml += '<div class="tot-row"><span>Acompte à la commande (' + pctAcompte + ' %)</span><span>' + fmtMontant(acompteCommande) + ' ' + devise + '</span></div>';
-  if (doc.type === 'facture') {
+  if (doc.type === 'devis') {
+    totauxHtml += '<div class="tot-row"><span>Acompte à la commande (' + pctAcompte + ' %)</span><span>' + fmtMontant(acompteCommande) + ' ' + devise + '</span></div>';
+  } else if (facturePayee) {
+    totauxHtml += '<div class="tot-row"><span>Montant réglé</span><span>' + fmtMontant(doc.total) + ' ' + devise + '</span></div>';
+    totauxHtml += '<div class="tot-row tot-reste-paye"><span>Reste à payer</span><span>' + fmtMontant(0) + ' ' + devise + '</span></div>';
+  } else {
     totauxHtml += '<div class="tot-row"><span>Acompte reçu</span><span>' + fmtMontant(doc.acompte) + ' ' + devise + '</span></div>';
     totauxHtml += '<div class="tot-row tot-reste"><span>Reste à payer</span><span>' + fmtMontant(doc.reste) + ' ' + devise + '</span></div>';
   }
   totauxHtml += '</div>';
+  const mentionAcquitteeHtml = facturePayee
+    ? '<div class="banniere-acquittee"><i class="ti ti-check"></i> ' + esc(substituerPlaceholders(P.mention_acquittee || 'Facture acquittée. Merci de votre confiance.', doc, P)) + '</div>'
+    : '';
 
-  const libelleMinuscule = libelle.toLowerCase();
+  const libelleMinuscule = facturePayee ? 'facture acquittée' : libelle.toLowerCase();
   const lettresHtml = afficherLettres
     ? '<div class="en-lettres">Arrêtée la présente ' + esc(libelleMinuscule) + ' à la somme de : <strong>' + nombreEnLettres(doc.total) + '</strong>.</div>'
     : '';
@@ -2310,8 +2356,10 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
   function puceListe(texte) {
     return String(texte || '').split(/\n/).map(function(l) { return l.trim(); }).filter(Boolean);
   }
-  const conditionsPaiementPuces = puceListe(P.conditions_paiement).map(function(l) { return substituerPlaceholders(l, doc, P); });
-  let conditionsGeneralesBrutes = puceListe(P.conditions_generales);
+  const cleConditionsPaiement = doc.type === 'facture' ? 'conditions_paiement_facture' : 'conditions_paiement';
+  const cleConditionsGenerales = doc.type === 'facture' ? 'conditions_generales_facture' : 'conditions_generales';
+  const conditionsPaiementPuces = puceListe(P[cleConditionsPaiement]).map(function(l) { return substituerPlaceholders(l, doc, P); });
+  let conditionsGeneralesBrutes = puceListe(P[cleConditionsGenerales]);
   if (doc.type !== 'devis') {
     conditionsGeneralesBrutes = conditionsGeneralesBrutes.filter(function(l) { return l.indexOf('{validite}') === -1; });
   }
@@ -2334,12 +2382,17 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
   const piedLigne2 = [telephone ? 'Tél. : ' + esc(telephone) : '', email ? 'E-mail : ' + esc(email) : ''].filter(Boolean).join(' · ');
   const piedBas = (piedLigne1 ? '<div>' + piedLigne1 + '</div>' : '') + (piedLigne2 ? '<div>' + piedLigne2 + '</div>' : '');
 
+  const watermarkHtml = brouillon
+    ? '<div class="watermark">BROUILLON</div>'
+    : (facturePayee ? '<div class="watermark" style="color:rgba(100,100,130,.1);">ACQUITTÉE</div>' : '');
+
   return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>' + esc(libelle) + ' ' + esc(doc.numero) + ' — ' + esc(enseigne) + '</title>'
     + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">'
+    + '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">'
     + '<style>' + STYLE_IMPRESSION + (avecBarreImpression ? BARRE_IMPRESSION_STYLE : '') + '</style></head><body>'
     + (avecBarreImpression ? BARRE_IMPRESSION_HTML : '')
     + '<div class="feuille">'
-    + (brouillon ? '<div class="watermark">BROUILLON</div>' : '')
+    + watermarkHtml
     + '<div class="entete">'
     + '<div class="entete-gauche">' + logoHtml + '<div><div class="enseigne" style="color:' + couleurPrincipale + ';">' + enseigneHtml + '</div>'
     + (slogan ? '<div class="slogan">' + esc(slogan) + '</div>' : '')
@@ -2362,6 +2415,7 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
     + (doc.date_livraison ? '<div class="livraison-ligne">Livraison prévue : ' + new Date(doc.date_livraison + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + '</div>' : '')
     + '<table class="lignes"><thead><tr style="background:' + couleurPrincipale + ';"><th style="width:36px;" class="c">N°</th><th>Désignation</th><th style="width:56px;" class="c">Qté</th><th style="width:110px;" class="r">Prix unitaire</th><th style="width:120px;" class="r">Montant</th></tr></thead><tbody>' + lignesHtml + '</tbody></table>'
     + totauxHtml
+    + mentionAcquitteeHtml
     + lettresHtml
     + sectionPuces('CONDITIONS DE PAIEMENT', conditionsPaiementPuces)
     + sectionPuces('CONDITIONS GÉNÉRALES', conditionsGeneralesPuces)
@@ -2487,6 +2541,9 @@ function remplirFormulaireParametres() {
   document.getElementById('paramAcomptePct').value = PARAMS.acompte_pct || 50;
   document.getElementById('paramConditionsPaiement').value = PARAMS.conditions_paiement || '';
   document.getElementById('paramConditionsGenerales').value = PARAMS.conditions_generales || '';
+  document.getElementById('paramConditionsPaiementFacture').value = PARAMS.conditions_paiement_facture || '';
+  document.getElementById('paramConditionsGeneralesFacture').value = PARAMS.conditions_generales_facture || '';
+  document.getElementById('paramMentionAcquittee').value = PARAMS.mention_acquittee || '';
   document.getElementById('paramSignataireNom').value = PARAMS.signataire_nom || '';
   document.getElementById('paramSignataireTitre').value = PARAMS.signataire_titre || '';
   document.getElementById('paramModesPaiement').value = PARAMS.modes_paiement || '';
@@ -2618,6 +2675,9 @@ function lireParamsDepuisFormulaire() {
     acompte_pct: document.getElementById('paramAcomptePct').value,
     conditions_paiement: document.getElementById('paramConditionsPaiement').value,
     conditions_generales: document.getElementById('paramConditionsGenerales').value,
+    conditions_paiement_facture: document.getElementById('paramConditionsPaiementFacture').value,
+    conditions_generales_facture: document.getElementById('paramConditionsGeneralesFacture').value,
+    mention_acquittee: document.getElementById('paramMentionAcquittee').value,
     signataire_nom: document.getElementById('paramSignataireNom').value,
     signataire_titre: document.getElementById('paramSignataireTitre').value,
     montant_en_lettres: document.getElementById('paramMontantLettres').checked ? 'true' : 'false',
@@ -2629,9 +2689,20 @@ function lireParamsDepuisFormulaire() {
   };
 }
 
-function documentExemple() {
+let paramApercuType = 'devis';
+
+function changerApercuType(type) {
+  paramApercuType = type;
+  document.getElementById('paramApercuTypeProforma').classList.toggle('active', type === 'devis');
+  document.getElementById('paramApercuTypeFacture').classList.toggle('active', type === 'facture');
+  regenererApercu();
+}
+
+function documentExemple(type) {
+  const t = type || 'devis';
   return {
-    numero: 'FAC-2026-0001', type: 'facture', date_doc: today(),
+    numero: t === 'devis' ? 'PF-2026-0001' : 'FAC-2026-0001', type: t, date_doc: today(),
+    validite_jours: t === 'devis' ? 15 : null,
     client_nom: 'Client Exemple', client_tel: '622000000', client_adresse: 'Dubréka, Guinée',
     objet: 'Impression de bâches publicitaires', objet_detail: 'Conception, impression numérique haute résolution et finition',
     lignes: [{ prestation: 'Carte de visite', rubrique: 'Imprimerie', unite: 'page', qte: 200, prix: 500 }],
@@ -2643,12 +2714,12 @@ function documentExemple() {
 function regenererApercu() {
   const iframe = document.getElementById('paramApercuIframe');
   if (!iframe) return;
-  const html = construireHtmlDocument(documentExemple(), false, lireParamsDepuisFormulaire(), false);
+  const html = construireHtmlDocument(documentExemple(paramApercuType), false, lireParamsDepuisFormulaire(), false);
   iframe.srcdoc = html;
 }
 
 function ouvrirApercuGrandFormat() {
-  const html = construireHtmlDocument(documentExemple(), false, lireParamsDepuisFormulaire(), true);
+  const html = construireHtmlDocument(documentExemple(paramApercuType), false, lireParamsDepuisFormulaire(), true);
   const win = window.open('', '_blank');
   if (!win) { showToast('Fenêtre bloquée par le navigateur.', 'error'); return; }
   win.document.open();
@@ -2677,6 +2748,9 @@ async function saveParametres() {
     acompte_pct: String(Number(document.getElementById('paramAcomptePct').value || 50)),
     conditions_paiement: document.getElementById('paramConditionsPaiement').value.trim(),
     conditions_generales: document.getElementById('paramConditionsGenerales').value.trim(),
+    conditions_paiement_facture: document.getElementById('paramConditionsPaiementFacture').value.trim(),
+    conditions_generales_facture: document.getElementById('paramConditionsGeneralesFacture').value.trim(),
+    mention_acquittee: document.getElementById('paramMentionAcquittee').value.trim(),
     signataire_nom: document.getElementById('paramSignataireNom').value.trim(),
     signataire_titre: document.getElementById('paramSignataireTitre').value.trim(),
     modes_paiement: document.getElementById('paramModesPaiement').value.trim(),
