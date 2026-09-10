@@ -1189,6 +1189,7 @@ function esc(s) {
 }
 function fmt(n) { return Number(n || 0).toLocaleString('fr-FR') + ' GNF'; }
 function fmtNombre(n) { return Number(n || 0).toLocaleString('fr-FR'); }
+function fmtMontant(n) { return Math.round(Number(n) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
 function fmtAvecUnite(n) { return Number(n || 0).toLocaleString('fr-FR') + ' <small>GNF</small>'; }
 function today() { return new Date().toISOString().split('T')[0]; }
 function initiales(nom) {
@@ -1882,7 +1883,7 @@ function renderDocLignes() {
       + '<div><input type="number" min="0" value="' + (l.qte != null ? l.qte : 1) + '" oninput="modifierLigneQte(' + i + ',this.value)" style="width:100%;min-width:0;box-sizing:border-box;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;text-align:right;">'
       + (l.unite ? '<div style="font-size:9px;color:var(--text-muted);text-align:right;">' + esc(l.unite) + '</div>' : '') + '</div>'
       + '<input type="number" min="0" value="' + (l.prix != null ? l.prix : 0) + '" oninput="modifierLignePrix(' + i + ',this.value)">'
-      + '<div class="doc-line-total">' + fmtNombre(total) + '</div>'
+      + '<div class="doc-line-total">' + fmtMontant(total) + '</div>'
       + '<button class="doc-line-del" onclick="supprimerLigne(' + i + ')"><i class="ti ti-trash"></i></button>'
       + '</div>';
   }).join('');
@@ -1897,7 +1898,7 @@ function majLigneTotalEtGlobal(i) {
   const row = rows[i];
   if (row) {
     const total = Number(docLignes[i].qte || 0) * Number(docLignes[i].prix || 0);
-    row.querySelector('.doc-line-total').textContent = fmtNombre(total);
+    row.querySelector('.doc-line-total').textContent = fmtMontant(total);
   }
   recalculerTotauxDoc();
 }
@@ -1959,17 +1960,17 @@ function recalculerTotauxDoc() {
   }
   const acompte = Number(document.getElementById('docAcompte').value || 0);
   const reste = Math.max(0, total - acompte);
-  document.getElementById('docSousTotal').textContent = fmt(sousTotal);
+  document.getElementById('docSousTotal').textContent = fmtMontant(sousTotal) + ' GNF';
   const tvaRow = document.getElementById('docTvaRow');
   tvaRow.classList.toggle('hidden', !tvaActive);
   if (tvaActive) {
     document.getElementById('docTvaLabel').textContent = 'TVA ' + tauxTva + ' %';
-    document.getElementById('docTva').textContent = fmt(tvaMontant);
+    document.getElementById('docTva').textContent = fmtMontant(tvaMontant) + ' GNF';
   }
   document.getElementById('docAcompteCommandeLabel').textContent = 'Acompte à la commande (' + pctAcompte + ' %)';
-  document.getElementById('docAcompteCommande').textContent = fmt(acompteCommande);
-  document.getElementById('docTotal').textContent = fmt(total);
-  document.getElementById('docReste').textContent = fmt(reste);
+  document.getElementById('docAcompteCommande').textContent = fmtMontant(acompteCommande) + ' GNF';
+  document.getElementById('docTotal').textContent = fmtMontant(total) + ' GNF';
+  document.getElementById('docReste').textContent = fmtMontant(reste) + ' GNF';
 }
 
 async function saveDocument() {
@@ -2118,8 +2119,8 @@ function renderDocRow(d) {
     + '<div><span class="doc-type-badge ' + d.type + '">' + libelleCourtType(d.type) + '</span></div>'
     + '<div>' + dateStr + '</div>'
     + '<div>' + esc(d.client_nom) + '</div>'
-    + '<div class="doc-montant-col">' + fmt(d.total) + '</div>'
-    + '<div class="doc-reste-col">' + fmt(d.reste) + '</div>'
+    + '<div class="doc-montant-col">' + fmtMontant(d.total) + ' GNF</div>'
+    + '<div class="doc-reste-col">' + fmtMontant(d.reste) + ' GNF</div>'
     + '<div><span class="doc-statut-badge ' + d.statut + '">' + (DOC_STATUT_LABELS[d.statut] || d.statut) + '</span></div>'
     + '<div class="doc-actions-col">' + actions + '</div>'
     + '</div>';
@@ -2202,7 +2203,7 @@ function apercuDocumentBrouillon() {
 
 const STYLE_IMPRESSION = '@page{size:A4;margin:18mm 18mm 22mm;}'
   + '*{box-sizing:border-box;}'
-  + 'body{font-family:Inter,system-ui,sans-serif;color:#1F1F55;margin:0;font-size:11px;}'
+  + 'body{font-family:Inter,system-ui,sans-serif;color:#1F1F55;margin:0;font-size:11px;max-width:100%;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
   + '.watermark{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:100px;font-weight:700;color:rgba(220,38,38,.15);z-index:99;pointer-events:none;}'
   + '.entete{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;}'
   + '.entete-gauche{display:flex;gap:12px;align-items:flex-start;}'
@@ -2220,14 +2221,15 @@ const STYLE_IMPRESSION = '@page{size:A4;margin:18mm 18mm 22mm;}'
   + '.client-objet-box div div{margin-top:2px;}'
   + '.livraison-ligne{font-size:11px;color:#444;margin-bottom:14px;}'
   + 'table.lignes{width:100%;border-collapse:collapse;margin-bottom:14px;}'
-  + 'table.lignes thead th{color:#fff;font-weight:700;padding:8px;font-size:11px;text-align:left;border:1px solid #D5D6E2;}'
+  + 'table.lignes thead th{color:#fff;font-weight:600;padding:8px;font-size:11px;text-align:left;border:1px solid #D5D6E2;}'
   + 'table.lignes td{padding:8px;border:1px solid #D5D6E2;font-size:11px;}'
   + 'table.lignes th.c,table.lignes td.c{text-align:center;}'
   + 'table.lignes th.r,table.lignes td.r{text-align:right;}'
   + '.totaux{margin-left:auto;width:300px;margin-bottom:14px;}'
   + '.tot-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11.5px;color:#444;}'
-  + '.tot-total{color:#fff;font-weight:700;font-size:13px;padding:6px 14px;border-radius:4px;margin:4px 0;}'
-  + '.tot-total span{color:#fff;}'
+  + '.tot-total-row{align-items:center;margin:4px 0;}'
+  + '.tot-total-label{font-weight:700;font-size:13px;}'
+  + '.tot-total-value{color:#fff;font-weight:700;padding:6px 14px;border-radius:4px;font-size:13px;}'
   + '.tot-reste{font-weight:700;color:#A32D2D;}'
   + '.en-lettres{font-size:11px;font-style:italic;color:#333;margin-bottom:16px;}'
   + '.section-conditions{margin-bottom:14px;}'
@@ -2236,11 +2238,12 @@ const STYLE_IMPRESSION = '@page{size:A4;margin:18mm 18mm 22mm;}'
   + '.section-conditions ul{margin:0;padding-left:16px;list-style:none;}'
   + '.section-conditions li{position:relative;padding-left:12px;font-size:10.5px;color:#333;margin-bottom:3px;}'
   + '.section-conditions li:before{content:"•";position:absolute;left:0;}'
-  + '.signature-bloc{text-align:right;margin-top:40px;font-size:11px;}'
+  + '.signature-bloc{text-align:right;margin-top:40px;margin-right:0;padding-right:0;width:100%;font-size:11px;box-sizing:border-box;}'
   + '.signature-espace{height:50px;}'
   + '.signature-nom{font-weight:700;}'
   + '.signature-titre{font-style:italic;color:#444;margin-top:2px;}'
-  + '.pied{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:9px;color:#9A9AB5;padding:8px 0 0;border-top:1px solid #E3E4EC;}';
+  + '.pied{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:9px;color:#9A9AB5;white-space:normal;padding:8px 0 0;border-top:1px solid #E3E4EC;}'
+  + '.pied div{margin-top:2px;}';
 
 function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpression) {
   const P = paramsSource || PARAMS;
@@ -2279,21 +2282,21 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
   const lignesHtml = (doc.lignes || []).map(function(l, i) {
     const total = Number(l.qte || 0) * Number(l.prix || 0);
     const qteAffichee = l.unite ? (l.qte + ' ' + pluraliserUnite(l.unite, l.qte)) : l.qte;
-    return '<tr><td class="c">' + (i + 1) + '</td><td>' + esc(l.prestation) + '</td><td class="c">' + esc(qteAffichee) + '</td><td class="r">' + fmtNombre(l.prix) + '</td><td class="r">' + fmtNombre(total) + '</td></tr>';
+    return '<tr><td class="c">' + (i + 1) + '</td><td>' + esc(l.prestation) + '</td><td class="c">' + esc(qteAffichee) + '</td><td class="r">' + fmtMontant(l.prix) + '</td><td class="r">' + fmtMontant(total) + '</td></tr>';
   }).join('');
 
-  const tvaLigne = Number(doc.tva_montant) > 0 ? '<div class="tot-row"><span>TVA ' + fmtNombre(doc.tva_taux) + ' %</span><span>' + fmtNombre(doc.tva_montant) + ' ' + devise + '</span></div>' : '';
+  const tvaLigne = Number(doc.tva_montant) > 0 ? '<div class="tot-row"><span>TVA ' + fmtMontant(doc.tva_taux) + ' %</span><span>' + fmtMontant(doc.tva_montant) + ' ' + devise + '</span></div>' : '';
   let totauxHtml = '<div class="totaux">';
   if (Number(doc.remise) > 0) {
-    totauxHtml += '<div class="tot-row"><span>Sous-total</span><span>' + fmtNombre(doc.sous_total) + ' ' + devise + '</span></div>';
-    totauxHtml += '<div class="tot-row"><span>Remise</span><span>-' + fmtNombre(doc.remise) + ' ' + devise + '</span></div>';
+    totauxHtml += '<div class="tot-row"><span>Sous-total</span><span>' + fmtMontant(doc.sous_total) + ' ' + devise + '</span></div>';
+    totauxHtml += '<div class="tot-row"><span>Remise</span><span>-' + fmtMontant(doc.remise) + ' ' + devise + '</span></div>';
   }
   totauxHtml += tvaLigne;
-  totauxHtml += '<div class="tot-row tot-total" style="background:' + couleurAccent + ';"><span>TOTAL</span><span>' + fmtNombre(doc.total) + ' ' + devise + '</span></div>';
-  totauxHtml += '<div class="tot-row"><span>Acompte à la commande (' + pctAcompte + ' %)</span><span>' + fmtNombre(acompteCommande) + ' ' + devise + '</span></div>';
+  totauxHtml += '<div class="tot-row tot-total-row"><span class="tot-total-label" style="color:' + couleurPrincipale + ';">TOTAL</span><span class="tot-total-value" style="background:' + couleurAccent + ';">' + fmtMontant(doc.total) + ' ' + devise + '</span></div>';
+  totauxHtml += '<div class="tot-row"><span>Acompte à la commande (' + pctAcompte + ' %)</span><span>' + fmtMontant(acompteCommande) + ' ' + devise + '</span></div>';
   if (doc.type === 'facture') {
-    totauxHtml += '<div class="tot-row"><span>Acompte reçu</span><span>' + fmtNombre(doc.acompte) + ' ' + devise + '</span></div>';
-    totauxHtml += '<div class="tot-row tot-reste"><span>Reste à payer</span><span>' + fmtNombre(doc.reste) + ' ' + devise + '</span></div>';
+    totauxHtml += '<div class="tot-row"><span>Acompte reçu</span><span>' + fmtMontant(doc.acompte) + ' ' + devise + '</span></div>';
+    totauxHtml += '<div class="tot-row tot-reste"><span>Reste à payer</span><span>' + fmtMontant(doc.reste) + ' ' + devise + '</span></div>';
   }
   totauxHtml += '</div>';
 
@@ -2305,8 +2308,12 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
   function puceListe(texte) {
     return String(texte || '').split(/\n/).map(function(l) { return l.trim(); }).filter(Boolean);
   }
-  const conditionsPaiementPuces = puceListe(substituerPlaceholders(P.conditions_paiement, doc, P));
-  const conditionsGeneralesPuces = puceListe(substituerPlaceholders(P.conditions_generales, doc, P));
+  const conditionsPaiementPuces = puceListe(P.conditions_paiement).map(function(l) { return substituerPlaceholders(l, doc, P); });
+  let conditionsGeneralesBrutes = puceListe(P.conditions_generales);
+  if (doc.type !== 'devis') {
+    conditionsGeneralesBrutes = conditionsGeneralesBrutes.filter(function(l) { return l.indexOf('{validite}') === -1; });
+  }
+  const conditionsGeneralesPuces = conditionsGeneralesBrutes.map(function(l) { return substituerPlaceholders(l, doc, P); });
   if (doc.notes && doc.notes.trim()) conditionsGeneralesPuces.push(doc.notes.trim());
   function sectionPuces(titre, puces) {
     if (!puces.length) return '';
@@ -2321,7 +2328,9 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
     ? '<div class="signature-bloc"><div class="signature-espace"></div><div class="signature-nom">' + esc(P.signataire_nom || '') + '</div><div class="signature-titre">' + esc(P.signataire_titre || '') + '</div></div>'
     : '';
 
-  const piedBas = [piedLegal ? esc(piedLegal) : '', telephone ? 'Tél. : ' + esc(telephone) : '', email ? esc(email) : ''].filter(Boolean).join(' · ');
+  const piedLigne1 = piedLegal ? esc(piedLegal) : '';
+  const piedLigne2 = [telephone ? 'Tél. : ' + esc(telephone) : '', email ? 'E-mail : ' + esc(email) : ''].filter(Boolean).join(' · ');
+  const piedBas = (piedLigne1 ? '<div>' + piedLigne1 + '</div>' : '') + (piedLigne2 ? '<div>' + piedLigne2 + '</div>' : '');
 
   return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>' + esc(libelle) + ' ' + esc(doc.numero) + ' — ' + esc(enseigne) + '</title>'
     + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">'
