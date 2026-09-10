@@ -2203,7 +2203,8 @@ function apercuDocumentBrouillon() {
 
 const STYLE_IMPRESSION = '@page{size:A4;margin:18mm 18mm 22mm;}'
   + '*{box-sizing:border-box;}'
-  + 'body{font-family:Inter,system-ui,sans-serif;color:#1F1F55;margin:0;font-size:11px;max-width:100%;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+  + 'body{font-family:Inter,system-ui,sans-serif;color:#1F1F55;margin:0;font-size:11px;max-width:100%;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#E9EAF0;}'
+  + '.feuille{width:210mm;min-height:297mm;margin:24px auto;padding:18mm 18mm 30mm;background:#fff;box-shadow:0 4px 24px rgba(31,31,85,.15);box-sizing:border-box;position:relative;}'
   + '.watermark{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:100px;font-weight:700;color:rgba(220,38,38,.15);z-index:99;pointer-events:none;}'
   + '.entete{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;}'
   + '.entete-gauche{display:flex;gap:12px;align-items:flex-start;}'
@@ -2238,12 +2239,13 @@ const STYLE_IMPRESSION = '@page{size:A4;margin:18mm 18mm 22mm;}'
   + '.section-conditions ul{margin:0;padding-left:16px;list-style:none;}'
   + '.section-conditions li{position:relative;padding-left:12px;font-size:10.5px;color:#333;margin-bottom:3px;}'
   + '.section-conditions li:before{content:"•";position:absolute;left:0;}'
-  + '.signature-bloc{text-align:right;margin-top:40px;margin-right:0;padding-right:0;width:100%;font-size:11px;box-sizing:border-box;}'
+  + '.signature-bloc{text-align:right;margin-top:40px;margin-right:0;padding-right:0;width:100%;font-size:11px;box-sizing:border-box;page-break-inside:avoid;}'
   + '.signature-espace{height:50px;}'
   + '.signature-nom{font-weight:700;}'
   + '.signature-titre{font-style:italic;color:#444;margin-top:2px;}'
-  + '.pied{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:9px;color:#9A9AB5;white-space:normal;padding:8px 0 0;border-top:1px solid #E3E4EC;}'
-  + '.pied div{margin-top:2px;}';
+  + '.pied{position:absolute;bottom:10mm;left:18mm;right:18mm;text-align:center;font-size:9px;color:#9A9AB5;white-space:normal;padding:8px 0 0;border-top:1px solid #E3E4EC;}'
+  + '.pied div{margin-top:2px;}'
+  + '@media print{body{background:#fff;}.feuille{width:auto;min-height:auto;margin:0;padding:0;box-shadow:none;}.pied{position:fixed;bottom:0;left:0;right:0;}}';
 
 function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpression) {
   const P = paramsSource || PARAMS;
@@ -2336,6 +2338,7 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
     + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">'
     + '<style>' + STYLE_IMPRESSION + (avecBarreImpression ? BARRE_IMPRESSION_STYLE : '') + '</style></head><body>'
     + (avecBarreImpression ? BARRE_IMPRESSION_HTML : '')
+    + '<div class="feuille">'
     + (brouillon ? '<div class="watermark">BROUILLON</div>' : '')
     + '<div class="entete">'
     + '<div class="entete-gauche">' + logoHtml + '<div><div class="enseigne" style="color:' + couleurPrincipale + ';">' + enseigneHtml + '</div>'
@@ -2364,6 +2367,7 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
     + sectionPuces('CONDITIONS GÉNÉRALES', conditionsGeneralesPuces)
     + signatureHtml
     + '<div class="pied">' + piedBas + '</div>'
+    + '</div>'
     + '</body></html>';
 }
 
