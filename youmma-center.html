@@ -420,6 +420,31 @@ h1,h2,h3{margin:0;}
 .om-actions{display:flex;gap:10px;margin-bottom:20px;}
 .om-ouverture h3{font-size:15px;margin-bottom:16px;}
 
+/* ---- Orange Money (redesign) ---- */
+.om-ouverture-card{max-width:520px;margin:0 auto;text-align:center;}
+.om-ouverture-icon{width:48px;height:48px;border-radius:50%;background:var(--coral-bg);color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 14px;}
+.om-ouverture-titre{font-size:15px;font-weight:500;color:var(--text);margin-bottom:16px;}
+.om-ouverture-card .form-row{text-align:left;}
+.om-ouverture-card .form-row label{font-size:12px;color:var(--text-muted);font-weight:600;}
+.om-ouverture-card .form-row input{border:1.5px solid var(--border);border-radius:8px;}
+.om-ouverture-card input[readonly]{background:var(--bg-page);color:var(--text-muted);cursor:not-allowed;}
+.om-banner-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;white-space:nowrap;}
+.om-banner-btn.depot{background:var(--green-bg);color:#27500A;}
+.om-banner-btn.retrait{background:var(--red-bg);color:#791F1F;}
+.om-cloture-row{display:flex;justify-content:flex-end;margin-top:4px;}
+.om-btn-cloture{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;border:1.5px solid var(--border);color:var(--text);}
+#modalOMCloture .modal-header{background:var(--indigo-dark);border-bottom:3px solid var(--orange);}
+#modalOMCloture .modal-header h3{color:#fff;}
+#modalOMCloture .modal-header .modal-close{color:#fff;}
+#modalOMCloture .form-row label{font-size:12px;color:var(--text-muted);font-weight:600;}
+#modalOMCloture .form-row input{border:1.5px solid var(--border);border-radius:8px;}
+@media (max-width:600px){
+  .om-ouverture-card .form-row-2{grid-template-columns:1fr;}
+}
+@media (max-width:768px){
+  #page-om .kpi-grid{grid-template-columns:repeat(2,1fr);}
+}
+
 .cloture-resume{background:#F9FAFB;border-radius:10px;padding:12px 14px;margin-bottom:14px;}
 .cloture-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13.5px;}
 .cloture-row-bold{font-weight:800;border-top:1px solid #E5E7EB;margin-top:4px;padding-top:8px;}
@@ -809,9 +834,17 @@ h1,h2,h3{margin:0;}
 
       <!-- PAGE 4 : ORANGE MONEY -->
       <section id="page-om" class="page">
-        <div class="page-header">
-          <h2>📱 Orange Money</h2>
-          <button class="btn btn-ghost gerant-only" onclick="ouvrirHistoriqueOM()">📜 Historique</button>
+        <div class="taches-header">
+          <div class="taches-header-left">
+            <div class="taches-header-icon" style="width:38px;height:38px;"><i class="ti ti-device-mobile"></i></div>
+            <div>
+              <h2>Orange Money</h2>
+              <div class="taches-header-sub" id="omSousTitre">—</div>
+            </div>
+          </div>
+          <div class="taches-header-right">
+            <button class="caisse-action-btn historique gerant-only" onclick="ouvrirHistoriqueOM()"><i class="ti ti-history"></i> Historique</button>
+          </div>
         </div>
         <div id="omContent"></div>
       </section>
@@ -3381,6 +3414,9 @@ async function loadOM() {
   const t = today();
   const { data } = await sb.from('yc_orange_money').select('*').eq('date', t).order('id', { ascending: false }).limit(1);
   omSessionToday = (data && data[0]) || null;
+  const dateBrute = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const sousTitreEl = document.getElementById('omSousTitre');
+  if (sousTitreEl) sousTitreEl.textContent = dateBrute.charAt(0).toUpperCase() + dateBrute.slice(1) + ' · Dubréka';
   renderOM();
 }
 
@@ -3392,13 +3428,15 @@ function renderOM() {
 }
 
 function renderOMOuverture() {
-  return '<div class="card om-ouverture"><h3>🔓 Ouvrir la journée Orange Money</h3>'
-    + '<div class="form-row"><label>Nom de l\'agent</label><input type="text" id="omOuvAgent" value="' + esc(session.nom) + '"></div>'
+  return '<div class="card om-ouverture-card">'
+    + '<div class="om-ouverture-icon"><i class="ti ti-device-mobile"></i></div>'
+    + '<div class="om-ouverture-titre">Ouvrir la journée Orange Money</div>'
+    + '<div class="form-row"><label>Nom de l\'agent</label><input type="text" id="omOuvAgent" value="' + esc(session.nom) + '" readonly></div>'
     + '<div class="form-row-2"><div class="form-row"><label>Solde OM de départ (GNF)</label><input type="number" id="omOuvSoldeOm" min="0" value="0"></div>'
     + '<div class="form-row"><label>Cash de départ (GNF)</label><input type="number" id="omOuvCash" min="0" value="0"></div></div>'
     + '<div class="form-row"><label>Taux de commission (%)</label><input type="number" id="omOuvTaux" min="0" step="0.1" value="1.5"></div>'
     + '<div id="omOuvErreur" class="form-error hidden"></div>'
-    + '<button class="btn btn-primary btn-block" onclick="ouvrirJourneeOM()">Ouvrir la journée</button></div>';
+    + '<button class="btn btn-primary btn-block" onclick="ouvrirJourneeOM()"><i class="ti ti-player-play"></i> Ouvrir la journée</button></div>';
 }
 
 async function ouvrirJourneeOM() {
@@ -3420,23 +3458,33 @@ async function ouvrirJourneeOM() {
 }
 
 function renderOMOuvert(om) {
-  const boutonCloture = session.role === 'gerant' ? '<button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="openModal(\'modalOMCloture\')">🔒 Clôturer la journée</button>' : '';
-  return '<div class="card om-header">'
-    + '<div><div class="om-label">Ouverte le</div><div class="om-value">' + new Date(om.date).toLocaleDateString('fr-FR') + ' — ' + esc(om.agent_nom) + '</div></div>'
-    + '<div><div class="om-label">Solde OM ouverture</div><div class="om-value">' + fmt(om.solde_ouverture_om) + '</div></div>'
-    + '<div><div class="om-label">Cash ouverture</div><div class="om-value">' + fmt(om.solde_ouverture_cash) + '</div></div></div>'
-    + '<div class="om-actions"><button class="btn btn-success" onclick="openModalOMTransaction(\'depot\')">+ Dépôt</button>'
-    + '<button class="btn btn-danger-outline" onclick="openModalOMTransaction(\'retrait\')">– Retrait</button></div>'
-    + '<div class="stats-grid stats-grid-4">'
-    + '<div class="stat-card"><div class="stat-value">' + fmt(om.total_depots) + '</div><div class="stat-label">Total dépôts</div></div>'
-    + '<div class="stat-card"><div class="stat-value">' + fmt(om.total_retraits) + '</div><div class="stat-label">Total retraits</div></div>'
-    + '<div class="stat-card"><div class="stat-value">' + (om.nb_transactions || 0) + '</div><div class="stat-label">Transactions</div></div>'
-    + '<div class="stat-card"><div class="stat-value text-success">' + fmt(om.benefice_jour) + '</div><div class="stat-label">Bénéfice estimé</div></div></div>'
+  const boutonCloture = session.role === 'gerant'
+    ? '<div class="om-cloture-row"><button class="om-btn-cloture" onclick="openModal(\'modalOMCloture\')"><i class="ti ti-lock"></i> Clôturer la journée</button></div>'
+    : '';
+  const dateAffichee = new Date(om.date).toLocaleDateString('fr-FR');
+  return '<div class="aj-banner">'
+    + '<i class="ti ti-device-mobile aj-banner-watermark"></i>'
+    + '<div class="aj-banner-row1">'
+    + '<div class="aj-banner-avatar"><i class="ti ti-device-mobile"></i></div>'
+    + '<div><div class="aj-banner-title">Session du ' + dateAffichee + ' · ' + esc(om.agent_nom) + '</div>'
+    + '<div class="aj-banner-date">Solde OM ouverture : ' + fmtMontant(om.solde_ouverture_om) + ' GNF · Cash ouverture : ' + fmtMontant(om.solde_ouverture_cash) + ' GNF · Commission ' + (om.taux_commission || 0) + ' %</div></div>'
+    + '</div>'
+    + '<div class="aj-banner-actions">'
+    + '<button class="om-banner-btn depot" onclick="openModalOMTransaction(\'depot\')"><i class="ti ti-arrow-down-circle"></i> + Dépôt</button>'
+    + '<button class="om-banner-btn retrait" onclick="openModalOMTransaction(\'retrait\')"><i class="ti ti-arrow-up-circle"></i> − Retrait</button>'
+    + '</div>'
+    + '</div>'
+    + '<div class="kpi-grid">'
+    + '<div class="kpi-card"><div class="kpi-icon green"><i class="ti ti-arrow-down-circle"></i></div><div><div class="kpi-label">Total dépôts</div><div class="kpi-value">' + fmtMontant(om.total_depots) + ' GNF</div></div></div>'
+    + '<div class="kpi-card"><div class="kpi-icon red"><i class="ti ti-arrow-up-circle"></i></div><div><div class="kpi-label">Total retraits</div><div class="kpi-value">' + fmtMontant(om.total_retraits) + ' GNF</div></div></div>'
+    + '<div class="kpi-card"><div class="kpi-icon blue"><i class="ti ti-arrows-exchange"></i></div><div><div class="kpi-label">Transactions</div><div class="kpi-value">' + (om.nb_transactions || 0) + '</div></div></div>'
+    + '<div class="kpi-card"><div class="kpi-icon amber"><i class="ti ti-coin"></i></div><div><div class="kpi-label">Bénéfice estimé</div><div class="kpi-value">' + fmtMontant(om.benefice_jour) + ' GNF</div></div></div>'
+    + '</div>'
     + boutonCloture;
 }
 
 function renderOMCloture(om) {
-  return '<div class="card"><h3>✅ Journée clôturée</h3><div class="cloture-resume">'
+  return '<div class="card"><h3><i class="ti ti-circle-check" style="color:var(--green);"></i> Journée clôturée</h3><div class="cloture-resume">'
     + '<div class="cloture-row"><span>Solde OM fermeture</span><span>' + fmt(om.solde_fermeture_om) + '</span></div>'
     + '<div class="cloture-row"><span>Cash fermeture</span><span>' + fmt(om.solde_fermeture_cash) + '</span></div>'
     + '<div class="cloture-row"><span>Écart OM</span><span class="' + (Number(om.ecart_om) === 0 ? 'text-success' : 'text-danger') + '">' + fmt(om.ecart_om) + '</span></div>'
@@ -3500,7 +3548,7 @@ async function ouvrirHistoriqueOM() {
   const { data } = await sb.from('yc_orange_money').select('*').order('date', { ascending: false }).limit(60);
   const sessionsOM = data || [];
   document.getElementById('histOMListe').innerHTML = sessionsOM.length ? sessionsOM.map(function(om) {
-    const statutLabel = om.statut === 'cloture' ? '✅ Clôturée' : '🔓 Ouverte';
+    const statutLabel = om.statut === 'cloture' ? '<i class="ti ti-circle-check" style="color:var(--green);"></i> Clôturée' : '<i class="ti ti-lock-open" style="color:var(--amber);"></i> Ouverte';
     return '<div class="caisse-row"><div><div class="caisse-libelle">' + new Date(om.date).toLocaleDateString('fr-FR') + ' — ' + esc(om.agent_nom) + '</div><div class="caisse-meta">' + statutLabel + '</div></div>'
       + '<div class="caisse-montant text-success">' + fmt(om.benefice_jour) + '</div></div>';
   }).join('') : '<div class="empty">Aucune session.</div>';
