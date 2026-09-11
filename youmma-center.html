@@ -382,6 +382,38 @@ h1,h2,h3{margin:0;}
 .caisse-meta{font-size:11.5px;color:#9CA3AF;text-transform:capitalize;}
 .caisse-montant{font-weight:800;font-size:14px;}
 
+/* ---- Caisse (redesign) ---- */
+.kpi-icon.red{background:var(--red-bg);color:var(--red);}
+.kpi-icon.orange{background:var(--coral-bg);color:var(--orange);}
+.kpi-sub{font-size:11px;color:var(--text-light);margin-top:2px;}
+.caisse-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.caisse-actions{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.caisse-action-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+.caisse-action-btn.encaisser{background:var(--green-bg);color:#27500A;}
+.caisse-action-btn.depense{background:var(--red-bg);color:#791F1F;}
+.caisse-action-btn.historique{background:#fff;border:1.5px solid var(--border);color:var(--text);}
+.caisse-op-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.caisse-op-header-left{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:500;color:var(--text);}
+.caisse-op-count{background:var(--bg-page);color:var(--text-muted);font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px;}
+.caisse-op-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #F3F4F6;}
+.caisse-op-row:last-child{border-bottom:none;}
+.caisse-op-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.caisse-op-icon.entree{background:var(--green-bg);color:var(--green);}
+.caisse-op-icon.sortie{background:var(--red-bg);color:var(--red);}
+.caisse-op-texte{flex:1;min-width:0;}
+.caisse-op-libelle{font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.caisse-op-meta{font-size:11.5px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:none;}
+.caisse-op-montant{font-size:13.5px;font-weight:500;flex-shrink:0;}
+#modalEncaisser .modal-header,#modalDepense .modal-header{background:var(--indigo-dark);border-bottom:3px solid var(--orange);}
+#modalEncaisser .modal-header h3,#modalDepense .modal-header h3{color:#fff;}
+#modalEncaisser .modal-header .modal-close,#modalDepense .modal-header .modal-close{color:#fff;}
+#modalEncaisser .form-row label,#modalDepense .form-row label{font-size:12px;color:var(--text-muted);font-weight:600;}
+#modalEncaisser .form-row input,#modalEncaisser .form-row select,#modalDepense .form-row input,#modalDepense .form-row select{border:1.5px solid var(--border);border-radius:8px;}
+@media (max-width:600px){
+  .caisse-kpi-grid{grid-template-columns:1fr;}
+  .caisse-actions{display:grid;grid-template-columns:1fr 1fr;}
+}
+
 .om-header{display:flex;gap:24px;flex-wrap:wrap;}
 .om-label{font-size:11px;color:#9CA3AF;font-weight:600;text-transform:uppercase;}
 .om-value{font-size:14px;font-weight:800;color:#1A1A4E;margin-top:2px;}
@@ -705,20 +737,50 @@ h1,h2,h3{margin:0;}
 
       <!-- PAGE 3 : CAISSE -->
       <section id="page-caisse" class="page">
-        <div class="page-header"><h2>💰 Caisse</h2></div>
-        <div class="stats-grid stats-grid-3">
-          <div class="stat-card"><div class="stat-value text-success" id="caisseEntrees">—</div><div class="stat-label">Entrées du jour</div></div>
-          <div class="stat-card"><div class="stat-value text-danger" id="caisseSorties">—</div><div class="stat-label">Sorties du jour</div></div>
-          <div class="stat-card"><div class="stat-value" id="caisseSolde">—</div><div class="stat-label">Solde net</div></div>
+        <div class="taches-header">
+          <div class="taches-header-left">
+            <div class="taches-header-icon" style="width:38px;height:38px;"><i class="ti ti-cash"></i></div>
+            <div>
+              <h2>Caisse</h2>
+              <div class="taches-header-sub" id="caisseSousTitre">—</div>
+            </div>
+          </div>
         </div>
-        <div class="quick-actions">
-          <button class="btn btn-success" onclick="openModal('modalEncaisser')">+ Encaisser</button>
-          <button class="btn btn-danger-outline restricted" onclick="openModal('modalDepense')">– Dépense</button>
-          <button class="btn btn-ghost restricted" onclick="openModalCloture()">🔒 Clôturer la journée</button>
-          <button class="btn btn-ghost gerant-only" onclick="ouvrirHistoriqueCaisse()">📜 Historique complet</button>
+        <div class="caisse-kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon green"><i class="ti ti-trending-up"></i></div>
+            <div>
+              <div class="kpi-label">Entrées du jour</div>
+              <div class="kpi-value" id="caisseEntrees" style="color:var(--green);">—</div>
+              <div class="kpi-sub" id="caisseEntreesNb"></div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon red"><i class="ti ti-trending-down"></i></div>
+            <div>
+              <div class="kpi-label">Sorties du jour</div>
+              <div class="kpi-value" id="caisseSorties" style="color:var(--red);">—</div>
+              <div class="kpi-sub" id="caisseSortiesNb"></div>
+            </div>
+          </div>
+          <div class="kpi-card" style="border:1.5px solid var(--orange);">
+            <div class="kpi-icon orange"><i class="ti ti-scale"></i></div>
+            <div>
+              <div class="kpi-label">Solde net</div>
+              <div class="kpi-value" id="caisseSolde" style="color:var(--orange);">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="caisse-actions">
+          <button class="caisse-action-btn encaisser" onclick="openModal('modalEncaisser')"><i class="ti ti-plus"></i> Encaisser</button>
+          <button class="caisse-action-btn depense restricted" onclick="openModal('modalDepense')"><i class="ti ti-minus"></i> Dépense</button>
+          <button class="caisse-action-btn historique gerant-only" onclick="ouvrirHistoriqueCaisse()"><i class="ti ti-history"></i> Historique complet</button>
         </div>
         <div class="card">
-          <h3>Opérations du jour</h3>
+          <div class="caisse-op-header">
+            <div class="caisse-op-header-left"><i class="ti ti-list" style="color:var(--orange);"></i> Opérations du jour</div>
+            <span class="caisse-op-count" id="caisseOpCount">0</span>
+          </div>
           <div id="caisseListe"></div>
         </div>
       </section>
@@ -1039,25 +1101,6 @@ h1,h2,h3{margin:0;}
       <div id="dErreur" class="form-error hidden"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalDepense')">Annuler</button><button class="btn btn-primary" onclick="enregistrerDepense()">Enregistrer</button></div>
-  </div>
-</div>
-
-<div id="modalClotureCaisse" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-header"><h3>Clôturer la journée</h3><button class="modal-close" onclick="closeModal('modalClotureCaisse')">×</button></div>
-    <div class="modal-body">
-      <div class="cloture-resume">
-        <div class="cloture-row"><span>Entrées</span><span id="clotEntrees" class="text-success"></span></div>
-        <div class="cloture-row"><span>Sorties</span><span id="clotSorties" class="text-danger"></span></div>
-        <div class="cloture-row cloture-row-bold"><span>Solde</span><span id="clotSolde"></span></div>
-      </div>
-      <div class="form-row"><label>Espèces comptées (GNF)</label><input type="number" id="clotEspeces" min="0" oninput="calculerEcartCloture()"></div>
-      <div id="clotEcart" class="cloture-ecart hidden"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modalClotureCaisse')">Fermer</button>
-      <button class="btn btn-primary" onclick="envoyerRapportWhatsapp()">📱 WhatsApp</button>
-    </div>
   </div>
 </div>
 
@@ -1977,18 +2020,31 @@ async function loadCaisse() {
   const t = today();
   const { data } = await sb.from('yc_caisse').select('*').eq('date', t).order('created_at', { ascending: false });
   const ops = data || [];
-  caisseEntreesJour = ops.filter(function(o) { return o.type === 'entree'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
-  caisseSortiesJour = ops.filter(function(o) { return o.type === 'sortie'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
-  document.getElementById('caisseEntrees').textContent = fmt(caisseEntreesJour);
-  document.getElementById('caisseSorties').textContent = fmt(caisseSortiesJour);
-  document.getElementById('caisseSolde').textContent = fmt(caisseEntreesJour - caisseSortiesJour);
-  document.getElementById('caisseListe').innerHTML = ops.length ? ops.map(renderCaisseRow).join('') : '<div class="empty">Aucune opération aujourd\'hui.</div>';
+  const entrees = ops.filter(function(o) { return o.type === 'entree'; });
+  const sorties = ops.filter(function(o) { return o.type === 'sortie'; });
+  caisseEntreesJour = entrees.reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+  caisseSortiesJour = sorties.reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+  document.getElementById('caisseEntrees').textContent = fmtMontant(caisseEntreesJour) + ' GNF';
+  document.getElementById('caisseSorties').textContent = fmtMontant(caisseSortiesJour) + ' GNF';
+  document.getElementById('caisseSolde').textContent = fmtMontant(caisseEntreesJour - caisseSortiesJour) + ' GNF';
+  document.getElementById('caisseEntreesNb').textContent = entrees.length + ' opération' + (entrees.length > 1 ? 's' : '');
+  document.getElementById('caisseSortiesNb').textContent = sorties.length + ' opération' + (sorties.length > 1 ? 's' : '');
+  document.getElementById('caisseOpCount').textContent = ops.length;
+  document.getElementById('caisseListe').innerHTML = ops.length ? ops.map(renderCaisseOpRow).join('') : '<div class="priority-empty"><i class="ti ti-receipt-off"></i>Aucune opération aujourd\'hui.</div>';
+
+  const dateBrute = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('caisseSousTitre').textContent = dateBrute.charAt(0).toUpperCase() + dateBrute.slice(1) + ' · Dubréka';
 }
 
-function renderCaisseRow(o) {
+function renderCaisseOpRow(o) {
   const isEntree = o.type === 'entree';
-  return '<div class="caisse-row"><div><div class="caisse-libelle">' + esc(o.libelle) + '</div><div class="caisse-meta">' + esc(o.categorie || '') + ' · ' + esc(o.agent_nom || '') + '</div></div>'
-    + '<div class="caisse-montant ' + (isEntree ? 'text-success' : 'text-danger') + '">' + (isEntree ? '+ ' : '– ') + fmt(o.montant) + '</div></div>';
+  const heure = o.created_at ? new Date(o.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+  const meta = [o.categorie || '', o.agent_nom || '', heure].filter(Boolean).join(' · ');
+  return '<div class="caisse-op-row">'
+    + '<div class="caisse-op-icon ' + (isEntree ? 'entree' : 'sortie') + '"><i class="ti ti-arrow-' + (isEntree ? 'down' : 'up') + '-circle"></i></div>'
+    + '<div class="caisse-op-texte"><div class="caisse-op-libelle">' + esc(o.libelle) + '</div><div class="caisse-op-meta">' + esc(meta) + '</div></div>'
+    + '<div class="caisse-op-montant" style="color:' + (isEntree ? 'var(--green)' : 'var(--red)') + ';">' + (isEntree ? '+ ' : '− ') + fmtMontant(o.montant) + ' GNF</div>'
+    + '</div>';
 }
 
 async function enregistrerEncaissement() {
@@ -2025,39 +2081,6 @@ async function enregistrerDepense() {
   showToast('Dépense enregistrée ✅');
   loadCaisse();
   if (document.getElementById('page-aujourdhui').classList.contains('active')) loadAujourdhui();
-}
-
-function openModalCloture() {
-  document.getElementById('clotEntrees').textContent = fmt(caisseEntreesJour);
-  document.getElementById('clotSorties').textContent = fmt(caisseSortiesJour);
-  document.getElementById('clotSolde').textContent = fmt(caisseEntreesJour - caisseSortiesJour);
-  document.getElementById('clotEspeces').value = '';
-  document.getElementById('clotEcart').classList.add('hidden');
-  openModal('modalClotureCaisse');
-}
-
-function calculerEcartCloture() {
-  const compte = Number(document.getElementById('clotEspeces').value || 0);
-  const solde = caisseEntreesJour - caisseSortiesJour;
-  const ecart = compte - solde;
-  const el = document.getElementById('clotEcart');
-  el.classList.remove('hidden');
-  el.textContent = ecart === 0 ? '✅ Caisse juste (écart 0)' : (ecart > 0 ? '⚠️ Excédent de ' + fmt(ecart) : '⚠️ Manque de ' + fmt(Math.abs(ecart)));
-  el.className = 'cloture-ecart ' + (ecart === 0 ? 'text-success' : 'text-danger');
-}
-
-function envoyerRapportWhatsapp() {
-  const compte = Number(document.getElementById('clotEspeces').value || 0);
-  const solde = caisseEntreesJour - caisseSortiesJour;
-  const ecart = compte - solde;
-  const msg = 'Rapport de caisse YOUMMA CENTER — ' + new Date().toLocaleDateString('fr-FR') + '\n'
-    + 'Agent: ' + session.nom + '\n'
-    + 'Entrées: ' + fmt(caisseEntreesJour) + '\n'
-    + 'Sorties: ' + fmt(caisseSortiesJour) + '\n'
-    + 'Solde: ' + fmt(solde) + '\n'
-    + 'Espèces comptées: ' + fmt(compte) + '\n'
-    + 'Écart: ' + (ecart === 0 ? '0 (juste)' : fmt(ecart));
-  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
 async function ouvrirHistoriqueCaisse() {
