@@ -405,6 +405,44 @@ h1,h2,h3{margin:0;}
 .top5-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F3F4F6;font-size:13.5px;}
 .top5-row:last-child{border-bottom:none;}
 
+/* ---- Performance des agents (Rapports) ---- */
+.perf-header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+.perf-header-left{display:flex;align-items:center;gap:10px;}
+.perf-sous-titre{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.perf-mois-select{display:flex;align-items:center;gap:6px;border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;}
+.perf-mois-select i{color:var(--text-light);font-size:14px;}
+.perf-mois-select select{border:none;background:none;font-size:13px;font-family:inherit;cursor:pointer;color:var(--text);}
+.perf-toggle-angle{display:flex;gap:6px;margin-bottom:16px;background:var(--bg-page);border-radius:10px;padding:4px;width:fit-content;}
+.perf-angle-btn{padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:600;border:none;background:none;color:var(--text-muted);cursor:pointer;}
+.perf-angle-btn.active{background:#fff;color:var(--indigo);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.perf-podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:14px;align-items:end;margin-bottom:20px;}
+.perf-podium-card{background:var(--bg-page);border-radius:12px;padding:16px 12px;text-align:center;position:relative;}
+.perf-podium-card.rang-1{background:linear-gradient(135deg,#FFF7E0,#FFEFC2);padding-top:28px;transform:scale(1.05);}
+.perf-podium-crown{position:absolute;top:-14px;left:50%;transform:translateX(-50%);color:#D4A017;font-size:22px;}
+.perf-podium-avatar{width:52px;height:52px;border-radius:50%;background:var(--indigo);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px;margin:0 auto 8px;}
+.perf-podium-nom{font-weight:700;font-size:13.5px;color:var(--text);}
+.perf-podium-role{font-size:11px;color:var(--text-muted);text-transform:capitalize;margin-bottom:8px;}
+.perf-podium-taches{font-size:20px;font-weight:800;color:var(--text);}
+.perf-podium-taches-label{font-size:10.5px;color:var(--text-light);text-transform:uppercase;}
+.perf-podium-montant{font-size:13px;font-weight:700;color:var(--green);margin-top:4px;}
+.perf-medaille{font-size:20px;margin-top:6px;}
+.perf-table{width:100%;border-collapse:collapse;}
+.perf-table th{text-align:left;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;padding:6px 10px;border-bottom:1px solid var(--border);}
+.perf-table td{padding:10px;border-bottom:1px solid #F3F4F6;font-size:13px;vertical-align:middle;}
+.perf-table .perf-col-taches{text-align:center;}
+.perf-table td.perf-col-montant{text-align:right;color:var(--green);font-weight:700;}
+.perf-agent-cell{display:flex;align-items:center;gap:8px;}
+.perf-agent-avatar{width:30px;height:30px;border-radius:50%;background:var(--indigo);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:11.5px;flex-shrink:0;}
+.perf-agent-nom{font-weight:600;color:var(--text);}
+.perf-agent-role{font-size:11px;color:var(--text-muted);text-transform:capitalize;}
+.perf-part-bar-wrap{display:flex;align-items:center;gap:8px;}
+.perf-part-bar{flex:1;height:6px;border-radius:4px;background:var(--bg-page);overflow:hidden;}
+.perf-part-bar-fill{height:100%;background:var(--orange);border-radius:4px;}
+.perf-part-pct{font-size:12px;color:var(--text-muted);min-width:36px;text-align:right;}
+.perf-note{font-size:11px;color:var(--text-light);display:flex;align-items:center;gap:6px;margin-top:14px;}
+@media (max-width:700px){ .perf-podium{grid-template-columns:1fr;} .perf-podium-card.rang-1{transform:none;} }
+@media (max-width:600px){ .perf-col-part{display:none;} }
+
 .agent-row{display:flex;justify-content:space-between;align-items:center;}
 .agent-nom{font-weight:700;font-size:14px;color:#1A1A4E;}
 .agent-meta{font-size:12px;color:#9CA3AF;text-transform:capitalize;margin-top:2px;}
@@ -732,6 +770,27 @@ h1,h2,h3{margin:0;}
         <div class="card">
           <h3>🗒️ Journal des actions</h3>
           <div id="rapJournal"></div>
+        </div>
+        <div class="card">
+          <div class="perf-header">
+            <div class="perf-header-left">
+              <i class="ti ti-trophy" style="color:var(--orange);font-size:20px;"></i>
+              <div>
+                <h3 style="margin:0;">Performance des agents</h3>
+                <div class="perf-sous-titre" id="perfSousTitre">Classement du mois — …</div>
+              </div>
+            </div>
+            <div class="perf-mois-select">
+              <i class="ti ti-calendar"></i>
+              <select id="perfMoisSelect" onchange="onPerfMoisChange()"></select>
+            </div>
+          </div>
+          <div class="perf-toggle-angle">
+            <button type="button" class="perf-angle-btn active" id="perfAnglePriseEnCharge" onclick="setPerfAngle('prise_en_charge')">Prise en charge</button>
+            <button type="button" class="perf-angle-btn" id="perfAngleRealisation" onclick="setPerfAngle('realisation')">Réalisation</button>
+          </div>
+          <div id="perfContenu"></div>
+          <div class="perf-note"><i class="ti ti-info-circle"></i> Basé sur les tâches validées du mois. Le classement se réinitialise chaque mois.</div>
         </div>
       </section>
 
@@ -3580,6 +3639,129 @@ async function loadRapports() {
     sb.from('yc_taches').select('*').order('date_creation', { ascending: false }).limit(50),
   ]);
   renderJournal('rapJournal', construireActionsCaisse(caisseJournal).concat(construireActionsTaches(tachesJournal)), 50);
+
+  await chargerPerformanceAgents();
+}
+
+/* ── PERFORMANCE DES AGENTS (Rapports) ── */
+let perfMoisSelectionne = null;
+let perfAngle = 'prise_en_charge';
+let perfTachesMoisCache = [];
+let perfAgentsRoleMap = {};
+
+function moisListeDouzeMois() {
+  const liste = [];
+  const now = new Date();
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const valeur = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    const libelleBrut = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    liste.push({ valeur: valeur, libelle: libelleBrut.charAt(0).toUpperCase() + libelleBrut.slice(1) });
+  }
+  return liste;
+}
+
+function remplirSelectMoisPerf() {
+  const sel = document.getElementById('perfMoisSelect');
+  const liste = moisListeDouzeMois();
+  if (!perfMoisSelectionne) perfMoisSelectionne = liste[0].valeur;
+  sel.innerHTML = liste.map(function(m) { return '<option value="' + m.valeur + '">' + m.libelle + '</option>'; }).join('');
+  sel.value = perfMoisSelectionne;
+}
+
+function onPerfMoisChange() {
+  perfMoisSelectionne = document.getElementById('perfMoisSelect').value;
+  chargerPerformanceAgents();
+}
+
+function setPerfAngle(angle) {
+  perfAngle = angle;
+  document.getElementById('perfAnglePriseEnCharge').classList.toggle('active', angle === 'prise_en_charge');
+  document.getElementById('perfAngleRealisation').classList.toggle('active', angle === 'realisation');
+  renderPerformanceAgents();
+}
+
+async function chargerPerformanceAgents() {
+  remplirSelectMoisPerf();
+  const [annee, mois] = perfMoisSelectionne.split('-').map(Number);
+  const debut = new Date(annee, mois - 1, 1).toISOString().split('T')[0];
+  const fin = new Date(annee, mois, 0).toISOString().split('T')[0];
+  const [{ data: taches }, { data: agents }] = await Promise.all([
+    sb.from('yc_taches').select('id,montant,agent_nom,termine_par,date_validation').eq('statut', 'valide').gte('date_validation', debut + 'T00:00:00').lte('date_validation', fin + 'T23:59:59'),
+    sb.from('yc_agents').select('nom,role'),
+  ]);
+  perfTachesMoisCache = taches || [];
+  perfAgentsRoleMap = {};
+  (agents || []).forEach(function(a) { perfAgentsRoleMap[a.nom] = a.role; });
+  const selectEl = document.getElementById('perfMoisSelect');
+  const moisLibelle = selectEl.selectedOptions[0] ? selectEl.selectedOptions[0].textContent : '';
+  document.getElementById('perfSousTitre').textContent = 'Classement du mois — ' + moisLibelle;
+  renderPerformanceAgents();
+}
+
+function calculerClassementPerf(taches, angle, agentsRoleMap) {
+  const champ = angle === 'realisation' ? 'termine_par' : 'agent_nom';
+  const parAgent = {};
+  taches.forEach(function(t) {
+    const nom = t[champ];
+    if (!nom) return;
+    if (!parAgent[nom]) parAgent[nom] = { nom: nom, nbTaches: 0, montant: 0 };
+    parAgent[nom].nbTaches += 1;
+    parAgent[nom].montant += Number(t.montant || 0);
+  });
+  const liste = Object.values(parAgent).filter(function(a) { return a.montant > 0; });
+  liste.sort(function(a, b) { return (b.montant - a.montant) || (b.nbTaches - a.nbTaches); });
+  const totalMois = liste.reduce(function(s, a) { return s + a.montant; }, 0);
+  liste.forEach(function(a) {
+    a.role = agentsRoleMap[a.nom] || '';
+    a.part = totalMois > 0 ? (a.montant / totalMois * 100) : 0;
+  });
+  return liste;
+}
+
+function renderPodiumPerf(top3) {
+  const slots = [top3[1] || null, top3[0] || null, top3[2] || null];
+  const medailles = ['🥈', '🥇', '🥉'];
+  const rangs = [2, 1, 3];
+  return '<div class="perf-podium">' + slots.map(function(agent, i) {
+    if (!agent) return '<div></div>';
+    const estPremier = rangs[i] === 1;
+    return '<div class="perf-podium-card' + (estPremier ? ' rang-1' : '') + '">'
+      + (estPremier ? '<i class="ti ti-crown perf-podium-crown"></i>' : '')
+      + '<div class="perf-podium-avatar">' + initiales(agent.nom) + '</div>'
+      + '<div class="perf-podium-nom">' + esc(agent.nom) + '</div>'
+      + '<div class="perf-podium-role">' + esc(ROLE_LABELS[agent.role] || agent.role || '') + '</div>'
+      + '<div class="perf-podium-taches">' + agent.nbTaches + '</div>'
+      + '<div class="perf-podium-taches-label">tâche' + (agent.nbTaches > 1 ? 's' : '') + '</div>'
+      + '<div class="perf-podium-montant">' + fmtMontant(agent.montant) + ' GNF</div>'
+      + '<div class="perf-medaille">' + medailles[i] + '</div>'
+      + '</div>';
+  }).join('') + '</div>';
+}
+
+function renderTableauPerf(liste) {
+  const medailles = { 1: '🥇', 2: '🥈', 3: '🥉' };
+  return '<table class="perf-table"><thead><tr><th>Rang</th><th>Agent</th><th class="perf-col-taches">Tâches</th><th style="text-align:right;">Montant</th><th class="perf-col-part">Part du CA</th></tr></thead><tbody>'
+    + liste.map(function(a, i) {
+      const rang = i + 1;
+      return '<tr>'
+        + '<td>' + (medailles[rang] || rang) + '</td>'
+        + '<td><div class="perf-agent-cell"><div class="perf-agent-avatar">' + initiales(a.nom) + '</div><div><div class="perf-agent-nom">' + esc(a.nom) + '</div><div class="perf-agent-role">' + esc(ROLE_LABELS[a.role] || a.role || '') + '</div></div></div></td>'
+        + '<td class="perf-col-taches">' + a.nbTaches + '</td>'
+        + '<td class="perf-col-montant">' + fmtMontant(a.montant) + ' GNF</td>'
+        + '<td class="perf-col-part"><div class="perf-part-bar-wrap"><div class="perf-part-bar"><div class="perf-part-bar-fill" style="width:' + a.part.toFixed(0) + '%;"></div></div><span class="perf-part-pct">' + a.part.toFixed(0) + '%</span></div></td>'
+        + '</tr>';
+    }).join('') + '</tbody></table>';
+}
+
+function renderPerformanceAgents() {
+  const liste = calculerClassementPerf(perfTachesMoisCache, perfAngle, perfAgentsRoleMap);
+  const cont = document.getElementById('perfContenu');
+  if (!liste.length) {
+    cont.innerHTML = '<div class="priority-empty"><i class="ti ti-trophy-off"></i>Aucune tâche validée ce mois-ci.</div>';
+    return;
+  }
+  cont.innerHTML = renderPodiumPerf(liste.slice(0, 3)) + renderTableauPerf(liste);
 }
 
 function renderGraphique(jours, valeurs) {
