@@ -1756,7 +1756,7 @@ async function ouvrirFactureDepuisTache(tacheId, nature) {
   document.getElementById('docObjet').value = t.type_service || '';
   docLignes = [{ prestation: t.description || '', rubrique: '', unite: '', qte: 1, prix: Number(t.montant || 0) }];
   if (t.date_livraison) document.getElementById('docDateLivraison').value = new Date(t.date_livraison).toISOString().slice(0, 10);
-  document.getElementById('docAcompte').value = Number(t.acompte || 0);
+  document.getElementById('docAcompte').value = nature === 'finale' ? Number(t.montant || 0) : Number(t.acompte || 0);
   docAcompteModifieManuel = true;
   document.getElementById('docToggleDevis').disabled = true;
   document.getElementById('docToggleFacture').disabled = true;
