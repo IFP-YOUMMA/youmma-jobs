@@ -310,36 +310,50 @@ h1,h2,h3{margin:0;}
 .taches-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
 .taches-header-left{display:flex;align-items:center;gap:12px;}
 .taches-header-icon{width:40px;height:40px;border-radius:10px;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
-.taches-header-left h2{font-size:20px;font-weight:800;color:var(--text);}
+.taches-header-left h2{font-size:18px;font-weight:500;color:var(--text);}
 .taches-header-sub{font-size:12.5px;color:var(--text-muted);margin-top:2px;}
-.taches-header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.taches-header-right .doc-search-wrap{margin-top:0;min-width:240px;}
+.taches-header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto;}
+.taches-header-right .doc-search-wrap{margin-top:0;width:210px;}
+
+.tf-bar{display:flex;gap:6px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:5px;margin-bottom:16px;}
+.tf-segment{flex:1 1 30%;min-width:90px;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 10px;border-radius:7px;border:none;background:none;font-size:12.5px;font-weight:600;color:var(--text-muted);cursor:pointer;white-space:nowrap;}
+.tf-segment:hover:not(.active){background:#F4F5F9;}
+.tf-segment.active{background:var(--indigo-dark);color:#fff;}
+.tf-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;font-size:10px;font-weight:700;color:#fff;}
+.tf-count.neutre{background:#9CA3AF;}
+.tf-count.amber{background:var(--amber);}
+.tf-count.bleu{background:var(--blue);}
+.tf-count.vert{background:var(--green);}
+.tf-count.violet{background:var(--violet);}
 
 .taches-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
-.tache-card{background:#fff;border:1px solid #F3F4F6;border-left:3px solid transparent;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:10px;transition:opacity .2s ease,transform .2s ease;}
+.tache-card{background:#fff;border:1px solid #F3F4F6;border-left:3px solid transparent;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:10px;transition:opacity .2s ease,transform .2s ease;min-width:0;box-sizing:border-box;}
 .tache-card.removing{opacity:0;transform:translateX(16px);}
-.tache-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.tache-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;min-width:0;}
 .tache-card-identite{display:flex;align-items:center;gap:10px;min-width:0;}
+.tache-card-nom-wrap{min-width:0;overflow:hidden;}
 .tache-avatar{width:38px;height:38px;border-radius:50%;background:var(--indigo);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:13px;flex-shrink:0;}
-.tache-card-nom{font-weight:500;font-size:14px;color:var(--text);}
-.tache-card-tel{font-size:11.5px;color:var(--text-muted);}
+.tache-card-nom{font-weight:500;font-size:14px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tache-card-tel{font-size:11.5px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
 .badge-muted{background:#F3F4F6;color:#9CA3AF;margin-left:8px;}
-.tache-card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.tache-card-top .badge{flex-shrink:0;}
+.tache-card-top .badge i{margin-right:3px;}
+.tache-card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;}
 .tache-card-type{font-size:12px;color:var(--text-muted);}
-.tache-badge-facturee{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--green);background:var(--green-bg);padding:2px 8px;border-radius:10px;}
+.tache-badge-facturee{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--green);background:var(--green-bg);padding:2px 8px;border-radius:10px;flex-shrink:0;}
 .tache-card-desc{font-size:12.5px;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;min-height:2.8em;}
-.tache-chiffres{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
-.tache-chiffre{padding:8px 6px;text-align:center;border-right:1px solid var(--border);}
+.tache-chiffres{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:10px;overflow:hidden;min-width:0;}
+.tache-chiffre{padding:7px 4px;text-align:center;border-right:1px solid var(--border);min-width:0;}
 .tache-chiffre:last-child{border-right:none;}
-.tache-chiffre-label{font-size:9.5px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;}
-.tache-chiffre-valeur{font-size:12.5px;font-weight:700;margin-top:2px;color:var(--text);}
-.tache-actions-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
-.tache-agent-tag{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text-muted);}
-.tache-historique{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-light);overflow:hidden;white-space:nowrap;border-top:1px solid var(--border);padding-top:8px;}
+.tache-chiffre-label{font-size:9.5px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tache-chiffre-valeur{font-size:12.5px;font-weight:700;margin-top:2px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tache-actions-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;min-width:0;}
+.tache-agent-tag{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.tache-historique{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-light);overflow:hidden;white-space:nowrap;border-top:1px solid var(--border);padding-top:8px;min-width:0;}
 .tache-historique i{flex-shrink:0;}
-.tache-historique span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.tache-actions-right{display:flex;align-items:center;gap:6px;}
+.tache-historique span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.tache-actions-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;}
 .tache-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;white-space:nowrap;}
 .tache-btn.blue-light{background:var(--blue-bg);color:var(--blue);}
 .tache-btn.green-light{background:var(--green-bg);color:var(--green);}
@@ -358,8 +372,7 @@ h1,h2,h3{margin:0;}
   .taches-header-right{width:100%;flex-direction:column;align-items:stretch;}
   .taches-header-right .doc-search-wrap{min-width:0;width:100%;}
   .taches-header-right .btn{width:100%;justify-content:center;}
-  #tachesFiltres{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;}
-  #tachesFiltres .filtre-btn{flex-shrink:0;}
+  .tf-bar{flex-wrap:wrap;}
   .taches-grid{grid-template-columns:1fr;}
 }
 
@@ -669,7 +682,7 @@ h1,h2,h3{margin:0;}
             <div class="taches-header-icon"><i class="ti ti-checklist"></i></div>
             <div>
               <h2>Tâches</h2>
-              <div class="taches-header-sub" id="tachesSousTitre">0 en cours · 0 à livrer aujourd'hui</div>
+              <div class="taches-header-sub" id="tachesSousTitre">Aucune tâche active</div>
             </div>
           </div>
           <div class="taches-header-right">
@@ -680,12 +693,12 @@ h1,h2,h3{margin:0;}
             <button class="btn btn-primary" onclick="openModalTache()"><i class="ti ti-plus"></i> Nouvelle tâche</button>
           </div>
         </div>
-        <div class="filtres" id="tachesFiltres">
-          <button class="filtre-btn active" data-filtre="tous" onclick="setTacheFilter('tous')">Toutes <span class="filtre-count" id="fcTous">0</span></button>
-          <button class="filtre-btn" data-filtre="attente" onclick="setTacheFilter('attente')">En attente <span class="filtre-count" id="fcAttente">0</span></button>
-          <button class="filtre-btn" data-filtre="en_cours" onclick="setTacheFilter('en_cours')">En cours <span class="filtre-count" id="fcEnCours">0</span></button>
-          <button class="filtre-btn" data-filtre="termine" onclick="setTacheFilter('termine')">Terminé <span class="filtre-count" id="fcTermine">0</span></button>
-          <button class="filtre-btn" data-filtre="valide" onclick="setTacheFilter('valide')">Validé <span class="filtre-count" id="fcValide">0</span></button>
+        <div class="tf-bar" id="tachesFiltres">
+          <button class="tf-segment active" data-filtre="tous" onclick="setTacheFilter('tous')">Toutes <span class="tf-count neutre" id="fcTous">0</span></button>
+          <button class="tf-segment" data-filtre="attente" onclick="setTacheFilter('attente')">En attente <span class="tf-count amber" id="fcAttente">0</span></button>
+          <button class="tf-segment" data-filtre="en_cours" onclick="setTacheFilter('en_cours')">En cours <span class="tf-count bleu" id="fcEnCours">0</span></button>
+          <button class="tf-segment" data-filtre="termine" onclick="setTacheFilter('termine')">Terminé <span class="tf-count vert" id="fcTermine">0</span></button>
+          <button class="tf-segment" data-filtre="valide" onclick="setTacheFilter('valide')">Validé <span class="tf-count violet" id="fcValide">0</span></button>
         </div>
         <div id="tachesListe" class="taches-grid"></div>
       </section>
@@ -1295,10 +1308,10 @@ let agentPourResetPin = null;
 
 const ROLE_LABELS = { gerant: 'Gérant', agent: 'Agent', comptable: 'Comptable' };
 const TACHE_BADGES = {
-  attente: { label: '⏳ En attente', color: '#D97706', bg: '#FEF3C7' },
-  en_cours: { label: '🔧 En cours', color: '#2563EB', bg: '#EFF6FF' },
-  termine: { label: '✅ Terminé', color: '#16A34A', bg: '#F0FDF4' },
-  valide: { label: '💰 Validé', color: '#1A1A4E', bg: '#F3F4F6' },
+  attente: { label: '<i class="ti ti-clock"></i> En attente', color: '#D97706', bg: '#FEF3C7' },
+  en_cours: { label: '<i class="ti ti-player-play"></i> En cours', color: '#2563EB', bg: '#EFF6FF' },
+  termine: { label: '<i class="ti ti-check"></i> Terminé', color: '#16A34A', bg: '#F0FDF4' },
+  valide: { label: '<i class="ti ti-rosette-discount-check"></i> Validé', color: '#1A1A4E', bg: '#F3F4F6' },
 };
 const PRIORITE_ORDER = { urgente: 4, haute: 3, normale: 2, basse: 1 };
 const PRIORITE_BADGES = {
@@ -1605,7 +1618,7 @@ function renderUrgentes(list) {
 /* ── PAGE 2 : TÂCHES ── */
 function setTacheFilter(f) {
   currentTacheFilter = f;
-  document.querySelectorAll('#tachesFiltres .filtre-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.filtre === f); });
+  document.querySelectorAll('#tachesFiltres .tf-segment').forEach(function(b) { b.classList.toggle('active', b.dataset.filtre === f); });
   loadTaches();
 }
 
@@ -1639,7 +1652,11 @@ function majCompteursEtSousTitre(rows) {
     if (el) el.textContent = counts[key];
   });
   const sousTitreEl = document.getElementById('tachesSousTitre');
-  if (sousTitreEl) sousTitreEl.textContent = counts.en_cours + ' en cours · ' + aLivrerAujourdhui + " à livrer aujourd'hui";
+  if (sousTitreEl) {
+    sousTitreEl.textContent = counts.tous === 0
+      ? 'Aucune tâche active'
+      : counts.tous + ' tâche' + (counts.tous > 1 ? 's' : '') + ' active' + (counts.tous > 1 ? 's' : '') + ' · ' + aLivrerAujourdhui + " à livrer aujourd'hui";
+  }
 }
 
 async function chargerDocumentsNatureCache() {
@@ -1755,7 +1772,7 @@ function renderTacheCard(t) {
     + '<div class="tache-card-top">'
     + '<div class="tache-card-identite">'
     + '<div class="tache-avatar">' + initiales(t.client_nom) + '</div>'
-    + '<div><div class="tache-card-nom">' + esc(t.client_nom) + '</div>' + (t.client_telephone ? '<div class="tache-card-tel">' + esc(t.client_telephone) + '</div>' : '') + '</div>'
+    + '<div class="tache-card-nom-wrap"><div class="tache-card-nom">' + esc(t.client_nom) + '</div>' + (t.client_telephone ? '<div class="tache-card-tel">' + esc(t.client_telephone) + '</div>' : '') + '</div>'
     + '</div>'
     + '<span class="badge" style="color:' + badge.color + ';background:' + badge.bg + ';">' + badge.label + '</span>'
     + '</div>'
@@ -2648,6 +2665,7 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
   const afficherLettres = P.montant_en_lettres !== 'false';
   const afficherSignatures = P.bloc_signatures !== 'false';
   const libelle = doc.type === 'facture' ? (P.libelle_facture || 'FACTURE') : (P.libelle_devis || 'FACTURE PROFORMA');
+  const titrePrincipal = (doc.nature === 'acompte') ? 'FACTURE D\'ACOMPTE' : libelle;
   const pctAcompte = Number(P.acompte_pct || 50);
   const acompteCommande = Math.round(Number(doc.total || 0) * pctAcompte / 100);
   const dateDoc = doc.date_doc ? new Date(doc.date_doc) : new Date();
@@ -2773,7 +2791,7 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
     + (email ? '<div class="souslabel">E-mail : ' + esc(email) + '</div>' : '')
     + ((rccm || nif) ? '<div class="souslabel">' + [rccm ? 'RCCM : ' + esc(rccm) : '', nif ? 'NIF : ' + esc(nif) : ''].filter(Boolean).join(' · ') + '</div>' : '')
     + '</div></div>'
-    + '<div class="entete-droite"><div class="titre-doc" style="color:' + couleurPrincipale + ';">' + esc(libelle.toUpperCase()) + '</div>'
+    + '<div class="entete-droite"><div class="titre-doc" style="color:' + couleurPrincipale + ';">' + esc(titrePrincipal.toUpperCase()) + '</div>'
     + '<div><strong>N° :</strong> ' + esc(doc.numero) + '</div><div><strong>Date :</strong> ' + dateAffichee + '</div>' + validiteLigne + '</div>'
     + '</div>'
     + '<div class="filet" style="border-color:' + couleurAccent + ';"></div>'
