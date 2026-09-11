@@ -2249,6 +2249,7 @@ const STYLE_IMPRESSION = '@page{size:A4;margin:18mm 18mm 22mm;}'
   + '.enseigne{font-size:22px;font-weight:700;}'
   + '.slogan{font-size:10px;font-style:italic;color:#6B6B8A;margin-top:2px;}'
   + '.souslabel{font-size:10px;color:#444;margin-top:2px;}'
+  + '.souslabel-agence{font-size:12px;font-weight:400;color:#6B6B8A;margin-top:2px;}'
   + '.entete-droite{text-align:right;font-size:11px;color:#333;}'
   + '.entete-droite div{margin-top:3px;}'
   + '.titre-doc{font-size:16px;font-weight:700;margin-bottom:6px;}'
@@ -2314,10 +2315,11 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
     validiteLigne = '<div><strong>Validité :</strong> ' + jours + ' jours (jusqu\'au ' + dateValidite.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + ')</div>';
   }
 
-  const enseigneMots = enseigne.trim().split(/\s+/);
-  const enseigneHtml = enseigneMots.length > 1
-    ? esc(enseigneMots[0]) + ' <span style="color:' + couleurAccent + ';">' + esc(enseigneMots.slice(1).join(' ')) + '</span>'
-    : esc(enseigne);
+  const raisonSociale = P.raison_sociale || enseigne;
+  const raisonSocialeMots = raisonSociale.trim().split(/\s+/);
+  const raisonSocialeHtml = raisonSocialeMots.length > 1
+    ? esc(raisonSocialeMots[0]) + ' <span style="color:' + couleurAccent + ';">' + esc(raisonSocialeMots.slice(1).join(' ')) + '</span>'
+    : esc(raisonSociale);
 
   const lignesHtml = (doc.lignes || []).map(function(l, i) {
     const total = Number(l.qte || 0) * Number(l.prix || 0);
@@ -2394,7 +2396,8 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
     + '<div class="feuille">'
     + watermarkHtml
     + '<div class="entete">'
-    + '<div class="entete-gauche">' + logoHtml + '<div><div class="enseigne" style="color:' + couleurPrincipale + ';">' + enseigneHtml + '</div>'
+    + '<div class="entete-gauche">' + logoHtml + '<div><div class="enseigne" style="color:' + couleurPrincipale + ';">' + raisonSocialeHtml + '</div>'
+    + '<div class="souslabel-agence">Agence ' + esc(enseigne) + '</div>'
     + (slogan ? '<div class="slogan">' + esc(slogan) + '</div>' : '')
     + (adresse ? '<div class="souslabel">' + esc(adresse) + '</div>' : '')
     + (telephone ? '<div class="souslabel">Tél. : ' + esc(telephone) + '</div>' : '')
