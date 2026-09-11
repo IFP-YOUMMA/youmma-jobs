@@ -1764,13 +1764,12 @@ function pluraliserUnite(unite, qte) {
 function substituerPlaceholders(texte, doc, P) {
   const pct = Number(P.acompte_pct || 50);
   const validite = Number(doc.validite_jours || P.validite_devis_jours || 15);
-  const devise = P.devise || 'GNF';
   return String(texte || '')
     .replace(/\{acompte_pct\}/g, String(pct))
     .replace(/\{validite\}/g, String(validite))
-    .replace(/\{acompte\}/g, fmtMontant(doc.acompte) + ' ' + devise)
-    .replace(/\{reste\}/g, fmtMontant(doc.reste) + ' ' + devise)
-    .replace(/\{total\}/g, fmtMontant(doc.total) + ' ' + devise);
+    .replace(/\{acompte\}/g, fmtMontant(doc.acompte))
+    .replace(/\{reste\}/g, fmtMontant(doc.reste))
+    .replace(/\{total\}/g, fmtMontant(doc.total));
 }
 
 const DOC_STATUT_LABELS = { envoye: 'Envoyé', converti: 'Converti', payee: 'Payée', annule: 'Annulé' };
@@ -2328,6 +2327,8 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
   }).join('');
 
   const facturePayee = doc.type === 'facture' && doc.statut === 'payee';
+  const resteAPayer = Number(doc.reste || 0);
+  const acompteRecu = Number(doc.acompte || 0);
   const tvaLigne = Number(doc.tva_montant) > 0 ? '<div class="tot-row"><span>TVA ' + fmtMontant(doc.tva_taux) + ' %</span><span>' + fmtMontant(doc.tva_montant) + ' ' + devise + '</span></div>' : '';
   let totauxHtml = '<div class="totaux">';
   if (Number(doc.remise) > 0) {
@@ -2350,21 +2351,42 @@ function construireHtmlDocument(doc, brouillon, paramsSource, avecBarreImpressio
     ? '<div class="banniere-acquittee"><i class="ti ti-check"></i> ' + esc(substituerPlaceholders(P.mention_acquittee || 'Facture acquittée. Merci de votre confiance.', doc, P)) + '</div>'
     : '';
 
-  const libelleMinuscule = facturePayee ? 'facture acquittée' : libelle.toLowerCase();
+  let ouverturePhraseLettres;
+  if (doc.type === 'facture') {
+    ouverturePhraseLettres = resteAPayer === 0 ? 'Arrêtée et acquittée la présente facture' : 'Arrêtée la présente facture';
+  } else {
+    ouverturePhraseLettres = 'Arrêtée la présente ' + libelle.toLowerCase();
+  }
   const lettresHtml = afficherLettres
-    ? '<div class="en-lettres">Arrêtée la présente ' + esc(libelleMinuscule) + ' à la somme de : <strong>' + nombreEnLettres(doc.total) + '</strong>.</div>'
+    ? '<div class="en-lettres">' + ouverturePhraseLettres + ' à la somme de : <strong>' + nombreEnLettres(doc.total) + '</strong>.</div>'
     : '';
 
   function puceListe(texte) {
     return String(texte || '').split(/\n/).map(function(l) { return l.trim(); }).filter(Boolean);
   }
-  const cleConditionsPaiement = doc.type === 'facture' ? 'conditions_paiement_facture' : 'conditions_paiement';
   const cleConditionsGenerales = doc.type === 'facture' ? 'conditions_generales_facture' : 'conditions_generales';
-  const conditionsPaiementPuces = puceListe(P[cleConditionsPaiement]).map(function(l) { return substituerPlaceholders(l, doc, P); });
+  let conditionsPaiementBrutes;
+  if (doc.type === 'facture') {
+    let premiereLignePaiement;
+    if (resteAPayer === 0) {
+      premiereLignePaiement = 'Facture réglée intégralement. Montant payé : {total} GNF. Merci de votre confiance.';
+    } else if (acompteRecu > 0) {
+      premiereLignePaiement = 'Acompte reçu : {acompte} GNF. Solde de {reste} GNF à régler à la livraison.';
+    } else {
+      premiereLignePaiement = 'Montant à régler : {total} GNF, payable à la livraison.';
+    }
+    conditionsPaiementBrutes = [premiereLignePaiement, 'Paiement par virement bancaire, Orange Money ou espèces contre reçu.'];
+  } else {
+    conditionsPaiementBrutes = puceListe(P.conditions_paiement);
+  }
+  const conditionsPaiementPuces = conditionsPaiementBrutes.map(function(l) { return substituerPlaceholders(l, doc, P); });
   let conditionsGeneralesBrutes = puceListe(P[cleConditionsGenerales]);
   if (doc.type !== 'devis') {
     conditionsGeneralesBrutes = conditionsGeneralesBrutes.filter(function(l) { return l.indexOf('{validite}') === -1; });
   }
+  conditionsGeneralesBrutes = conditionsGeneralesBrutes
+    .filter(function(l) { return l.indexOf('[si_impaye]') !== 0 || resteAPayer > 0; })
+    .map(function(l) { return l.indexOf('[si_impaye]') === 0 ? l.slice('[si_impaye]'.length).trim() : l; });
   const conditionsGeneralesPuces = conditionsGeneralesBrutes.map(function(l) { return substituerPlaceholders(l, doc, P); });
   if (doc.notes && doc.notes.trim()) conditionsGeneralesPuces.push(doc.notes.trim());
   function sectionPuces(titre, puces) {
