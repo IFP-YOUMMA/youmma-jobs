@@ -336,6 +336,9 @@ h1,h2,h3{margin:0;}
 .tache-chiffre-valeur{font-size:12.5px;font-weight:700;margin-top:2px;color:var(--text);}
 .tache-actions-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .tache-agent-tag{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text-muted);}
+.tache-historique{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-light);overflow:hidden;white-space:nowrap;border-top:1px solid var(--border);padding-top:8px;}
+.tache-historique i{flex-shrink:0;}
+.tache-historique span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .tache-actions-right{display:flex;align-items:center;gap:6px;}
 .tache-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;white-space:nowrap;}
 .tache-btn.blue-light{background:var(--blue-bg);color:var(--blue);}
@@ -905,6 +908,7 @@ h1,h2,h3{margin:0;}
     <div class="modal-body">
       <div class="form-row"><label>Client — nom *</label><input type="text" id="tNomClient"></div>
       <div class="form-row"><label>Client — téléphone</label><input type="tel" id="tTelClient"></div>
+      <div class="form-row"><label>Adresse du client</label><input type="text" id="tAdresseClient"></div>
       <div class="form-row"><label>Type de service *</label>
         <select id="tType">
           <option value="">— Choisir —</option>
@@ -1629,6 +1633,18 @@ function renderTaches() {
   cont.innerHTML = liste.map(renderTacheCard).join('');
 }
 
+function prenom(nom) { return (nom || '').trim().split(/\s+/)[0] || ''; }
+
+function construireHistoriqueTache(t) {
+  const etapes = [];
+  if (t.agent_nom) etapes.push('Créée par ' + prenom(t.agent_nom));
+  if (t.acompte_facture_par) etapes.push('Acompte facturé par ' + prenom(t.acompte_facture_par));
+  if (t.demarre_par) etapes.push('Démarrée par ' + prenom(t.demarre_par));
+  if (t.termine_par) etapes.push('Terminée par ' + prenom(t.termine_par));
+  if (t.comptable_nom) etapes.push('Validée par ' + prenom(t.comptable_nom));
+  return etapes.join(' · ');
+}
+
 function renderTacheCard(t) {
   const solde = Math.max(0, Number(t.montant || 0) - Number(t.acompte || 0));
   const prio = PRIORITE_BADGES[t.priorite || 'normale'] || PRIORITE_BADGES.normale;
@@ -1673,6 +1689,8 @@ function renderTacheCard(t) {
     : '';
 
   const badgeFacturee = finaleEmise ? '<span class="tache-badge-facturee"><i class="ti ti-file-check"></i> Facturée</span>' : '';
+  const histoTexte = construireHistoriqueTache(t);
+  const histoHtml = histoTexte ? '<div class="tache-historique" title="' + esc(histoTexte) + '"><i class="ti ti-history"></i><span>' + esc(histoTexte) + '</span></div>' : '';
 
   return '<div class="tache-card" style="border-left-color:' + borderColor + ';" data-tache-id="' + t.id + '">'
     + '<div class="tache-card-top">'
@@ -1694,6 +1712,7 @@ function renderTacheCard(t) {
     + '<div class="tache-agent-tag"><i class="ti ti-user"></i> ' + esc(t.agent_nom || '') + '</div>'
     + '<div class="tache-actions-right">' + boutonPrincipal + menuHtml + '</div>'
     + '</div>'
+    + histoHtml
     + '</div>';
 }
 
@@ -1753,8 +1772,11 @@ async function ouvrirFactureDepuisTache(tacheId, nature) {
   docNature = nature;
   document.getElementById('docClientNom').value = t.client_nom || '';
   document.getElementById('docClientTel').value = t.client_telephone || '';
+  document.getElementById('docClientAdresse').value = t.client_adresse || '';
   document.getElementById('docObjet').value = t.type_service || '';
-  docLignes = [{ prestation: t.description || '', rubrique: '', unite: '', qte: 1, prix: Number(t.montant || 0) }];
+  document.getElementById('docObjetDetail').value = t.description || '';
+  const prestationLigne = t.description ? (t.type_service + ' — ' + t.description) : (t.type_service || '');
+  docLignes = [{ prestation: prestationLigne, rubrique: '', unite: '', qte: 1, prix: Number(t.montant || 0) }];
   if (t.date_livraison) document.getElementById('docDateLivraison').value = new Date(t.date_livraison).toISOString().slice(0, 10);
   document.getElementById('docAcompte').value = nature === 'finale' ? Number(t.montant || 0) : Number(t.acompte || 0);
   docAcompteModifieManuel = true;
@@ -1775,6 +1797,7 @@ function openModalTache(tacheId) {
   document.getElementById('tBtnSubmit').textContent = tacheEnEdition ? 'Enregistrer' : 'Créer la tâche';
   document.getElementById('tNomClient').value = tacheEnEdition ? tacheEnEdition.client_nom : '';
   document.getElementById('tTelClient').value = tacheEnEdition ? (tacheEnEdition.client_telephone || '') : '';
+  document.getElementById('tAdresseClient').value = tacheEnEdition ? (tacheEnEdition.client_adresse || '') : '';
   document.getElementById('tType').value = tacheEnEdition ? tacheEnEdition.type_service : '';
   document.getElementById('tDescription').value = tacheEnEdition ? tacheEnEdition.description : '';
   document.getElementById('tPriorite').value = tacheEnEdition ? (tacheEnEdition.priorite || 'normale') : 'normale';
@@ -1802,6 +1825,7 @@ async function creerTache() {
   const payload = {
     client_nom: nom,
     client_telephone: document.getElementById('tTelClient').value.trim() || null,
+    client_adresse: document.getElementById('tAdresseClient').value.trim() || null,
     type_service: type, description, montant, acompte,
     priorite: document.getElementById('tPriorite').value || 'normale',
     date_livraison: new Date(dateLivraison).toISOString(),
@@ -1835,8 +1859,16 @@ async function supprimerTache(id) {
 
 async function changerStatutTache(id, statut) {
   const payload = { statut: statut };
-  if (statut === 'en_cours') payload.date_debut = new Date().toISOString();
-  if (statut === 'termine') payload.date_fin = new Date().toISOString();
+  if (statut === 'en_cours') {
+    payload.date_debut = new Date().toISOString();
+    payload.demarre_par = session.nom;
+    payload.demarre_le = payload.date_debut;
+  }
+  if (statut === 'termine') {
+    payload.date_fin = new Date().toISOString();
+    payload.termine_par = session.nom;
+    payload.termine_le = payload.date_fin;
+  }
   const { error } = await sb.from('yc_taches').update(payload).eq('id', id);
   if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
   showToast('Statut mis à jour ✅');
@@ -2326,6 +2358,10 @@ async function saveDocument() {
 
     if (docConversionDevisId) {
       await sb.from('yc_documents').update({ statut: 'converti' }).eq('id', docConversionDevisId);
+    }
+
+    if (docTacheId && docNature === 'acompte') {
+      await sb.from('yc_taches').update({ acompte_facture_par: session.nom, acompte_facture_le: new Date().toISOString() }).eq('id', docTacheId);
     }
 
     closeModal('modalDocument');
