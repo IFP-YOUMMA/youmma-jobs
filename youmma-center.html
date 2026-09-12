@@ -1263,6 +1263,9 @@ h1,h2,h3{margin:0;}
     <div class="modal-header"><h3>Enregistrer un paiement</h3><button class="modal-close" onclick="closeModal('modalPaiement')">×</button></div>
     <div class="modal-body">
       <div class="form-row"><label>Montant à encaisser (GNF) *</label><input type="number" id="pMontant" min="0"></div>
+      <div class="form-row"><label>Mode de paiement</label>
+        <select id="pModePaiement"><option value="cash">Cash</option><option value="orange_money">Orange Money</option></select>
+      </div>
       <div id="pErreur" class="form-error hidden"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-primary" onclick="enregistrerPaiementApprenant()">Enregistrer</button></div>
@@ -2981,6 +2984,147 @@ function nombreEnLettres(n) {
   return resultat + ' franc' + (n > 1 ? 's' : '') + ' guinéen' + (n > 1 ? 's' : '');
 }
 
+/* ── REÇU DE VERSEMENT IFP YOUMMA (indépendant du module Devis/Facture) ── */
+const STYLE_IMPRESSION_RECU = '@page{size:A5;margin:15mm;}'
+  + '*{box-sizing:border-box;}'
+  + 'body{font-family:Inter,system-ui,sans-serif;color:#1F1F55;margin:0;font-size:10.5px;background:#E9EAF0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+  + '.watermark{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:60px;font-weight:700;color:rgba(220,38,38,.15);z-index:99;pointer-events:none;}'
+  + '.feuille{width:148mm;min-height:210mm;margin:24px auto;padding:15mm;background:#fff;box-shadow:0 4px 24px rgba(31,31,85,.15);box-sizing:border-box;position:relative;}'
+  + '.rec-entete{display:flex;justify-content:space-between;gap:14px;}'
+  + '.rec-logo{height:44px;min-width:44px;border-radius:6px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}'
+  + '.rec-logo img{height:100%;width:auto;object-fit:contain;}'
+  + '.rec-titre-inst{font-size:20px;}'
+  + '.rec-soustitre{font-size:10.5px;font-style:italic;color:#6B6B8A;margin-top:2px;}'
+  + '.rec-agence{font-size:10px;color:#444;margin-top:2px;}'
+  + '.rec-coord{font-size:10px;color:#333;text-align:right;margin-top:8px;}'
+  + '.rec-coord div{margin-top:2px;}'
+  + '.rec-filet{border-top:2px solid;margin:10px 0 12px;}'
+  + '.rec-titre-doc{text-align:right;margin-bottom:10px;}'
+  + '.rec-titre-doc .rec-h1{font-size:16px;font-weight:700;}'
+  + '.rec-titre-doc div{margin-top:3px;font-size:10.5px;color:#333;}'
+  + '.rec-bloc-apprenant{display:grid;grid-template-columns:1fr 1fr;gap:14px;background:#F4F5F9;padding:12px;border-radius:6px;margin-bottom:12px;}'
+  + '.rec-bloc-titre{font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:4px;}'
+  + '.rec-bloc-apprenant div div{margin-top:2px;}'
+  + '.rec-versement{width:100%;margin-bottom:12px;}'
+  + '.rec-versement-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #E3E4EC;font-size:11px;}'
+  + '.rec-versement-row:last-child{border-bottom:none;}'
+  + '.rec-versement-montant{font-weight:700;font-size:16px;padding:4px 10px;border-radius:4px;}'
+  + '.rec-solde{text-align:center;font-weight:700;color:#1E7D32;background:#E7F6EC;padding:8px;border-radius:6px;margin-bottom:12px;}'
+  + '.rec-lettres{font-size:10.5px;font-style:italic;color:#333;margin-bottom:14px;}'
+  + '.rec-conditions{margin-bottom:14px;}'
+  + '.rec-conditions-titre{font-size:10.5px;font-weight:700;letter-spacing:.03em;margin-bottom:4px;}'
+  + '.rec-conditions ul{margin:0;padding-left:14px;list-style:none;}'
+  + '.rec-conditions li{position:relative;padding-left:11px;font-size:9.5px;color:#333;margin-bottom:3px;}'
+  + '.rec-conditions li:before{content:"•";position:absolute;left:0;}'
+  + '.rec-signature{text-align:right;margin-top:40px;font-size:10px;}'
+  + '.rec-signature-espace{height:50px;}'
+  + '.rec-signature-nom{font-weight:700;}'
+  + '.rec-signature-titre{font-style:italic;color:#444;margin-top:2px;}'
+  + '.rec-pied{position:absolute;bottom:10mm;left:15mm;right:15mm;text-align:center;font-size:9px;color:#9A9AB5;border-top:1px solid #E3E4EC;padding-top:8px;}'
+  + '@media print{body{background:#fff;}.feuille{width:auto;min-height:auto;margin:0;padding:0;box-shadow:none;}.rec-pied{position:fixed;bottom:0;left:0;right:0;}}';
+
+function construireBarreImpressionRecu() {
+  return '<div class="barre-impression"><button onclick="this.disabled=true;window.opener.confirmerImpressionRecu();window.print();">Imprimer / PDF</button>'
+    + '<span>Astuce : décochez « En-têtes et pieds de page » dans les options d\'impression.</span></div>';
+}
+
+async function calculerProchainNumeroRec() {
+  const annee = new Date().getFullYear();
+  const dernier = Number(PARAMS['dernier_rec_numero_' + annee] || 0);
+  return 'REC-' + annee + '-' + String(dernier + 1).padStart(4, '0');
+}
+
+async function confirmerImpressionRecu() {
+  const annee = new Date().getFullYear();
+  const cle = 'dernier_rec_numero_' + annee;
+  const nouveau = Number(PARAMS[cle] || 0) + 1;
+  PARAMS[cle] = String(nouveau);
+  await sb.from('yc_parametres').upsert([{ cle: cle, valeur: String(nouveau) }], { onConflict: 'cle' });
+}
+
+function construireHtmlRecuVersement(apprenant, formation, montantVerse, modePaiement, numero, brouillon) {
+  const P = PARAMS;
+  const couleurPrincipale = P.couleur_principale || '#2D2D6B';
+  const couleurAccent = P.couleur_accent || '#E85D04';
+  const telephone = P.telephone || '';
+  const email = P.email || '';
+  const rccm = P.rccm || '';
+  const nif = P.nif || '';
+  const piedLegal = P.pied_legal || '';
+  const dateAffichee = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const total = Number(apprenant.montant_total || 0);
+  const paye = Number(apprenant.montant_paye || 0);
+  const reste = Math.max(0, total - paye);
+  const modeLabel = modePaiement === 'orange_money' ? 'Orange Money' : (modePaiement === 'cash' ? 'Cash' : '—');
+
+  const logoHtml = P.logo_url
+    ? '<div class="rec-logo"><img src="' + esc(P.logo_url) + '"></div>'
+    : '<div class="rec-logo" style="background:' + couleurAccent + ';">YC</div>';
+
+  const datesFormation = (formation && formation.date_debut ? new Date(formation.date_debut).toLocaleDateString('fr-FR') : '—')
+    + (formation && formation.date_fin ? ' → ' + new Date(formation.date_fin).toLocaleDateString('fr-FR') : '');
+
+  const conditionsHtml = '<div class="rec-conditions"><div class="rec-conditions-titre" style="color:' + couleurAccent + ';">CONDITIONS GÉNÉRALES IFP YOUMMA</div><ul>'
+    + '<li>Les frais de formation sont payables à 50 % avant le début de la formation et le solde à partir de 50 % du programme accompli.</li>'
+    + '<li>L\'apprenant doit maintenir un taux de présence minimum de 95 %.</li>'
+    + '<li>L\'attestation de fin de formation est délivrée après une évaluation finale.</li>'
+    + '<li>Tout versement est définitif et non remboursable sauf cas de force majeure.</li>'
+    + '<li>TVA non applicable — IFP YOUMMA est un organisme de formation professionnelle.</li>'
+    + '</ul></div>';
+
+  const mentionSolde = reste === 0 ? '<div class="rec-solde">SOLDE INTÉGRALEMENT RÉGLÉ</div>' : '';
+
+  return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Reçu ' + esc(numero) + ' — IFP YOUMMA</title>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">'
+    + '<style>' + STYLE_IMPRESSION_RECU + BARRE_IMPRESSION_STYLE + '</style></head><body>'
+    + construireBarreImpressionRecu()
+    + '<div class="feuille">'
+    + (brouillon ? '<div class="watermark">BROUILLON</div>' : '')
+    + '<div class="rec-entete">'
+    + logoHtml
+    + '<div style="flex:1;"><div class="rec-titre-inst" style="color:' + couleurPrincipale + ';">IFP <strong>YOUMMA</strong></div>'
+    + '<div class="rec-soustitre">Institut de Formation Professionnelle</div>'
+    + '<div class="rec-agence">Agence de YOUMMA SARLU · Dubréka, Guinée</div></div>'
+    + '<div class="rec-coord">'
+    + (telephone ? '<div>Tél. : ' + esc(telephone) + '</div>' : '')
+    + (email ? '<div>Email : ' + esc(email) + '</div>' : '')
+    + (rccm ? '<div>RCCM : ' + esc(rccm) + '</div>' : '')
+    + (nif ? '<div>NIF : ' + esc(nif) + '</div>' : '')
+    + '</div>'
+    + '</div>'
+    + '<div class="rec-filet" style="border-color:' + couleurAccent + ';"></div>'
+    + '<div class="rec-titre-doc"><div class="rec-h1" style="color:' + couleurPrincipale + ';">REÇU DE VERSEMENT</div>'
+    + '<div>N° ' + esc(numero) + '</div>'
+    + '<div>Date : ' + dateAffichee + '</div></div>'
+    + '<div class="rec-bloc-apprenant">'
+    + '<div><div class="rec-bloc-titre" style="color:' + couleurAccent + ';">APPRENANT</div><div><strong>' + esc(apprenant.nom) + '</strong></div>' + (apprenant.telephone ? '<div>' + esc(apprenant.telephone) + '</div>' : '') + '</div>'
+    + '<div><div class="rec-bloc-titre" style="color:' + couleurAccent + ';">FORMATION</div><div><strong>' + esc(formation ? formation.intitule : '') + '</strong></div><div>' + (formation ? (formation.nb_seances || 0) : 0) + ' séances</div><div>' + datesFormation + '</div></div>'
+    + '</div>'
+    + '<div class="rec-versement">'
+    + '<div class="rec-versement-row"><span>Montant versé ce jour</span><span class="rec-versement-montant" style="background:' + couleurAccent + '22;color:' + couleurAccent + ';">' + fmtMontant(montantVerse) + ' GNF</span></div>'
+    + '<div class="rec-versement-row"><span>Mode de paiement</span><span>' + modeLabel + '</span></div>'
+    + '<div class="rec-versement-row"><span>Total payé à ce jour</span><span>' + fmtMontant(paye) + ' GNF</span></div>'
+    + '<div class="rec-versement-row"><span>Reste à payer</span><span style="color:' + (reste > 0 ? '#A32D2D' : '#1E7D32') + ';font-weight:700;">' + fmtMontant(reste) + ' GNF</span></div>'
+    + '</div>'
+    + mentionSolde
+    + '<div class="rec-lettres">Reçu la somme de : <strong>' + nombreEnLettres(montantVerse) + '</strong>.</div>'
+    + conditionsHtml
+    + '<div class="rec-signature"><div class="rec-signature-espace"></div><div class="rec-signature-nom">' + esc(P.signataire_nom || '') + '</div><div class="rec-signature-titre">' + esc(P.signataire_titre || '') + '</div></div>'
+    + '<div class="rec-pied">' + esc(piedLegal) + (telephone ? ' · Tél. : ' + esc(telephone) : '') + (email ? ' · ' + esc(email) : '') + '</div>'
+    + '</div>'
+    + '</body></html>';
+}
+
+async function imprimerRecuVersement(apprenant, formation, montantVerse, modePaiement, brouillon) {
+  const numero = await calculerProchainNumeroRec();
+  const win = window.open('', '_blank');
+  if (!win) { showToast('Le navigateur a bloqué l\'ouverture du reçu.', 'error'); return; }
+  const html = construireHtmlRecuVersement(apprenant, formation, montantVerse, modePaiement, numero, !!brouillon);
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+}
+
 /* ── PAGE : PARAMÈTRES ── */
 async function loadParametresPage() {
   await chargerParametres();
@@ -3705,7 +3849,8 @@ function renderApprenantRow(a) {
     + '<td>' + (a.nb_presences || 0) + '/' + (a.nb_seances_total || 0) + '</td>'
     + '<td><span class="formation-statut-badge ' + badge.cls + '">' + badge.label + '</span></td>'
     + '<td><div class="apprenant-actions"><button class="btn btn-sm" onclick="openModalPaiement(\'' + a.id + '\')"><i class="ti ti-cash"></i> Paiement</button>'
-    + '<button class="btn btn-sm btn-ghost" onclick="marquerPresence(\'' + a.id + '\',1)"><i class="ti ti-check"></i> Présence</button></div></td>'
+    + '<button class="btn btn-sm btn-ghost" onclick="marquerPresence(\'' + a.id + '\',1)"><i class="ti ti-check"></i> Présence</button>'
+    + '<button class="btn btn-sm btn-ghost" onclick="reimprimerRecu(\'' + a.id + '\')"><i class="ti ti-receipt"></i> Reçu</button></div></td>'
     + '</tr>';
 }
 
@@ -3743,7 +3888,7 @@ async function inscrireApprenant() {
   const { error } = await sb.from('yc_apprenants').insert(payload);
   if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
   if (montantPaye > 0) {
-    await sb.from('yc_caisse').insert({ date: today(), libelle: 'Formation: ' + nom, type: 'entree', montant: montantPaye, categorie: 'formation', agent_nom: session.nom });
+    await sb.from('yc_caisse').insert({ date: today(), libelle: 'Inscription ' + nom + ' — ' + formationCourante.intitule, type: 'entree', montant: montantPaye, categorie: 'formation', agent_nom: session.nom });
   }
   closeModal('modalInscrire');
   showToast('Apprenant inscrit ✅');
@@ -3754,24 +3899,35 @@ async function inscrireApprenant() {
 function openModalPaiement(id) {
   apprenantCourantPaiement = id;
   document.getElementById('pMontant').value = '';
+  document.getElementById('pModePaiement').value = 'cash';
   document.getElementById('pErreur').classList.add('hidden');
   openModal('modalPaiement');
 }
 
 async function enregistrerPaiementApprenant() {
   const montant = Number(document.getElementById('pMontant').value || 0);
+  const modePaiement = document.getElementById('pModePaiement').value;
   const errEl = document.getElementById('pErreur');
   if (!montant || montant <= 0) { errEl.textContent = 'Montant requis.'; errEl.classList.remove('hidden'); return; }
-  const { data: a } = await sb.from('yc_apprenants').select('nom,montant_paye').eq('id', apprenantCourantPaiement).single();
+  const { data: a } = await sb.from('yc_apprenants').select('*').eq('id', apprenantCourantPaiement).single();
   if (!a) return;
   const nouveauMontant = Number(a.montant_paye || 0) + montant;
   const { error } = await sb.from('yc_apprenants').update({ montant_paye: nouveauMontant }).eq('id', apprenantCourantPaiement);
   if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
-  await sb.from('yc_caisse').insert({ date: today(), libelle: 'Formation: ' + a.nom, type: 'entree', montant: montant, categorie: 'formation', agent_nom: session.nom });
+  const formationDuPaiement = formationCourante;
+  await sb.from('yc_caisse').insert({ date: today(), libelle: 'Versement ' + a.nom + ' — ' + (formationDuPaiement ? formationDuPaiement.intitule : ''), type: 'entree', montant: montant, categorie: 'formation', agent_nom: session.nom, mode_paiement: modePaiement });
   closeModal('modalPaiement');
   showToast('Paiement enregistré ✅');
   chargerApprenants();
   loadFormations();
+  const apprenantMisAJour = Object.assign({}, a, { montant_paye: nouveauMontant });
+  imprimerRecuVersement(apprenantMisAJour, formationDuPaiement, montant, modePaiement);
+}
+
+async function reimprimerRecu(id) {
+  const { data: a } = await sb.from('yc_apprenants').select('*').eq('id', id).single();
+  if (!a) return;
+  imprimerRecuVersement(a, formationCourante, a.montant_paye, null);
 }
 
 /* ── PAGE 6 : RAPPORTS ── */
