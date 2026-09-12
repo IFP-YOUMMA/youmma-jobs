@@ -438,6 +438,11 @@ h1,h2,h3{margin:0;}
 #modalOMCloture .modal-header .modal-close{color:#fff;}
 #modalOMCloture .form-row label{font-size:12px;color:var(--text-muted);font-weight:600;}
 #modalOMCloture .form-row input{border:1.5px solid var(--border);border-radius:8px;}
+#modalFormation .modal-header,#modalInscrire .modal-header,#modalPaiement .modal-header{background:var(--indigo-dark);border-bottom:3px solid var(--orange);}
+#modalFormation .modal-header h3,#modalInscrire .modal-header h3,#modalPaiement .modal-header h3{color:#fff;}
+#modalFormation .modal-header .modal-close,#modalInscrire .modal-header .modal-close,#modalPaiement .modal-header .modal-close{color:#fff;}
+#modalFormation .form-row label,#modalInscrire .form-row label,#modalPaiement .form-row label{font-size:12px;color:var(--text-muted);font-weight:600;}
+#modalFormation .form-row input,#modalInscrire .form-row input,#modalPaiement .form-row input{border:1.5px solid var(--border);border-radius:8px;}
 @media (max-width:600px){
   .om-ouverture-card .form-row-2{grid-template-columns:1fr;}
 }
@@ -450,20 +455,41 @@ h1,h2,h3{margin:0;}
 .cloture-row-bold{font-weight:800;border-top:1px solid #E5E7EB;margin-top:4px;padding-top:8px;}
 .cloture-ecart{font-weight:700;font-size:13.5px;padding:10px;border-radius:8px;background:#F9FAFB;margin-top:8px;}
 
-.formations-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
-.formation-titre{font-weight:800;font-size:15px;color:#1A1A4E;}
-.formation-dates{font-size:12px;color:#9CA3AF;margin-top:2px;}
-.formation-stats{display:flex;gap:14px;font-size:12.5px;color:#374151;margin:12px 0;flex-wrap:wrap;}
+.formations-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+@media (max-width:768px){ .formations-grid{grid-template-columns:1fr;} }
+.formation-card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;}
+.formation-card-header{background:var(--indigo);color:#fff;padding:14px 16px;}
+.formation-card-header-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.formation-card-titre{font-size:15px;font-weight:500;}
+.formation-card-dates{font-size:12px;color:rgba(255,255,255,.75);margin-top:6px;display:flex;align-items:center;gap:6px;}
+.formation-statut-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;}
+.formation-statut-badge.actif{background:var(--green-bg);color:var(--green);}
+.formation-statut-badge.termine{background:var(--gray-bg);color:var(--gray);}
+.formation-statut-badge.annule{background:var(--red-bg);color:var(--red);}
+.formation-card-body{padding:14px 16px;flex:1;display:flex;flex-direction:column;gap:12px;}
+.formation-stats-row{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--text-muted);}
+.formation-stats-row span{display:flex;align-items:center;gap:5px;}
+.formation-stats-row i{color:var(--text-light);}
+.formation-progress-wrap{display:flex;align-items:center;gap:8px;}
+.formation-progress-bar{flex:1;height:6px;border-radius:4px;background:var(--bg-page);overflow:hidden;}
+.formation-progress-fill{height:100%;background:var(--orange);border-radius:4px;}
+.formation-progress-pct{font-size:12px;color:var(--text-muted);min-width:32px;text-align:right;}
+.formation-btn-voir{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--text);font-size:13px;font-weight:600;cursor:pointer;margin-top:auto;}
 
-.apprenant-row{border-bottom:1px solid #F3F4F6;padding:12px 0;}
-.apprenant-row:last-child{border-bottom:none;}
-.apprenant-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.apprenant-nom{font-weight:700;font-size:13.5px;color:#1A1A4E;}
-.apprenant-tel{font-size:11px;color:#9CA3AF;}
-.apprenant-presences{font-size:11.5px;color:#6B7280;font-weight:600;}
-.progress-bar{background:#F3F4F6;height:6px;border-radius:10px;overflow:hidden;margin-bottom:6px;}
-.progress-fill{height:100%;background:linear-gradient(90deg,#E8622A,#F97316);border-radius:10px;}
-.apprenant-montants{display:flex;gap:12px;font-size:12px;color:#6B7280;margin-bottom:8px;}
+.formation-detail-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.formation-btn-retour{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.formation-detail-titre-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
+.formation-detail-titre{font-size:16px;font-weight:600;color:var(--text);}
+.formation-apprenants-wrap{overflow-x:auto;background:#fff;border:1px solid var(--border);border-radius:12px;}
+.formation-apprenants-table{width:100%;border-collapse:collapse;}
+.formation-apprenants-table th{text-align:left;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap;}
+.formation-apprenants-table td{padding:10px 14px;border-bottom:1px solid #F3F4F6;font-size:13px;vertical-align:middle;white-space:nowrap;}
+.formation-apprenants-table tr:last-child td{border-bottom:none;}
+.apprenant-nom{font-weight:500;font-size:13px;color:var(--text);}
+.formation-mini-bar{width:70px;height:5px;border-radius:3px;background:var(--bg-page);overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px;}
+.formation-mini-bar-fill{height:100%;border-radius:3px;}
+.formation-mini-bar-fill.soldee{background:var(--green);}
+.formation-mini-bar-fill.encours{background:var(--orange);}
 .apprenant-actions{display:flex;gap:6px;flex-wrap:wrap;}
 
 .bar-chart{display:flex;align-items:flex-end;gap:10px;height:160px;padding-top:20px;}
@@ -851,11 +877,37 @@ h1,h2,h3{margin:0;}
 
       <!-- PAGE 5 : FORMATIONS -->
       <section id="page-formations" class="page">
-        <div class="page-header">
-          <h2>🎓 Formations</h2>
-          <button class="btn btn-primary restricted" onclick="openModalFormation()">+ Nouvelle formation</button>
+        <div id="formationsListeVue">
+          <div class="taches-header">
+            <div class="taches-header-left">
+              <div class="taches-header-icon" style="width:38px;height:38px;"><i class="ti ti-school"></i></div>
+              <div>
+                <h2>Formations</h2>
+                <div class="taches-header-sub" id="formationsSousTitre">0 formation active</div>
+              </div>
+            </div>
+            <div class="taches-header-right">
+              <button class="btn btn-primary restricted" onclick="openModalFormation()"><i class="ti ti-plus"></i> Nouvelle formation</button>
+            </div>
+          </div>
+          <div id="formationsListe" class="formations-grid"></div>
         </div>
-        <div id="formationsListe" class="formations-grid"></div>
+        <div id="formationsDetailVue" class="hidden">
+          <div class="formation-detail-header">
+            <button class="formation-btn-retour" onclick="retourListeFormations()"><i class="ti ti-arrow-left"></i></button>
+            <div class="formation-detail-titre-wrap">
+              <div class="formation-detail-titre" id="detFormTitre">Formation</div>
+              <span class="formation-statut-badge" id="detFormBadge"></span>
+            </div>
+            <button class="btn btn-primary" style="margin-left:auto;" onclick="openModalInscrire()"><i class="ti ti-plus"></i> Inscrire un apprenant</button>
+          </div>
+          <div class="formation-apprenants-wrap">
+            <table class="formation-apprenants-table">
+              <thead><tr><th>Apprenant</th><th>Téléphone</th><th>Payé / Total</th><th>Présences</th><th>Statut</th><th>Actions</th></tr></thead>
+              <tbody id="detFormApprenants"></tbody>
+            </table>
+          </div>
+        </div>
       </section>
 
       <!-- PAGE 6 : RAPPORTS -->
@@ -1190,16 +1242,6 @@ h1,h2,h3{margin:0;}
   </div>
 </div>
 
-<div id="modalDetailsFormation" class="modal-overlay">
-  <div class="modal-card modal-card-lg">
-    <div class="modal-header"><h3 id="detFormTitre">Formation</h3><button class="modal-close" onclick="closeModal('modalDetailsFormation')">×</button></div>
-    <div class="modal-body">
-      <button class="btn btn-primary btn-sm" onclick="openModalInscrire()">+ Inscrire un apprenant</button>
-      <div id="detFormApprenants" style="margin-top:14px;"></div>
-    </div>
-  </div>
-</div>
-
 <div id="modalInscrire" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-header"><h3>Inscrire un apprenant</h3><button class="modal-close" onclick="closeModal('modalInscrire')">×</button></div>
@@ -1220,7 +1262,7 @@ h1,h2,h3{margin:0;}
   <div class="modal-card">
     <div class="modal-header"><h3>Enregistrer un paiement</h3><button class="modal-close" onclick="closeModal('modalPaiement')">×</button></div>
     <div class="modal-body">
-      <div class="form-row"><label>Montant versé (GNF) *</label><input type="number" id="pMontant" min="0"></div>
+      <div class="form-row"><label>Montant à encaisser (GNF) *</label><input type="number" id="pMontant" min="0"></div>
       <div id="pErreur" class="form-error hidden"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-primary" onclick="enregistrerPaiementApprenant()">Enregistrer</button></div>
@@ -3556,6 +3598,12 @@ async function ouvrirHistoriqueOM() {
 }
 
 /* ── PAGE 5 : FORMATIONS ── */
+const FORMATION_STATUT_BADGES = {
+  actif: { label: 'Actif', cls: 'actif' },
+  termine: { label: 'Terminé', cls: 'termine' },
+  annule: { label: 'Annulé', cls: 'annule' },
+};
+
 async function loadFormations() {
   const { data } = await sb.from('yc_formations').select('*').eq('statut', 'actif').order('date_debut', { ascending: false });
   const base = data || [];
@@ -3565,14 +3613,32 @@ async function loadFormations() {
     return Object.assign({}, f, { nbApprenants: (apps || []).length, ca: ca });
   }));
   formationsCache = withStats;
-  document.getElementById('formationsListe').innerHTML = withStats.length ? withStats.map(renderFormationCard).join('') : '<div class="empty">Aucune formation active.</div>';
+  const sousTitreEl = document.getElementById('formationsSousTitre');
+  if (sousTitreEl) sousTitreEl.textContent = withStats.length + ' formation' + (withStats.length > 1 ? 's' : '') + ' active' + (withStats.length > 1 ? 's' : '');
+  document.getElementById('formationsListe').innerHTML = withStats.length ? withStats.map(renderFormationCard).join('')
+    : '<div class="priority-empty" style="grid-column:1/-1;"><i class="ti ti-school-off"></i>Aucune formation active.<div style="margin-top:8px;"><button class="btn btn-primary btn-sm" onclick="openModalFormation()"><i class="ti ti-plus"></i> Créer la première formation</button></div></div>';
 }
 
 function renderFormationCard(f) {
-  return '<div class="card formation-card"><div class="formation-titre">' + esc(f.intitule) + '</div>'
-    + '<div class="formation-dates">' + (f.date_debut ? new Date(f.date_debut).toLocaleDateString('fr-FR') : '—') + (f.date_fin ? ' → ' + new Date(f.date_fin).toLocaleDateString('fr-FR') : '') + '</div>'
-    + '<div class="formation-stats"><span>👥 ' + f.nbApprenants + ' apprenant(s)</span><span>💰 ' + fmt(f.ca) + '</span></div>'
-    + '<button class="btn btn-ghost btn-block" onclick="openFormationDetails(\'' + f.id + '\')">Voir détails</button></div>';
+  const badge = FORMATION_STATUT_BADGES[f.statut] || FORMATION_STATUT_BADGES.actif;
+  const totalAttendu = f.nbApprenants * Number(f.prix_total || 0);
+  const pct = totalAttendu > 0 ? Math.min(100, Math.round(f.ca / totalAttendu * 100)) : 0;
+  const dates = (f.date_debut ? new Date(f.date_debut).toLocaleDateString('fr-FR') : '—') + (f.date_fin ? ' → ' + new Date(f.date_fin).toLocaleDateString('fr-FR') : '');
+  return '<div class="formation-card">'
+    + '<div class="formation-card-header">'
+    + '<div class="formation-card-header-top"><div class="formation-card-titre">' + esc(f.intitule) + '</div><span class="formation-statut-badge ' + badge.cls + '">' + badge.label + '</span></div>'
+    + '<div class="formation-card-dates"><i class="ti ti-calendar"></i> ' + dates + '</div>'
+    + '</div>'
+    + '<div class="formation-card-body">'
+    + '<div class="formation-stats-row">'
+    + '<span><i class="ti ti-users"></i> ' + f.nbApprenants + ' apprenant' + (f.nbApprenants > 1 ? 's' : '') + '</span>'
+    + '<span><i class="ti ti-clock"></i> ' + (f.nb_seances || 0) + ' séances</span>'
+    + '<span><i class="ti ti-coin"></i> ' + fmtMontant(f.ca) + ' GNF</span>'
+    + '</div>'
+    + '<div class="formation-progress-wrap"><div class="formation-progress-bar"><div class="formation-progress-fill" style="width:' + pct + '%;"></div></div><span class="formation-progress-pct">' + pct + '%</span></div>'
+    + '<button class="formation-btn-voir" onclick="openFormationDetails(\'' + f.id + '\')">Voir les apprenants <i class="ti ti-chevron-right"></i></button>'
+    + '</div>'
+    + '</div>';
 }
 
 function openModalFormation() {
@@ -3603,27 +3669,44 @@ async function openFormationDetails(id) {
   formationCourante = formationsCache.find(function(f) { return f.id === id; });
   if (!formationCourante) return;
   document.getElementById('detFormTitre').textContent = formationCourante.intitule;
+  const badge = FORMATION_STATUT_BADGES[formationCourante.statut] || FORMATION_STATUT_BADGES.actif;
+  const badgeEl = document.getElementById('detFormBadge');
+  badgeEl.textContent = badge.label;
+  badgeEl.className = 'formation-statut-badge ' + badge.cls;
+  document.getElementById('formationsListeVue').classList.add('hidden');
+  document.getElementById('formationsDetailVue').classList.remove('hidden');
   await chargerApprenants();
-  openModal('modalDetailsFormation');
+}
+
+function retourListeFormations() {
+  document.getElementById('formationsDetailVue').classList.add('hidden');
+  document.getElementById('formationsListeVue').classList.remove('hidden');
+  formationCourante = null;
+  loadFormations();
 }
 
 async function chargerApprenants() {
   const { data } = await sb.from('yc_apprenants').select('*').eq('formation_id', formationCourante.id).order('nom');
   const apprenants = data || [];
   const cont = document.getElementById('detFormApprenants');
-  cont.innerHTML = apprenants.length ? apprenants.map(renderApprenantRow).join('') : '<div class="empty">Aucun apprenant inscrit.</div>';
+  cont.innerHTML = apprenants.length ? apprenants.map(renderApprenantRow).join('') : '<tr><td colspan="6" class="empty">Aucun apprenant inscrit.</td></tr>';
 }
 
 function renderApprenantRow(a) {
-  const pct = a.montant_total ? Math.min(100, Math.round(Number(a.montant_paye || 0) / Number(a.montant_total) * 100)) : 0;
-  const reste = Number(a.montant_total || 0) - Number(a.montant_paye || 0);
-  return '<div class="apprenant-row"><div class="apprenant-top"><div><div class="apprenant-nom">' + esc(a.nom) + '</div><div class="apprenant-tel">' + esc(a.telephone || '') + '</div></div>'
-    + '<div class="apprenant-presences">' + (a.nb_presences || 0) + '/' + (a.nb_seances_total || 0) + ' présences</div></div>'
-    + '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%;"></div></div>'
-    + '<div class="apprenant-montants"><span>Payé: ' + fmt(a.montant_paye) + '</span><span>Reste: ' + fmt(reste) + '</span></div>'
-    + '<div class="apprenant-actions"><button class="btn btn-sm" onclick="marquerPresence(\'' + a.id + '\',1)">✓ Présent</button>'
-    + '<button class="btn btn-sm btn-ghost" onclick="marquerPresence(\'' + a.id + '\',-1)">Annuler</button>'
-    + '<button class="btn btn-sm btn-primary" onclick="openModalPaiement(\'' + a.id + '\')">+ Paiement</button></div></div>';
+  const total = Number(a.montant_total || 0);
+  const paye = Number(a.montant_paye || 0);
+  const solde = total > 0 && paye >= total;
+  const pct = total > 0 ? Math.min(100, Math.round(paye / total * 100)) : 0;
+  const badge = FORMATION_STATUT_BADGES[a.statut] || FORMATION_STATUT_BADGES.actif;
+  return '<tr>'
+    + '<td><div class="apprenant-nom">' + esc(a.nom) + '</div></td>'
+    + '<td>' + esc(a.telephone || '—') + '</td>'
+    + '<td><div class="formation-mini-bar"><div class="formation-mini-bar-fill ' + (solde ? 'soldee' : 'encours') + '" style="width:' + pct + '%;"></div></div>' + fmtMontant(paye) + ' / ' + fmtMontant(total) + ' GNF</td>'
+    + '<td>' + (a.nb_presences || 0) + '/' + (a.nb_seances_total || 0) + '</td>'
+    + '<td><span class="formation-statut-badge ' + badge.cls + '">' + badge.label + '</span></td>'
+    + '<td><div class="apprenant-actions"><button class="btn btn-sm" onclick="openModalPaiement(\'' + a.id + '\')"><i class="ti ti-cash"></i> Paiement</button>'
+    + '<button class="btn btn-sm btn-ghost" onclick="marquerPresence(\'' + a.id + '\',1)"><i class="ti ti-check"></i> Présence</button></div></td>'
+    + '</tr>';
 }
 
 async function marquerPresence(id, delta) {
