@@ -4111,10 +4111,12 @@ async function supprimerFormation(id) {
   if (!f) return;
   const { data: apps } = await sb.from('yc_apprenants').select('id').eq('formation_id', id);
   const nbApprenants = (apps || []).length;
-  const message = nbApprenants > 0
-    ? 'Cette formation a ' + nbApprenants + ' apprenant(s) inscrit(s). Supprimer quand même ?'
-    : 'Supprimer définitivement cette formation ?';
-  if (!confirm(message)) return;
+  if (nbApprenants > 0) {
+    showToast('Impossible de supprimer : cette formation a ' + nbApprenants + ' apprenant(s) inscrit(s). Vous pouvez la marquer "Annulé" ou "Terminé" à la place.', 'error');
+    fermerMenusTaches();
+    return;
+  }
+  if (!confirm('Supprimer définitivement cette formation ?')) return;
   const { error } = await sb.from('yc_formations').delete().eq('id', id);
   if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
   showToast('Formation supprimée.');
