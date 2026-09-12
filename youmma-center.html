@@ -363,6 +363,8 @@ h1,h2,h3{margin:0;}
 .tache-menu{position:relative;}
 .tache-menu-btn{background:none;border:1.5px solid var(--border);color:var(--text-muted);width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .tache-menu-btn:hover{border-color:var(--orange);color:var(--orange);}
+.tache-menu-btn.on-dark{border-color:rgba(255,255,255,.35);color:rgba(255,255,255,.85);}
+.tache-menu-btn.on-dark:hover{border-color:#fff;color:#fff;}
 .tache-menu-dropdown{position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 6px 20px rgba(31,31,85,.12);min-width:210px;z-index:30;display:none;overflow:hidden;}
 .tache-menu-dropdown.open{display:block;}
 .tache-menu-item{display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;text-align:left;padding:9px 12px;font-size:13px;color:var(--text);cursor:pointer;}
@@ -490,6 +492,14 @@ h1,h2,h3{margin:0;}
 .formation-mini-bar-fill{height:100%;border-radius:3px;}
 .formation-mini-bar-fill.soldee{background:var(--green);}
 .formation-mini-bar-fill.encours{background:var(--orange);}
+.formation-filtre-chip{display:inline-flex;align-items:center;gap:6px;background:var(--indigo);color:#fff;font-size:12px;font-weight:600;padding:5px 10px;border-radius:20px;}
+.formation-filtre-chip button{background:none;border:none;color:#fff;cursor:pointer;font-size:15px;line-height:1;padding:0;}
+.suivi-pastille{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:24px;padding:0 8px;border-radius:12px;font-size:12.5px;font-weight:700;border:none;}
+button.suivi-pastille{cursor:pointer;}
+.suivi-pastille-vide{background:var(--bg-page);color:var(--text-light);}
+.suivi-pastille-bleu{background:var(--blue-bg);color:var(--blue);}
+.suivi-pastille-amber{background:var(--amber-bg);color:var(--amber);}
+.suivi-pastille-vert{background:var(--green-bg);color:var(--green);}
 .apprenant-actions{display:flex;gap:6px;flex-wrap:wrap;}
 .apprenant-souscol{font-size:10px;color:var(--text-light);margin-top:2px;}
 .formation-statut-badge.inscrit{background:var(--amber-bg);color:var(--amber);}
@@ -910,6 +920,17 @@ h1,h2,h3{margin:0;}
             </div>
           </div>
           <div id="formationsListe" class="formations-grid"></div>
+          <div class="card" id="suiviGlobalCard" style="display:none;margin-top:20px;">
+            <div class="caisse-op-header">
+              <div class="caisse-op-header-left"><i class="ti ti-list-check" style="color:var(--orange);"></i> Suivi des apprenants par formation</div>
+            </div>
+            <div class="formation-apprenants-wrap">
+              <table class="formation-apprenants-table">
+                <thead><tr><th>Formation</th><th style="text-align:center;">En cours</th><th style="text-align:center;">Terminé</th><th style="text-align:center;">Attesté</th><th style="text-align:center;">Total</th></tr></thead>
+                <tbody id="suiviGlobalBody"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
         <div id="formationsDetailVue" class="hidden">
           <div class="formation-detail-header">
@@ -918,6 +939,7 @@ h1,h2,h3{margin:0;}
               <div class="formation-detail-titre" id="detFormTitre">Formation</div>
               <span class="formation-statut-badge" id="detFormBadge"></span>
             </div>
+            <span id="detFormFiltre" class="hidden"></span>
             <button class="btn btn-primary" style="margin-left:auto;" onclick="openModalInscrire()"><i class="ti ti-plus"></i> Inscrire un apprenant</button>
           </div>
           <div class="formation-apprenants-wrap">
@@ -1247,7 +1269,7 @@ h1,h2,h3{margin:0;}
 
 <div id="modalFormation" class="modal-overlay">
   <div class="modal-card">
-    <div class="modal-header"><h3>Nouvelle formation</h3><button class="modal-close" onclick="closeModal('modalFormation')">×</button></div>
+    <div class="modal-header"><h3 id="fModalTitre">Nouvelle formation</h3><button class="modal-close" onclick="closeModal('modalFormation')">×</button></div>
     <div class="modal-body">
       <div class="form-row"><label>Intitulé *</label><input type="text" id="fIntitule"></div>
       <div class="form-row-2">
@@ -1256,23 +1278,9 @@ h1,h2,h3{margin:0;}
       </div>
       <div class="form-row"><label>Places disponibles <small style="color:var(--text-light);font-weight:400;">(laisser vide = illimité)</small></label><input type="number" id="fNbPlacesMax" min="0"></div>
       <div class="form-row"><label>Date de début *</label><input type="date" id="fDateDebut"></div>
-      <div class="form-row"><label>Jours de formation *</label>
-        <div class="jours-formation-liste">
-          <label class="jour-checkbox"><input type="checkbox" value="Lundi"> Lundi</label>
-          <label class="jour-checkbox"><input type="checkbox" value="Mardi"> Mardi</label>
-          <label class="jour-checkbox"><input type="checkbox" value="Mercredi"> Mercredi</label>
-          <label class="jour-checkbox"><input type="checkbox" value="Jeudi"> Jeudi</label>
-          <label class="jour-checkbox"><input type="checkbox" value="Vendredi"> Vendredi</label>
-          <label class="jour-checkbox"><input type="checkbox" value="Samedi"> Samedi</label>
-        </div>
-      </div>
-      <div class="form-row-2">
-        <div class="form-row"><label>Heure de début *</label><input type="time" id="fHeureDebut"></div>
-        <div class="form-row"><label>Heure de fin *</label><input type="time" id="fHeureFin"></div>
-      </div>
       <div id="fErreur" class="form-error hidden"></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalFormation')">Annuler</button><button class="btn btn-primary" onclick="creerFormation()">Créer</button></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalFormation')">Annuler</button><button class="btn btn-primary" id="fBtnSubmit" onclick="creerFormation()">Créer</button></div>
   </div>
 </div>
 
@@ -1294,7 +1302,20 @@ h1,h2,h3{margin:0;}
         <div class="form-row"><label>Heures par séance (h) *</label><input type="number" id="iHeuresSeance" min="0" step="0.5" oninput="majCalculsInscription()"></div>
         <div class="form-row"><label>Nombre total de séances estimé</label><div class="inscrire-readonly" id="iNbSeancesEstime">—</div></div>
       </div>
-      <div class="form-row"><label>Jours et horaire de la formation</label><div class="inscrire-readonly" id="iJoursHoraire">—</div></div>
+      <div class="form-row"><label>Jours de formation *</label>
+        <div class="jours-formation-liste">
+          <label class="jour-checkbox"><input type="checkbox" value="Lundi"> Lundi</label>
+          <label class="jour-checkbox"><input type="checkbox" value="Mardi"> Mardi</label>
+          <label class="jour-checkbox"><input type="checkbox" value="Mercredi"> Mercredi</label>
+          <label class="jour-checkbox"><input type="checkbox" value="Jeudi"> Jeudi</label>
+          <label class="jour-checkbox"><input type="checkbox" value="Vendredi"> Vendredi</label>
+          <label class="jour-checkbox"><input type="checkbox" value="Samedi"> Samedi</label>
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row"><label>Heure de début *</label><input type="time" id="iHeureDebut" oninput="majCalculsInscription()"></div>
+        <div class="form-row"><label>Heure de fin *</label><input type="time" id="iHeureFin" oninput="majCalculsInscription()"></div>
+      </div>
       <div class="inscrire-section-titre" id="iSectionPaiementTitre">Paiement</div>
       <div id="iSectionPaiement">
         <div class="form-row"><label>Montant total de la formation (GNF) *</label><input type="number" id="iMontantTotal" min="0" oninput="majCalculsInscription()"></div>
@@ -3115,10 +3136,10 @@ function construireHtmlRecuVersement(apprenant, formation, montantVerse, modePai
     : '<div class="rec-logo" style="background:' + COULEUR_ORANGE + ';">YC</div>';
 
   const ABREV_JOURS = { Lundi: 'Lun.', Mardi: 'Mar.', Mercredi: 'Mer.', Jeudi: 'Jeu.', Vendredi: 'Ven.', Samedi: 'Sam.', Dimanche: 'Dim.' };
-  const joursFormationListe = (formation && formation.jours_formation ? formation.jours_formation : '').split(',').map(function(j) { return j.trim(); }).filter(Boolean);
+  const joursFormationListe = (apprenant.jours_formation || '').split(',').map(function(j) { return j.trim(); }).filter(Boolean);
   const joursAbreges = joursFormationListe.map(function(j) { return ABREV_JOURS[j] || j; }).join(' / ');
-  const ligneHoraireFormation = (joursAbreges && formation && formation.heure_debut && formation.heure_fin)
-    ? 'Horaire : ' + joursAbreges + ' · ' + formaterHeure(formation.heure_debut).replace(':', 'h') + ' – ' + formaterHeure(formation.heure_fin).replace(':', 'h')
+  const ligneHoraireFormation = (joursAbreges && apprenant.heure_debut && apprenant.heure_fin)
+    ? 'Horaire : ' + joursAbreges + ' · ' + formaterHeure(apprenant.heure_debut).replace(':', 'h') + ' – ' + formaterHeure(apprenant.heure_fin).replace(':', 'h')
     : '';
 
   const conditionsHtml = '<div class="rec-conditions"><div class="rec-conditions-titre" style="color:' + COULEUR_ORANGE + ';">CONDITIONS GÉNÉRALES IFP YOUMMA</div><ul>'
@@ -3934,20 +3955,52 @@ const APPRENANT_STATUT_BADGES = {
 };
 let apprenantsCourants = [];
 let apprenantEnEdition = null;
+let formationEnEdition = null;
+let filtreStatutApprenant = null;
 
 async function loadFormations() {
   const { data } = await sb.from('yc_formations').select('*').eq('statut', 'actif').order('date_debut', { ascending: false });
   const base = data || [];
   const withStats = await Promise.all(base.map(async function(f) {
-    const { data: apps } = await sb.from('yc_apprenants').select('montant_paye').eq('formation_id', f.id);
-    const ca = (apps || []).reduce(function(s, a) { return s + Number(a.montant_paye || 0); }, 0);
-    return Object.assign({}, f, { nbApprenants: (apps || []).length, ca: ca });
+    const { data: apps } = await sb.from('yc_apprenants').select('montant_paye,jours_formation,heure_debut,heure_fin,statut_apprenant').eq('formation_id', f.id);
+    const rows = apps || [];
+    const ca = rows.reduce(function(s, a) { return s + Number(a.montant_paye || 0); }, 0);
+    const avecHoraire = rows.find(function(a) { return a.jours_formation && a.heure_debut && a.heure_fin; });
+    const suiviCounts = {
+      en_cours: rows.filter(function(a) { return a.statut_apprenant === 'en_cours'; }).length,
+      evaluation: rows.filter(function(a) { return a.statut_apprenant === 'evaluation'; }).length,
+      atteste: rows.filter(function(a) { return a.statut_apprenant === 'atteste'; }).length,
+      total: rows.length,
+    };
+    return Object.assign({}, f, { nbApprenants: rows.length, ca: ca, joursHoraireApprenant: avecHoraire || null, suiviCounts: suiviCounts });
   }));
   formationsCache = withStats;
   const sousTitreEl = document.getElementById('formationsSousTitre');
   if (sousTitreEl) sousTitreEl.textContent = withStats.length + ' formation' + (withStats.length > 1 ? 's' : '') + ' active' + (withStats.length > 1 ? 's' : '');
   document.getElementById('formationsListe').innerHTML = withStats.length ? withStats.map(renderFormationCard).join('')
     : '<div class="priority-empty" style="grid-column:1/-1;"><i class="ti ti-school-off"></i>Aucune formation active.<div style="margin-top:8px;"><button class="btn btn-primary btn-sm" onclick="openModalFormation()"><i class="ti ti-plus"></i> Créer la première formation</button></div></div>';
+  renderSuiviGlobal(withStats);
+}
+
+function suiviPastille(formationId, statut, count, couleur) {
+  if (!count) return '<span class="suivi-pastille suivi-pastille-vide">0</span>';
+  return '<button class="suivi-pastille suivi-pastille-' + couleur + '" onclick="openFormationDetails(\'' + formationId + '\',\'' + statut + '\')">' + count + '</button>';
+}
+
+function renderSuiviGlobal(formations) {
+  const card = document.getElementById('suiviGlobalCard');
+  if (!formations.length) { card.style.display = 'none'; return; }
+  card.style.display = '';
+  document.getElementById('suiviGlobalBody').innerHTML = formations.map(function(f) {
+    const c = f.suiviCounts || { en_cours: 0, evaluation: 0, atteste: 0, total: 0 };
+    return '<tr>'
+      + '<td><div class="apprenant-nom">' + esc(f.intitule) + '</div></td>'
+      + '<td style="text-align:center;">' + suiviPastille(f.id, 'en_cours', c.en_cours, 'bleu') + '</td>'
+      + '<td style="text-align:center;">' + suiviPastille(f.id, 'evaluation', c.evaluation, 'amber') + '</td>'
+      + '<td style="text-align:center;">' + suiviPastille(f.id, 'atteste', c.atteste, 'vert') + '</td>'
+      + '<td style="text-align:center;font-weight:600;">' + c.total + '</td>'
+      + '</tr>';
+  }).join('');
 }
 
 function formaterHeure(h) {
@@ -3965,12 +4018,16 @@ function renderFormationCard(f) {
   const badge = FORMATION_STATUT_BADGES[f.statut] || FORMATION_STATUT_BADGES.actif;
   const totalAttendu = f.nbApprenants * Number(f.prix_total || 0);
   const pct = totalAttendu > 0 ? Math.min(100, Math.round(f.ca / totalAttendu * 100)) : 0;
-  const dates = (f.date_debut ? new Date(f.date_debut).toLocaleDateString('fr-FR') : '—') + (f.date_fin ? ' → ' + new Date(f.date_fin).toLocaleDateString('fr-FR') : '');
-  const joursHoraire = formaterJoursHoraire(f);
+  const joursHoraire = f.joursHoraireApprenant ? formaterJoursHoraire(f.joursHoraireApprenant) : '';
+  const peutGerer = session.role === 'gerant';
+  const menuItems = '<button class="tache-menu-item" onclick="openModalModifierFormation(\'' + f.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>'
+    + (peutGerer ? '<button class="tache-menu-item danger" onclick="supprimerFormation(\'' + f.id + '\')"><i class="ti ti-trash"></i> Supprimer</button>' : '');
+  const menuHtml = '<div class="tache-menu"><button class="tache-menu-btn on-dark" onclick="toggleTacheMenu(event,\'' + f.id + '\')"><i class="ti ti-dots-vertical"></i></button><div class="tache-menu-dropdown" id="tacheMenu-' + f.id + '">' + menuItems + '</div></div>';
   return '<div class="formation-card">'
     + '<div class="formation-card-header">'
-    + '<div class="formation-card-header-top"><div class="formation-card-titre">' + esc(f.intitule) + '</div><span class="formation-statut-badge ' + badge.cls + '">' + badge.label + '</span></div>'
-    + '<div class="formation-card-dates"><i class="ti ti-calendar"></i> ' + dates + '</div>'
+    + '<div class="formation-card-header-top"><div class="formation-card-titre">' + esc(f.intitule) + '</div>'
+    + '<div style="display:flex;align-items:center;gap:8px;"><span class="formation-statut-badge ' + badge.cls + '">' + badge.label + '</span>' + menuHtml + '</div>'
+    + '</div>'
     + (joursHoraire ? '<div class="formation-card-dates"><i class="ti ti-clock"></i> ' + esc(joursHoraire) + '</div>' : '')
     + '</div>'
     + '<div class="formation-card-body">'
@@ -3986,16 +4043,32 @@ function renderFormationCard(f) {
 }
 
 function openModalFormation() {
+  formationEnEdition = null;
+  document.getElementById('fModalTitre').textContent = 'Nouvelle formation';
+  document.getElementById('fBtnSubmit').textContent = 'Créer';
   document.getElementById('fIntitule').value = '';
   document.getElementById('fNbSeances').value = '';
   document.getElementById('fPrixTotal').value = '';
   document.getElementById('fNbPlacesMax').value = '';
   document.getElementById('fDateDebut').value = '';
-  document.getElementById('fHeureDebut').value = '';
-  document.getElementById('fHeureFin').value = '';
-  document.querySelectorAll('.jour-checkbox input').forEach(function(c) { c.checked = false; });
   document.getElementById('fErreur').classList.add('hidden');
   openModal('modalFormation');
+}
+
+function openModalModifierFormation(id) {
+  const f = formationsCache.find(function(x) { return x.id === id; });
+  if (!f) return;
+  formationEnEdition = f;
+  document.getElementById('fModalTitre').textContent = 'Modifier la formation';
+  document.getElementById('fBtnSubmit').textContent = 'Enregistrer les modifications';
+  document.getElementById('fIntitule').value = f.intitule || '';
+  document.getElementById('fNbSeances').value = f.nb_seances || '';
+  document.getElementById('fPrixTotal').value = f.prix_total || '';
+  document.getElementById('fNbPlacesMax').value = f.nb_places_max != null ? f.nb_places_max : '';
+  document.getElementById('fDateDebut').value = f.date_debut || '';
+  document.getElementById('fErreur').classList.add('hidden');
+  openModal('modalFormation');
+  fermerMenusTaches();
 }
 
 async function creerFormation() {
@@ -4005,19 +4078,26 @@ async function creerFormation() {
   const nbPlacesMaxBrut = document.getElementById('fNbPlacesMax').value.trim();
   const nbPlacesMax = nbPlacesMaxBrut ? Number(nbPlacesMaxBrut) : null;
   const dateDebut = document.getElementById('fDateDebut').value;
-  const heureDebut = document.getElementById('fHeureDebut').value;
-  const heureFin = document.getElementById('fHeureFin').value;
-  const joursFormation = Array.from(document.querySelectorAll('.jour-checkbox input:checked')).map(function(c) { return c.value; });
   const errEl = document.getElementById('fErreur');
-  if (!intitule || !nbSeances || !prixTotal || !dateDebut || !heureDebut || !heureFin || !joursFormation.length) {
-    errEl.textContent = 'Tous les champs sont requis (au moins un jour de formation).';
+  if (!intitule || !nbSeances || !prixTotal || !dateDebut) {
+    errEl.textContent = 'Tous les champs sont requis.';
     errEl.classList.remove('hidden');
     return;
   }
-  const payload = {
-    intitule: intitule, nb_seances: nbSeances, prix_total: prixTotal, date_debut: dateDebut, statut: 'actif',
-    jours_formation: joursFormation.join(','), heure_debut: heureDebut, heure_fin: heureFin, nb_places_max: nbPlacesMax,
-  };
+
+  if (formationEnEdition) {
+    const { error } = await sb.from('yc_formations').update({
+      intitule: intitule, nb_seances: nbSeances, prix_total: prixTotal, date_debut: dateDebut, nb_places_max: nbPlacesMax,
+    }).eq('id', formationEnEdition.id);
+    if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+    closeModal('modalFormation');
+    showToast('Formation modifiée ✅');
+    formationEnEdition = null;
+    loadFormations();
+    return;
+  }
+
+  const payload = { intitule: intitule, nb_seances: nbSeances, prix_total: prixTotal, date_debut: dateDebut, nb_places_max: nbPlacesMax, statut: 'actif' };
   const { error } = await sb.from('yc_formations').insert(payload);
   if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
   closeModal('modalFormation');
@@ -4025,9 +4105,27 @@ async function creerFormation() {
   loadFormations();
 }
 
-async function openFormationDetails(id) {
+async function supprimerFormation(id) {
+  if (session.role !== 'gerant') return;
+  const f = formationsCache.find(function(x) { return x.id === id; });
+  if (!f) return;
+  const { data: apps } = await sb.from('yc_apprenants').select('id').eq('formation_id', id);
+  const nbApprenants = (apps || []).length;
+  const message = nbApprenants > 0
+    ? 'Cette formation a ' + nbApprenants + ' apprenant(s) inscrit(s). Supprimer quand même ?'
+    : 'Supprimer définitivement cette formation ?';
+  if (!confirm(message)) return;
+  const { error } = await sb.from('yc_formations').delete().eq('id', id);
+  if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
+  showToast('Formation supprimée.');
+  fermerMenusTaches();
+  loadFormations();
+}
+
+async function openFormationDetails(id, statutFiltre) {
   formationCourante = formationsCache.find(function(f) { return f.id === id; });
   if (!formationCourante) return;
+  filtreStatutApprenant = statutFiltre || null;
   document.getElementById('detFormTitre').textContent = formationCourante.intitule;
   const badge = FORMATION_STATUT_BADGES[formationCourante.statut] || FORMATION_STATUT_BADGES.actif;
   const badgeEl = document.getElementById('detFormBadge');
@@ -4042,14 +4140,34 @@ function retourListeFormations() {
   document.getElementById('formationsDetailVue').classList.add('hidden');
   document.getElementById('formationsListeVue').classList.remove('hidden');
   formationCourante = null;
+  filtreStatutApprenant = null;
   loadFormations();
 }
 
+function retirerFiltreApprenant() {
+  filtreStatutApprenant = null;
+  chargerApprenants();
+}
+
 async function chargerApprenants() {
+  if (!formationCourante) return;
   const { data } = await sb.from('yc_apprenants').select('*').eq('formation_id', formationCourante.id).order('nom');
   apprenantsCourants = data || [];
+  let liste = apprenantsCourants;
+  if (filtreStatutApprenant) {
+    liste = liste.filter(function(a) { return a.statut_apprenant === filtreStatutApprenant; });
+  }
+  const filtreEl = document.getElementById('detFormFiltre');
+  if (filtreStatutApprenant) {
+    const badgeFiltre = APPRENANT_STATUT_BADGES[filtreStatutApprenant] || { label: filtreStatutApprenant };
+    filtreEl.innerHTML = '<span class="formation-filtre-chip">Filtré : ' + esc(badgeFiltre.label) + ' <button onclick="retirerFiltreApprenant()">×</button></span>';
+    filtreEl.classList.remove('hidden');
+  } else {
+    filtreEl.innerHTML = '';
+    filtreEl.classList.add('hidden');
+  }
   const cont = document.getElementById('detFormApprenants');
-  cont.innerHTML = apprenantsCourants.length ? apprenantsCourants.map(renderApprenantRow).join('') : '<tr><td colspan="7" class="empty">Aucun apprenant inscrit.</td></tr>';
+  cont.innerHTML = liste.length ? liste.map(renderApprenantRow).join('') : '<tr><td colspan="7" class="empty">Aucun apprenant inscrit' + (filtreStatutApprenant ? ' pour ce statut' : '') + '.</td></tr>';
 }
 
 function renderApprenantRow(a) {
@@ -4114,11 +4232,6 @@ function majCalculsInscription() {
   const freq = Number(document.getElementById('iFrequenceSemaine').value || 0);
   const heures = Number(document.getElementById('iHeuresSeance').value || 0);
   const montantTotal = Number(document.getElementById('iMontantTotal').value || 0);
-  const jours = (formationCourante && formationCourante.jours_formation ? formationCourante.jours_formation : '').split(',').map(function(j) { return j.trim(); }).filter(Boolean);
-  const horaireStr = (formationCourante && formationCourante.heure_debut && formationCourante.heure_fin)
-    ? formaterHeure(formationCourante.heure_debut).replace(':', 'h') + ' – ' + formaterHeure(formationCourante.heure_fin).replace(':', 'h')
-    : '—';
-  document.getElementById('iJoursHoraire').textContent = 'Jours : ' + (jours.length ? jours.join(', ') : '—') + ' · Horaire : ' + horaireStr;
   const nbSeances = Math.round(duree * 4.33 * freq);
   document.getElementById('iNbSeancesEstime').textContent = 'Nombre total de séances estimé : ' + nbSeances;
   const t1 = Math.round(montantTotal * 0.5);
@@ -4151,6 +4264,9 @@ function openModalInscrire() {
   document.getElementById('iHeuresSeance').value = '';
   document.getElementById('iMontantTotal').value = formationCourante.prix_total || '';
   document.getElementById('iModePaiementT1').value = 'cash';
+  document.getElementById('iHeureDebut').value = '';
+  document.getElementById('iHeureFin').value = '';
+  document.querySelectorAll('#modalInscrire .jour-checkbox input').forEach(function(c) { c.checked = false; });
   document.getElementById('iErreur').classList.add('hidden');
   majCalculsInscription();
   openModal('modalInscrire');
@@ -4170,6 +4286,10 @@ function openModalModifierApprenant(id) {
   document.getElementById('iFrequenceSemaine').value = a.frequence_semaine || '';
   document.getElementById('iHeuresSeance').value = a.heures_seance || '';
   document.getElementById('iMontantTotal').value = a.montant_total || '';
+  document.getElementById('iHeureDebut').value = a.heure_debut ? formaterHeure(a.heure_debut) : '';
+  document.getElementById('iHeureFin').value = a.heure_fin ? formaterHeure(a.heure_fin) : '';
+  const joursApprenant = (a.jours_formation || '').split(',').map(function(j) { return j.trim(); });
+  document.querySelectorAll('#modalInscrire .jour-checkbox input').forEach(function(c) { c.checked = joursApprenant.indexOf(c.value) !== -1; });
   document.getElementById('iErreur').classList.add('hidden');
   majCalculsInscription();
   openModal('modalInscrire');
@@ -4183,9 +4303,12 @@ async function inscrireApprenant() {
   const freq = Number(document.getElementById('iFrequenceSemaine').value || 0);
   const heures = Number(document.getElementById('iHeuresSeance').value || 0);
   const montantTotal = Number(document.getElementById('iMontantTotal').value || 0);
+  const heureDebut = document.getElementById('iHeureDebut').value;
+  const heureFin = document.getElementById('iHeureFin').value;
+  const joursFormation = Array.from(document.querySelectorAll('#modalInscrire .jour-checkbox input:checked')).map(function(c) { return c.value; });
   const errEl = document.getElementById('iErreur');
-  if (!nom || !tel || !duree || !freq || !heures || (!apprenantEnEdition && !montantTotal)) {
-    errEl.textContent = 'Merci de remplir tous les champs obligatoires (*).';
+  if (!nom || !tel || !duree || !freq || !heures || !heureDebut || !heureFin || !joursFormation.length || (!apprenantEnEdition && !montantTotal)) {
+    errEl.textContent = 'Merci de remplir tous les champs obligatoires (*), dont au moins un jour de formation.';
     errEl.classList.remove('hidden');
     return;
   }
@@ -4195,6 +4318,7 @@ async function inscrireApprenant() {
     const { error } = await sb.from('yc_apprenants').update({
       nom: nom, telephone: tel || null, duree_mois: duree, frequence_semaine: freq,
       heures_seance: heures, nb_seances_total: calc.nbSeances,
+      jours_formation: joursFormation.join(','), heure_debut: heureDebut, heure_fin: heureFin,
     }).eq('id', apprenantEnEdition.id);
     if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
     closeModal('modalInscrire');
@@ -4209,6 +4333,7 @@ async function inscrireApprenant() {
   const payload = {
     formation_id: formationCourante.id, nom: nom, telephone: tel || null,
     duree_mois: duree, frequence_semaine: freq, heures_seance: heures,
+    jours_formation: joursFormation.join(','), heure_debut: heureDebut, heure_fin: heureFin,
     montant_total: montantTotal, montant_paye: calc.t1,
     tranche1_montant: calc.t1, tranche1_date: today(),
     tranche2_montant: calc.t2, tranche2_date: calc.dateT2.toISOString().slice(0, 10), tranche2_payee: false,
