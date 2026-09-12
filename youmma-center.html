@@ -491,6 +491,21 @@ h1,h2,h3{margin:0;}
 .formation-mini-bar-fill.soldee{background:var(--green);}
 .formation-mini-bar-fill.encours{background:var(--orange);}
 .apprenant-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.apprenant-souscol{font-size:10px;color:var(--text-light);margin-top:2px;}
+.formation-statut-badge.inscrit{background:var(--amber-bg);color:var(--amber);}
+.formation-statut-badge.en_cours{background:var(--blue-bg);color:var(--blue);}
+.formation-statut-badge.evaluation{background:var(--violet-bg);color:var(--violet);}
+.formation-statut-badge.atteste{background:var(--green-bg);color:var(--green);}
+
+.modal-card-inscrire{max-width:640px;}
+.inscrire-section-titre{font-weight:700;font-size:11.5px;letter-spacing:.04em;color:var(--text-light);text-transform:uppercase;margin:16px 0 8px;}
+.inscrire-section-titre:first-child{margin-top:0;}
+.inscrire-readonly{background:var(--bg-page);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13.5px;color:var(--text-muted);}
+.inscrire-recap{background:var(--bg-page);border-radius:8px;padding:12px;font-size:12.5px;color:var(--text-muted);line-height:1.7;margin-top:12px;}
+.inscrire-recap strong{color:var(--text);}
+@media (max-width:640px){
+  #modalInscrire .form-row-2{grid-template-columns:1fr;}
+}
 
 .bar-chart{display:flex;align-items:flex-end;gap:10px;height:160px;padding-top:20px;}
 .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
@@ -1243,18 +1258,42 @@ h1,h2,h3{margin:0;}
 </div>
 
 <div id="modalInscrire" class="modal-overlay">
-  <div class="modal-card">
-    <div class="modal-header"><h3>Inscrire un apprenant</h3><button class="modal-close" onclick="closeModal('modalInscrire')">×</button></div>
+  <div class="modal-card modal-card-inscrire">
+    <div class="modal-header"><h3 id="iModalTitre">Inscrire un apprenant</h3><button class="modal-close" onclick="closeModal('modalInscrire')">×</button></div>
     <div class="modal-body">
-      <div class="form-row"><label>Nom *</label><input type="text" id="iNom"></div>
-      <div class="form-row"><label>Téléphone</label><input type="tel" id="iTel"></div>
+      <div class="inscrire-section-titre">Apprenant</div>
       <div class="form-row-2">
-        <div class="form-row"><label>Montant total (GNF) *</label><input type="number" id="iMontantTotal" min="0"></div>
-        <div class="form-row"><label>Acompte versé (GNF)</label><input type="number" id="iMontantPaye" min="0" value="0"></div>
+        <div class="form-row"><label>Nom *</label><input type="text" id="iNom"></div>
+        <div class="form-row"><label>Téléphone *</label><input type="tel" id="iTel"></div>
+      </div>
+      <div class="inscrire-section-titre">Formation</div>
+      <div class="form-row-2">
+        <div class="form-row"><label>Durée totale (mois) *</label><input type="number" id="iDureeMois" min="0" step="0.5" oninput="majCalculsInscription()"></div>
+        <div class="form-row"><label>Fréquence (séances/semaine) *</label><input type="number" id="iFrequenceSemaine" min="0" oninput="majCalculsInscription()"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row"><label>Heures par séance (h) *</label><input type="number" id="iHeuresSeance" min="0" step="0.5" oninput="majCalculsInscription()"></div>
+        <div class="form-row"><label>Nombre total de séances estimé</label><div class="inscrire-readonly" id="iNbSeancesEstime">—</div></div>
+      </div>
+      <div class="inscrire-section-titre" id="iSectionPaiementTitre">Paiement</div>
+      <div id="iSectionPaiement">
+        <div class="form-row"><label>Montant total de la formation (GNF) *</label><input type="number" id="iMontantTotal" min="0" oninput="majCalculsInscription()"></div>
+        <div class="form-row-2">
+          <div class="form-row"><label>Tranche 1 (payée aujourd'hui)</label><div class="inscrire-readonly" id="iTranche1Montant">—</div></div>
+          <div class="form-row"><label>Date tranche 1</label><div class="inscrire-readonly" id="iTranche1Date">—</div></div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-row"><label>Tranche 2 (à échéance)</label><div class="inscrire-readonly" id="iTranche2Montant">—</div></div>
+          <div class="form-row"><label>Échéance tranche 2</label><div class="inscrire-readonly" id="iTranche2DateAffichee">—</div></div>
+        </div>
+        <div class="form-row"><label>Mode de paiement — Tranche 1</label>
+          <select id="iModePaiementT1"><option value="cash">Cash</option><option value="orange_money">Orange Money</option></select>
+        </div>
+        <div class="inscrire-recap" id="iRecap"></div>
       </div>
       <div id="iErreur" class="form-error hidden"></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalInscrire')">Annuler</button><button class="btn btn-primary" onclick="inscrireApprenant()">Inscrire</button></div>
+    <div class="modal-footer"><button class="btn btn-primary btn-block" id="iBtnSubmit" onclick="inscrireApprenant()">Inscrire et générer le reçu</button></div>
   </div>
 </div>
 
@@ -1266,6 +1305,7 @@ h1,h2,h3{margin:0;}
       <div class="form-row"><label>Mode de paiement</label>
         <select id="pModePaiement"><option value="cash">Cash</option><option value="orange_money">Orange Money</option></select>
       </div>
+      <div class="form-row"><label>Note (optionnel)</label><input type="text" id="pNote"></div>
       <div id="pErreur" class="form-error hidden"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-primary" onclick="enregistrerPaiementApprenant()">Enregistrer</button></div>
@@ -2993,8 +3033,8 @@ const STYLE_IMPRESSION_RECU = '@page{size:A5;margin:15mm;}'
   + '.rec-entete{display:flex;justify-content:space-between;gap:14px;}'
   + '.rec-logo{height:44px;min-width:44px;border-radius:6px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}'
   + '.rec-logo img{height:100%;width:auto;object-fit:contain;}'
-  + '.rec-titre-inst{font-size:20px;}'
-  + '.rec-soustitre{font-size:10.5px;font-style:italic;color:#6B6B8A;margin-top:2px;}'
+  + '.rec-titre-inst{font-size:22px;}'
+  + '.rec-soustitre{font-size:12px;font-style:italic;color:#6B6B8A;margin-top:2px;}'
   + '.rec-agence{font-size:10px;color:#444;margin-top:2px;}'
   + '.rec-coord{font-size:10px;color:#333;text-align:right;margin-top:8px;}'
   + '.rec-coord div{margin-top:2px;}'
@@ -3005,7 +3045,7 @@ const STYLE_IMPRESSION_RECU = '@page{size:A5;margin:15mm;}'
   + '.rec-bloc-apprenant{display:grid;grid-template-columns:1fr 1fr;gap:14px;background:#F4F5F9;padding:12px;border-radius:6px;margin-bottom:12px;}'
   + '.rec-bloc-titre{font-size:11px;font-weight:700;letter-spacing:.04em;margin-bottom:4px;}'
   + '.rec-bloc-apprenant div div{margin-top:2px;}'
-  + '.rec-versement{width:100%;margin-bottom:12px;}'
+  + '.rec-versement{width:280px;margin-left:auto;margin-bottom:12px;}'
   + '.rec-versement-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #E3E4EC;font-size:11px;}'
   + '.rec-versement-row:last-child{border-bottom:none;}'
   + '.rec-versement-montant{font-weight:700;font-size:16px;padding:4px 10px;border-radius:4px;}'
@@ -3024,28 +3064,21 @@ const STYLE_IMPRESSION_RECU = '@page{size:A5;margin:15mm;}'
   + '@media print{body{background:#fff;}.feuille{width:auto;min-height:auto;margin:0;padding:0;box-shadow:none;}.rec-pied{position:fixed;bottom:0;left:0;right:0;}}';
 
 function construireBarreImpressionRecu() {
-  return '<div class="barre-impression"><button onclick="this.disabled=true;window.opener.confirmerImpressionRecu();window.print();">Imprimer / PDF</button>'
+  return '<div class="barre-impression"><button onclick="window.print()">Imprimer / PDF</button>'
     + '<span>Astuce : décochez « En-têtes et pieds de page » dans les options d\'impression.</span></div>';
 }
 
-async function calculerProchainNumeroRec() {
+function calculerProchainNumeroRec() {
   const annee = new Date().getFullYear();
   const dernier = Number(PARAMS['dernier_rec_numero_' + annee] || 0);
   return 'REC-' + annee + '-' + String(dernier + 1).padStart(4, '0');
 }
 
-async function confirmerImpressionRecu() {
-  const annee = new Date().getFullYear();
-  const cle = 'dernier_rec_numero_' + annee;
-  const nouveau = Number(PARAMS[cle] || 0) + 1;
-  PARAMS[cle] = String(nouveau);
-  await sb.from('yc_parametres').upsert([{ cle: cle, valeur: String(nouveau) }], { onConflict: 'cle' });
-}
-
-function construireHtmlRecuVersement(apprenant, formation, montantVerse, modePaiement, numero, brouillon) {
+function construireHtmlRecuVersement(apprenant, formation, montantVerse, modePaiement, numero, estInscription) {
   const P = PARAMS;
-  const couleurPrincipale = P.couleur_principale || '#2D2D6B';
-  const couleurAccent = P.couleur_accent || '#E85D04';
+  const COULEUR_INDIGO = '#2D2D6B';
+  const COULEUR_ORANGE = '#E85D04';
+  const COULEUR_AMBER = '#854F0B';
   const telephone = P.telephone || '';
   const email = P.email || '';
   const rccm = P.rccm || '';
@@ -3059,12 +3092,9 @@ function construireHtmlRecuVersement(apprenant, formation, montantVerse, modePai
 
   const logoHtml = P.logo_url
     ? '<div class="rec-logo"><img src="' + esc(P.logo_url) + '"></div>'
-    : '<div class="rec-logo" style="background:' + couleurAccent + ';">YC</div>';
+    : '<div class="rec-logo" style="background:' + COULEUR_ORANGE + ';">YC</div>';
 
-  const datesFormation = (formation && formation.date_debut ? new Date(formation.date_debut).toLocaleDateString('fr-FR') : '—')
-    + (formation && formation.date_fin ? ' → ' + new Date(formation.date_fin).toLocaleDateString('fr-FR') : '');
-
-  const conditionsHtml = '<div class="rec-conditions"><div class="rec-conditions-titre" style="color:' + couleurAccent + ';">CONDITIONS GÉNÉRALES IFP YOUMMA</div><ul>'
+  const conditionsHtml = '<div class="rec-conditions"><div class="rec-conditions-titre" style="color:' + COULEUR_ORANGE + ';">CONDITIONS GÉNÉRALES IFP YOUMMA</div><ul>'
     + '<li>Les frais de formation sont payables à 50 % avant le début de la formation et le solde à partir de 50 % du programme accompli.</li>'
     + '<li>L\'apprenant doit maintenir un taux de présence minimum de 95 %.</li>'
     + '<li>L\'attestation de fin de formation est délivrée après une évaluation finale.</li>'
@@ -3072,17 +3102,20 @@ function construireHtmlRecuVersement(apprenant, formation, montantVerse, modePai
     + '<li>TVA non applicable — IFP YOUMMA est un organisme de formation professionnelle.</li>'
     + '</ul></div>';
 
-  const mentionSolde = reste === 0 ? '<div class="rec-solde">SOLDE INTÉGRALEMENT RÉGLÉ</div>' : '';
+  const mentionSolde = reste === 0 ? '<div class="rec-solde">FORMATION INTÉGRALEMENT RÉGLÉE</div>' : '';
+
+  const ligneT2Due = estInscription
+    ? '<div class="rec-versement-row"><span>2ᵉ tranche due le</span><span style="color:' + COULEUR_AMBER + ';font-weight:600;">' + (apprenant.tranche2_date ? new Date(apprenant.tranche2_date + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—') + '</span></div>'
+    : '';
 
   return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Reçu ' + esc(numero) + ' — IFP YOUMMA</title>'
     + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">'
     + '<style>' + STYLE_IMPRESSION_RECU + BARRE_IMPRESSION_STYLE + '</style></head><body>'
     + construireBarreImpressionRecu()
     + '<div class="feuille">'
-    + (brouillon ? '<div class="watermark">BROUILLON</div>' : '')
     + '<div class="rec-entete">'
     + logoHtml
-    + '<div style="flex:1;"><div class="rec-titre-inst" style="color:' + couleurPrincipale + ';">IFP <strong>YOUMMA</strong></div>'
+    + '<div style="flex:1;"><div class="rec-titre-inst"><span style="color:' + COULEUR_INDIGO + ';">IFP</span> <strong style="color:' + COULEUR_ORANGE + ';">YOUMMA</strong></div>'
     + '<div class="rec-soustitre">Institut de Formation Professionnelle</div>'
     + '<div class="rec-agence">Agence de YOUMMA SARLU · Dubréka, Guinée</div></div>'
     + '<div class="rec-coord">'
@@ -3092,19 +3125,23 @@ function construireHtmlRecuVersement(apprenant, formation, montantVerse, modePai
     + (nif ? '<div>NIF : ' + esc(nif) + '</div>' : '')
     + '</div>'
     + '</div>'
-    + '<div class="rec-filet" style="border-color:' + couleurAccent + ';"></div>'
-    + '<div class="rec-titre-doc"><div class="rec-h1" style="color:' + couleurPrincipale + ';">REÇU DE VERSEMENT</div>'
+    + '<div class="rec-filet" style="border-color:' + COULEUR_ORANGE + ';"></div>'
+    + '<div class="rec-titre-doc"><div class="rec-h1" style="color:' + COULEUR_INDIGO + ';">REÇU DE VERSEMENT</div>'
     + '<div>N° ' + esc(numero) + '</div>'
     + '<div>Date : ' + dateAffichee + '</div></div>'
     + '<div class="rec-bloc-apprenant">'
-    + '<div><div class="rec-bloc-titre" style="color:' + couleurAccent + ';">APPRENANT</div><div><strong>' + esc(apprenant.nom) + '</strong></div>' + (apprenant.telephone ? '<div>' + esc(apprenant.telephone) + '</div>' : '') + '</div>'
-    + '<div><div class="rec-bloc-titre" style="color:' + couleurAccent + ';">FORMATION</div><div><strong>' + esc(formation ? formation.intitule : '') + '</strong></div><div>' + (formation ? (formation.nb_seances || 0) : 0) + ' séances</div><div>' + datesFormation + '</div></div>'
+    + '<div><div class="rec-bloc-titre" style="color:' + COULEUR_ORANGE + ';">APPRENANT</div><div><strong>' + esc(apprenant.nom) + '</strong></div>' + (apprenant.telephone ? '<div>' + esc(apprenant.telephone) + '</div>' : '') + '</div>'
+    + '<div><div class="rec-bloc-titre" style="color:' + COULEUR_ORANGE + ';">FORMATION</div><div><strong>' + esc(formation ? formation.intitule : '') + '</strong></div>'
+    + '<div>' + (apprenant.nb_seances_total || 0) + ' séances</div>'
+    + '<div>' + (apprenant.heures_seance || 0) + 'h/séance · ' + (apprenant.frequence_semaine || 0) + '×/semaine</div>'
+    + '<div>Durée : ' + (apprenant.duree_mois || 0) + ' mois</div></div>'
     + '</div>'
     + '<div class="rec-versement">'
-    + '<div class="rec-versement-row"><span>Montant versé ce jour</span><span class="rec-versement-montant" style="background:' + couleurAccent + '22;color:' + couleurAccent + ';">' + fmtMontant(montantVerse) + ' GNF</span></div>'
+    + '<div class="rec-versement-row"><span>Montant versé ce jour</span><span class="rec-versement-montant" style="background:#FAECE7;color:' + COULEUR_ORANGE + ';">' + fmtMontant(montantVerse) + ' GNF</span></div>'
     + '<div class="rec-versement-row"><span>Mode de paiement</span><span>' + modeLabel + '</span></div>'
     + '<div class="rec-versement-row"><span>Total payé à ce jour</span><span>' + fmtMontant(paye) + ' GNF</span></div>'
     + '<div class="rec-versement-row"><span>Reste à payer</span><span style="color:' + (reste > 0 ? '#A32D2D' : '#1E7D32') + ';font-weight:700;">' + fmtMontant(reste) + ' GNF</span></div>'
+    + ligneT2Due
     + '</div>'
     + mentionSolde
     + '<div class="rec-lettres">Reçu la somme de : <strong>' + nombreEnLettres(montantVerse) + '</strong>.</div>'
@@ -3115,14 +3152,19 @@ function construireHtmlRecuVersement(apprenant, formation, montantVerse, modePai
     + '</body></html>';
 }
 
-async function imprimerRecuVersement(apprenant, formation, montantVerse, modePaiement, brouillon) {
-  const numero = await calculerProchainNumeroRec();
+async function imprimerRecuVersement(apprenant, formation, montantVerse, modePaiement, estInscription) {
+  const numero = calculerProchainNumeroRec();
   const win = window.open('', '_blank');
   if (!win) { showToast('Le navigateur a bloqué l\'ouverture du reçu.', 'error'); return; }
-  const html = construireHtmlRecuVersement(apprenant, formation, montantVerse, modePaiement, numero, !!brouillon);
+  const html = construireHtmlRecuVersement(apprenant, formation, montantVerse, modePaiement, numero, !!estInscription);
   win.document.open();
   win.document.write(html);
   win.document.close();
+  const annee = new Date().getFullYear();
+  const cle = 'dernier_rec_numero_' + annee;
+  const nouveau = Number(PARAMS[cle] || 0) + 1;
+  PARAMS[cle] = String(nouveau);
+  await sb.from('yc_parametres').upsert([{ cle: cle, valeur: String(nouveau) }], { onConflict: 'cle' });
 }
 
 /* ── PAGE : PARAMÈTRES ── */
@@ -3747,6 +3789,14 @@ const FORMATION_STATUT_BADGES = {
   termine: { label: 'Terminé', cls: 'termine' },
   annule: { label: 'Annulé', cls: 'annule' },
 };
+const APPRENANT_STATUT_BADGES = {
+  inscrit: { label: 'Inscrit', cls: 'inscrit' },
+  en_cours: { label: 'En cours', cls: 'en_cours' },
+  evaluation: { label: 'Évaluation', cls: 'evaluation' },
+  atteste: { label: 'Attesté', cls: 'atteste' },
+};
+let apprenantsCourants = [];
+let apprenantEnEdition = null;
 
 async function loadFormations() {
   const { data } = await sb.from('yc_formations').select('*').eq('statut', 'actif').order('date_debut', { ascending: false });
@@ -3831,75 +3881,185 @@ function retourListeFormations() {
 
 async function chargerApprenants() {
   const { data } = await sb.from('yc_apprenants').select('*').eq('formation_id', formationCourante.id).order('nom');
-  const apprenants = data || [];
+  apprenantsCourants = data || [];
   const cont = document.getElementById('detFormApprenants');
-  cont.innerHTML = apprenants.length ? apprenants.map(renderApprenantRow).join('') : '<tr><td colspan="6" class="empty">Aucun apprenant inscrit.</td></tr>';
+  cont.innerHTML = apprenantsCourants.length ? apprenantsCourants.map(renderApprenantRow).join('') : '<tr><td colspan="7" class="empty">Aucun apprenant inscrit.</td></tr>';
 }
 
 function renderApprenantRow(a) {
-  const total = Number(a.montant_total || 0);
-  const paye = Number(a.montant_paye || 0);
-  const solde = total > 0 && paye >= total;
-  const pct = total > 0 ? Math.min(100, Math.round(paye / total * 100)) : 0;
-  const badge = FORMATION_STATUT_BADGES[a.statut] || FORMATION_STATUT_BADGES.actif;
+  const badge = APPRENANT_STATUT_BADGES[a.statut_apprenant] || APPRENANT_STATUT_BADGES.inscrit;
+  const t2EnRetard = a.tranche2_date && !a.tranche2_payee && a.tranche2_date < today();
+  const t2StatutHtml = a.tranche2_payee
+    ? '<span style="color:var(--green);"><i class="ti ti-check"></i> Payée</span>'
+    : t2EnRetard
+      ? '<span style="color:var(--red);"><i class="ti ti-alert-triangle"></i> En retard</span>'
+      : '<span style="color:var(--text-muted);"><i class="ti ti-clock"></i> Due</span>';
+  const menuItems = '<button class="tache-menu-item" onclick="openModalModifierApprenant(\'' + a.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>'
+    + '<button class="tache-menu-item danger" onclick="supprimerApprenant(\'' + a.id + '\')"><i class="ti ti-trash"></i> Supprimer</button>'
+    + (session.role === 'gerant' && a.statut_apprenant === 'evaluation' ? '<button class="tache-menu-item" onclick="marquerAtteste(\'' + a.id + '\')"><i class="ti ti-certificate"></i> Marquer attesté</button>' : '');
   return '<tr>'
     + '<td><div class="apprenant-nom">' + esc(a.nom) + '</div></td>'
     + '<td>' + esc(a.telephone || '—') + '</td>'
-    + '<td><div class="formation-mini-bar"><div class="formation-mini-bar-fill ' + (solde ? 'soldee' : 'encours') + '" style="width:' + pct + '%;"></div></div>' + fmtMontant(paye) + ' / ' + fmtMontant(total) + ' GNF</td>'
+    + '<td>' + fmtMontant(a.tranche1_montant) + ' GNF<div class="apprenant-souscol">' + (a.tranche1_date ? new Date(a.tranche1_date).toLocaleDateString('fr-FR') : '—') + ' · <i class="ti ti-check" style="color:var(--green);"></i></div></td>'
+    + '<td' + (t2EnRetard ? ' style="color:var(--red);"' : '') + '>' + fmtMontant(a.tranche2_montant) + ' GNF<div class="apprenant-souscol">' + (a.tranche2_date ? new Date(a.tranche2_date).toLocaleDateString('fr-FR') : '—') + '</div>' + t2StatutHtml + '</td>'
     + '<td>' + (a.nb_presences || 0) + '/' + (a.nb_seances_total || 0) + '</td>'
     + '<td><span class="formation-statut-badge ' + badge.cls + '">' + badge.label + '</span></td>'
-    + '<td><div class="apprenant-actions"><button class="btn btn-sm" onclick="openModalPaiement(\'' + a.id + '\')"><i class="ti ti-cash"></i> Paiement</button>'
-    + '<button class="btn btn-sm btn-ghost" onclick="marquerPresence(\'' + a.id + '\',1)"><i class="ti ti-check"></i> Présence</button>'
-    + '<button class="btn btn-sm btn-ghost" onclick="reimprimerRecu(\'' + a.id + '\')"><i class="ti ti-receipt"></i> Reçu</button></div></td>'
+    + '<td><div class="apprenant-actions"><button class="btn btn-sm" onclick="openModalPaiement(\'' + a.id + '\')"><i class="ti ti-cash"></i> Versement</button>'
+    + '<button class="btn btn-sm btn-ghost" onclick="marquerPresence(\'' + a.id + '\')"><i class="ti ti-check"></i> Présence</button>'
+    + '<button class="btn btn-sm btn-ghost" onclick="reimprimerRecu(\'' + a.id + '\')"><i class="ti ti-receipt"></i> Reçu</button>'
+    + '<div class="tache-menu"><button class="tache-menu-btn" onclick="toggleTacheMenu(event,\'' + a.id + '\')"><i class="ti ti-dots-vertical"></i></button><div class="tache-menu-dropdown" id="tacheMenu-' + a.id + '">' + menuItems + '</div></div>'
+    + '</div></td>'
     + '</tr>';
 }
 
-async function marquerPresence(id, delta) {
-  const { data: a } = await sb.from('yc_apprenants').select('nb_presences,nb_seances_total').eq('id', id).single();
+async function marquerPresence(id) {
+  const { data: a } = await sb.from('yc_apprenants').select('nb_presences,nb_seances_total,statut_apprenant').eq('id', id).single();
   if (!a) return;
-  let nb = Number(a.nb_presences || 0) + delta;
-  if (nb < 0) nb = 0;
+  let nb = Number(a.nb_presences || 0) + 1;
   if (a.nb_seances_total && nb > a.nb_seances_total) nb = a.nb_seances_total;
-  await sb.from('yc_apprenants').update({ nb_presences: nb }).eq('id', id);
+  const payload = { nb_presences: nb };
+  let statut = a.statut_apprenant || 'inscrit';
+  if (statut === 'inscrit' && nb >= 1) statut = 'en_cours';
+  if (statut === 'en_cours' && a.nb_seances_total && nb >= a.nb_seances_total) statut = 'evaluation';
+  if (statut !== a.statut_apprenant) payload.statut_apprenant = statut;
+  await sb.from('yc_apprenants').update(payload).eq('id', id);
+  showToast('Présence enregistrée ✅');
   chargerApprenants();
 }
 
+async function marquerAtteste(id) {
+  if (session.role !== 'gerant') return;
+  await sb.from('yc_apprenants').update({ statut_apprenant: 'atteste' }).eq('id', id);
+  showToast('Apprenant attesté ✅');
+  chargerApprenants();
+}
+
+async function supprimerApprenant(id) {
+  if (!confirm('Supprimer définitivement cet apprenant ?')) return;
+  const { error } = await sb.from('yc_apprenants').delete().eq('id', id);
+  if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
+  showToast('Apprenant supprimé.');
+  chargerApprenants();
+  loadFormations();
+}
+
+function majCalculsInscription() {
+  const duree = Number(document.getElementById('iDureeMois').value || 0);
+  const freq = Number(document.getElementById('iFrequenceSemaine').value || 0);
+  const heures = Number(document.getElementById('iHeuresSeance').value || 0);
+  const montantTotal = Number(document.getElementById('iMontantTotal').value || 0);
+  const nbSeances = Math.round(duree * 4.33 * freq);
+  document.getElementById('iNbSeancesEstime').textContent = 'Nombre total de séances estimé : ' + nbSeances;
+  const t1 = Math.round(montantTotal * 0.5);
+  const t2 = montantTotal - t1;
+  document.getElementById('iTranche1Montant').textContent = fmtMontant(t1) + ' GNF';
+  document.getElementById('iTranche1Date').textContent = new Date().toLocaleDateString('fr-FR');
+  document.getElementById('iTranche2Montant').textContent = fmtMontant(t2) + ' GNF';
+  const dateDebut = formationCourante && formationCourante.date_debut ? new Date(formationCourante.date_debut + 'T00:00:00') : new Date();
+  const joursT2 = Math.round(duree * 30 / 2);
+  const dateT2 = new Date(dateDebut);
+  dateT2.setDate(dateT2.getDate() + joursT2);
+  const dateT2Str = dateT2.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('iTranche2DateAffichee').textContent = dateT2Str;
+  document.getElementById('iRecap').innerHTML = 'Formation : <strong>' + esc(formationCourante ? formationCourante.intitule : '') + '</strong> · ' + nbSeances + ' séances · ' + heures + 'h/séance<br>'
+    + 'Tranche 1 : <strong>' + fmtMontant(t1) + ' GNF</strong> — payée aujourd\'hui<br>'
+    + 'Tranche 2 : <strong>' + fmtMontant(t2) + ' GNF</strong> — due le ' + dateT2Str;
+  return { nbSeances: nbSeances, t1: t1, t2: t2, dateT2: dateT2 };
+}
+
 function openModalInscrire() {
+  apprenantEnEdition = null;
+  document.getElementById('iModalTitre').textContent = 'Inscrire un apprenant';
+  document.getElementById('iBtnSubmit').textContent = 'Inscrire et générer le reçu';
+  document.getElementById('iSectionPaiementTitre').classList.remove('hidden');
+  document.getElementById('iSectionPaiement').classList.remove('hidden');
   document.getElementById('iNom').value = '';
   document.getElementById('iTel').value = '';
+  document.getElementById('iDureeMois').value = '';
+  document.getElementById('iFrequenceSemaine').value = '';
+  document.getElementById('iHeuresSeance').value = '';
   document.getElementById('iMontantTotal').value = formationCourante.prix_total || '';
-  document.getElementById('iMontantPaye').value = 0;
+  document.getElementById('iModePaiementT1').value = 'cash';
   document.getElementById('iErreur').classList.add('hidden');
+  majCalculsInscription();
   openModal('modalInscrire');
+}
+
+function openModalModifierApprenant(id) {
+  const a = apprenantsCourants.find(function(x) { return x.id === id; });
+  if (!a) return;
+  apprenantEnEdition = a;
+  document.getElementById('iModalTitre').textContent = 'Modifier un apprenant';
+  document.getElementById('iBtnSubmit').textContent = 'Enregistrer les modifications';
+  document.getElementById('iSectionPaiementTitre').classList.add('hidden');
+  document.getElementById('iSectionPaiement').classList.add('hidden');
+  document.getElementById('iNom').value = a.nom || '';
+  document.getElementById('iTel').value = a.telephone || '';
+  document.getElementById('iDureeMois').value = a.duree_mois || '';
+  document.getElementById('iFrequenceSemaine').value = a.frequence_semaine || '';
+  document.getElementById('iHeuresSeance').value = a.heures_seance || '';
+  document.getElementById('iMontantTotal').value = a.montant_total || '';
+  document.getElementById('iErreur').classList.add('hidden');
+  majCalculsInscription();
+  openModal('modalInscrire');
+  fermerMenusTaches();
 }
 
 async function inscrireApprenant() {
   const nom = document.getElementById('iNom').value.trim();
   const tel = document.getElementById('iTel').value.trim();
+  const duree = Number(document.getElementById('iDureeMois').value || 0);
+  const freq = Number(document.getElementById('iFrequenceSemaine').value || 0);
+  const heures = Number(document.getElementById('iHeuresSeance').value || 0);
   const montantTotal = Number(document.getElementById('iMontantTotal').value || 0);
-  const montantPaye = Number(document.getElementById('iMontantPaye').value || 0);
   const errEl = document.getElementById('iErreur');
-  if (!nom || !montantTotal) { errEl.textContent = 'Nom et montant total requis.'; errEl.classList.remove('hidden'); return; }
+  if (!nom || !tel || !duree || !freq || !heures || (!apprenantEnEdition && !montantTotal)) {
+    errEl.textContent = 'Merci de remplir tous les champs obligatoires (*).';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  const calc = majCalculsInscription();
+
+  if (apprenantEnEdition) {
+    const { error } = await sb.from('yc_apprenants').update({
+      nom: nom, telephone: tel || null, duree_mois: duree, frequence_semaine: freq,
+      heures_seance: heures, nb_seances_total: calc.nbSeances,
+    }).eq('id', apprenantEnEdition.id);
+    if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+    closeModal('modalInscrire');
+    showToast('Apprenant modifié ✅');
+    apprenantEnEdition = null;
+    chargerApprenants();
+    loadFormations();
+    return;
+  }
+
+  const modePaiementT1 = document.getElementById('iModePaiementT1').value;
   const payload = {
     formation_id: formationCourante.id, nom: nom, telephone: tel || null,
-    montant_total: montantTotal, montant_paye: montantPaye,
-    nb_presences: 0, nb_seances_total: formationCourante.nb_seances, statut: 'actif',
+    duree_mois: duree, frequence_semaine: freq, heures_seance: heures,
+    montant_total: montantTotal, montant_paye: calc.t1,
+    tranche1_montant: calc.t1, tranche1_date: today(),
+    tranche2_montant: calc.t2, tranche2_date: calc.dateT2.toISOString().slice(0, 10), tranche2_payee: false,
+    nb_presences: 0, nb_seances_total: calc.nbSeances, statut_apprenant: 'inscrit', statut: 'actif',
   };
-  const { error } = await sb.from('yc_apprenants').insert(payload);
+  const { data, error } = await sb.from('yc_apprenants').insert(payload).select().single();
   if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
-  if (montantPaye > 0) {
-    await sb.from('yc_caisse').insert({ date: today(), libelle: 'Inscription ' + nom + ' — ' + formationCourante.intitule, type: 'entree', montant: montantPaye, categorie: 'formation', agent_nom: session.nom });
-  }
+  await sb.from('yc_caisse').insert({ date: today(), libelle: 'Inscription ' + nom + ' — ' + formationCourante.intitule + ' · T1', type: 'entree', montant: calc.t1, categorie: 'formation', agent_nom: session.nom, mode_paiement: modePaiementT1 });
   closeModal('modalInscrire');
   showToast('Apprenant inscrit ✅');
   chargerApprenants();
   loadFormations();
+  imprimerRecuVersement(data, formationCourante, calc.t1, modePaiementT1, true);
 }
 
 function openModalPaiement(id) {
   apprenantCourantPaiement = id;
-  document.getElementById('pMontant').value = '';
+  const a = apprenantsCourants.find(function(x) { return x.id === id; });
+  const montantDefaut = (a && !a.tranche2_payee && Number(a.tranche2_montant || 0) > 0) ? a.tranche2_montant : '';
+  document.getElementById('pMontant').value = montantDefaut;
   document.getElementById('pModePaiement').value = 'cash';
+  document.getElementById('pNote').value = '';
   document.getElementById('pErreur').classList.add('hidden');
   openModal('modalPaiement');
 }
@@ -3907,27 +4067,34 @@ function openModalPaiement(id) {
 async function enregistrerPaiementApprenant() {
   const montant = Number(document.getElementById('pMontant').value || 0);
   const modePaiement = document.getElementById('pModePaiement').value;
+  const note = document.getElementById('pNote').value.trim();
   const errEl = document.getElementById('pErreur');
   if (!montant || montant <= 0) { errEl.textContent = 'Montant requis.'; errEl.classList.remove('hidden'); return; }
   const { data: a } = await sb.from('yc_apprenants').select('*').eq('id', apprenantCourantPaiement).single();
   if (!a) return;
   const nouveauMontant = Number(a.montant_paye || 0) + montant;
-  const { error } = await sb.from('yc_apprenants').update({ montant_paye: nouveauMontant }).eq('id', apprenantCourantPaiement);
+  const payload = { montant_paye: nouveauMontant };
+  if (!a.tranche2_payee && Number(a.tranche2_montant || 0) > 0 && montant === Number(a.tranche2_montant)) {
+    payload.tranche2_payee = true;
+  }
+  const { error } = await sb.from('yc_apprenants').update(payload).eq('id', apprenantCourantPaiement);
   if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
   const formationDuPaiement = formationCourante;
-  await sb.from('yc_caisse').insert({ date: today(), libelle: 'Versement ' + a.nom + ' — ' + (formationDuPaiement ? formationDuPaiement.intitule : ''), type: 'entree', montant: montant, categorie: 'formation', agent_nom: session.nom, mode_paiement: modePaiement });
+  let libelle = 'Versement ' + a.nom + ' — ' + (formationDuPaiement ? formationDuPaiement.intitule : '');
+  if (note) libelle += ' (' + note + ')';
+  await sb.from('yc_caisse').insert({ date: today(), libelle: libelle, type: 'entree', montant: montant, categorie: 'formation', agent_nom: session.nom, mode_paiement: modePaiement });
   closeModal('modalPaiement');
   showToast('Paiement enregistré ✅');
   chargerApprenants();
   loadFormations();
-  const apprenantMisAJour = Object.assign({}, a, { montant_paye: nouveauMontant });
-  imprimerRecuVersement(apprenantMisAJour, formationDuPaiement, montant, modePaiement);
+  const apprenantMisAJour = Object.assign({}, a, payload);
+  imprimerRecuVersement(apprenantMisAJour, formationDuPaiement, montant, modePaiement, false);
 }
 
 async function reimprimerRecu(id) {
   const { data: a } = await sb.from('yc_apprenants').select('*').eq('id', id).single();
   if (!a) return;
-  imprimerRecuVersement(a, formationCourante, a.montant_paye, null);
+  imprimerRecuVersement(a, formationCourante, a.montant_paye, null, false);
 }
 
 /* ── PAGE 6 : RAPPORTS ── */
