@@ -498,6 +498,9 @@ h1,h2,h3{margin:0;}
 .formation-statut-badge.atteste{background:var(--green-bg);color:var(--green);}
 
 .modal-card-inscrire{max-width:640px;}
+.jours-formation-liste{display:flex;flex-wrap:wrap;gap:10px;}
+.jours-formation-liste label.jour-checkbox{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--text);font-weight:400;cursor:pointer;margin-bottom:0;}
+.form-row .jour-checkbox input{width:auto;margin:0;}
 .inscrire-section-titre{font-weight:700;font-size:11.5px;letter-spacing:.04em;color:var(--text-light);text-transform:uppercase;margin:16px 0 8px;}
 .inscrire-section-titre:first-child{margin-top:0;}
 .inscrire-readonly{background:var(--bg-page);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13.5px;color:var(--text-muted);}
@@ -1251,6 +1254,20 @@ h1,h2,h3{margin:0;}
         <div class="form-row"><label>Prix total (GNF) *</label><input type="number" id="fPrixTotal" min="0"></div>
       </div>
       <div class="form-row"><label>Date de début *</label><input type="date" id="fDateDebut"></div>
+      <div class="form-row"><label>Jours de formation *</label>
+        <div class="jours-formation-liste">
+          <label class="jour-checkbox"><input type="checkbox" value="Lundi"> Lundi</label>
+          <label class="jour-checkbox"><input type="checkbox" value="Mardi"> Mardi</label>
+          <label class="jour-checkbox"><input type="checkbox" value="Mercredi"> Mercredi</label>
+          <label class="jour-checkbox"><input type="checkbox" value="Jeudi"> Jeudi</label>
+          <label class="jour-checkbox"><input type="checkbox" value="Vendredi"> Vendredi</label>
+          <label class="jour-checkbox"><input type="checkbox" value="Samedi"> Samedi</label>
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row"><label>Heure de début *</label><input type="time" id="fHeureDebut"></div>
+        <div class="form-row"><label>Heure de fin *</label><input type="time" id="fHeureFin"></div>
+      </div>
       <div id="fErreur" class="form-error hidden"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalFormation')">Annuler</button><button class="btn btn-primary" onclick="creerFormation()">Créer</button></div>
@@ -1275,6 +1292,7 @@ h1,h2,h3{margin:0;}
         <div class="form-row"><label>Heures par séance (h) *</label><input type="number" id="iHeuresSeance" min="0" step="0.5" oninput="majCalculsInscription()"></div>
         <div class="form-row"><label>Nombre total de séances estimé</label><div class="inscrire-readonly" id="iNbSeancesEstime">—</div></div>
       </div>
+      <div class="form-row"><label>Jours et horaire de la formation</label><div class="inscrire-readonly" id="iJoursHoraire">—</div></div>
       <div class="inscrire-section-titre" id="iSectionPaiementTitre">Paiement</div>
       <div id="iSectionPaiement">
         <div class="form-row"><label>Montant total de la formation (GNF) *</label><input type="number" id="iMontantTotal" min="0" oninput="majCalculsInscription()"></div>
@@ -3094,6 +3112,13 @@ function construireHtmlRecuVersement(apprenant, formation, montantVerse, modePai
     ? '<div class="rec-logo"><img src="' + esc(P.logo_url) + '"></div>'
     : '<div class="rec-logo" style="background:' + COULEUR_ORANGE + ';">YC</div>';
 
+  const ABREV_JOURS = { Lundi: 'Lun.', Mardi: 'Mar.', Mercredi: 'Mer.', Jeudi: 'Jeu.', Vendredi: 'Ven.', Samedi: 'Sam.', Dimanche: 'Dim.' };
+  const joursFormationListe = (formation && formation.jours_formation ? formation.jours_formation : '').split(',').map(function(j) { return j.trim(); }).filter(Boolean);
+  const joursAbreges = joursFormationListe.map(function(j) { return ABREV_JOURS[j] || j; }).join(' / ');
+  const ligneHoraireFormation = (joursAbreges && formation && formation.heure_debut && formation.heure_fin)
+    ? 'Horaire : ' + joursAbreges + ' · ' + formaterHeure(formation.heure_debut).replace(':', 'h') + ' – ' + formaterHeure(formation.heure_fin).replace(':', 'h')
+    : '';
+
   const conditionsHtml = '<div class="rec-conditions"><div class="rec-conditions-titre" style="color:' + COULEUR_ORANGE + ';">CONDITIONS GÉNÉRALES IFP YOUMMA</div><ul>'
     + '<li>Les frais de formation sont payables à 50 % avant le début de la formation et le solde à partir de 50 % du programme accompli.</li>'
     + '<li>L\'apprenant doit maintenir un taux de présence minimum de 95 %.</li>'
@@ -3105,7 +3130,7 @@ function construireHtmlRecuVersement(apprenant, formation, montantVerse, modePai
   const mentionSolde = reste === 0 ? '<div class="rec-solde">FORMATION INTÉGRALEMENT RÉGLÉE</div>' : '';
 
   const ligneT2Due = estInscription
-    ? '<div class="rec-versement-row"><span>2ᵉ tranche due le</span><span style="color:' + COULEUR_AMBER + ';font-weight:600;">' + (apprenant.tranche2_date ? new Date(apprenant.tranche2_date + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—') + '</span></div>'
+    ? '<div class="rec-versement-row"><span>2ème tranche due le</span><span style="color:' + COULEUR_AMBER + ';font-weight:600;">' + (apprenant.tranche2_date ? new Date(apprenant.tranche2_date + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—') + '</span></div>'
     : '';
 
   return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Reçu ' + esc(numero) + ' — IFP YOUMMA</title>'
@@ -3134,7 +3159,9 @@ function construireHtmlRecuVersement(apprenant, formation, montantVerse, modePai
     + '<div><div class="rec-bloc-titre" style="color:' + COULEUR_ORANGE + ';">FORMATION</div><div><strong>' + esc(formation ? formation.intitule : '') + '</strong></div>'
     + '<div>' + (apprenant.nb_seances_total || 0) + ' séances</div>'
     + '<div>' + (apprenant.heures_seance || 0) + 'h/séance · ' + (apprenant.frequence_semaine || 0) + '×/semaine</div>'
-    + '<div>Durée : ' + (apprenant.duree_mois || 0) + ' mois</div></div>'
+    + '<div>Durée : ' + (apprenant.duree_mois || 0) + ' mois</div>'
+    + (ligneHoraireFormation ? '<div>' + esc(ligneHoraireFormation) + '</div>' : '')
+    + '</div>'
     + '</div>'
     + '<div class="rec-versement">'
     + '<div class="rec-versement-row"><span>Montant versé ce jour</span><span class="rec-versement-montant" style="background:#FAECE7;color:' + COULEUR_ORANGE + ';">' + fmtMontant(montantVerse) + ' GNF</span></div>'
@@ -3813,15 +3840,28 @@ async function loadFormations() {
     : '<div class="priority-empty" style="grid-column:1/-1;"><i class="ti ti-school-off"></i>Aucune formation active.<div style="margin-top:8px;"><button class="btn btn-primary btn-sm" onclick="openModalFormation()"><i class="ti ti-plus"></i> Créer la première formation</button></div></div>';
 }
 
+function formaterHeure(h) {
+  return h ? String(h).slice(0, 5) : '';
+}
+
+function formaterJoursHoraire(f) {
+  const jours = (f.jours_formation || '').split(',').map(function(j) { return j.trim(); }).filter(Boolean);
+  const horaire = (f.heure_debut && f.heure_fin) ? (formaterHeure(f.heure_debut) + ' – ' + formaterHeure(f.heure_fin)) : '';
+  const parties = jours.concat(horaire ? [horaire] : []);
+  return parties.join(' · ');
+}
+
 function renderFormationCard(f) {
   const badge = FORMATION_STATUT_BADGES[f.statut] || FORMATION_STATUT_BADGES.actif;
   const totalAttendu = f.nbApprenants * Number(f.prix_total || 0);
   const pct = totalAttendu > 0 ? Math.min(100, Math.round(f.ca / totalAttendu * 100)) : 0;
   const dates = (f.date_debut ? new Date(f.date_debut).toLocaleDateString('fr-FR') : '—') + (f.date_fin ? ' → ' + new Date(f.date_fin).toLocaleDateString('fr-FR') : '');
+  const joursHoraire = formaterJoursHoraire(f);
   return '<div class="formation-card">'
     + '<div class="formation-card-header">'
     + '<div class="formation-card-header-top"><div class="formation-card-titre">' + esc(f.intitule) + '</div><span class="formation-statut-badge ' + badge.cls + '">' + badge.label + '</span></div>'
     + '<div class="formation-card-dates"><i class="ti ti-calendar"></i> ' + dates + '</div>'
+    + (joursHoraire ? '<div class="formation-card-dates"><i class="ti ti-clock"></i> ' + esc(joursHoraire) + '</div>' : '')
     + '</div>'
     + '<div class="formation-card-body">'
     + '<div class="formation-stats-row">'
@@ -3840,6 +3880,9 @@ function openModalFormation() {
   document.getElementById('fNbSeances').value = '';
   document.getElementById('fPrixTotal').value = '';
   document.getElementById('fDateDebut').value = '';
+  document.getElementById('fHeureDebut').value = '';
+  document.getElementById('fHeureFin').value = '';
+  document.querySelectorAll('.jour-checkbox input').forEach(function(c) { c.checked = false; });
   document.getElementById('fErreur').classList.add('hidden');
   openModal('modalFormation');
 }
@@ -3849,9 +3892,19 @@ async function creerFormation() {
   const nbSeances = Number(document.getElementById('fNbSeances').value || 0);
   const prixTotal = Number(document.getElementById('fPrixTotal').value || 0);
   const dateDebut = document.getElementById('fDateDebut').value;
+  const heureDebut = document.getElementById('fHeureDebut').value;
+  const heureFin = document.getElementById('fHeureFin').value;
+  const joursFormation = Array.from(document.querySelectorAll('.jour-checkbox input:checked')).map(function(c) { return c.value; });
   const errEl = document.getElementById('fErreur');
-  if (!intitule || !nbSeances || !prixTotal || !dateDebut) { errEl.textContent = 'Tous les champs sont requis.'; errEl.classList.remove('hidden'); return; }
-  const payload = { intitule: intitule, nb_seances: nbSeances, prix_total: prixTotal, date_debut: dateDebut, statut: 'actif' };
+  if (!intitule || !nbSeances || !prixTotal || !dateDebut || !heureDebut || !heureFin || !joursFormation.length) {
+    errEl.textContent = 'Tous les champs sont requis (au moins un jour de formation).';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  const payload = {
+    intitule: intitule, nb_seances: nbSeances, prix_total: prixTotal, date_debut: dateDebut, statut: 'actif',
+    jours_formation: joursFormation.join(','), heure_debut: heureDebut, heure_fin: heureFin,
+  };
   const { error } = await sb.from('yc_formations').insert(payload);
   if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
   closeModal('modalFormation');
@@ -3948,6 +4001,11 @@ function majCalculsInscription() {
   const freq = Number(document.getElementById('iFrequenceSemaine').value || 0);
   const heures = Number(document.getElementById('iHeuresSeance').value || 0);
   const montantTotal = Number(document.getElementById('iMontantTotal').value || 0);
+  const jours = (formationCourante && formationCourante.jours_formation ? formationCourante.jours_formation : '').split(',').map(function(j) { return j.trim(); }).filter(Boolean);
+  const horaireStr = (formationCourante && formationCourante.heure_debut && formationCourante.heure_fin)
+    ? formaterHeure(formationCourante.heure_debut).replace(':', 'h') + ' – ' + formaterHeure(formationCourante.heure_fin).replace(':', 'h')
+    : '—';
+  document.getElementById('iJoursHoraire').textContent = 'Jours : ' + (jours.length ? jours.join(', ') : '—') + ' · Horaire : ' + horaireStr;
   const nbSeances = Math.round(duree * 4.33 * freq);
   document.getElementById('iNbSeancesEstime').textContent = 'Nombre total de séances estimé : ' + nbSeances;
   const t1 = Math.round(montantTotal * 0.5);
