@@ -463,7 +463,6 @@ h1,h2,h3{margin:0;}
 .formation-card-header{background:var(--indigo);color:#fff;padding:14px 16px;}
 .formation-card-header-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .formation-card-titre{font-size:15px;font-weight:500;}
-.formation-card-dates{font-size:12px;color:rgba(255,255,255,.75);margin-top:6px;display:flex;align-items:center;gap:6px;}
 .formation-statut-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;}
 .formation-statut-badge.actif{background:var(--green-bg);color:var(--green);}
 .formation-statut-badge.termine{background:var(--gray-bg);color:var(--gray);}
@@ -577,6 +576,7 @@ button.suivi-pastille{cursor:pointer;}
 .modal-card{background:#fff;border-radius:16px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;}
 .modal-card-lg{max-width:600px;}
 .modal-card-xl{max-width:760px;width:min(760px, calc(100vw - 32px));}
+.modal-card-suivi{max-width:900px;width:min(900px, calc(100vw - 32px));}
 .modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #F3F4F6;}
 .modal-header h3{font-size:16px;font-weight:800;}
 .modal-close{background:none;border:none;font-size:22px;color:#9CA3AF;cursor:pointer;line-height:1;}
@@ -915,22 +915,12 @@ button.suivi-pastille{cursor:pointer;}
               </div>
             </div>
             <div class="taches-header-right">
+              <button class="caisse-action-btn historique" onclick="ouvrirSuiviGlobal()"><i class="ti ti-list-check"></i> Suivi global</button>
               <button class="caisse-action-btn historique" onclick="genererCatalogueFormations()"><i class="ti ti-download"></i> Télécharger le catalogue</button>
               <button class="btn btn-primary restricted" onclick="openModalFormation()"><i class="ti ti-plus"></i> Nouvelle formation</button>
             </div>
           </div>
           <div id="formationsListe" class="formations-grid"></div>
-          <div class="card" id="suiviGlobalCard" style="display:none;margin-top:20px;">
-            <div class="caisse-op-header">
-              <div class="caisse-op-header-left"><i class="ti ti-list-check" style="color:var(--orange);"></i> Suivi des apprenants par formation</div>
-            </div>
-            <div class="formation-apprenants-wrap">
-              <table class="formation-apprenants-table">
-                <thead><tr><th>Formation</th><th style="text-align:center;">En cours</th><th style="text-align:center;">Terminé</th><th style="text-align:center;">Attesté</th><th style="text-align:center;">Total</th></tr></thead>
-                <tbody id="suiviGlobalBody"></tbody>
-              </table>
-            </div>
-          </div>
         </div>
         <div id="formationsDetailVue" class="hidden">
           <div class="formation-detail-header">
@@ -940,11 +930,11 @@ button.suivi-pastille{cursor:pointer;}
               <span class="formation-statut-badge" id="detFormBadge"></span>
             </div>
             <span id="detFormFiltre" class="hidden"></span>
-            <button class="btn btn-primary" style="margin-left:auto;" onclick="openModalInscrire()"><i class="ti ti-plus"></i> Inscrire un apprenant</button>
+            <button class="btn btn-primary" style="margin-left:auto;" onclick="openModalInscrire()"><i class="ti ti-plus"></i> Inscrire un nouvel étudiant</button>
           </div>
           <div class="formation-apprenants-wrap">
             <table class="formation-apprenants-table">
-              <thead><tr><th>Apprenant</th><th>Téléphone</th><th>Payé / Total</th><th>Présences</th><th>Statut</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Étudiant</th><th>Date d'inscription</th><th>Statut</th><th>Montant payé</th><th>Actions</th></tr></thead>
               <tbody id="detFormApprenants"></tbody>
             </table>
           </div>
@@ -1350,6 +1340,35 @@ button.suivi-pastille{cursor:pointer;}
       <div id="pErreur" class="form-error hidden"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalPaiement')">Annuler</button><button class="btn btn-primary" onclick="enregistrerPaiementApprenant()">Enregistrer</button></div>
+  </div>
+</div>
+
+<div id="modalSuiviGlobal" class="modal-overlay">
+  <div class="modal-card modal-card-suivi">
+    <div class="modal-header"><h3><i class="ti ti-list-check" style="color:var(--orange);"></i> Suivi des apprenants</h3><button class="modal-close" onclick="closeModal('modalSuiviGlobal')">×</button></div>
+    <div class="modal-body">
+      <div class="perf-toggle-angle">
+        <button type="button" class="perf-angle-btn active" id="suiviToggleFormation" onclick="setSuiviOnglet('formation')">Par formation</button>
+        <button type="button" class="perf-angle-btn" id="suiviToggleEtudiant" onclick="setSuiviOnglet('etudiant')">Par étudiant</button>
+      </div>
+      <div id="suiviOngletFormation">
+        <div class="formation-apprenants-wrap">
+          <table class="formation-apprenants-table">
+            <thead><tr><th>Formation</th><th style="text-align:center;">En cours</th><th style="text-align:center;">Terminé</th><th style="text-align:center;">Attesté</th><th style="text-align:center;">Total apprenants</th><th>Total payé</th></tr></thead>
+            <tbody id="suiviGlobalBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="suiviOngletEtudiant" class="hidden">
+        <div class="form-row"><input type="text" id="suiviRechercheEtudiant" placeholder="Rechercher un étudiant (nom, téléphone)…" oninput="filtrerSuiviEtudiants()"></div>
+        <div class="formation-apprenants-wrap">
+          <table class="formation-apprenants-table">
+            <thead><tr><th>Étudiant</th><th>Formation</th><th>Statut</th><th>Payé / Total</th><th>Reste</th></tr></thead>
+            <tbody id="suiviEtudiantsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -3950,29 +3969,29 @@ const FORMATION_STATUT_BADGES = {
 const APPRENANT_STATUT_BADGES = {
   inscrit: { label: 'Inscrit', cls: 'inscrit' },
   en_cours: { label: 'En cours', cls: 'en_cours' },
-  evaluation: { label: 'Évaluation', cls: 'evaluation' },
+  evaluation: { label: 'Terminé', cls: 'evaluation' },
   atteste: { label: 'Attesté', cls: 'atteste' },
 };
 let apprenantsCourants = [];
 let apprenantEnEdition = null;
 let formationEnEdition = null;
 let filtreStatutApprenant = null;
+let suiviEtudiantsCache = [];
 
 async function loadFormations() {
   const { data } = await sb.from('yc_formations').select('*').eq('statut', 'actif').order('date_debut', { ascending: false });
   const base = data || [];
   const withStats = await Promise.all(base.map(async function(f) {
-    const { data: apps } = await sb.from('yc_apprenants').select('montant_paye,jours_formation,heure_debut,heure_fin,statut_apprenant').eq('formation_id', f.id);
+    const { data: apps } = await sb.from('yc_apprenants').select('montant_paye,statut_apprenant').eq('formation_id', f.id);
     const rows = apps || [];
     const ca = rows.reduce(function(s, a) { return s + Number(a.montant_paye || 0); }, 0);
-    const avecHoraire = rows.find(function(a) { return a.jours_formation && a.heure_debut && a.heure_fin; });
     const suiviCounts = {
       en_cours: rows.filter(function(a) { return a.statut_apprenant === 'en_cours'; }).length,
       evaluation: rows.filter(function(a) { return a.statut_apprenant === 'evaluation'; }).length,
       atteste: rows.filter(function(a) { return a.statut_apprenant === 'atteste'; }).length,
       total: rows.length,
     };
-    return Object.assign({}, f, { nbApprenants: rows.length, ca: ca, joursHoraireApprenant: avecHoraire || null, suiviCounts: suiviCounts });
+    return Object.assign({}, f, { nbApprenants: rows.length, ca: ca, suiviCounts: suiviCounts });
   }));
   formationsCache = withStats;
   const sousTitreEl = document.getElementById('formationsSousTitre');
@@ -3984,14 +4003,16 @@ async function loadFormations() {
 
 function suiviPastille(formationId, statut, count, couleur) {
   if (!count) return '<span class="suivi-pastille suivi-pastille-vide">0</span>';
-  return '<button class="suivi-pastille suivi-pastille-' + couleur + '" onclick="openFormationDetails(\'' + formationId + '\',\'' + statut + '\')">' + count + '</button>';
+  return '<button class="suivi-pastille suivi-pastille-' + couleur + '" onclick="suiviAllerFormation(\'' + formationId + '\',\'' + statut + '\')">' + count + '</button>';
+}
+
+function suiviAllerFormation(formationId, statutFiltre) {
+  closeModal('modalSuiviGlobal');
+  openFormationDetails(formationId, statutFiltre);
 }
 
 function renderSuiviGlobal(formations) {
-  const card = document.getElementById('suiviGlobalCard');
-  if (!formations.length) { card.style.display = 'none'; return; }
-  card.style.display = '';
-  document.getElementById('suiviGlobalBody').innerHTML = formations.map(function(f) {
+  document.getElementById('suiviGlobalBody').innerHTML = formations.length ? formations.map(function(f) {
     const c = f.suiviCounts || { en_cours: 0, evaluation: 0, atteste: 0, total: 0 };
     return '<tr>'
       + '<td><div class="apprenant-nom">' + esc(f.intitule) + '</div></td>'
@@ -3999,26 +4020,63 @@ function renderSuiviGlobal(formations) {
       + '<td style="text-align:center;">' + suiviPastille(f.id, 'evaluation', c.evaluation, 'amber') + '</td>'
       + '<td style="text-align:center;">' + suiviPastille(f.id, 'atteste', c.atteste, 'vert') + '</td>'
       + '<td style="text-align:center;font-weight:600;">' + c.total + '</td>'
+      + '<td style="color:var(--green);font-weight:600;">' + fmtMontant(f.ca) + ' GNF</td>'
       + '</tr>';
-  }).join('');
+  }).join('') : '<tr><td colspan="6" class="empty">Aucune formation active.</td></tr>';
+}
+
+function setSuiviOnglet(onglet) {
+  document.getElementById('suiviToggleFormation').classList.toggle('active', onglet === 'formation');
+  document.getElementById('suiviToggleEtudiant').classList.toggle('active', onglet === 'etudiant');
+  document.getElementById('suiviOngletFormation').classList.toggle('hidden', onglet !== 'formation');
+  document.getElementById('suiviOngletEtudiant').classList.toggle('hidden', onglet !== 'etudiant');
+}
+
+async function ouvrirSuiviGlobal() {
+  setSuiviOnglet('formation');
+  document.getElementById('suiviRechercheEtudiant').value = '';
+  renderSuiviGlobal(formationsCache);
+  const idsActifs = formationsCache.map(function(f) { return f.id; });
+  const { data } = await sb.from('yc_apprenants').select('nom,telephone,formation_id,statut_apprenant,montant_paye,montant_total').order('nom');
+  const rows = (data || []).filter(function(a) { return idsActifs.indexOf(a.formation_id) !== -1; });
+  suiviEtudiantsCache = rows.map(function(a) {
+    const f = formationsCache.find(function(x) { return x.id === a.formation_id; });
+    return Object.assign({}, a, { formationNom: f ? f.intitule : '—' });
+  }).sort(function(a, b) { return (a.nom || '').localeCompare(b.nom || ''); });
+  renderSuiviEtudiants(suiviEtudiantsCache);
+  openModal('modalSuiviGlobal');
+}
+
+function renderSuiviEtudiants(list) {
+  document.getElementById('suiviEtudiantsBody').innerHTML = list.length ? list.map(function(a) {
+    const badge = APPRENANT_STATUT_BADGES[a.statut_apprenant] || APPRENANT_STATUT_BADGES.inscrit;
+    const reste = Number(a.montant_total || 0) - Number(a.montant_paye || 0);
+    return '<tr>'
+      + '<td><div class="apprenant-nom">' + esc(a.nom) + '</div><div class="apprenant-souscol">' + esc(a.telephone || '—') + '</div></td>'
+      + '<td>' + esc(a.formationNom) + '</td>'
+      + '<td><span class="formation-statut-badge ' + badge.cls + '">' + badge.label + '</span></td>'
+      + '<td>' + fmtMontant(a.montant_paye) + ' / ' + fmtMontant(a.montant_total) + ' GNF</td>'
+      + '<td>' + fmtMontant(reste) + ' GNF</td>'
+      + '</tr>';
+  }).join('') : '<tr><td colspan="5" class="empty">Aucun étudiant trouvé.</td></tr>';
+}
+
+function filtrerSuiviEtudiants() {
+  const q = document.getElementById('suiviRechercheEtudiant').value.trim().toLowerCase();
+  const liste = !q ? suiviEtudiantsCache : suiviEtudiantsCache.filter(function(a) {
+    return (a.nom || '').toLowerCase().indexOf(q) !== -1 || (a.telephone || '').toLowerCase().indexOf(q) !== -1;
+  });
+  renderSuiviEtudiants(liste);
 }
 
 function formaterHeure(h) {
   return h ? String(h).slice(0, 5) : '';
 }
 
-function formaterJoursHoraire(f) {
-  const jours = (f.jours_formation || '').split(',').map(function(j) { return j.trim(); }).filter(Boolean);
-  const horaire = (f.heure_debut && f.heure_fin) ? (formaterHeure(f.heure_debut) + ' – ' + formaterHeure(f.heure_fin)) : '';
-  const parties = jours.concat(horaire ? [horaire] : []);
-  return parties.join(' · ');
-}
-
 function renderFormationCard(f) {
   const badge = FORMATION_STATUT_BADGES[f.statut] || FORMATION_STATUT_BADGES.actif;
   const totalAttendu = f.nbApprenants * Number(f.prix_total || 0);
   const pct = totalAttendu > 0 ? Math.min(100, Math.round(f.ca / totalAttendu * 100)) : 0;
-  const joursHoraire = f.joursHoraireApprenant ? formaterJoursHoraire(f.joursHoraireApprenant) : '';
   const peutGerer = session.role === 'gerant';
   const menuItems = '<button class="tache-menu-item" onclick="openModalModifierFormation(\'' + f.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>'
     + (peutGerer ? '<button class="tache-menu-item danger" onclick="supprimerFormation(\'' + f.id + '\')"><i class="ti ti-trash"></i> Supprimer</button>' : '');
@@ -4028,7 +4086,6 @@ function renderFormationCard(f) {
     + '<div class="formation-card-header-top"><div class="formation-card-titre">' + esc(f.intitule) + '</div>'
     + '<div style="display:flex;align-items:center;gap:8px;"><span class="formation-statut-badge ' + badge.cls + '">' + badge.label + '</span>' + menuHtml + '</div>'
     + '</div>'
-    + (joursHoraire ? '<div class="formation-card-dates"><i class="ti ti-clock"></i> ' + esc(joursHoraire) + '</div>' : '')
     + '</div>'
     + '<div class="formation-card-body">'
     + '<div class="formation-stats-row">'
@@ -4169,27 +4226,20 @@ async function chargerApprenants() {
     filtreEl.classList.add('hidden');
   }
   const cont = document.getElementById('detFormApprenants');
-  cont.innerHTML = liste.length ? liste.map(renderApprenantRow).join('') : '<tr><td colspan="7" class="empty">Aucun apprenant inscrit' + (filtreStatutApprenant ? ' pour ce statut' : '') + '.</td></tr>';
+  cont.innerHTML = liste.length ? liste.map(renderApprenantRow).join('') : '<tr><td colspan="5" class="empty">Aucun apprenant inscrit' + (filtreStatutApprenant ? ' pour ce statut' : '') + '.</td></tr>';
 }
 
 function renderApprenantRow(a) {
   const badge = APPRENANT_STATUT_BADGES[a.statut_apprenant] || APPRENANT_STATUT_BADGES.inscrit;
-  const t2EnRetard = a.tranche2_date && !a.tranche2_payee && a.tranche2_date < today();
-  const t2StatutHtml = a.tranche2_payee
-    ? '<span style="color:var(--green);"><i class="ti ti-check"></i> Payée</span>'
-    : t2EnRetard
-      ? '<span style="color:var(--red);"><i class="ti ti-alert-triangle"></i> En retard</span>'
-      : '<span style="color:var(--text-muted);"><i class="ti ti-clock"></i> Due</span>';
+  const dateInscription = a.created_at ? new Date(a.created_at).toLocaleDateString('fr-FR') : '—';
   const menuItems = '<button class="tache-menu-item" onclick="openModalModifierApprenant(\'' + a.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>'
     + '<button class="tache-menu-item danger" onclick="supprimerApprenant(\'' + a.id + '\')"><i class="ti ti-trash"></i> Supprimer</button>'
     + (session.role === 'gerant' && a.statut_apprenant === 'evaluation' ? '<button class="tache-menu-item" onclick="marquerAtteste(\'' + a.id + '\')"><i class="ti ti-certificate"></i> Marquer attesté</button>' : '');
   return '<tr>'
-    + '<td><div class="apprenant-nom">' + esc(a.nom) + '</div></td>'
-    + '<td>' + esc(a.telephone || '—') + '</td>'
-    + '<td>' + fmtMontant(a.tranche1_montant) + ' GNF<div class="apprenant-souscol">' + (a.tranche1_date ? new Date(a.tranche1_date).toLocaleDateString('fr-FR') : '—') + ' · <i class="ti ti-check" style="color:var(--green);"></i></div></td>'
-    + '<td' + (t2EnRetard ? ' style="color:var(--red);"' : '') + '>' + fmtMontant(a.tranche2_montant) + ' GNF<div class="apprenant-souscol">' + (a.tranche2_date ? new Date(a.tranche2_date).toLocaleDateString('fr-FR') : '—') + '</div>' + t2StatutHtml + '</td>'
-    + '<td>' + (a.nb_presences || 0) + '/' + (a.nb_seances_total || 0) + '</td>'
+    + '<td><div class="apprenant-nom">' + esc(a.nom) + '</div><div class="apprenant-souscol">' + esc(a.telephone || '—') + '</div></td>'
+    + '<td>' + dateInscription + '</td>'
     + '<td><span class="formation-statut-badge ' + badge.cls + '">' + badge.label + '</span></td>'
+    + '<td style="color:var(--green);font-weight:600;">' + fmtMontant(a.montant_paye) + ' GNF</td>'
     + '<td><div class="apprenant-actions"><button class="btn btn-sm" onclick="openModalPaiement(\'' + a.id + '\')"><i class="ti ti-cash"></i> Versement</button>'
     + '<button class="btn btn-sm btn-ghost" onclick="marquerPresence(\'' + a.id + '\')"><i class="ti ti-check"></i> Présence</button>'
     + '<button class="btn btn-sm btn-ghost" onclick="reimprimerRecu(\'' + a.id + '\')"><i class="ti ti-receipt"></i> Reçu</button>'
