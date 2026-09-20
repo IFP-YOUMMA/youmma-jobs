@@ -1005,6 +1005,16 @@ button.suivi-pastille{cursor:pointer;}
           <div class="form-row"><label>Téléphone</label><input type="tel" id="pTelephone"></div>
           <div class="form-row"><label>Email</label><input type="email" id="pEmail"></div>
           <div class="form-row"><label>Adresse</label><input type="text" id="pAdresse"></div>
+          <div class="form-row">
+            <label>Logo</label>
+            <div class="param-logo-zone">
+              <div class="param-logo-preview" id="paramLogoPreview">Aucun logo</div>
+              <div>
+                <input type="file" id="paramLogoFile" accept="image/png,image/jpeg" onchange="uploadLogoGN(this)" style="font-size:12px;">
+                <button class="btn btn-ghost btn-sm" style="margin-top:6px;" onclick="retirerLogoGN()"><i class="ti ti-trash"></i> Retirer</button>
+              </div>
+            </div>
+          </div>
           <button class="btn btn-primary" onclick="enregistrerParametres()"><i class="ti ti-device-floppy"></i> Enregistrer</button>
         </div>
       </section>
@@ -1439,9 +1449,9 @@ function renderCommandeCard(c) {
     : '<span class="paiement-badge du">Dû</span>';
   const peutGerer = session.role === 'gerant';
   const peutPreparerRole = session.role === 'gerant' || session.role === 'agent';
-  let actionBtn = '';
+  let actionBtn = '<button class="btn btn-sm btn-ghost" onclick="imprimerFactureCommande(\'' + c.id + '\')"><i class="ti ti-file-invoice"></i> Facture</button>';
   if (c.statut === 'recue' && peutPreparerRole) {
-    actionBtn = '<button class="btn btn-sm btn-primary" onclick="marquerCommandePreparee(\'' + c.id + '\')"><i class="ti ti-checklist"></i> Marquer préparée</button>';
+    actionBtn += '<button class="btn btn-sm btn-primary" onclick="marquerCommandePreparee(\'' + c.id + '\')"><i class="ti ti-checklist"></i> Marquer préparée</button>';
   }
   let menuHtml = '';
   if (peutGerer) {
@@ -1459,6 +1469,231 @@ function renderCommandeCard(c) {
     + '<div class="cmd-card-articles">' + esc(articlesResume(c.lignes)) + '</div>'
     + '<div class="cmd-card-footer"><div class="cmd-card-montant">' + fmtMontant(c.total) + ' GNF</div><div class="cmd-card-actions">' + actionBtn + '</div></div>'
     + '</div>';
+}
+
+/* ── FACTURE COMMANDE (impression) ── */
+function fmtMontantInsecable(n) { return Math.round(Number(n) || 0).toLocaleString('fr-FR'); }
+
+function nombreEnLettres(n) {
+  n = Math.round(Number(n) || 0);
+  if (n === 0) return 'Zéro franc guinéen';
+  const UNITES = ['zéro','un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze','douze','treize','quatorze','quinze','seize','dix-sept','dix-huit','dix-neuf'];
+  const DIZAINES = ['','','vingt','trente','quarante','cinquante','soixante','soixante-dix','quatre-vingt','quatre-vingt-dix'];
+
+  function deuxChiffres(num, followedByMultiplier) {
+    if (num < 20) return UNITES[num];
+    const d = Math.floor(num / 10);
+    const u = num % 10;
+    if (d === 7 || d === 9) {
+      const base = d === 7 ? 'soixante' : 'quatre-vingt';
+      if (u === 1 && d === 7) return base + ' et onze';
+      return base + '-' + UNITES[10 + u];
+    }
+    if (u === 0) {
+      if (d === 8) return followedByMultiplier ? 'quatre-vingt' : 'quatre-vingts';
+      return DIZAINES[d];
+    }
+    if (u === 1 && d !== 8) return DIZAINES[d] + ' et un';
+    return DIZAINES[d] + '-' + UNITES[u];
+  }
+
+  function troisChiffres(num, followedByMultiplier) {
+    const c2 = Math.floor(num / 100);
+    const reste = num % 100;
+    let mots = '';
+    if (c2 > 0) {
+      mots += (c2 === 1 ? 'cent' : UNITES[c2] + ' cent');
+      if (c2 > 1 && reste === 0 && !followedByMultiplier) mots += 's';
+      if (reste > 0) mots += ' ';
+    }
+    if (reste > 0) mots += deuxChiffres(reste, followedByMultiplier);
+    return mots;
+  }
+
+  const milliard = Math.floor(n / 1000000000);
+  const million = Math.floor((n % 1000000000) / 1000000);
+  const mille = Math.floor((n % 1000000) / 1000);
+  const unite = n % 1000;
+
+  const parties = [];
+  if (milliard > 0) parties.push(troisChiffres(milliard, true) + (milliard > 1 ? ' milliards' : ' milliard'));
+  if (million > 0) parties.push(troisChiffres(million, true) + (million > 1 ? ' millions' : ' million'));
+  if (mille > 0) parties.push(mille === 1 ? 'mille' : troisChiffres(mille, true) + ' mille');
+  if (unite > 0 || parties.length === 0) parties.push(troisChiffres(unite, false));
+
+  let resultat = parties.join(' ');
+  resultat = resultat.charAt(0).toUpperCase() + resultat.slice(1);
+  return resultat + ' franc' + (n > 1 ? 's' : '') + ' guinéen' + (n > 1 ? 's' : '');
+}
+
+const STATUT_LABELS_FACTURE = { recue: 'Reçue', preparee: 'Préparée', assignee: 'Assignée', en_livraison: 'En livraison', livree: 'Livrée', echec: 'Échec', annulee: 'Annulée' };
+const STATUT_COULEURS_FACTURE = {
+  recue: { bg: '#FAEEDA', color: '#854F0B' },
+  preparee: { bg: '#E6F1FB', color: '#185FA5' },
+  assignee: { bg: '#F1EAFB', color: '#6D28D9' },
+  en_livraison: { bg: '#FAECE7', color: '#993C1D' },
+  livree: { bg: '#EAF3DE', color: '#3B6D11' },
+  echec: { bg: '#FCEBEB', color: '#A32D2D' },
+  annulee: { bg: '#F1EFE8', color: '#444441' },
+};
+
+const STYLE_IMPRESSION_FACTURE_GN = '@page{size:A4;margin:18mm 18mm 22mm;}'
+  + '*{box-sizing:border-box;}'
+  + 'body{font-family:Inter,system-ui,sans-serif;color:#1F1F55;margin:0;font-size:11px;max-width:100%;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#E9EAF0;}'
+  + '.feuille{width:210mm;min-height:297mm;margin:24px auto;padding:18mm 18mm 30mm;background:#fff;box-shadow:0 4px 24px rgba(31,31,85,.15);box-sizing:border-box;position:relative;}'
+  + '.entete{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;}'
+  + '.entete-gauche{display:flex;gap:12px;align-items:flex-start;}'
+  + '.logo-gn{height:56px;min-width:56px;border-radius:8px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;font-size:24px;}'
+  + '.logo-gn img{height:100%;width:auto;object-fit:contain;}'
+  + '.enseigne{font-size:22px;font-weight:700;}'
+  + '.slogan{font-size:12px;font-style:italic;color:#6B6B8A;margin-top:2px;}'
+  + '.souslabel{font-size:10px;color:#444;margin-top:2px;}'
+  + '.entete-droite{text-align:right;font-size:11px;color:#333;}'
+  + '.entete-droite div{margin-top:3px;}'
+  + '.titre-doc{font-size:16px;font-weight:700;margin-bottom:6px;}'
+  + '.filet{border-top:2px solid;margin:12px 0 14px;}'
+  + '.client-objet-box{display:grid;grid-template-columns:1fr 1fr;gap:24px;background:#F4F5F9;padding:12px;border-radius:8px;margin-bottom:14px;}'
+  + '.section-titre{font-size:11px;font-weight:700;letter-spacing:.06em;margin-bottom:6px;}'
+  + '.client-objet-box div div{margin-top:2px;}'
+  + 'table.lignes{width:100%;border-collapse:collapse;margin-bottom:14px;}'
+  + 'table.lignes thead th{color:#fff;font-weight:600;padding:8px;font-size:11px;text-align:left;border:1px solid #D5D6E2;}'
+  + 'table.lignes td{padding:8px;border:1px solid #D5D6E2;font-size:11px;}'
+  + 'table.lignes th.c,table.lignes td.c{text-align:center;}'
+  + 'table.lignes th.r,table.lignes td.r{text-align:right;}'
+  + '.totaux{margin-left:auto;width:300px;margin-bottom:14px;}'
+  + '.tot-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:11.5px;color:#444;}'
+  + '.tot-total-row{align-items:center;margin:4px 0;}'
+  + '.tot-total-label{font-weight:700;font-size:13px;}'
+  + '.tot-total-value{color:#fff;font-weight:700;padding:6px 14px;border-radius:4px;font-size:13px;}'
+  + '.statut-badge-facture{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}'
+  + '.paiement-badge-facture{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}'
+  + '.statut-ligne{font-size:12px;color:#333;margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}'
+  + '.en-lettres{font-size:11px;font-style:italic;color:#333;margin-bottom:16px;}'
+  + '.signature-bloc{text-align:right;margin-top:40px;width:100%;font-size:11px;box-sizing:border-box;page-break-inside:avoid;}'
+  + '.signature-espace{height:50px;}'
+  + '.signature-nom{font-weight:700;}'
+  + '.signature-titre{font-style:italic;color:#444;margin-top:2px;}'
+  + '.pied{position:absolute;bottom:10mm;left:18mm;right:18mm;text-align:center;font-size:9px;color:#9A9AB5;white-space:normal;padding:8px 0 0;border-top:1px solid #E3E4EC;}'
+  + '.pied div{margin-top:2px;}'
+  + '@media print{body{background:#fff;}.feuille{width:auto;min-height:auto;margin:0;padding:0;box-shadow:none;}.pied{position:fixed;bottom:0;left:0;right:0;}}';
+
+const BARRE_IMPRESSION_STYLE_GN = '.barre-impression{position:sticky;top:0;background:#1F1F55;color:#fff;padding:10px 18px;display:flex;align-items:center;gap:14px;font-family:Inter,system-ui,sans-serif;z-index:999;}'
+  + '.barre-impression button{background:#E85D04;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-weight:700;font-size:13px;cursor:pointer;}'
+  + '.barre-impression span{font-size:11.5px;color:#C6C6E0;}'
+  + '@media print{.barre-impression{display:none;}}';
+const BARRE_IMPRESSION_HTML_GN = '<div class="barre-impression"><button onclick="window.print()">Imprimer / PDF</button>'
+  + '<span>Astuce : décochez « En-têtes et pieds de page » dans les options d\'impression.</span></div>';
+
+function construireHtmlFactureCommande(c, numeroFacture) {
+  const P = PARAMS;
+  const enseigne = P.enseigne || 'YOUMMA GN';
+  const slogan = P.slogan || '';
+  const adresse = P.adresse || '';
+  const telephone = P.telephone || '';
+  const email = P.email || '';
+  const rccm = P.rccm || '';
+  const nif = P.nif || '';
+  const piedLegal = P.pied_legal || '';
+  const couleurPrincipale = P.couleur_principale || '#2D2D6B';
+  const couleurAccent = P.couleur_accent || '#E85D04';
+  const dateDoc = new Date(c.date_creation);
+  const dateAffichee = dateDoc.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const raisonSociale = P.raison_sociale || enseigne;
+  const raisonSocialeMots = raisonSociale.trim().split(/\s+/);
+  const raisonSocialeHtml = raisonSocialeMots.length > 1
+    ? esc(raisonSocialeMots[0]) + ' <span style="color:' + couleurAccent + ';">' + esc(raisonSocialeMots.slice(1).join(' ')) + '</span>'
+    : esc(raisonSociale);
+
+  const logoHtml = P.logo_url
+    ? '<div class="logo-gn"><img src="' + esc(P.logo_url) + '"></div>'
+    : '<div class="logo-gn" style="background:' + couleurAccent + ';"><i class="ti ti-shopping-cart"></i></div>';
+
+  const lignesHtml = (c.lignes || []).map(function(l, i) {
+    const total = Number(l.qte || 0) * Number(l.prix || 0);
+    return '<tr><td class="c">' + (i + 1) + '</td><td>' + esc(l.nom) + '</td><td class="c">' + esc(l.qte) + '</td><td class="r">' + fmtMontantInsecable(l.prix) + '</td><td class="r">' + fmtMontantInsecable(total) + '</td></tr>';
+  }).join('');
+
+  const modeLabel = c.mode_paiement === 'orange_money' ? 'Orange Money' : 'Cash';
+  const paiementBadgeHtml = c.paiement_statut === 'paye'
+    ? '<span class="paiement-badge-facture" style="background:#EAF3DE;color:#3B6D11;">Payé</span>'
+    : '<span class="paiement-badge-facture" style="background:#FAEEDA;color:#854F0B;">Dû à la livraison</span>';
+
+  const statutCouleur = STATUT_COULEURS_FACTURE[c.statut] || STATUT_COULEURS_FACTURE.recue;
+  const statutLabel = STATUT_LABELS_FACTURE[c.statut] || c.statut;
+  const ligneLivraisonDate = (c.statut === 'livree' && c.date_livraison)
+    ? ' — livrée le ' + new Date(c.date_livraison).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '';
+
+  const piedLigne1 = piedLegal ? esc(piedLegal) : '';
+  const piedLigne2 = [telephone ? 'Tél. : ' + esc(telephone) : '', email ? 'E-mail : ' + esc(email) : ''].filter(Boolean).join(' · ');
+  const piedBas = (piedLigne1 ? '<div>' + piedLigne1 + '</div>' : '') + (piedLigne2 ? '<div>' + piedLigne2 + '</div>' : '');
+
+  const signatureHtml = '<div class="signature-bloc"><div class="signature-espace"></div><div class="signature-nom">' + esc(P.signataire_nom || '') + '</div><div class="signature-titre">' + esc(P.signataire_titre || '') + '</div></div>';
+
+  return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Facture ' + esc(numeroFacture) + ' — ' + esc(enseigne) + '</title>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">'
+    + '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">'
+    + '<style>' + STYLE_IMPRESSION_FACTURE_GN + BARRE_IMPRESSION_STYLE_GN + '</style></head><body>'
+    + BARRE_IMPRESSION_HTML_GN
+    + '<div class="feuille">'
+    + '<div class="entete">'
+    + '<div class="entete-gauche">' + logoHtml + '<div><div class="enseigne" style="color:' + couleurPrincipale + ';">' + raisonSocialeHtml + '</div>'
+    + '<div class="slogan">Agence YOUMMA GN' + (slogan ? ' — ' + esc(slogan) : '') + '</div>'
+    + (adresse ? '<div class="souslabel">' + esc(adresse) + '</div>' : '')
+    + (telephone ? '<div class="souslabel">Tél. : ' + esc(telephone) + '</div>' : '')
+    + (email ? '<div class="souslabel">E-mail : ' + esc(email) + '</div>' : '')
+    + ((rccm || nif) ? '<div class="souslabel">' + [rccm ? 'RCCM : ' + esc(rccm) : '', nif ? 'NIF : ' + esc(nif) : ''].filter(Boolean).join(' · ') + '</div>' : '')
+    + '</div></div>'
+    + '<div class="entete-droite"><div class="titre-doc" style="color:' + couleurPrincipale + ';">FACTURE</div>'
+    + '<div><strong>N° :</strong> ' + esc(numeroFacture) + '</div><div><strong>Date :</strong> ' + dateAffichee + '</div></div>'
+    + '</div>'
+    + '<div class="filet" style="border-color:' + couleurAccent + ';"></div>'
+    + '<div class="client-objet-box">'
+    + '<div><div class="section-titre" style="color:' + couleurAccent + ';">CLIENT</div><div><strong>' + esc(c.client_nom) + '</strong></div>'
+    + '<div>Téléphone : ' + esc(c.client_telephone || '') + '</div></div>'
+    + '<div><div class="section-titre" style="color:' + couleurAccent + ';">LIVRAISON</div><div>' + esc(c.client_adresse || '') + '</div>'
+    + (c.client_quartier ? '<div>' + esc(c.client_quartier) + '</div>' : '') + '</div>'
+    + '</div>'
+    + '<table class="lignes"><thead><tr style="background:' + couleurPrincipale + ';"><th style="width:36px;" class="c">N°</th><th>Désignation</th><th style="width:56px;" class="c">Qté</th><th style="width:110px;" class="r">Prix unitaire</th><th style="width:120px;" class="r">Montant</th></tr></thead><tbody>' + lignesHtml + '</tbody></table>'
+    + '<div class="totaux">'
+    + '<div class="tot-row tot-total-row"><span class="tot-total-label" style="color:' + couleurPrincipale + ';">TOTAL</span><span class="tot-total-value" style="background:' + couleurAccent + ';">' + fmtMontantInsecable(c.total) + ' GNF</span></div>'
+    + '<div class="tot-row"><span>Mode de paiement</span><span>' + modeLabel + '</span></div>'
+    + '<div class="tot-row"><span>Statut paiement</span>' + paiementBadgeHtml + '</div>'
+    + '</div>'
+    + '<div class="en-lettres">Arrêtée la présente facture à la somme de : <strong>' + nombreEnLettres(c.total) + '</strong>.</div>'
+    + '<div class="statut-ligne">Statut de la commande : <span class="statut-badge-facture" style="background:' + statutCouleur.bg + ';color:' + statutCouleur.color + ';">' + esc(statutLabel) + '</span>' + esc(ligneLivraisonDate) + '</div>'
+    + signatureHtml
+    + '<div class="pied">' + piedBas + '</div>'
+    + '</div>'
+    + '</body></html>';
+}
+
+async function calculerProchainNumeroFactureGN() {
+  const annee = new Date().getFullYear();
+  const cle = 'dernier_facture_numero_' + annee;
+  const dernier = Number(PARAMS[cle] || 0);
+  const numero = 'FAC-GN-' + annee + '-' + String(dernier + 1).padStart(4, '0');
+  await sb.from('gn_parametres').upsert([{ cle: cle, valeur: String(dernier + 1) }], { onConflict: 'cle' });
+  PARAMS[cle] = String(dernier + 1);
+  return numero;
+}
+
+async function imprimerFactureCommande(commandeId) {
+  const { data: c, error } = await sb.from('gn_commandes').select('*').eq('id', commandeId).maybeSingle();
+  if (error || !c) { showToast('Commande introuvable.', 'error'); return; }
+  let numeroFacture = c.numero_facture;
+  if (!numeroFacture) {
+    numeroFacture = await calculerProchainNumeroFactureGN();
+    await sb.from('gn_commandes').update({ numero_facture: numeroFacture }).eq('id', c.id);
+    c.numero_facture = numeroFacture;
+  }
+  const win = window.open('', '_blank');
+  if (!win) { showToast('Le navigateur a bloqué l\'ouverture de la facture.', 'error'); return; }
+  const html = construireHtmlFactureCommande(c, numeroFacture);
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
 }
 
 /* ── PAGE COMMANDES (gérant/agent) ── */
@@ -2229,6 +2464,39 @@ async function chargerParametresPage() {
   document.getElementById('pTelephone').value = PARAMS.telephone || '';
   document.getElementById('pEmail').value = PARAMS.email || '';
   document.getElementById('pAdresse').value = PARAMS.adresse || '';
+  afficherLogoPreviewGN();
+}
+async function uploadLogoGN(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 500 * 1024) { showToast('Le logo doit faire moins de 500 Ko.', 'error'); input.value = ''; return; }
+  const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+  const chemin = 'logo.' + ext;
+  try {
+    const { error } = await sb.storage.from('gn-assets').upload(chemin, file, { upsert: true });
+    if (error) throw error;
+    const { data: urlData } = sb.storage.from('gn-assets').getPublicUrl(chemin);
+    const url = urlData.publicUrl + '?t=' + Date.now();
+    await sb.from('gn_parametres').upsert([{ cle: 'logo_url', valeur: url }], { onConflict: 'cle' });
+    PARAMS.logo_url = url;
+    afficherLogoPreviewGN();
+    showToast('Logo mis à jour.');
+  } catch (e) {
+    showToast('Erreur upload logo: ' + e.message, 'error');
+  }
+}
+function afficherLogoPreviewGN() {
+  const el = document.getElementById('paramLogoPreview');
+  if (!el) return;
+  if (PARAMS.logo_url) { el.innerHTML = '<img src="' + esc(PARAMS.logo_url) + '">'; }
+  else { el.textContent = 'Aucun logo'; }
+}
+async function retirerLogoGN() {
+  PARAMS.logo_url = null;
+  await sb.from('gn_parametres').upsert([{ cle: 'logo_url', valeur: '' }], { onConflict: 'cle' });
+  afficherLogoPreviewGN();
+  document.getElementById('paramLogoFile').value = '';
+  showToast('Logo retiré.');
 }
 async function enregistrerParametres() {
   const champs = {
