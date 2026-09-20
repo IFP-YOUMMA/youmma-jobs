@@ -1290,6 +1290,7 @@ async function loginVerifierTel() {
     .eq('actif', true)
     .or('telephone.eq.' + tel + ',telephone.eq.224' + tel)
     .maybeSingle();
+  console.log('DEBUG login — tel recherché:', tel, '| data:', data, '| error:', error);
   if (error || !data) {
     errDiv.textContent = 'Numéro non reconnu. Contactez le gérant.';
     errDiv.style.display = 'block';
