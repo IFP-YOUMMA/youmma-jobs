@@ -1015,6 +1015,10 @@ button.suivi-pastille{cursor:pointer;}
               </div>
             </div>
           </div>
+        </div>
+        <div class="card">
+          <h3>Facture</h3>
+          <div class="form-row"><label>Message de remerciement (facture)</label><input type="text" id="pMessageRemerciement"></div>
           <button class="btn btn-primary" onclick="enregistrerParametres()"><i class="ti ti-device-floppy"></i> Enregistrer</button>
         </div>
       </section>
@@ -1593,17 +1597,11 @@ function construireHtmlFactureCommande(c, numeroFacture) {
   const email = P.email || '';
   const rccm = P.rccm || '';
   const nif = P.nif || '';
-  const piedLegal = P.pied_legal || '';
+  const messageRemerciement = P.message_remerciement || '';
   const couleurPrincipale = P.couleur_principale || '#2D2D6B';
   const couleurAccent = P.couleur_accent || '#E85D04';
   const dateDoc = new Date(c.date_creation);
   const dateAffichee = dateDoc.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-
-  const raisonSociale = P.raison_sociale || enseigne;
-  const raisonSocialeMots = raisonSociale.trim().split(/\s+/);
-  const raisonSocialeHtml = raisonSocialeMots.length > 1
-    ? esc(raisonSocialeMots[0]) + ' <span style="color:' + couleurAccent + ';">' + esc(raisonSocialeMots.slice(1).join(' ')) + '</span>'
-    : esc(raisonSociale);
 
   const logoHtml = P.logo_url
     ? '<div class="logo-gn"><img src="' + esc(P.logo_url) + '"></div>'
@@ -1625,10 +1623,16 @@ function construireHtmlFactureCommande(c, numeroFacture) {
     ? ' — livrée le ' + new Date(c.date_livraison).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
     : '';
 
-  const piedLigne1 = piedLegal ? esc(piedLegal) : '';
-  const piedLigne2 = [telephone ? 'Tél. : ' + esc(telephone) : '', email ? 'E-mail : ' + esc(email) : ''].filter(Boolean).join(' · ');
-  const piedBas = (piedLigne1 ? '<div>' + piedLigne1 + '</div>' : '') + (piedLigne2 ? '<div>' + piedLigne2 + '</div>' : '');
+  const piedLigne1 = 'YOUMMA SARLU · RCCM : ' + esc(rccm) + ' · NIF : ' + esc(nif);
+  const piedLigne2Parties = [];
+  if (telephone) piedLigne2Parties.push('Tél. : ' + esc(telephone));
+  if (email) piedLigne2Parties.push(esc(email));
+  const piedLigne2 = piedLigne2Parties.join(' · ');
+  const piedBas = '<div>' + piedLigne1 + '</div>' + (piedLigne2 ? '<div>' + piedLigne2 + '</div>' : '');
 
+  const remerciementHtml = messageRemerciement
+    ? '<div style="font-size:13px;font-style:italic;color:' + couleurAccent + ';text-align:center;margin-bottom:12px;">' + esc(messageRemerciement) + '</div>'
+    : '';
   const signatureHtml = '<div class="signature-bloc"><div class="signature-espace"></div><div class="signature-nom">' + esc(P.signataire_nom || '') + '</div><div class="signature-titre">' + esc(P.signataire_titre || '') + '</div></div>';
 
   return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Facture ' + esc(numeroFacture) + ' — ' + esc(enseigne) + '</title>'
@@ -1638,12 +1642,11 @@ function construireHtmlFactureCommande(c, numeroFacture) {
     + BARRE_IMPRESSION_HTML_GN
     + '<div class="feuille">'
     + '<div class="entete">'
-    + '<div class="entete-gauche">' + logoHtml + '<div><div class="enseigne" style="color:' + couleurPrincipale + ';">' + raisonSocialeHtml + '</div>'
-    + '<div class="slogan">Agence YOUMMA GN' + (slogan ? ' — ' + esc(slogan) : '') + '</div>'
+    + '<div class="entete-gauche">' + logoHtml + '<div><div class="enseigne" style="font-size:24px;"><span style="color:' + couleurPrincipale + ';">YOUMMA</span> <span style="color:' + couleurAccent + ';">GN</span></div>'
+    + (slogan ? '<div class="slogan" style="font-size:13px;color:' + couleurAccent + ';">' + esc(slogan) + '</div>' : '')
     + (adresse ? '<div class="souslabel">' + esc(adresse) + '</div>' : '')
     + (telephone ? '<div class="souslabel">Tél. : ' + esc(telephone) + '</div>' : '')
     + (email ? '<div class="souslabel">E-mail : ' + esc(email) + '</div>' : '')
-    + ((rccm || nif) ? '<div class="souslabel">' + [rccm ? 'RCCM : ' + esc(rccm) : '', nif ? 'NIF : ' + esc(nif) : ''].filter(Boolean).join(' · ') + '</div>' : '')
     + '</div></div>'
     + '<div class="entete-droite"><div class="titre-doc" style="color:' + couleurPrincipale + ';">FACTURE</div>'
     + '<div><strong>N° :</strong> ' + esc(numeroFacture) + '</div><div><strong>Date :</strong> ' + dateAffichee + '</div></div>'
@@ -1663,6 +1666,7 @@ function construireHtmlFactureCommande(c, numeroFacture) {
     + '</div>'
     + '<div class="en-lettres">Arrêtée la présente facture à la somme de : <strong>' + nombreEnLettres(c.total) + '</strong>.</div>'
     + '<div class="statut-ligne">Statut de la commande : <span class="statut-badge-facture" style="background:' + statutCouleur.bg + ';color:' + statutCouleur.color + ';">' + esc(statutLabel) + '</span>' + esc(ligneLivraisonDate) + '</div>'
+    + remerciementHtml
     + signatureHtml
     + '<div class="pied">' + piedBas + '</div>'
     + '</div>'
@@ -2464,6 +2468,7 @@ async function chargerParametresPage() {
   document.getElementById('pTelephone').value = PARAMS.telephone || '';
   document.getElementById('pEmail').value = PARAMS.email || '';
   document.getElementById('pAdresse').value = PARAMS.adresse || '';
+  document.getElementById('pMessageRemerciement').value = PARAMS.message_remerciement || '';
   afficherLogoPreviewGN();
 }
 async function uploadLogoGN(input) {
@@ -2504,6 +2509,7 @@ async function enregistrerParametres() {
     telephone: document.getElementById('pTelephone').value.trim(),
     email: document.getElementById('pEmail').value.trim(),
     adresse: document.getElementById('pAdresse').value.trim(),
+    message_remerciement: document.getElementById('pMessageRemerciement').value.trim(),
   };
   const lignes = Object.keys(champs).map(function(k) { return { cle: k, valeur: champs[k] }; });
   await sb.from('gn_parametres').upsert(lignes, { onConflict: 'cle' });
