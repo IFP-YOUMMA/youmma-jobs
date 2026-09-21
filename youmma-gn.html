@@ -751,6 +751,22 @@ button.suivi-pastille{cursor:pointer;}
 @media (max-width:500px){
   .produits-grid{grid-template-columns:1fr;}
 }
+
+/* ---- Fournisseurs / dépôt-vente ---- */
+.fournisseur-card{cursor:pointer;}
+.fournisseur-solde-row{display:flex;gap:16px;font-size:12.5px;color:var(--text-muted);flex-wrap:wrap;}
+.fournisseur-solde-row strong{color:var(--text);}
+.fournisseur-detail-avatar{width:52px;height:52px;border-radius:50%;background:var(--indigo);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px;flex-shrink:0;}
+.fournisseur-table-wrap{overflow-x:auto;}
+.fournisseur-table{width:100%;border-collapse:collapse;min-width:480px;}
+.fournisseur-table th{text-align:left;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.03em;padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap;}
+.fournisseur-table td{padding:10px 14px;border-bottom:1px solid #F3F4F6;font-size:13px;vertical-align:middle;}
+.fournisseur-table tr:last-child td{border-bottom:none;}
+.fournisseur-paiement-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #F3F4F6;font-size:12.5px;}
+.fournisseur-paiement-row:last-child{border-bottom:none;}
+@media (max-width:600px){
+  .fournisseur-solde-row{flex-direction:column;gap:4px;}
+}
 </style>
 </head>
 <body>
@@ -803,6 +819,7 @@ button.suivi-pastille{cursor:pointer;}
       <button class="nav-item" data-nav="aujourdhui" onclick="navigate('aujourdhui')"><i class="ti ti-home"></i> Aujourd'hui</button>
       <button class="nav-item" data-nav="commandes" onclick="navigate('commandes')"><i class="ti ti-shopping-bag"></i> Commandes<span class="sidebar-badge" id="sidebarBadgeCommandes" style="display:none;">0</span></button>
       <button class="nav-item gn-restricted" data-nav="produits" onclick="navigate('produits')"><i class="ti ti-package"></i> Produits</button>
+      <button class="nav-item gerant-only" data-nav="fournisseurs" onclick="navigate('fournisseurs')"><i class="ti ti-building-warehouse"></i> Fournisseurs</button>
       <button class="nav-item gerant-only" data-nav="caisse" onclick="navigate('caisse')"><i class="ti ti-cash"></i> Caisse</button>
       <button class="nav-item gerant-only" data-nav="rapports" onclick="navigate('rapports')"><i class="ti ti-chart-bar"></i> Rapports</button>
       <button class="nav-item gerant-only" data-nav="agents" onclick="navigate('agents')"><i class="ti ti-users"></i> Agents</button>
@@ -913,6 +930,60 @@ button.suivi-pastille{cursor:pointer;}
           </div>
         </div>
         <div id="produitsListe" class="produits-grid"></div>
+      </section>
+
+      <!-- PAGE : FOURNISSEURS -->
+      <section id="page-fournisseurs" class="page">
+        <div id="fournisseursListeVue">
+          <div class="taches-header">
+            <div class="taches-header-left">
+              <div class="taches-header-icon" style="width:38px;height:38px;"><i class="ti ti-building-warehouse"></i></div>
+              <div><h2>Fournisseurs</h2><div class="taches-header-sub" id="fournisseursSousTitre">—</div></div>
+            </div>
+            <div class="taches-header-right">
+              <button class="btn btn-primary" onclick="openModalFournisseur()"><i class="ti ti-plus"></i> Nouveau fournisseur</button>
+            </div>
+          </div>
+          <div id="fournisseursListe"></div>
+        </div>
+        <div id="fournisseurDetailVue" class="hidden">
+          <div class="formation-detail-header">
+            <button class="formation-btn-retour" onclick="retourListeFournisseurs()"><i class="ti ti-arrow-left"></i></button>
+            <div class="fournisseur-detail-avatar" id="fdAvatar">--</div>
+            <div>
+              <div class="tache-card-nom" style="font-size:16px;" id="fdNom">—</div>
+              <div class="tache-card-tel" id="fdMeta">—</div>
+            </div>
+            <button class="btn btn-primary" style="margin-left:auto;" onclick="openModalPaiementFournisseur()"><i class="ti ti-cash"></i> Payer</button>
+          </div>
+          <div class="caisse-kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-icon blue"><i class="ti ti-shopping-cart"></i></div>
+              <div><div class="kpi-label">Total vendu</div><div class="kpi-value" id="fdTotalVendu">—</div></div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon green"><i class="ti ti-cash"></i></div>
+              <div><div class="kpi-label">Total payé</div><div class="kpi-value" id="fdTotalPaye" style="color:var(--green);">—</div></div>
+            </div>
+            <div class="kpi-card" id="fdResteCard">
+              <div class="kpi-icon red" id="fdResteIcon"><i class="ti ti-scale"></i></div>
+              <div><div class="kpi-label" id="fdResteLabel">Reste dû</div><div class="kpi-value" id="fdResteValeur">—</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Produits en dépôt</h3>
+            <div class="fournisseur-table-wrap">
+              <table class="fournisseur-table">
+                <thead><tr><th>Produit</th><th>Stock actuel</th><th>Vendu</th><th>Dû</th></tr></thead>
+                <tbody id="fdProduitsBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Historique des paiements</h3>
+            <div id="fdPaiementsListe"></div>
+          </div>
+        </div>
       </section>
 
       <!-- PAGE : CAISSE -->
@@ -1108,10 +1179,51 @@ button.suivi-pastille{cursor:pointer;}
         <div class="form-row"><label>Prix (GNF) *</label><input type="number" id="prodPrix" min="0"></div>
       </div>
       <div class="form-row"><label>Stock initial *</label><input type="number" id="prodStock" min="0"></div>
+      <div class="form-row gerant-only" id="prodDepotVenteRow">
+        <label style="display:flex;align-items:center;gap:8px;font-weight:400;"><input type="checkbox" id="prodDepotVente" style="width:auto;" onchange="toggleDepotVenteChamps()"> Marchandise en dépôt-vente</label>
+      </div>
+      <div id="prodDepotVenteChamps" class="hidden">
+        <div class="form-row">
+          <label>Fournisseur *</label>
+          <div style="display:flex;gap:8px;">
+            <select id="prodFournisseurSelect" style="flex:1;"><option value="">— Choisir —</option></select>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="openModalFournisseur(true)"><i class="ti ti-plus"></i></button>
+          </div>
+        </div>
+        <div class="form-row"><label>Prix fournisseur (GNF) *</label><input type="number" id="prodPrixFournisseur" min="0"></div>
+      </div>
       <div class="form-row"><label>Photo (optionnel)</label><input type="file" id="prodPhoto" accept="image/*"></div>
       <div id="prodErreur" class="form-error hidden"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalProduit')">Annuler</button><button class="btn btn-primary" id="prodBtnSubmit" onclick="enregistrerProduit()">Ajouter</button></div>
+  </div>
+</div>
+
+<div id="modalFournisseur" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Nouveau fournisseur</h3><button class="modal-close" onclick="closeModal('modalFournisseur')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Nom *</label><input type="text" id="fourNom"></div>
+      <div class="form-row-2">
+        <div class="form-row"><label>Téléphone</label><input type="tel" id="fourTel"></div>
+        <div class="form-row"><label>Catégorie</label><input type="text" id="fourCategorie" placeholder="Ex: Alimentation"></div>
+      </div>
+      <div class="form-row"><label>Notes</label><textarea id="fourNotes" rows="2"></textarea></div>
+      <div id="fourErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalFournisseur')">Annuler</button><button class="btn btn-primary" onclick="creerFournisseur()">Ajouter</button></div>
+  </div>
+</div>
+
+<div id="modalPaiementFournisseur" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Payer le fournisseur</h3><button class="modal-close" onclick="closeModal('modalPaiementFournisseur')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Montant (GNF) *</label><input type="number" id="fpMontant" min="0"></div>
+      <div class="form-row"><label>Note (optionnel)</label><input type="text" id="fpNote" placeholder="Ex: Avance, Solde de septembre..."></div>
+      <div id="fpErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalPaiementFournisseur')">Annuler</button><button class="btn btn-primary" onclick="enregistrerPaiementFournisseur()">Enregistrer</button></div>
   </div>
 </div>
 
@@ -1185,6 +1297,9 @@ let _loginAgent = null;
 let PARAMS = {};
 let produitsCache = [];
 let produitEnEdition = null;
+let fournisseursCache = [];
+let fournisseurCourant = null;
+let fournisseurCreationDepuisProduit = false;
 let commandesCache = [];
 let commandeEnEdition = null;
 let commandeEchecCourante = null;
@@ -1386,6 +1501,7 @@ async function chargerParametres() {
 /* ── NAVIGATION ── */
 const PAGE_ROLES = {
   produits: ['gerant', 'agent'],
+  fournisseurs: ['gerant'],
   caisse: ['gerant'],
   rapports: ['gerant'],
   agents: ['gerant'],
@@ -1395,6 +1511,7 @@ const PAGE_LOADERS = {
   aujourdhui: loadAujourdhuiWrap,
   commandes: loadCommandes,
   produits: loadProduits,
+  fournisseurs: loadFournisseurs,
   caisse: loadCaisse,
   rapports: loadRapports,
   agents: loadAgents,
@@ -1959,7 +2076,11 @@ function rechercherProduitCommande() {
 function ajouterLigneCommande(produitId) {
   const p = produitsCache.find(function(x) { return x.id === produitId; });
   if (!p) return;
-  ligneCommandeArticles.push({ produit_id: p.id, nom: p.nom, prix: Number(p.prix), qte: 1, stockDispo: Number(p.stock) });
+  ligneCommandeArticles.push({
+    produit_id: p.id, nom: p.nom, prix: Number(p.prix), qte: 1, stockDispo: Number(p.stock),
+    depot_vente: !!p.depot_vente, fournisseur_id: p.fournisseur_id || null,
+    prix_fournisseur: p.prix_fournisseur != null ? Number(p.prix_fournisseur) : null,
+  });
   document.getElementById('cRechercheProduit').value = '';
   document.getElementById('cRechercheResultats').classList.remove('open');
   renderLignesCommande();
@@ -2036,7 +2157,11 @@ async function enregistrerCommande() {
   const numeroInfo = await calculerProchainNumeroCmd();
   const payload = {
     numero: numeroInfo.numero, client_nom: nom, client_telephone: tel, client_adresse: adresse, client_quartier: quartier || null,
-    lignes: ligneCommandeArticles.map(function(l) { return { produit_id: l.produit_id, nom: l.nom, prix: l.prix, qte: l.qte }; }),
+    lignes: ligneCommandeArticles.map(function(l) {
+      const ligne = { produit_id: l.produit_id, nom: l.nom, prix: l.prix, qte: l.qte };
+      if (l.depot_vente) { ligne.fournisseur_id = l.fournisseur_id; ligne.prix_fournisseur = l.prix_fournisseur; }
+      return ligne;
+    }),
     total: total, mode_paiement: modePaiementCommande, paiement_statut: paiementStatut, statut: 'recue',
     agent_creation: session.nom,
   };
@@ -2096,7 +2221,23 @@ function renderProduitCard(p) {
     + (peutGerer ? '<div class="produit-footer"><button class="btn btn-sm btn-ghost" onclick="openModalProduitEdit(' + p.id + ')"><i class="ti ti-pencil"></i> Modifier</button><button class="btn btn-sm btn-danger-outline" onclick="supprimerProduit(' + p.id + ')"><i class="ti ti-trash"></i></button></div>' : '')
     + '</div></div>';
 }
-function openModalProduit() {
+function toggleDepotVenteChamps() {
+  const coche = document.getElementById('prodDepotVente').checked;
+  document.getElementById('prodDepotVenteChamps').classList.toggle('hidden', !coche);
+}
+async function chargerFournisseursSelect() {
+  if (!fournisseursCache.length) {
+    const { data } = await sb.from('gn_fournisseurs').select('*').eq('actif', true).order('nom');
+    fournisseursCache = data || [];
+  }
+}
+function remplirSelectFournisseur(selectionnerId) {
+  const sel = document.getElementById('prodFournisseurSelect');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Choisir —</option>' + fournisseursCache.map(function(f) { return '<option value="' + f.id + '">' + esc(f.nom) + '</option>'; }).join('');
+  if (selectionnerId) sel.value = selectionnerId;
+}
+async function openModalProduit() {
   produitEnEdition = null;
   document.getElementById('prodModalTitre').textContent = 'Nouveau produit';
   document.getElementById('prodBtnSubmit').textContent = 'Ajouter';
@@ -2105,10 +2246,14 @@ function openModalProduit() {
   document.getElementById('prodPrix').value = '';
   document.getElementById('prodStock').value = '';
   document.getElementById('prodPhoto').value = '';
+  document.getElementById('prodDepotVente').checked = false;
+  document.getElementById('prodPrixFournisseur').value = '';
+  toggleDepotVenteChamps();
+  if (session.role === 'gerant') { await chargerFournisseursSelect(); remplirSelectFournisseur(); }
   document.getElementById('prodErreur').classList.add('hidden');
   openModal('modalProduit');
 }
-function openModalProduitEdit(id) {
+async function openModalProduitEdit(id) {
   const p = produitsCache.find(function(x) { return x.id === id; });
   if (!p) return;
   produitEnEdition = p;
@@ -2119,6 +2264,10 @@ function openModalProduitEdit(id) {
   document.getElementById('prodPrix').value = p.prix || '';
   document.getElementById('prodStock').value = p.stock || 0;
   document.getElementById('prodPhoto').value = '';
+  document.getElementById('prodDepotVente').checked = !!p.depot_vente;
+  document.getElementById('prodPrixFournisseur').value = p.prix_fournisseur || '';
+  toggleDepotVenteChamps();
+  if (session.role === 'gerant') { await chargerFournisseursSelect(); remplirSelectFournisseur(p.fournisseur_id || ''); }
   document.getElementById('prodErreur').classList.add('hidden');
   openModal('modalProduit');
 }
@@ -2129,6 +2278,14 @@ async function enregistrerProduit() {
   const stock = Number(document.getElementById('prodStock').value || 0);
   const errEl = document.getElementById('prodErreur');
   if (!nom || !prix) { errEl.textContent = 'Nom et prix requis.'; errEl.classList.remove('hidden'); return; }
+  const depotVente = session.role === 'gerant' && document.getElementById('prodDepotVente').checked;
+  const fournisseurId = depotVente ? (document.getElementById('prodFournisseurSelect').value || null) : null;
+  const prixFournisseur = depotVente ? Number(document.getElementById('prodPrixFournisseur').value || 0) : null;
+  if (depotVente && (!fournisseurId || !prixFournisseur)) {
+    errEl.textContent = 'Fournisseur et prix fournisseur requis pour un produit en dépôt-vente.';
+    errEl.classList.remove('hidden');
+    return;
+  }
   let photoUrl = produitEnEdition ? produitEnEdition.photo_url : null;
   const fichier = document.getElementById('prodPhoto').files[0];
   if (fichier) {
@@ -2142,7 +2299,7 @@ async function enregistrerProduit() {
     } catch (e) { /* photo optionnelle : on ignore une erreur d'upload */ }
   }
   if (produitEnEdition) {
-    const { error } = await sb.from('gn_produits').update({ nom: nom, categorie: categorie || null, prix: prix, stock: stock, photo_url: photoUrl }).eq('id', produitEnEdition.id);
+    const { error } = await sb.from('gn_produits').update({ nom: nom, categorie: categorie || null, prix: prix, stock: stock, photo_url: photoUrl, depot_vente: depotVente, fournisseur_id: fournisseurId, prix_fournisseur: prixFournisseur }).eq('id', produitEnEdition.id);
     if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
     closeModal('modalProduit');
     showToast('Produit modifié.');
@@ -2150,7 +2307,7 @@ async function enregistrerProduit() {
     loadProduits();
     return;
   }
-  const { error } = await sb.from('gn_produits').insert({ nom: nom, categorie: categorie || null, prix: prix, stock: stock, photo_url: photoUrl, actif: true });
+  const { error } = await sb.from('gn_produits').insert({ nom: nom, categorie: categorie || null, prix: prix, stock: stock, photo_url: photoUrl, actif: true, depot_vente: depotVente, fournisseur_id: fournisseurId, prix_fournisseur: prixFournisseur });
   if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
   closeModal('modalProduit');
   showToast('Produit ajouté.');
@@ -2162,6 +2319,183 @@ async function supprimerProduit(id) {
   if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
   showToast('Produit supprimé.');
   loadProduits();
+}
+
+/* ── PAGE FOURNISSEURS (gérant) ── */
+async function loadFournisseurs() {
+  document.getElementById('fournisseurDetailVue').classList.add('hidden');
+  document.getElementById('fournisseursListeVue').classList.remove('hidden');
+  fournisseurCourant = null;
+
+  const [{ data: fours }, { data: commandes }, { data: paiements }] = await Promise.all([
+    sb.from('gn_fournisseurs').select('*').eq('actif', true).order('nom'),
+    sb.from('gn_commandes').select('lignes,statut'),
+    sb.from('gn_fournisseur_paiements').select('*'),
+  ]);
+  fournisseursCache = fours || [];
+  const sousTitreEl = document.getElementById('fournisseursSousTitre');
+  if (sousTitreEl) sousTitreEl.textContent = fournisseursCache.length + ' fournisseur' + (fournisseursCache.length > 1 ? 's' : '') + ' actif' + (fournisseursCache.length > 1 ? 's' : '');
+
+  const commandesValides = (commandes || []).filter(function(c) { return c.statut !== 'annulee' && c.statut !== 'echec'; });
+  const venduParFournisseur = {};
+  commandesValides.forEach(function(c) {
+    (c.lignes || []).forEach(function(l) {
+      if (!l.fournisseur_id) return;
+      venduParFournisseur[l.fournisseur_id] = (venduParFournisseur[l.fournisseur_id] || 0) + Number(l.prix_fournisseur || 0) * Number(l.qte || 0);
+    });
+  });
+  const payeParFournisseur = {};
+  (paiements || []).forEach(function(p) {
+    payeParFournisseur[p.fournisseur_id] = (payeParFournisseur[p.fournisseur_id] || 0) + Number(p.montant || 0);
+  });
+  fournisseursCache.forEach(function(f) {
+    f.vendu = venduParFournisseur[f.id] || 0;
+    f.paye = payeParFournisseur[f.id] || 0;
+    f.reste = f.vendu - f.paye;
+  });
+
+  document.getElementById('fournisseursListe').innerHTML = fournisseursCache.length ? fournisseursCache.map(renderFournisseurCard).join('')
+    : '<div class="priority-empty"><i class="ti ti-building-warehouse"></i>Aucun fournisseur.</div>';
+}
+function renderFournisseurCard(f) {
+  const bordureCouleur = f.reste > 0 ? 'var(--red)' : (f.reste < 0 ? 'var(--blue)' : 'var(--green)');
+  const resteCouleur = bordureCouleur;
+  const resteTexte = f.reste > 0 ? fmtMontant(f.reste) + ' GNF dû' : (f.reste < 0 ? fmtMontant(Math.abs(f.reste)) + ' GNF de crédit' : 'Soldé');
+  return '<div class="tache-card fournisseur-card" style="border-left-color:' + bordureCouleur + ';" onclick="openFournisseurDetail(\'' + f.id + '\')">'
+    + '<div class="tache-card-top">'
+    + '<div class="tache-card-identite"><div class="tache-avatar">' + initiales(f.nom) + '</div>'
+    + '<div class="tache-card-nom-wrap"><div class="tache-card-nom">' + esc(f.nom) + '</div><div class="tache-card-tel">' + esc(f.telephone || '') + (f.categorie ? ' · ' + esc(f.categorie) : '') + '</div></div></div>'
+    + '</div>'
+    + '<div class="fournisseur-solde-row"><span>Vendu : <strong>' + fmtMontant(f.vendu) + ' GNF</strong></span><span>Payé : <strong>' + fmtMontant(f.paye) + ' GNF</strong></span><span style="color:' + resteCouleur + ';font-weight:600;">' + resteTexte + '</span></div>'
+    + '</div>';
+}
+function openModalFournisseur(depuisProduit) {
+  fournisseurCreationDepuisProduit = !!depuisProduit;
+  document.getElementById('fourNom').value = '';
+  document.getElementById('fourTel').value = '';
+  document.getElementById('fourCategorie').value = '';
+  document.getElementById('fourNotes').value = '';
+  document.getElementById('fourErreur').classList.add('hidden');
+  openModal('modalFournisseur');
+}
+async function creerFournisseur() {
+  const nom = document.getElementById('fourNom').value.trim();
+  const tel = document.getElementById('fourTel').value.trim();
+  const categorie = document.getElementById('fourCategorie').value.trim();
+  const notes = document.getElementById('fourNotes').value.trim();
+  const errEl = document.getElementById('fourErreur');
+  if (!nom) { errEl.textContent = 'Nom requis.'; errEl.classList.remove('hidden'); return; }
+  const { data, error } = await sb.from('gn_fournisseurs').insert({ nom: nom, telephone: tel || null, categorie: categorie || null, notes: notes || null, actif: true }).select().single();
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  fournisseursCache.push(data);
+  fournisseursCache.sort(function(a, b) { return (a.nom || '').localeCompare(b.nom || ''); });
+  closeModal('modalFournisseur');
+  showToast('Fournisseur ajouté.');
+  if (fournisseurCreationDepuisProduit) {
+    remplirSelectFournisseur(data.id);
+  } else {
+    loadFournisseurs();
+  }
+}
+async function openFournisseurDetail(id) {
+  fournisseurCourant = fournisseursCache.find(function(x) { return x.id === id; });
+  if (!fournisseurCourant) return;
+  document.getElementById('fournisseursListeVue').classList.add('hidden');
+  document.getElementById('fournisseurDetailVue').classList.remove('hidden');
+  await chargerDetailFournisseur();
+}
+function retourListeFournisseurs() {
+  document.getElementById('fournisseurDetailVue').classList.add('hidden');
+  document.getElementById('fournisseursListeVue').classList.remove('hidden');
+  fournisseurCourant = null;
+  loadFournisseurs();
+}
+async function chargerDetailFournisseur() {
+  const f = fournisseurCourant;
+  document.getElementById('fdAvatar').textContent = initiales(f.nom);
+  document.getElementById('fdNom').textContent = f.nom;
+  document.getElementById('fdMeta').textContent = [f.telephone, f.categorie].filter(Boolean).join(' · ') || '—';
+
+  const [{ data: produits }, { data: commandes }, { data: paiements }] = await Promise.all([
+    sb.from('gn_produits').select('*').eq('fournisseur_id', f.id),
+    sb.from('gn_commandes').select('lignes,statut'),
+    sb.from('gn_fournisseur_paiements').select('*').eq('fournisseur_id', f.id).order('created_at', { ascending: false }),
+  ]);
+
+  const commandesValides = (commandes || []).filter(function(c) { return c.statut !== 'annulee' && c.statut !== 'echec'; });
+  const venduParProduit = {};
+  let totalVendu = 0;
+  commandesValides.forEach(function(c) {
+    (c.lignes || []).forEach(function(l) {
+      if (l.fournisseur_id !== f.id) return;
+      const montant = Number(l.prix_fournisseur || 0) * Number(l.qte || 0);
+      totalVendu += montant;
+      if (!venduParProduit[l.produit_id]) venduParProduit[l.produit_id] = { qte: 0, du: 0 };
+      venduParProduit[l.produit_id].qte += Number(l.qte || 0);
+      venduParProduit[l.produit_id].du += montant;
+    });
+  });
+  const totalPaye = (paiements || []).reduce(function(s, p) { return s + Number(p.montant || 0); }, 0);
+  const reste = totalVendu - totalPaye;
+
+  document.getElementById('fdTotalVendu').textContent = fmtMontant(totalVendu) + ' GNF';
+  document.getElementById('fdTotalPaye').textContent = fmtMontant(totalPaye) + ' GNF';
+  const resteCard = document.getElementById('fdResteCard');
+  const resteIcon = document.getElementById('fdResteIcon');
+  const resteLabelEl = document.getElementById('fdResteLabel');
+  const resteValeurEl = document.getElementById('fdResteValeur');
+  if (reste > 0) {
+    resteCard.style.border = '1.5px solid var(--red)';
+    resteIcon.className = 'kpi-icon red';
+    resteLabelEl.textContent = 'Reste dû';
+    resteValeurEl.style.color = 'var(--red)';
+    resteValeurEl.textContent = fmtMontant(reste) + ' GNF';
+  } else if (reste < 0) {
+    resteCard.style.border = '1.5px solid var(--blue)';
+    resteIcon.className = 'kpi-icon blue';
+    resteLabelEl.textContent = 'Avance';
+    resteValeurEl.style.color = 'var(--blue)';
+    resteValeurEl.textContent = fmtMontant(Math.abs(reste)) + ' GNF';
+  } else {
+    resteCard.style.border = '1.5px solid var(--green)';
+    resteIcon.className = 'kpi-icon green';
+    resteLabelEl.textContent = 'Reste dû';
+    resteValeurEl.style.color = 'var(--green)';
+    resteValeurEl.textContent = '0 GNF';
+  }
+
+  const produitsListe = produits || [];
+  document.getElementById('fdProduitsBody').innerHTML = produitsListe.length ? produitsListe.map(function(p) {
+    const v = venduParProduit[p.id] || { qte: 0, du: 0 };
+    return '<tr><td>' + esc(p.nom) + '</td><td>' + Number(p.stock || 0) + '</td><td>' + v.qte + '</td><td>' + fmtMontant(v.du) + ' GNF</td></tr>';
+  }).join('') : '<tr><td colspan="4" class="empty">Aucun produit en dépôt pour ce fournisseur.</td></tr>';
+
+  document.getElementById('fdPaiementsListe').innerHTML = (paiements && paiements.length) ? paiements.map(renderPaiementFournisseurRow).join('') : '<div class="empty">Aucun paiement enregistré.</div>';
+}
+function renderPaiementFournisseurRow(p) {
+  const libelle = p.note ? esc(p.note) : 'Paiement — ' + esc(p.agent_nom || '—');
+  const date = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  return '<div class="fournisseur-paiement-row"><div><div style="font-weight:500;color:var(--text);">' + libelle + '</div><div style="color:var(--text-muted);font-size:11.5px;">' + date + '</div></div><div style="color:var(--green);font-weight:600;">' + fmtMontant(p.montant) + ' GNF</div></div>';
+}
+function openModalPaiementFournisseur() {
+  document.getElementById('fpMontant').value = '';
+  document.getElementById('fpNote').value = '';
+  document.getElementById('fpErreur').classList.add('hidden');
+  openModal('modalPaiementFournisseur');
+}
+async function enregistrerPaiementFournisseur() {
+  const montant = Number(document.getElementById('fpMontant').value || 0);
+  const note = document.getElementById('fpNote').value.trim();
+  const errEl = document.getElementById('fpErreur');
+  if (!montant || montant <= 0) { errEl.textContent = 'Montant requis.'; errEl.classList.remove('hidden'); return; }
+  const f = fournisseurCourant;
+  if (!f) return;
+  const { error } = await sb.from('gn_fournisseur_paiements').insert({ fournisseur_id: f.id, montant: montant, note: note || null, agent_nom: session.nom });
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  await sb.from('gn_caisse').insert({ date: today(), libelle: 'Paiement fournisseur — ' + f.nom, type: 'sortie', montant: montant, categorie: 'fournisseur', agent_nom: session.nom });
+  closeModal('modalPaiementFournisseur');
+  showToast('Paiement enregistré.');
+  await chargerDetailFournisseur();
 }
 
 /* ── PAGE CAISSE ── */
