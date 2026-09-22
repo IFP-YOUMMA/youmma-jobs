@@ -2020,9 +2020,13 @@ async function loadCommandes() {
   renderFiltresCommandes();
   renderCommandesListe();
 }
+function commandeVisibleDansToutes(c) {
+  const estAujourdhui = (c.date_creation || '').slice(0, 10) === today();
+  return estAujourdhui || (c.statut !== 'livree' && c.statut !== 'echec');
+}
 function renderFiltresCommandes() {
   document.getElementById('commandesFiltres').innerHTML = CMD_FILTRES.map(function(f) {
-    const count = f.key === 'toutes' ? commandesCache.length : commandesCache.filter(function(c) { return c.statut === f.key; }).length;
+    const count = f.key === 'toutes' ? commandesCache.filter(commandeVisibleDansToutes).length : commandesCache.filter(function(c) { return c.statut === f.key; }).length;
     return '<button class="filtre-btn' + (filtreStatutCommande === f.key ? ' active' : '') + '" onclick="setFiltreCommande(\'' + f.key + '\')">' + f.label + '<span class="filtre-count">' + count + '</span></button>';
   }).join('');
 }
@@ -2035,7 +2039,8 @@ function filtrerCommandes() { renderCommandesListe(); }
 function renderCommandesListe() {
   const q = (document.getElementById('commandesRecherche').value || '').trim().toLowerCase();
   let liste = commandesCache;
-  if (filtreStatutCommande !== 'toutes') liste = liste.filter(function(c) { return c.statut === filtreStatutCommande; });
+  if (filtreStatutCommande === 'toutes') liste = liste.filter(commandeVisibleDansToutes);
+  else liste = liste.filter(function(c) { return c.statut === filtreStatutCommande; });
   if (q) liste = liste.filter(function(c) { return (c.client_nom || '').toLowerCase().indexOf(q) !== -1 || (c.client_telephone || '').indexOf(q) !== -1; });
   const cont = document.getElementById('commandesListe');
   cont.innerHTML = liste.length ? liste.map(renderCommandeCard).join('') : '<div class="priority-empty"><i class="ti ti-shopping-bag-off"></i>Aucune commande.</div>';
