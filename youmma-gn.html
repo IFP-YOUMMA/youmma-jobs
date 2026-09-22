@@ -122,6 +122,30 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .kpi-value{font-size:24px;font-weight:500;color:var(--text);margin-top:2px;}
 .kpi-value small{font-size:12px;font-weight:400;color:var(--text-muted);}
 
+/* ---- Aujourd'hui : cartes stats (redesign) ---- */
+.aj-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.aj-stat-card{background:#fff;border:1px solid #EAE6DF;border-radius:18px;padding:20px;min-width:0;}
+.aj-stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;}
+.aj-stat-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.aj-stat-icon.blue{background:#E9F0FC;color:#2E6BD6;}
+.aj-stat-icon.amber{background:#FDF3E3;color:#B9770E;}
+.aj-stat-icon.orange{background:#FDEEE6;color:#E8622C;}
+.aj-stat-icon.green{background:#E7F6ED;color:#1F9254;}
+.aj-stat-badge{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0;}
+.aj-stat-badge.blue{background:#E9F0FC;color:#2E6BD6;}
+.aj-stat-badge.amber{background:#FDF3E3;color:#B9770E;}
+.aj-stat-badge.orange{background:#FDEEE6;color:#E8622C;}
+.aj-stat-badge.green{background:#E7F6ED;color:#1F9254;}
+.aj-stat-label{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#8A8494;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.aj-stat-value{font-size:32px;font-weight:800;color:#1E2247;font-family:'Sora',system-ui,sans-serif;line-height:1.15;}
+.aj-stat-context{font-size:12px;color:#8A8494;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+@media (max-width:900px){
+  .aj-stat-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:480px){
+  .aj-stat-grid{grid-template-columns:1fr;}
+}
+
 .priority-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:0 1px 2px rgba(31,31,85,.04);margin-bottom:16px;}
 .priority-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
 .priority-header-left{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:500;color:var(--text);}
@@ -935,11 +959,31 @@ button.suivi-pastille{cursor:pointer;}
             <button class="aj-btn ghost gerant-only" onclick="openModal('modalEncaisser')"><i class="ti ti-cash"></i> Encaisser</button>
           </div>
         </div>
-        <div class="kpi-grid">
-          <div class="kpi-card"><div class="kpi-icon blue"><i class="ti ti-shopping-bag"></i></div><div><div class="kpi-label">Commandes du jour</div><div class="kpi-value" id="ajCommandesJour">—</div></div></div>
-          <div class="kpi-card"><div class="kpi-icon amber"><i class="ti ti-clock"></i></div><div><div class="kpi-label">En attente</div><div class="kpi-value" id="ajEnAttente">—</div></div></div>
-          <div class="kpi-card"><div class="kpi-icon coral"><i class="ti ti-truck-delivery"></i></div><div><div class="kpi-label">En livraison</div><div class="kpi-value" id="ajEnLivraison">—</div></div></div>
-          <div class="kpi-card"><div class="kpi-icon green"><i class="ti ti-check"></i></div><div><div class="kpi-label">Livrées aujourd'hui</div><div class="kpi-value" id="ajLivrees">—</div></div></div>
+        <div class="aj-stat-grid">
+          <div class="aj-stat-card">
+            <div class="aj-stat-top"><div class="aj-stat-icon blue"><i class="ti ti-shopping-bag"></i></div><span class="aj-stat-badge blue">Jour</span></div>
+            <div class="aj-stat-label">Commandes du jour</div>
+            <div class="aj-stat-value" id="ajCommandesJour">—</div>
+            <div class="aj-stat-context" id="ajCommandesJourCtx">—</div>
+          </div>
+          <div class="aj-stat-card">
+            <div class="aj-stat-top"><div class="aj-stat-icon amber"><i class="ti ti-clock"></i></div><span class="aj-stat-badge amber">À traiter</span></div>
+            <div class="aj-stat-label">En attente</div>
+            <div class="aj-stat-value" id="ajEnAttente">—</div>
+            <div class="aj-stat-context" id="ajEnAttenteCtx">—</div>
+          </div>
+          <div class="aj-stat-card">
+            <div class="aj-stat-top"><div class="aj-stat-icon orange"><i class="ti ti-truck-delivery"></i></div><span class="aj-stat-badge orange">Route</span></div>
+            <div class="aj-stat-label">En livraison</div>
+            <div class="aj-stat-value" id="ajEnLivraison">—</div>
+            <div class="aj-stat-context" id="ajEnLivraisonCtx">—</div>
+          </div>
+          <div class="aj-stat-card">
+            <div class="aj-stat-top"><div class="aj-stat-icon green"><i class="ti ti-check"></i></div><span class="aj-stat-badge green">Livrées</span></div>
+            <div class="aj-stat-label">Livrées aujourd'hui</div>
+            <div class="aj-stat-value" id="ajLivrees">—</div>
+            <div class="aj-stat-context" id="ajLivreesCtx">—</div>
+          </div>
         </div>
         <div class="priority-card">
           <div class="priority-header-row">
@@ -1675,6 +1719,18 @@ async function loadAujourdhui() {
   document.getElementById('ajEnAttente').textContent = enAttente.length;
   document.getElementById('ajEnLivraison').textContent = enLivraison.length;
   document.getElementById('ajLivrees').textContent = livreesAuj.length;
+
+  document.getElementById('ajCommandesJourCtx').textContent = duJour.length
+    ? duJour.length + ' commande' + (duJour.length > 1 ? 's' : '') + ' reçue' + (duJour.length > 1 ? 's' : '') + ' aujourd\'hui'
+    : 'Pas encore de commande';
+  document.getElementById('ajEnAttenteCtx').textContent = enAttente.length
+    ? enAttente.length + ' en attente de traitement'
+    : 'Aucune commande en file';
+  document.getElementById('ajEnLivraisonCtx').textContent = enLivraison.length
+    ? enLivraison.length + ' commande' + (enLivraison.length > 1 ? 's' : '') + ' en cours de route'
+    : 'Aucun livreur actif';
+  const caJour = livreesAuj.reduce(function(s, c) { return s + Number(c.total || 0); }, 0);
+  document.getElementById('ajLivreesCtx').textContent = 'CA du jour : ' + fmtMontant(caJour) + ' GNF';
 
   const ordre = { recue: 1, preparee: 2, assignee: 3, en_livraison: 4, echec: 5 };
   const aTraiter = commandes.filter(function(c) { return c.statut !== 'livree' && c.statut !== 'annulee'; })
