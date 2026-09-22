@@ -5,24 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>YOUMMA GN · Livraison</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  --indigo: #2D2D6B;   --indigo-dark: #1F1F55;   --orange: #E85D04;   --orange-light: #F5A15C;
-  --gold: #F5C842;     --bg-page: #F4F5F9;       --card: #FFFFFF;     --border: #E3E4EC;
-  --text: #1F1F55;     --text-muted: #6B6B8A;    --text-light: #9A9AB5;
-  --green-bg:#EAF3DE; --green:#3B6D11;  --amber-bg:#FAEEDA; --amber:#854F0B;
-  --blue-bg:#E6F1FB;  --blue:#185FA5;   --coral-bg:#FAECE7; --coral:#993C1D;
-  --red-bg:#FCEBEB;   --red:#A32D2D;    --gray-bg:#F1EFE8;  --gray:#444441;
+  --indigo: #1E2247;   --indigo-dark: #171A38;   --orange: #E8622C;   --orange-light: #F2A87F;
+  --navy-secondary: #4A4F72;
+  --gold: #F5C842;     --bg-page: #FBF9F6;       --card: #FFFFFF;     --border: #E7E2DA;
+  --text: #1E2247;     --text-muted: #8A8494;    --text-light: #9A94A6;
+  --green-bg:#E7F6ED; --green:#1F9254;  --amber-bg:#FDF3E3; --amber:#B9770E;
+  --blue-bg:#E9F0FC;  --blue:#2E6BD6;   --coral-bg:#FAECE7; --coral:#993C1D;
+  --red-bg:#FCE8E8;   --red:#D64545;    --gray-bg:#F1EFE8;  --gray:#444441;
   --violet-bg:#F1EAFB; --violet:#6D28D9;
-  --radius: 12px;
+  --radius: 16px;
 }
 *{box-sizing:border-box;}
-html,body{margin:0;padding:0;font-family:'Inter',system-ui,sans-serif;background:#F9FAFB;color:#1A1A4E;}
+html,body{margin:0;padding:0;font-family:'Work Sans',system-ui,sans-serif;background:var(--bg-page);color:var(--text);-webkit-font-smoothing:antialiased;}
 button,input,select,textarea{font-family:inherit;}
-h1,h2,h3{margin:0;}
+h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
+::placeholder{color:#9A94A6;}
 .hidden{display:none!important;}
 .text-success{color:#16A34A;}
 .text-danger{color:#DC2626;}
@@ -604,8 +606,8 @@ button.suivi-pastille{cursor:pointer;}
 .modal-footer .btn{flex:1;justify-content:center;}
 
 .form-row{margin-bottom:14px;}
-.form-row label{display:block;font-size:12.5px;font-weight:700;color:#374151;margin-bottom:5px;}
-.form-row input,.form-row select,.form-row textarea{width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:13.5px;outline:none;font-family:inherit;}
+.form-row label{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--navy-secondary);margin-bottom:6px;}
+.form-row input,.form-row select,.form-row textarea{width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:15px;outline:none;font-family:inherit;background:var(--bg-page);color:var(--text);}
 .form-row textarea{resize:vertical;}
 .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .form-error{color:#DC2626;font-size:12.5px;font-weight:600;background:#FEF2F2;padding:8px 12px;border-radius:8px;margin-bottom:12px;}
@@ -628,10 +630,12 @@ button.suivi-pastille{cursor:pointer;}
   .mobile-topbar{display:flex;align-items:center;gap:12px;background:var(--indigo-dark);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:500;}
   .mobile-topbar button{background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;padding:6px 10px;border-radius:8px;cursor:pointer;}
   .mobile-topbar-title{font-weight:500;font-size:14px;}
-  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #F3F4F6;z-index:900;padding-bottom:env(safe-area-inset-bottom);}
-  .bottom-nav-item{flex:1;background:none;border:none;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;color:#9CA3AF;cursor:pointer;font-size:10px;font-weight:600;}
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);z-index:900;padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));justify-content:space-around;}
+  .bottom-nav-item{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text-light);cursor:pointer;font-size:9.5px;font-weight:600;}
   .bottom-nav-item i{font-size:18px;}
+  .bottom-nav-item svg{width:20px;height:20px;}
   .bottom-nav-item.active{color:var(--orange);}
+  .bottom-nav-item span{font-weight:700;}
   .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;}
   .sidebar-overlay.open{display:block;}
   .kpi-grid{grid-template-columns:repeat(2,1fr);}
@@ -700,6 +704,31 @@ button.suivi-pastille{cursor:pointer;}
 .livreur-btn-appeler{background:#fff;border:1.5px solid var(--border);color:var(--text);border-radius:10px;padding:13px 16px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;}
 .livreur-hist-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #F3F4F6;font-size:12.5px;}
 .livreur-hist-row:last-child{border-bottom:none;}
+.livreur-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;position:relative;}
+.livreur-card.urgent{border:1.5px solid var(--red);box-shadow:0 6px 18px rgba(214,69,69,.12);margin-top:10px;}
+.livreur-badge-urgent{position:absolute;top:-9px;left:16px;background:var(--red);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:4px 10px;border-radius:8px;display:flex;align-items:center;gap:5px;}
+.livreur-badge-dot{width:6px;height:6px;border-radius:50%;background:#fff;flex-shrink:0;}
+.livreur-heure-normale{font-size:11.5px;font-weight:700;color:var(--amber);display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.livreur-heure-normale.muted{color:var(--text-muted);font-weight:600;}
+.livreur-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.livreur-card-nom{font-size:15px;font-weight:700;color:var(--text);}
+.livreur-card-meta{font-size:12.5px;color:var(--text-muted);margin-top:2px;}
+.livreur-card-frais{text-align:right;flex-shrink:0;}
+.livreur-frais{font-size:15px;font-weight:800;color:var(--green);font-family:'Sora',sans-serif;}
+.livreur-frais-label{font-size:10.5px;color:var(--text-muted);}
+.livreur-chips{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap;}
+.livreur-chip{font-size:11px;font-weight:600;color:var(--navy-secondary);background:#F1EDE7;padding:5px 10px;border-radius:8px;}
+.livreur-btn-principal.outline{background:var(--coral-bg);color:var(--orange);border:1.5px solid var(--orange);}
+.livreur-btn-principal.urgent{background:var(--red);}
+.livreur-hero{background:var(--indigo);border-radius:20px;padding:18px 20px 20px;margin-bottom:18px;}
+.livreur-hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.livreur-hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--orange-light);}
+.livreur-hero-titre{font-size:19px;font-weight:700;color:#fff;margin-top:2px;}
+.livreur-hero-avatar{width:38px;height:38px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;font-family:'Sora',sans-serif;flex-shrink:0;}
+.livreur-hero-stats{display:flex;gap:10px;}
+.livreur-hero-stat{flex:1;min-width:0;background:rgba(255,255,255,.09);border-radius:14px;padding:12px 10px;}
+.livreur-hero-stat-label{font-size:10px;font-weight:600;color:#B9BEE0;text-transform:uppercase;letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.livreur-hero-stat-value{font-size:19px;font-weight:800;color:#fff;font-family:'Sora',sans-serif;margin-top:2px;}
 .livreur-hist-client{font-weight:500;color:var(--text);}
 @media (max-width:600px){
   .livreur-btn-row{flex-direction:column;}
@@ -743,6 +772,46 @@ button.suivi-pastille{cursor:pointer;}
   .cmd-ligne-row > :nth-child(3){grid-area:prix;}
   .cmd-ligne-row > :nth-child(4){grid-area:total;}
   .cmd-ligne-row > :nth-child(5){grid-area:del;}
+}
+
+/* ---- Nouvelle commande (refonte mobile-first) ---- */
+.ncmd-card .modal-body{padding:16px;display:flex;flex-direction:column;gap:16px;background:var(--bg-page);}
+.ncmd-section{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px;}
+.ncmd-section .form-row:last-child{margin-bottom:0;}
+.ncmd-section-titre{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.ncmd-section-titre-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.ncmd-section-titre-row .ncmd-section-titre{margin-bottom:0;}
+.ncmd-icon-badge{width:22px;height:22px;border-radius:7px;background:var(--coral-bg);color:var(--orange);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;}
+.ncmd-articles-count{font-size:12px;font-weight:600;color:var(--text-muted);}
+.ncmd-produit-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #F1EDE7;}
+.ncmd-produit-thumb{width:44px;height:44px;border-radius:11px;background:#F1EDE7;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--text-light);font-size:18px;}
+.ncmd-produit-info{flex:1;min-width:0;}
+.ncmd-produit-nom{font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ncmd-produit-prix{font-size:12px;color:var(--text-muted);margin-top:1px;}
+.ncmd-stepper{display:flex;align-items:center;gap:8px;background:var(--bg-page);border-radius:10px;padding:4px;flex-shrink:0;}
+.ncmd-stepper button{width:26px;height:26px;border-radius:7px;border:none;background:#fff;font-size:16px;line-height:1;color:var(--text);cursor:pointer;}
+.ncmd-stepper button.plus{background:var(--orange);color:#fff;}
+.ncmd-stepper span{font-size:14px;font-weight:700;color:var(--text);width:16px;text-align:center;}
+.ncmd-label-optionnel{font-weight:500;color:var(--text-light);text-transform:none;letter-spacing:normal;}
+.ncmd-input-suffix-wrap{position:relative;}
+.ncmd-input-suffix-wrap input{padding-right:56px!important;font-weight:600;}
+.ncmd-input-suffix{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:600;color:var(--text-muted);}
+.ncmd-aide{display:block;font-size:11.5px;color:var(--text-muted);margin-top:6px;}
+.ncmd-input-icon-wrap{position:relative;}
+.ncmd-input-icon-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--orange);font-size:15px;}
+.ncmd-input-icon-wrap input{padding-left:38px!important;border:1.5px solid var(--orange)!important;background:var(--coral-bg)!important;font-weight:700;}
+.ncmd-aide-box{display:flex;gap:8px;align-items:flex-start;background:var(--amber-bg);border-radius:10px;padding:9px 11px;margin-top:8px;font-size:11.5px;color:#8A6A2E;line-height:1.4;}
+.ncmd-aide-box i{flex-shrink:0;margin-top:1px;color:var(--amber);}
+.ncmd-footer{background:#fff;border-top:1px solid var(--border);padding:14px 20px calc(14px + env(safe-area-inset-bottom,0px));}
+.ncmd-footer-total{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;}
+.ncmd-footer-total span{font-size:12px;font-weight:600;color:var(--text-muted);}
+.ncmd-footer-total strong{font-size:22px;font-weight:800;color:var(--text);font-family:'Sora',sans-serif;}
+.ncmd-footer-actions{display:flex;gap:10px;}
+.ncmd-footer-actions .btn-ghost{flex:0 0 auto;padding-left:18px;padding-right:18px;}
+.ncmd-footer-actions .btn-primary{flex:1;padding:14px;font-size:15px;box-shadow:0 8px 18px rgba(232,98,44,.28);}
+@media (max-width:480px){
+  .ncmd-footer-actions{flex-direction:column-reverse;}
+  .ncmd-footer-actions .btn-ghost{width:100%;}
 }
 
 @media (max-width:900px){
@@ -894,10 +963,18 @@ button.suivi-pastille{cursor:pointer;}
           <div id="commandesListe"></div>
         </div>
         <div id="commandesVueLivreur" class="hidden">
-          <div class="taches-header">
-            <div class="taches-header-left">
-              <div class="taches-header-icon" style="width:38px;height:38px;"><i class="ti ti-truck-delivery"></i></div>
-              <div><h2>Mes livraisons</h2><div class="taches-header-sub" id="livreurSousTitre">—</div></div>
+          <div class="livreur-hero">
+            <div class="livreur-hero-top">
+              <div>
+                <div class="livreur-hero-eyebrow">Livreur</div>
+                <h1 class="livreur-hero-titre" id="livreurSalut">Salut</h1>
+              </div>
+              <div class="livreur-hero-avatar" id="livreurHeroAvatar">--</div>
+            </div>
+            <div class="livreur-hero-stats">
+              <div class="livreur-hero-stat"><div class="livreur-hero-stat-label">À prendre</div><div class="livreur-hero-stat-value" id="livreurStatDispo">0</div></div>
+              <div class="livreur-hero-stat"><div class="livreur-hero-stat-label">En cours</div><div class="livreur-hero-stat-value" id="livreurStatEnCours">0</div></div>
+              <div class="livreur-hero-stat"><div class="livreur-hero-stat-label">Gains jour</div><div class="livreur-hero-stat-value" id="livreurStatGains">0</div></div>
             </div>
           </div>
           <div class="livreur-section-titre"><i class="ti ti-list-details"></i> Commandes disponibles <span class="livreur-count-badge" id="livreurDispoCount">0</span></div>
@@ -1098,53 +1175,94 @@ button.suivi-pastille{cursor:pointer;}
   </div>
 
   <nav class="bottom-nav" id="bottomNav">
-    <button class="bottom-nav-item" data-nav="aujourdhui" onclick="navigate('aujourdhui')"><i class="ti ti-home"></i><small>Accueil</small></button>
-    <button class="bottom-nav-item" data-nav="commandes" onclick="navigate('commandes')"><i class="ti ti-shopping-bag"></i><small>Commandes</small></button>
-    <button class="bottom-nav-item gn-restricted" data-nav="produits" onclick="navigate('produits')"><i class="ti ti-package"></i><small>Produits</small></button>
-    <button class="bottom-nav-item gerant-only" data-nav="caisse" onclick="navigate('caisse')"><i class="ti ti-cash"></i><small>Caisse</small></button>
+    <button class="bottom-nav-item" data-nav="aujourdhui" onclick="navigate('aujourdhui')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+      <span>Accueil</span>
+    </button>
+    <button class="bottom-nav-item" data-nav="commandes" onclick="navigate('commandes')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="13" height="9" rx="1.5"/><path d="M16 11h4l3 3v3h-7z"/><circle cx="7.5" cy="19.5" r="1.6"/><circle cx="18.5" cy="19.5" r="1.6"/></svg>
+      <span>Commandes</span>
+    </button>
+    <button class="bottom-nav-item gn-restricted" data-nav="produits" onclick="navigate('produits')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7l-8-4-8 4 8 4 8-4z"/><path d="M4 7v10l8 4 8-4V7"/><path d="M12 11v10"/></svg>
+      <span>Produits</span>
+    </button>
+    <button class="bottom-nav-item gerant-only" data-nav="caisse" onclick="navigate('caisse')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10.3c0-1 1-1.5 2.5-1.5s2.5.6 2.5 1.4-1 1.2-2.5 1.4-2.5.6-2.5 1.5 1 1.4 2.5 1.4 2.5-.4 2.5-1.4"/></svg>
+      <span>Caisse</span>
+    </button>
   </nav>
 </div>
 
 <!-- ═══ MODALES ═══ -->
 
 <div id="modalCommande" class="modal-overlay">
-  <div class="modal-card modal-card-lg">
+  <div class="modal-card modal-card-lg ncmd-card">
     <div class="modal-header"><h3 id="cmdModalTitre">Nouvelle commande</h3><button class="modal-close" onclick="closeModal('modalCommande')">×</button></div>
     <div class="modal-body">
-      <div class="form-row-2">
-        <div class="form-row"><label>Nom du client *</label><input type="text" id="cNomClient"></div>
-        <div class="form-row"><label>Téléphone *</label><input type="tel" id="cTelClient"></div>
+      <div class="ncmd-section">
+        <div class="ncmd-section-titre"><span class="ncmd-icon-badge"><i class="ti ti-user"></i></span> Client</div>
+        <div class="form-row-2">
+          <div class="form-row"><label>Nom du client *</label><input type="text" id="cNomClient"></div>
+          <div class="form-row"><label>Téléphone *</label><input type="tel" id="cTelClient"></div>
+        </div>
+        <div class="form-row"><label>Adresse *</label><input type="text" id="cAdresse"></div>
+        <div class="form-row"><label>Quartier</label><input type="text" id="cQuartier"></div>
       </div>
-      <div class="form-row"><label>Adresse *</label><input type="text" id="cAdresse"></div>
-      <div class="form-row"><label>Quartier</label><input type="text" id="cQuartier"></div>
 
-      <div id="cSectionArticles">
-        <div class="inscrire-section-titre">Articles</div>
-        <div class="doc-search-wrap">
+      <div class="ncmd-section" id="cSectionArticles">
+        <div class="ncmd-section-titre-row">
+          <div class="ncmd-section-titre"><span class="ncmd-icon-badge"><i class="ti ti-package"></i></span> Produits</div>
+          <span class="ncmd-articles-count" id="cArticlesCount">0 article</span>
+        </div>
+        <div class="doc-search-wrap" style="margin-top:0;">
           <i class="ti ti-search"></i>
           <input type="text" id="cRechercheProduit" placeholder="Rechercher un produit à ajouter..." oninput="rechercherProduitCommande()" onfocus="rechercherProduitCommande()">
           <div class="doc-search-results" id="cRechercheResultats"></div>
         </div>
-        <div style="margin-top:10px;">
-          <div id="cLignesListe"></div>
-          <div class="empty" id="cLignesVide">Aucun article ajouté.</div>
-        </div>
-        <div class="cmd-total-box"><span>Total</span><span id="cTotalAffiche">0 GNF</span></div>
+        <div id="cLignesListe"></div>
+        <div class="empty" id="cLignesVide">Aucun article ajouté.</div>
       </div>
 
-      <div id="cSectionPaiement">
-        <div class="inscrire-section-titre">Paiement</div>
+      <div class="ncmd-section" id="cSectionLivraison">
+        <div class="ncmd-section-titre"><span class="ncmd-icon-badge"><i class="ti ti-truck-delivery"></i></span> Livraison</div>
+        <div class="form-row">
+          <label>Frais de livraison <span class="ncmd-label-optionnel">(optionnel)</span></label>
+          <div class="ncmd-input-suffix-wrap">
+            <input type="number" id="cFraisLivraison" min="0" placeholder="0" oninput="renderLignesCommande()">
+            <span class="ncmd-input-suffix">GNF</span>
+          </div>
+          <span class="ncmd-aide">Laisser vide si la livraison est offerte</span>
+        </div>
+        <div class="form-row">
+          <label>Heure souhaitée</label>
+          <div class="ncmd-input-icon-wrap">
+            <i class="ti ti-clock"></i>
+            <input type="time" id="cHeureSouhaitee">
+          </div>
+          <div class="ncmd-aide-box"><i class="ti ti-alert-circle"></i> Sert à prioriser les commandes chez le livreur.</div>
+        </div>
+      </div>
+
+      <div class="ncmd-section" id="cSectionPaiement">
+        <div class="ncmd-section-titre">Paiement</div>
         <div class="cmd-mode-paiement-row">
           <button type="button" class="cmd-mode-btn active" id="cModeCash" onclick="setModePaiementCommande('cash')"><i class="ti ti-cash"></i> Cash</button>
           <button type="button" class="cmd-mode-btn" id="cModeOM" onclick="setModePaiementCommande('orange_money')"><i class="ti ti-device-mobile"></i> Orange Money</button>
         </div>
-        <div class="form-row" id="cDejaPayeRow" style="margin-top:10px;">
-          <label style="display:flex;align-items:center;gap:8px;font-weight:400;"><input type="checkbox" id="cDejaPaye" style="width:auto;"> Déjà payé (cash reçu à la commande)</label>
+        <div class="form-row" id="cDejaPayeRow" style="margin-top:10px;margin-bottom:0;">
+          <label style="display:flex;align-items:center;gap:8px;font-weight:400;text-transform:none;letter-spacing:normal;font-size:13.5px;"><input type="checkbox" id="cDejaPaye" style="width:auto;"> Déjà payé (cash reçu à la commande)</label>
         </div>
       </div>
       <div id="cErreur" class="form-error hidden"></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalCommande')">Annuler</button><button class="btn btn-primary" id="cBtnSubmit" onclick="enregistrerCommande()">Enregistrer la commande</button></div>
+    <div class="ncmd-footer">
+      <div class="ncmd-footer-total"><span>Total à payer</span><strong id="cTotalAffiche">0 GNF</strong></div>
+      <div class="ncmd-footer-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modalCommande')">Annuler</button>
+        <button class="btn btn-primary" id="cBtnSubmit" onclick="enregistrerCommande()">Enregistrer la commande</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1180,7 +1298,7 @@ button.suivi-pastille{cursor:pointer;}
       </div>
       <div class="form-row"><label>Stock initial *</label><input type="number" id="prodStock" min="0"></div>
       <div class="form-row gerant-only" id="prodDepotVenteRow">
-        <label style="display:flex;align-items:center;gap:8px;font-weight:400;"><input type="checkbox" id="prodDepotVente" style="width:auto;" onchange="toggleDepotVenteChamps()"> Marchandise en dépôt-vente</label>
+        <label style="display:flex;align-items:center;gap:8px;font-weight:400;text-transform:none;letter-spacing:normal;font-size:13.5px;"><input type="checkbox" id="prodDepotVente" style="width:auto;" onchange="toggleDepotVenteChamps()"> Marchandise en dépôt-vente</label>
       </div>
       <div id="prodDepotVenteChamps" class="hidden">
         <div class="form-row">
@@ -1728,6 +1846,11 @@ function construireHtmlFactureCommande(c, numeroFacture) {
     const total = Number(l.qte || 0) * Number(l.prix || 0);
     return '<tr><td class="c">' + (i + 1) + '</td><td>' + esc(l.nom) + '</td><td class="c">' + esc(l.qte) + '</td><td class="r">' + fmtMontantInsecable(l.prix) + '</td><td class="r">' + fmtMontantInsecable(total) + '</td></tr>';
   }).join('');
+  const sousTotalArticles = (c.lignes || []).reduce(function(s, l) { return s + Number(l.qte || 0) * Number(l.prix || 0); }, 0);
+  const fraisLivraisonHtml = Number(c.frais_livraison || 0) > 0
+    ? '<div class="tot-row"><span>Sous-total articles</span><span>' + fmtMontantInsecable(sousTotalArticles) + ' GNF</span></div>'
+      + '<div class="tot-row"><span>Frais de livraison</span><span>' + fmtMontantInsecable(c.frais_livraison) + ' GNF</span></div>'
+    : '';
 
   const modeLabel = c.mode_paiement === 'orange_money' ? 'Orange Money' : 'Cash';
   const paiementBadgeHtml = c.paiement_statut === 'paye'
@@ -1777,6 +1900,7 @@ function construireHtmlFactureCommande(c, numeroFacture) {
     + '</div>'
     + '<table class="lignes"><thead><tr style="background:' + couleurPrincipale + ';"><th style="width:36px;" class="c">N°</th><th>Désignation</th><th style="width:56px;" class="c">Qté</th><th style="width:110px;" class="r">Prix unitaire</th><th style="width:120px;" class="r">Montant</th></tr></thead><tbody>' + lignesHtml + '</tbody></table>'
     + '<div class="totaux">'
+    + fraisLivraisonHtml
     + '<div class="tot-row tot-total-row"><span class="tot-total-label" style="color:' + couleurPrincipale + ';">TOTAL</span><span class="tot-total-value" style="background:' + couleurAccent + ';">' + fmtMontantInsecable(c.total) + ' GNF</span></div>'
     + '<div class="tot-row"><span>Mode de paiement</span><span>' + modeLabel + '</span></div>'
     + '<div class="tot-row"><span>Statut paiement</span>' + paiementBadgeHtml + '</div>'
@@ -1898,6 +2022,7 @@ function ouvrirModifierCommande(id) {
   document.getElementById('cAdresse').value = commandeEnEdition.client_adresse || '';
   document.getElementById('cQuartier').value = commandeEnEdition.client_quartier || '';
   document.getElementById('cSectionArticles').classList.add('hidden');
+  document.getElementById('cSectionLivraison').classList.add('hidden');
   document.getElementById('cSectionPaiement').classList.add('hidden');
   document.getElementById('cBtnSubmit').textContent = 'Enregistrer les modifications';
   document.getElementById('cErreur').classList.add('hidden');
@@ -1907,37 +2032,87 @@ function ouvrirModifierCommande(id) {
 
 /* ── COMMANDES : VUE LIVREUR ── */
 async function chargerVueLivreur() {
-  const dateBrute = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  document.getElementById('livreurSousTitre').textContent = dateBrute.charAt(0).toUpperCase() + dateBrute.slice(1);
+  document.getElementById('livreurSalut').textContent = 'Salut, ' + session.nom.split(' ')[0];
+  document.getElementById('livreurHeroAvatar').textContent = initiales(session.nom);
 
   const { data } = await sb.from('gn_commandes').select('*');
   const commandes = data || [];
 
   const listeDispo = commandes.filter(function(c) { return c.statut === 'preparee' && !c.livreur_id; })
-    .sort(function(a, b) { return new Date(a.date_creation) - new Date(b.date_creation); });
+    .sort(comparerPrioriteLivraison);
   document.getElementById('livreurDispoCount').textContent = listeDispo.length;
+  document.getElementById('livreurStatDispo').textContent = listeDispo.length;
   document.getElementById('livreurDisponibles').innerHTML = listeDispo.length ? listeDispo.map(renderCommandeDisponible).join('')
     : '<div class="priority-empty"><i class="ti ti-shopping-bag-off"></i>Aucune commande disponible pour le moment.</div>';
 
   mesLivraisonsCache = commandes.filter(function(c) { return c.livreur_id === session.id && (c.statut === 'assignee' || c.statut === 'en_livraison'); })
     .sort(function(a, b) { return new Date(a.date_assignation || 0) - new Date(b.date_assignation || 0); });
   document.getElementById('livreurMesCount').textContent = mesLivraisonsCache.length;
+  document.getElementById('livreurStatEnCours').textContent = mesLivraisonsCache.length;
   document.getElementById('livreurMesLivraisons').innerHTML = mesLivraisonsCache.length ? mesLivraisonsCache.map(renderMaLivraison).join('')
     : '<div class="priority-empty"><i class="ti ti-truck-delivery"></i>Aucune livraison en cours.</div>';
 
   const t = today();
+  const livreesAuj = commandes.filter(function(c) { return c.livreur_id === session.id && c.statut === 'livree' && c.date_livraison && c.date_livraison.slice(0, 10) === t; });
+  const gainsJour = livreesAuj.reduce(function(s, c) { return s + Number(c.frais_livraison || 0); }, 0);
+  document.getElementById('livreurStatGains').textContent = fmtMontant(gainsJour);
+
   const hist = commandes.filter(function(c) { return c.livreur_id === session.id && (c.statut === 'livree' || c.statut === 'echec') && c.date_livraison && c.date_livraison.slice(0, 10) === t; })
     .sort(function(a, b) { return new Date(b.date_livraison) - new Date(a.date_livraison); });
   document.getElementById('livreurHistorique').innerHTML = hist.length ? hist.map(renderHistoriqueLivreurRow).join('')
     : '<div class="empty">Aucune livraison terminée aujourd\'hui.</div>';
 }
+function heureSouhaiteeCourte(c) {
+  return c.heure_souhaitee ? String(c.heure_souhaitee).slice(0, 5) : null;
+}
+function calculerMinutesRestantes(heureStr) {
+  if (!heureStr) return null;
+  const parts = heureStr.split(':').map(Number);
+  const maintenant = new Date();
+  const cible = new Date(maintenant.getFullYear(), maintenant.getMonth(), maintenant.getDate(), parts[0], parts[1] || 0, 0, 0);
+  return Math.round((cible - maintenant) / 60000);
+}
+function formaterDureeCourte(minutes) {
+  if (minutes < 60) return minutes + ' min';
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return h + 'h' + (m > 0 ? String(m).padStart(2, '0') : '');
+}
+function comparerPrioriteLivraison(a, b) {
+  const ma = calculerMinutesRestantes(heureSouhaiteeCourte(a));
+  const mb = calculerMinutesRestantes(heureSouhaiteeCourte(b));
+  if (ma === null && mb === null) return new Date(a.date_creation) - new Date(b.date_creation);
+  if (ma === null) return 1;
+  if (mb === null) return -1;
+  return ma - mb;
+}
 function renderCommandeDisponible(c) {
-  return '<div class="cmd-card bar-' + c.statut + '">'
-    + '<div class="cmd-card-head"><div><div class="cmd-card-numero">' + esc(c.numero) + '</div><div class="cmd-card-client">' + esc(c.client_nom) + '</div><div class="cmd-card-tel">' + esc(c.client_telephone || '') + '</div></div></div>'
-    + '<div class="cmd-card-adresse"><i class="ti ti-map-pin"></i> ' + esc(c.client_adresse) + (c.client_quartier ? ' · ' + esc(c.client_quartier) : '') + '</div>'
-    + '<div class="cmd-card-articles">' + esc(articlesResume(c.lignes)) + '</div>'
-    + '<div class="cmd-card-footer"><div class="cmd-card-montant">' + fmtMontant(c.total) + ' GNF</div>'
-    + '<div class="cmd-card-actions"><button class="btn btn-primary btn-sm" onclick="prendreEnCharge(\'' + c.id + '\')"><i class="ti ti-hand-stop"></i> Prendre en charge</button></div></div>'
+  const heureStr = heureSouhaiteeCourte(c);
+  const minutes = calculerMinutesRestantes(heureStr);
+  const estUrgent = minutes !== null && minutes < 20;
+  const frais = Number(c.frais_livraison || 0);
+  const fraisHtml = frais > 0
+    ? '<div class="livreur-frais">+' + fmtMontant(frais) + '</div><div class="livreur-frais-label">frais livraison</div>'
+    : '<div class="livreur-frais" style="color:var(--text-muted);">—</div><div class="livreur-frais-label">livraison offerte</div>';
+  let badgeTempsHtml;
+  if (!heureStr) {
+    badgeTempsHtml = '<div class="livreur-heure-normale muted">Sans heure précisée</div>';
+  } else if (estUrgent) {
+    badgeTempsHtml = '<div class="livreur-badge-urgent"><span class="livreur-badge-dot"></span>' + (minutes <= 0 ? 'EN RETARD' : 'DANS ' + minutes + ' MIN') + ' · ' + heureStr + '</div>';
+  } else {
+    badgeTempsHtml = '<div class="livreur-heure-normale"><i class="ti ti-clock"></i> ' + heureStr + ' · dans ' + formaterDureeCourte(minutes) + '</div>';
+  }
+  const nbArticles = (c.lignes || []).length;
+  const chips = [nbArticles + ' article' + (nbArticles > 1 ? 's' : ''), c.mode_paiement === 'orange_money' ? 'Orange Money' : 'Cash'];
+  const chipsHtml = chips.map(function(t) { return '<span class="livreur-chip">' + esc(t) + '</span>'; }).join('');
+  return '<div class="livreur-card' + (estUrgent ? ' urgent' : '') + '">'
+    + (estUrgent ? badgeTempsHtml : '')
+    + '<div class="livreur-card-top">'
+    + '<div>' + (estUrgent ? '' : badgeTempsHtml) + '<div class="livreur-card-nom">' + esc(c.client_nom) + '</div><div class="livreur-card-meta">' + esc(c.client_adresse || '') + (c.client_quartier ? ' · ' + esc(c.client_quartier) : '') + '</div></div>'
+    + '<div class="livreur-card-frais">' + fraisHtml + '</div>'
+    + '</div>'
+    + '<div class="livreur-chips">' + chipsHtml + '</div>'
+    + '<button class="livreur-btn-principal' + (estUrgent ? ' urgent' : ' outline') + '" onclick="prendreEnCharge(\'' + c.id + '\')"><i class="ti ti-hand-stop"></i> Prendre en charge</button>'
     + '</div>';
 }
 function renderMaLivraison(c) {
@@ -2045,9 +2220,12 @@ function openModalCommande() {
   document.getElementById('cQuartier').value = '';
   document.getElementById('cRechercheProduit').value = '';
   document.getElementById('cRechercheResultats').classList.remove('open');
+  document.getElementById('cFraisLivraison').value = '';
+  document.getElementById('cHeureSouhaitee').value = '';
   setModePaiementCommande('cash');
   document.getElementById('cDejaPaye').checked = false;
   document.getElementById('cSectionArticles').classList.remove('hidden');
+  document.getElementById('cSectionLivraison').classList.remove('hidden');
   document.getElementById('cSectionPaiement').classList.remove('hidden');
   document.getElementById('cBtnSubmit').textContent = 'Enregistrer la commande';
   renderLignesCommande();
@@ -2097,24 +2275,47 @@ function majQteLigne(index, valeur) {
   ligne.qte = qte;
   renderLignesCommande();
 }
+function incrementerLigne(index) {
+  const ligne = ligneCommandeArticles[index];
+  if (!ligne) return;
+  if (ligne.qte >= ligne.stockDispo) {
+    showToast('Stock insuffisant : ' + ligne.stockDispo + ' disponible(s) pour ' + ligne.nom + '.', 'error');
+    return;
+  }
+  ligne.qte += 1;
+  renderLignesCommande();
+}
+function decrementerLigne(index) {
+  const ligne = ligneCommandeArticles[index];
+  if (!ligne) return;
+  if (ligne.qte <= 1) { supprimerLigneCommande(index); return; }
+  ligne.qte -= 1;
+  renderLignesCommande();
+}
 function supprimerLigneCommande(index) {
   ligneCommandeArticles.splice(index, 1);
   renderLignesCommande();
 }
+function lireFraisLivraisonSaisi() {
+  const brut = document.getElementById('cFraisLivraison').value.trim();
+  return brut === '' ? null : Math.round(Number(brut) || 0);
+}
 function calculerTotalCommande() {
-  return ligneCommandeArticles.reduce(function(s, l) { return s + l.prix * l.qte; }, 0);
+  const sousTotal = ligneCommandeArticles.reduce(function(s, l) { return s + l.prix * l.qte; }, 0);
+  const frais = lireFraisLivraisonSaisi();
+  return sousTotal + (frais || 0);
 }
 function renderLignesCommande() {
   const cont = document.getElementById('cLignesListe');
   const vide = document.getElementById('cLignesVide');
   vide.style.display = ligneCommandeArticles.length ? 'none' : '';
+  const compteEl = document.getElementById('cArticlesCount');
+  if (compteEl) compteEl.textContent = ligneCommandeArticles.length + ' article' + (ligneCommandeArticles.length > 1 ? 's' : '');
   cont.innerHTML = ligneCommandeArticles.map(function(l, i) {
-    return '<div class="cmd-ligne-row">'
-      + '<div><div class="cmd-ligne-nom">' + esc(l.nom) + '</div><div class="cmd-ligne-stock-info">Stock dispo: ' + l.stockDispo + '</div></div>'
-      + '<input type="number" min="1" max="' + l.stockDispo + '" value="' + l.qte + '" onchange="majQteLigne(' + i + ', this.value)">'
-      + '<div>' + fmtMontant(l.prix) + ' GNF</div>'
-      + '<div class="cmd-ligne-total">' + fmtMontant(l.prix * l.qte) + ' GNF</div>'
-      + '<button class="cmd-ligne-del" onclick="supprimerLigneCommande(' + i + ')"><i class="ti ti-trash"></i></button>'
+    return '<div class="ncmd-produit-row">'
+      + '<div class="ncmd-produit-thumb"><i class="ti ti-package"></i></div>'
+      + '<div class="ncmd-produit-info"><div class="ncmd-produit-nom">' + esc(l.nom) + '</div><div class="ncmd-produit-prix">' + fmtMontant(l.prix) + ' GNF · stock ' + l.stockDispo + '</div></div>'
+      + '<div class="ncmd-stepper"><button type="button" onclick="decrementerLigne(' + i + ')">−</button><span>' + l.qte + '</span><button type="button" class="plus" onclick="incrementerLigne(' + i + ')">+</button></div>'
       + '</div>';
   }).join('');
   document.getElementById('cTotalAffiche').textContent = fmtMontant(calculerTotalCommande()) + ' GNF';
@@ -2152,6 +2353,8 @@ async function enregistrerCommande() {
     if (l.qte > l.stockDispo) { errEl.textContent = 'Quantité invalide pour ' + l.nom + ' (stock disponible : ' + l.stockDispo + ').'; errEl.classList.remove('hidden'); return; }
   }
   const total = calculerTotalCommande();
+  const fraisLivraison = lireFraisLivraisonSaisi();
+  const heureSouhaitee = document.getElementById('cHeureSouhaitee').value || null;
   const dejaPaye = document.getElementById('cDejaPaye').checked;
   const paiementStatut = modePaiementCommande === 'orange_money' ? 'paye' : (dejaPaye ? 'paye' : 'du');
   const numeroInfo = await calculerProchainNumeroCmd();
@@ -2162,7 +2365,8 @@ async function enregistrerCommande() {
       if (l.depot_vente) { ligne.fournisseur_id = l.fournisseur_id; ligne.prix_fournisseur = l.prix_fournisseur; }
       return ligne;
     }),
-    total: total, mode_paiement: modePaiementCommande, paiement_statut: paiementStatut, statut: 'recue',
+    total: total, frais_livraison: fraisLivraison, heure_souhaitee: heureSouhaitee,
+    mode_paiement: modePaiementCommande, paiement_statut: paiementStatut, statut: 'recue',
     agent_creation: session.nom,
   };
   const { data, error } = await sb.from('gn_commandes').insert(payload).select().single();
