@@ -2042,8 +2042,7 @@ async function loadAujourdhui() {
   };
   document.getElementById('ajSteps').innerHTML = renderAjrSteps(stepCounts);
 
-  const aTraiter = commandes.filter(function(c) { return c.statut !== 'livree' && c.statut !== 'annulee'; })
-    .sort(comparerPrioriteLivraison);
+  const aTraiter = enAttente.slice().sort(comparerPrioriteLivraison);
   const aTraiterHtml = aTraiter.length ? aTraiter.map(renderAjrTraiterRow).join('') : AJR_EMPTY_ATRAITER;
   document.getElementById('ajATraiterListe').innerHTML = aTraiterHtml;
   document.getElementById('ajATraiterListeMobile').innerHTML = aTraiterHtml;
@@ -2052,8 +2051,10 @@ async function loadAujourdhui() {
 
   const estGerant = session.role === 'gerant';
   if (estGerant) {
-    const cashTotal = livreesAuj.filter(function(c) { return c.mode_paiement !== 'orange_money'; }).reduce(function(s, c) { return s + Number(c.total || 0); }, 0);
-    const omTotal = livreesAuj.filter(function(c) { return c.mode_paiement === 'orange_money'; }).reduce(function(s, c) { return s + Number(c.total || 0); }, 0);
+    const { data: caisseData } = await sb.from('gn_caisse').select('*').eq('date', t);
+    const entreesLieesCommande = (caisseData || []).filter(function(o) { return o.type === 'entree' && o.commande_id; });
+    const cashTotal = entreesLieesCommande.filter(function(o) { return o.mode_paiement !== 'orange_money'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+    const omTotal = entreesLieesCommande.filter(function(o) { return o.mode_paiement === 'orange_money'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
     const totalEncaisse = cashTotal + omTotal;
     let barHtml, legendHtml, mobileBarHtml, mobileLegendHtml;
     if (totalEncaisse > 0) {
@@ -2078,7 +2079,13 @@ async function loadAujourdhui() {
   }
 
   document.getElementById('ajCaJourMobile').textContent = fmtMontant(caJour) + ' GNF';
-  document.getElementById('ajMobileCaPill').textContent = livreesAuj.length + ' livrée' + (livreesAuj.length > 1 ? 's' : '');
+  const mobileCaPill = document.getElementById('ajMobileCaPill');
+  if (livreesAuj.length > 0) {
+    mobileCaPill.textContent = livreesAuj.length + ' livrée' + (livreesAuj.length > 1 ? 's' : '');
+    mobileCaPill.classList.remove('hidden');
+  } else {
+    mobileCaPill.classList.add('hidden');
+  }
 
   const dernieresLivraisons = livreesAuj.slice().sort(function(a, b) { return new Date(b.date_livraison) - new Date(a.date_livraison); }).slice(0, 5);
   document.getElementById('ajLivraisonsListe').innerHTML = dernieresLivraisons.length ? dernieresLivraisons.map(renderAjrLivraisonRow).join('')
