@@ -2297,8 +2297,13 @@ async function loadAujourdhui() {
   if (estGerant) {
     const { data: caisseData } = await sb.from('gn_caisse').select('*').eq('date', t);
     const entreesLieesCommande = (caisseData || []).filter(function(o) { return o.type === 'entree' && o.commande_id; });
-    const cashTotal = entreesLieesCommande.filter(function(o) { return o.mode_paiement !== 'orange_money'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
-    const omTotal = entreesLieesCommande.filter(function(o) { return o.mode_paiement === 'orange_money'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+    const remboursementsLiesCommande = (caisseData || []).filter(function(o) { return o.type === 'sortie' && o.commande_id && o.categorie === 'remboursement'; });
+    const cashEncaisse = entreesLieesCommande.filter(function(o) { return o.mode_paiement !== 'orange_money'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+    const omEncaisse = entreesLieesCommande.filter(function(o) { return o.mode_paiement === 'orange_money'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+    const cashRembourse = remboursementsLiesCommande.filter(function(o) { return o.mode_paiement !== 'orange_money'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+    const omRembourse = remboursementsLiesCommande.filter(function(o) { return o.mode_paiement === 'orange_money'; }).reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
+    const cashTotal = Math.max(0, cashEncaisse - cashRembourse);
+    const omTotal = Math.max(0, omEncaisse - omRembourse);
     const totalEncaisse = cashTotal + omTotal;
     let barHtml, legendHtml, mobileBarHtml, mobileLegendHtml;
     if (totalEncaisse > 0) {
@@ -2955,15 +2960,35 @@ async function annulerCommande(id) {
   const c = commandesCache.find(function(x) { return x.id === id; });
   if (!c) return;
   if (!confirm('Annuler la commande #' + c.numero + ' ? Cette action est définitive.')) return;
+
+  let rembourser = false;
+  if (c.paiement_statut === 'paye') {
+    const modeLabel = c.mode_paiement === 'orange_money' ? 'Orange Money' : 'Cash';
+    rembourser = confirm('Cette commande a déjà été payée (' + fmtMontant(c.total) + ' GNF, ' + modeLabel + '). Rembourser le client ?');
+  }
+
   const lignes = c.lignes || [];
   for (let i = 0; i < lignes.length; i++) {
     const ligne = lignes[i];
     const { data: prod } = await sb.from('gn_produits').select('stock').eq('id', ligne.produit_id).maybeSingle();
     if (prod) await sb.from('gn_produits').update({ stock: Number(prod.stock || 0) + Number(ligne.qte || 0) }).eq('id', ligne.produit_id);
   }
-  const { error } = await sb.from('gn_commandes').update({ statut: 'annulee' }).eq('id', id);
+
+  const updatePayload = { statut: 'annulee' };
+  if (c.paiement_statut === 'paye' && !rembourser) {
+    updatePayload.notes = (c.notes ? c.notes + ' — ' : '') + 'Annulée sans remboursement (montant conservé)';
+  }
+  const { error } = await sb.from('gn_commandes').update(updatePayload).eq('id', id);
   if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
-  showToast('Commande annulée, stock restauré.');
+  if (c.paiement_statut === 'paye' && rembourser) {
+    // paiement_statut reste 'paye' : la contrainte CHECK de gn_commandes n'accepte que ('du','paye'), pas 'rembourse'.
+    await sb.from('gn_caisse').insert({
+      date: today(), type: 'sortie', montant: c.total, categorie: 'remboursement',
+      mode_paiement: c.mode_paiement, commande_id: c.id, agent_nom: session.nom,
+      libelle: 'Remboursement commande #' + c.numero,
+    });
+  }
+  showToast(rembourser ? 'Commande annulée, client remboursé.' : 'Commande annulée, stock restauré.');
   fermerMenusTaches();
   loadCommandes();
   loadProduits();
