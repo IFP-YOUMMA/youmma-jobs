@@ -416,10 +416,6 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .btn-sm{padding:6px 12px;font-size:12px;}
 
 .filtres{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
-.filtre-btn{background:#fff;border:1.5px solid #E5E7EB;color:#374151;padding:7px 14px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;}
-.filtre-btn.active{background:#1A1A4E;color:#fff;border-color:#1A1A4E;}
-.filtre-count{display:inline-block;margin-left:6px;background:rgba(0,0,0,.08);color:inherit;border-radius:10px;padding:1px 7px;font-size:10.5px;font-weight:700;}
-.filtre-btn.active .filtre-count{background:rgba(255,255,255,.25);color:#fff;}
 
 /* ---- Tâches (redesign) ---- */
 .taches-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
@@ -743,6 +739,10 @@ button.suivi-pastille{cursor:pointer;}
 .sidebar-overlay{display:none;}
 .ajr-desktop{display:flex;flex-direction:column;}
 .ajr-mobile{display:none;}
+#commandesVueGerant{display:flex;gap:16px;align-items:stretch;}
+.cmd-desktop{display:flex;flex-direction:column;flex:1;min-width:0;}
+.cmd-mobile{display:none;}
+.cmd-panel.open{flex-direction:column;}
 
 /* ---- Aujourd'hui V2 : version mobile (redesign) ---- */
 .ajr-mobile-header{background:#1E2247;color:#fff;padding:14px 20px 74px;margin:-16px -16px 0;border-radius:0 0 28px 28px;position:relative;overflow:hidden;}
@@ -800,6 +800,9 @@ button.suivi-pastille{cursor:pointer;}
   .rap-cols-grid{grid-template-columns:1fr;}
   .ajr-desktop{display:none;}
   .ajr-mobile{display:block;}
+  #commandesVueGerant{display:block;}
+  .cmd-desktop{display:none;}
+  .cmd-mobile{display:block;}
 }
 @media (max-width: 768px){
   .rap-kpi-grid{grid-template-columns:repeat(2,1fr);}
@@ -845,8 +848,137 @@ button.suivi-pastille{cursor:pointer;}
 .cmd-card-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto;}
 .cmd-encaisser-ligne{background:var(--coral-bg);color:var(--coral);border-radius:8px;padding:8px 12px;font-size:12.5px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
 
-/* ---- Filtres statut Commandes ---- */
-.cmd-filtres{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+/* ---- Commandes V2 (redesign gérant/agent) ---- */
+.cmd-desktop{min-height:calc(100vh - 86px);}
+@media (min-height:820px){
+  .cmd-desktop{height:calc(100vh - 86px);}
+}
+.cmd-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap;flex-shrink:0;}
+.cmd-header-title{font-family:'Sora',system-ui,sans-serif;font-size:26px;font-weight:700;color:#1E2247;}
+.cmd-header-sub{font-size:14px;color:#5F6275;margin-top:4px;}
+.cmd-header-actions{display:flex;gap:10px;align-items:center;flex-shrink:0;}
+.cmd-search{position:relative;width:220px;flex-shrink:0;}
+.cmd-search input{width:100%;height:44px;box-sizing:border-box;padding:0 14px 0 38px;border:1px solid #E7E5E0;border-radius:12px;font-size:13.5px;background:#fff;}
+.cmd-search i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#9A9CAB;font-size:15px;}
+
+.cmd-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;flex-shrink:0;}
+.cmd-tab{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border-radius:19px;background:#fff;border:1px solid #E7E5E0;color:#1E2247;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.cmd-tab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cmd-tab-count{background:#F3F2EE;color:#5F6275;font-size:11.5px;font-weight:700;border-radius:10px;padding:1px 8px;}
+.cmd-tab.active{background:#1E2247;color:#fff;border-color:#1E2247;}
+.cmd-tab.active .cmd-tab-dot{display:none;}
+.cmd-tab.active .cmd-tab-count{background:rgba(255,255,255,.18);color:#fff;}
+
+.cmd-body{display:flex;gap:16px;flex:1;min-height:0;}
+.cmd-table-wrap{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;}
+.cmd-table-card{background:#fff;border-radius:20px;box-shadow:0 1px 2px rgba(30,34,71,.06);display:flex;flex-direction:column;flex:1;min-height:0;}
+.cmd-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;flex-wrap:wrap;flex-shrink:0;}
+.cmd-toolbar-info{font-size:13px;color:#5F6275;font-weight:600;}
+.cmd-period{display:inline-flex;background:#E9E7E1;border-radius:10px;padding:3px;gap:2px;}
+.cmd-period-btn{border:none;background:none;padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600;color:#5F6275;cursor:pointer;}
+.cmd-period-btn.active{background:#fff;color:#1E2247;box-shadow:0 1px 2px rgba(30,34,71,.10);}
+.cmd-table-head{display:grid;grid-template-columns:minmax(0,1fr) 100px 84px 96px 80px 100px;gap:12px;padding:0 20px 10px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#5F6275;flex-shrink:0;}
+.cmd-table-head span:nth-child(5){text-align:right;}
+.cmd-table-body{flex:1;overflow-y:auto;min-height:0;}
+.cmd-row{display:grid;grid-template-columns:minmax(0,1fr) 100px 84px 96px 80px 100px;gap:12px;align-items:center;padding:12px 20px;border-bottom:1px solid #F1EFEA;cursor:pointer;min-height:44px;box-sizing:border-box;}
+.cmd-row:last-child{border-bottom:none;}
+.cmd-row:hover{background:#FAFAFC;}
+.cmd-row.selected{background:#FFF6F1;box-shadow:inset 0 0 0 2px #E8622C;}
+.cmd-row-client{display:flex;align-items:center;gap:10px;min-width:0;}
+.cmd-row-client-info{min-width:0;}
+.cmd-row-client-nom{font-size:15px;font-weight:700;color:#1E2247;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cmd-row-client-meta{font-size:12px;color:#5F6275;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cmd-row-livreur{font-size:13px;color:#1E2247;font-weight:600;}
+.cmd-row-livreur.none{color:#9A9CAB;font-weight:400;}
+.cmd-row-paiement-mode{font-size:13px;font-weight:700;color:#1E2247;}
+.cmd-row-paiement-statut{font-size:12px;margin-top:2px;}
+.cmd-row-paiement-statut.paye{color:#1F7A4D;}
+.cmd-row-paiement-statut.du{color:#8A6100;}
+.cmd-row-montant{font-family:'Sora',system-ui,sans-serif;font-size:14px;font-weight:700;color:#1E2247;text-align:right;}
+.cmd-row-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap;justify-self:start;}
+.cmd-table-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-top:1px solid #F1EFEA;font-size:12.5px;color:#5F6275;flex-shrink:0;flex-wrap:wrap;}
+.cmd-table-footer-total{font-weight:700;color:#1E2247;}
+.cmd-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 20px;text-align:center;flex:1;}
+.ajr-empty-icon.neutral{background:#F3F2EE;color:#9A9CAB;}
+
+.cmd-panel{width:340px;flex-shrink:0;background:#fff;border-radius:20px;box-shadow:0 1px 2px rgba(30,34,71,.06);display:none;flex-direction:column;overflow:hidden;min-height:0;}
+.cmd-panel.open{display:flex;}
+.cmd-panel-header{background:#1E2247;color:#fff;padding:20px;position:relative;overflow:hidden;flex-shrink:0;}
+.cmd-panel-header::before{content:'';position:absolute;right:-40px;top:-50px;width:110px;height:110px;border-radius:50%;border:16px solid rgba(232,98,44,.22);}
+.cmd-panel-header::after{content:'';position:absolute;right:20px;bottom:-30px;width:55px;height:55px;border-radius:50%;background:rgba(232,98,44,.16);}
+.cmd-panel-close,.cmd-panel-back{position:absolute;top:14px;background:rgba(255,255,255,.12);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;}
+.cmd-panel-close{right:14px;width:28px;height:28px;border-radius:8px;}
+.cmd-panel-back{left:14px;height:32px;padding:0 12px;border-radius:16px;font-size:13px;font-weight:600;gap:6px;display:none;}
+.cmd-panel-numero{font-size:12px;color:#B9BCD3;position:relative;z-index:1;}
+.cmd-panel-top{display:flex;align-items:center;gap:12px;margin-top:8px;position:relative;z-index:1;}
+.cmd-panel-avatar{width:48px;height:48px;border-radius:50%;background:#F4C542;color:#1E2247;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;flex-shrink:0;}
+.cmd-panel-nom{font-family:'Sora',system-ui,sans-serif;font-size:17px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cmd-panel-meta{font-size:12.5px;color:#B9BCD3;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cmd-panel-call{margin-left:auto;width:40px;height:40px;border-radius:50%;background:#C8501E;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none;}
+.cmd-panel-pills{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;position:relative;z-index:1;}
+.cmd-panel-pill{font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,.10);color:#D5D7E6;}
+.cmd-panel-pill.urgent{background:#C8501E;color:#fff;}
+.cmd-panel-body{flex:1;overflow-y:auto;min-height:0;padding:18px 20px;}
+.cmd-panel-section{margin-bottom:20px;}
+.cmd-panel-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#5F6275;margin-bottom:10px;}
+.cmd-article-row{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;color:#1E2247;padding:6px 0;border-bottom:1px dashed #E7E5E0;}
+.cmd-article-row:last-of-type{border-bottom:none;}
+.cmd-article-qte{color:#5F6275;flex-shrink:0;}
+.cmd-totaux-row{display:flex;justify-content:space-between;font-size:13px;color:#5F6275;padding:6px 0;}
+.cmd-totaux-row.total{font-family:'Sora',system-ui,sans-serif;font-size:20px;font-weight:700;color:#1E2247;padding-top:10px;border-top:1px solid #E7E5E0;margin-top:4px;}
+.cmd-totaux-row.total .unit{font-size:13px;font-weight:500;color:#5F6275;margin-left:4px;}
+.cmd-paiement-box{border-radius:12px;padding:12px 14px;font-size:13px;font-weight:600;margin-top:12px;}
+.cmd-paiement-box.du{background:#FDF3D7;color:#8A6100;}
+.cmd-paiement-box.paye{background:#E6F2EB;color:#1F7A4D;}
+.cmd-suivi-step{display:flex;gap:12px;position:relative;padding-bottom:20px;}
+.cmd-suivi-step:last-child{padding-bottom:0;}
+.cmd-suivi-line{position:absolute;left:9px;top:22px;bottom:0;width:2px;background:#E7E5E0;}
+.cmd-suivi-step:last-child .cmd-suivi-line{display:none;}
+.cmd-suivi-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid #E7E5E0;z-index:1;font-size:11px;}
+.cmd-suivi-dot.done{background:#1F7A4D;border-color:#1F7A4D;color:#fff;}
+.cmd-suivi-dot.next{border-color:#C8501E;}
+.cmd-suivi-label{font-size:13.5px;font-weight:600;color:#1E2247;}
+.cmd-suivi-label.next{color:#C8501E;}
+.cmd-suivi-meta{font-size:12px;color:#5F6275;margin-top:2px;}
+.cmd-suivi-future{font-size:12.5px;color:#9A9CAB;padding-left:32px;}
+.cmd-suivi-echec{background:#FBE9E9;color:#B42318;border-radius:10px;padding:10px 12px;font-size:12.5px;margin-top:10px;}
+.cmd-panel-footer{border-top:1px solid #EFEDE8;padding:16px 20px;display:flex;flex-direction:column;gap:10px;flex-shrink:0;}
+.cmd-panel-info-box{background:#F3F2EE;color:#5F6275;border-radius:10px;padding:12px 14px;font-size:12.5px;text-align:center;}
+.cmd-panel-secondary-row{display:flex;gap:10px;}
+.cmd-panel-secondary-row .ajr-btn{flex:1;justify-content:center;}
+
+.cmd-mobile-header{padding:0 0 4px;}
+.cmd-mobile-title{font-family:'Sora',system-ui,sans-serif;font-size:22px;font-weight:700;color:#1E2247;}
+.cmd-mobile-sub{font-size:13px;color:#5F6275;margin-top:2px;}
+.cmd-mobile-toolbar{display:flex;flex-direction:column;gap:10px;margin:12px 0;}
+.cmd-mobile-period-btn{display:flex;align-items:center;gap:6px;height:44px;padding:0 14px;border-radius:12px;background:#fff;border:1px solid #E7E5E0;font-size:13px;font-weight:600;color:#1E2247;white-space:nowrap;align-self:flex-start;}
+.cmd-search.full{width:100%;}
+.cmd-mobile-period-menu{position:absolute;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(30,34,71,.16);padding:6px;z-index:50;display:none;min-width:140px;}
+.cmd-mobile-period-menu.open{display:block;}
+.cmd-mobile-period-menu button{display:block;width:100%;text-align:left;background:none;border:none;padding:9px 12px;border-radius:8px;font-size:13px;color:#1E2247;cursor:pointer;}
+.cmd-mobile-period-menu button.active{background:#F3F2EE;font-weight:700;}
+.cmd-mobile-list{display:flex;flex-direction:column;gap:10px;margin-top:10px;}
+.cmd-mobile-card{background:#fff;border-radius:16px;padding:12px 14px;cursor:pointer;min-height:44px;box-sizing:border-box;}
+.cmd-mobile-card.urgent{background:#FFF6F1;border:1px solid #F7D2C1;}
+.cmd-mobile-card-row1{display:flex;align-items:center;gap:10px;}
+.cmd-mobile-card-main{flex:1;min-width:0;}
+.cmd-mobile-card-nom{font-size:14.5px;font-weight:700;color:#1E2247;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cmd-mobile-card-meta{font-size:12px;color:#5F6275;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cmd-mobile-card-row2{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.cmd-mobile-card-paiement{font-size:12px;font-weight:600;}
+.cmd-mobile-card-paiement.du{color:#8A6100;}
+.cmd-mobile-card-paiement.paye{color:#1F7A4D;}
+.cmd-mobile-card-montant{font-family:'Sora',system-ui,sans-serif;font-size:15px;font-weight:700;color:#1E2247;margin-left:auto;}
+
+@media (max-width:900px){
+  .cmd-tabs{flex-wrap:nowrap;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;padding-bottom:2px;}
+  .cmd-tabs::-webkit-scrollbar{display:none;}
+  .cmd-tab{height:36px;flex-shrink:0;}
+  .cmd-panel.open{position:fixed;inset:0;width:auto;z-index:2000;border-radius:0;}
+  .cmd-panel-close{display:none;}
+  .cmd-panel-back{display:flex;}
+  .cmd-panel-header{padding-top:56px;}
+}
 
 /* ---- Vue Livreur ---- */
 .livreur-section-titre{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:500;color:var(--text);margin:20px 0 12px;}
@@ -1199,21 +1331,75 @@ button.suivi-pastille{cursor:pointer;}
       <!-- PAGE : COMMANDES -->
       <section id="page-commandes" class="page">
         <div id="commandesVueGerant">
-          <div class="taches-header">
-            <div class="taches-header-left">
-              <div class="taches-header-icon" style="width:38px;height:38px;"><i class="ti ti-shopping-bag"></i></div>
-              <div><h2>Commandes</h2><div class="taches-header-sub" id="commandesSousTitre">—</div></div>
-            </div>
-            <div class="taches-header-right">
-              <div class="doc-search-wrap" style="margin-top:0;width:210px;">
-                <i class="ti ti-search"></i>
-                <input type="text" id="commandesRecherche" placeholder="Rechercher un client..." oninput="filtrerCommandes()">
+          <!-- Bureau -->
+          <div class="cmd-desktop">
+            <div class="cmd-header">
+              <div>
+                <div class="cmd-header-title">Commandes</div>
+                <div class="cmd-header-sub" id="cmdSousTitre">—</div>
               </div>
-              <button class="btn btn-primary" onclick="openModalCommande()"><i class="ti ti-plus"></i> Nouvelle commande</button>
+              <div class="cmd-header-actions">
+                <div class="cmd-search">
+                  <i class="ti ti-search"></i>
+                  <input type="text" id="cmdRecherche" placeholder="Client, n°, quartier…" oninput="cmdFiltrer()">
+                </div>
+                <button class="ajr-btn primary" onclick="openModalCommande()"><i class="ti ti-plus"></i> Nouvelle commande</button>
+              </div>
+            </div>
+            <div class="cmd-tabs" id="cmdTabs"></div>
+            <div class="cmd-table-card">
+              <div class="cmd-toolbar" id="cmdToolbar"></div>
+              <div class="cmd-table-head">
+                <span>Client</span><span>Heure souhaitée</span><span>Livreur</span><span>Paiement</span><span>Montant</span><span>Statut</span>
+              </div>
+              <div class="cmd-table-body" id="cmdTableBody"></div>
+              <div class="cmd-table-footer" id="cmdTableFooter"></div>
             </div>
           </div>
-          <div class="cmd-filtres" id="commandesFiltres"></div>
-          <div id="commandesListe"></div>
+
+          <!-- Mobile -->
+          <div class="cmd-mobile">
+            <div class="cmd-mobile-header">
+              <div class="cmd-mobile-title">Commandes</div>
+              <div class="cmd-mobile-sub" id="cmdSousTitreMobile">—</div>
+            </div>
+            <div class="cmd-tabs" id="cmdTabsMobile"></div>
+            <div class="cmd-mobile-toolbar">
+              <div style="position:relative;">
+                <button class="cmd-mobile-period-btn hidden" id="cmdMobilePeriodBtn" onclick="cmdTogglePeriodeMenu(event)"><i class="ti ti-calendar"></i> <span id="cmdMobilePeriodLabel">Aujourd'hui</span></button>
+                <div class="cmd-mobile-period-menu" id="cmdMobilePeriodMenu">
+                  <button onclick="cmdSetPeriode('aujourdhui')">Aujourd'hui</button>
+                  <button onclick="cmdSetPeriode('7jours')">7 jours</button>
+                  <button onclick="cmdSetPeriode('tout')">Tout</button>
+                </div>
+              </div>
+              <div class="cmd-search full">
+                <i class="ti ti-search"></i>
+                <input type="text" id="cmdRechercheMobile" placeholder="Client, n°, quartier…" oninput="cmdFiltrer()">
+              </div>
+            </div>
+            <div class="cmd-mobile-list" id="cmdMobileList"></div>
+          </div>
+
+          <!-- Panneau de détail (bureau : latéral · mobile : feuille plein écran) -->
+          <div class="cmd-panel" id="cmdPanel">
+            <div class="cmd-panel-header">
+              <button class="cmd-panel-back" onclick="cmdFermerPanneau()"><i class="ti ti-arrow-left"></i> Retour</button>
+              <button class="cmd-panel-close" onclick="cmdFermerPanneau()" aria-label="Fermer"><i class="ti ti-x"></i></button>
+              <div class="cmd-panel-numero" id="cmdPanelNumero">—</div>
+              <div class="cmd-panel-top">
+                <div class="cmd-panel-avatar" id="cmdPanelAvatar">--</div>
+                <div style="min-width:0;flex:1;">
+                  <div class="cmd-panel-nom" id="cmdPanelNom">—</div>
+                  <div class="cmd-panel-meta" id="cmdPanelMeta">—</div>
+                </div>
+                <a class="cmd-panel-call hidden" id="cmdPanelCall" href="#" aria-label="Appeler le client"><i class="ti ti-phone"></i></a>
+              </div>
+              <div class="cmd-panel-pills" id="cmdPanelPills"></div>
+            </div>
+            <div class="cmd-panel-body" id="cmdPanelBody"></div>
+            <div class="cmd-panel-footer" id="cmdPanelFooter"></div>
+          </div>
         </div>
         <div id="commandesVueLivreur" class="hidden">
           <div class="livreur-hero">
@@ -1681,7 +1867,10 @@ let commandeEnLivraisonCourante = null;
 let mesLivraisonsCache = [];
 let ligneCommandeArticles = [];
 let modePaiementCommande = 'cash';
-let filtreStatutCommande = 'toutes';
+let cmdAgentsMap = {};
+let cmdFiltreStatut = 'en_cours';
+let cmdPeriode = 'aujourdhui';
+let cmdSelectedId = null;
 let agentsCache = [];
 let agentEnEdition = null;
 let agentPourResetPin = null;
@@ -1701,8 +1890,18 @@ const CMD_STATUT_BADGES = {
   echec: { label: 'Échec', cls: 'echec' },
   annulee: { label: 'Annulée', cls: 'annulee' },
 };
-const CMD_FILTRES = [
-  { key: 'toutes', label: 'Toutes' },
+/* ── Commandes V2 : statuts, onglets, avatars ── */
+const CMD_STATUT_V2 = {
+  recue: { label: 'Reçue', bg: '#ECEDF5', color: '#1E2247', dot: '#1E2247' },
+  preparee: { label: 'Préparée', bg: '#FDF3D7', color: '#8A6100', dot: '#D9A21B' },
+  assignee: { label: 'Assignée', bg: '#E8F0FC', color: '#2E5FB0', dot: '#2E5FB0' },
+  en_livraison: { label: 'En livraison', bg: '#FCEBE3', color: '#C8501E', dot: '#E8622C' },
+  livree: { label: 'Livrée', bg: '#E6F2EB', color: '#1F7A4D', dot: '#1F7A4D' },
+  echec: { label: 'Échec', bg: '#FBE9E9', color: '#B42318', dot: '#B42318' },
+};
+const CMD_STATUTS_EN_COURS = ['recue', 'preparee', 'assignee', 'en_livraison'];
+const CMD_TABS_V2 = [
+  { key: 'en_cours', label: 'En cours' },
   { key: 'recue', label: 'Reçue' },
   { key: 'preparee', label: 'Préparée' },
   { key: 'assignee', label: 'Assignée' },
@@ -1710,6 +1909,35 @@ const CMD_FILTRES = [
   { key: 'livree', label: 'Livrée' },
   { key: 'echec', label: 'Échec' },
 ];
+const CMD_PERIODE_LABELS = { aujourdhui: 'Aujourd\'hui', '7jours': '7 jours', tout: 'Tout' };
+const CMD_AVATAR_PALETTE_V2 = [
+  { bg: '#1E2247', color: '#fff' },
+  { bg: '#FCEBE3', color: '#C8501E' },
+  { bg: '#E8F0FC', color: '#2E5FB0' },
+  { bg: '#E6F2EB', color: '#1F7A4D' },
+  { bg: '#FDF3D7', color: '#8A6100' },
+];
+function cmdAvatarStyle(nom) {
+  const s = String(nom || '');
+  let hash = 0;
+  for (let i = 0; i < s.length; i++) hash += s.charCodeAt(i);
+  return CMD_AVATAR_PALETTE_V2[hash % CMD_AVATAR_PALETTE_V2.length];
+}
+function cmdNumeroCourt(numero) {
+  if (!numero) return '';
+  const parts = String(numero).split('-');
+  return parts[parts.length - 1];
+}
+function cmdLivreurCourt(nom) {
+  if (!nom) return '';
+  const parts = String(nom).trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return parts[0] + ' ' + parts[1].charAt(0).toUpperCase() + '.';
+}
+function cmdHeureDe(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
 
 /* ── UTILITAIRES ── */
 function esc(s) {
@@ -1904,7 +2132,8 @@ function navigate(page) {
   if (pageEl) pageEl.classList.add('active');
   document.querySelectorAll('[data-nav]').forEach(function(n) { n.classList.toggle('active', n.dataset.nav === page); });
   const topbar = document.getElementById('mobileTopbar');
-  if (topbar) topbar.style.display = page === 'aujourdhui' ? 'none' : '';
+  const cachePourCettePage = page === 'aujourdhui' || (page === 'commandes' && session.role !== 'livreur');
+  if (topbar) topbar.style.display = cachePourCettePage ? 'none' : '';
   if (PAGE_LOADERS[page]) PAGE_LOADERS[page]();
 }
 function loadAujourdhuiWrap() { loadAujourdhui(); }
@@ -2107,35 +2336,6 @@ async function loadAujourdhui() {
 function articlesResume(lignes) {
   return (lignes || []).map(function(l) { return l.nom + ' ×' + l.qte; }).join(', ');
 }
-function renderCommandeCard(c) {
-  const badge = CMD_STATUT_BADGES[c.statut] || CMD_STATUT_BADGES.recue;
-  const paiementBadge = c.paiement_statut === 'paye'
-    ? '<span class="paiement-badge paye"><i class="ti ti-check"></i> Payé</span>'
-    : '<span class="paiement-badge du">Dû</span>';
-  const peutGerer = session.role === 'gerant';
-  const peutPreparerRole = session.role === 'gerant' || session.role === 'agent';
-  let actionBtn = '<button class="btn btn-sm btn-ghost" onclick="imprimerFactureCommande(\'' + c.id + '\')"><i class="ti ti-file-invoice"></i> Facture</button>';
-  if (c.statut === 'recue' && peutPreparerRole) {
-    actionBtn += '<button class="btn btn-sm btn-primary" onclick="marquerCommandePreparee(\'' + c.id + '\')"><i class="ti ti-checklist"></i> Marquer préparée</button>';
-  }
-  let menuHtml = '';
-  if (peutGerer) {
-    const menuItems = '<button class="tache-menu-item" onclick="ouvrirModifierCommande(\'' + c.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>'
-      + ((c.statut === 'assignee' || c.statut === 'en_livraison') ? '<button class="tache-menu-item" onclick="remettreDisponible(\'' + c.id + '\')"><i class="ti ti-refresh"></i> Remettre disponible</button>' : '')
-      + ((c.statut !== 'livree' && c.statut !== 'annulee') ? '<button class="tache-menu-item danger" onclick="annulerCommande(\'' + c.id + '\')"><i class="ti ti-x"></i> Annuler</button>' : '');
-    menuHtml = '<div class="tache-menu"><button class="tache-menu-btn" onclick="toggleTacheMenu(event,\'' + c.id + '\')"><i class="ti ti-dots-vertical"></i></button><div class="tache-menu-dropdown" id="tacheMenu-' + c.id + '">' + menuItems + '</div></div>';
-  }
-  return '<div class="cmd-card bar-' + c.statut + '">'
-    + '<div class="cmd-card-head">'
-    + '<div><div class="cmd-card-numero">' + esc(c.numero) + '</div><div class="cmd-card-client">' + esc(c.client_nom) + '</div><div class="cmd-card-tel">' + esc(c.client_telephone || '') + '</div></div>'
-    + '<div class="cmd-card-badges"><span class="cmd-badge ' + badge.cls + '">' + badge.label + '</span>' + paiementBadge + menuHtml + '</div>'
-    + '</div>'
-    + '<div class="cmd-card-adresse"><i class="ti ti-map-pin"></i> ' + esc(c.client_adresse) + (c.client_quartier ? ' · ' + esc(c.client_quartier) : '') + '</div>'
-    + '<div class="cmd-card-articles">' + esc(articlesResume(c.lignes)) + '</div>'
-    + '<div class="cmd-card-footer"><div class="cmd-card-montant">' + fmtMontant(c.total) + ' GNF</div><div class="cmd-card-actions">' + actionBtn + '</div></div>'
-    + '</div>';
-}
-
 /* ── FACTURE COMMANDE (impression) ── */
 function fmtMontantInsecable(n) { return Math.round(Number(n) || 0).toLocaleString('fr-FR'); }
 
@@ -2377,37 +2577,344 @@ async function loadCommandes() {
   }
   document.getElementById('commandesVueGerant').classList.remove('hidden');
   document.getElementById('commandesVueLivreur').classList.add('hidden');
-  const { data } = await sb.from('gn_commandes').select('*').order('date_creation', { ascending: false });
+  const [{ data }, { data: agentsData }] = await Promise.all([
+    sb.from('gn_commandes').select('*').order('date_creation', { ascending: false }),
+    sb.from('gn_agents').select('id,nom,role'),
+  ]);
   commandesCache = data || [];
-  const sousTitreEl = document.getElementById('commandesSousTitre');
-  if (sousTitreEl) sousTitreEl.textContent = commandesCache.length + ' commande' + (commandesCache.length > 1 ? 's' : '') + ' au total';
-  renderFiltresCommandes();
-  renderCommandesListe();
+  cmdAgentsMap = {};
+  (agentsData || []).forEach(function(a) { cmdAgentsMap[a.id] = a; });
+
+  const enCoursTotal = commandesCache.filter(function(c) { return CMD_STATUTS_EN_COURS.indexOf(c.statut) !== -1; }).length;
+  const t = today();
+  const livreesAujTotal = commandesCache.filter(function(c) { return c.statut === 'livree' && c.date_livraison && c.date_livraison.slice(0, 10) === t; }).length;
+  const subTxt = enCoursTotal + ' en cours · ' + livreesAujTotal + ' livrée' + (livreesAujTotal > 1 ? 's' : '') + ' aujourd\'hui';
+  const subEl = document.getElementById('cmdSousTitre');
+  const subMobEl = document.getElementById('cmdSousTitreMobile');
+  if (subEl) subEl.textContent = subTxt;
+  if (subMobEl) subMobEl.textContent = subTxt;
+
+  cmdRenderTabs();
+  cmdRenderTout();
 }
-function commandeVisibleDansToutes(c) {
-  const estAujourdhui = (c.date_creation || '').slice(0, 10) === today();
-  return estAujourdhui || (c.statut !== 'livree' && c.statut !== 'echec');
+function cmdCommandesPourOnglet(key) {
+  if (key === 'en_cours') return commandesCache.filter(function(c) { return CMD_STATUTS_EN_COURS.indexOf(c.statut) !== -1; });
+  return commandesCache.filter(function(c) { return c.statut === key; });
 }
-function renderFiltresCommandes() {
-  document.getElementById('commandesFiltres').innerHTML = CMD_FILTRES.map(function(f) {
-    const count = f.key === 'toutes' ? commandesCache.filter(commandeVisibleDansToutes).length : commandesCache.filter(function(c) { return c.statut === f.key; }).length;
-    return '<button class="filtre-btn' + (filtreStatutCommande === f.key ? ' active' : '') + '" onclick="setFiltreCommande(\'' + f.key + '\')">' + f.label + '<span class="filtre-count">' + count + '</span></button>';
+function cmdCommandesPeriodeFiltrees(liste, key) {
+  if (key !== 'livree' && key !== 'echec') return liste;
+  if (cmdPeriode === 'tout') return liste;
+  const t = today();
+  if (cmdPeriode === 'aujourdhui') {
+    return liste.filter(function(c) { return c.date_livraison && c.date_livraison.slice(0, 10) === t; });
+  }
+  const seuil = new Date();
+  seuil.setDate(seuil.getDate() - 6);
+  seuil.setHours(0, 0, 0, 0);
+  return liste.filter(function(c) { return c.date_livraison && new Date(c.date_livraison) >= seuil; });
+}
+function cmdRenderTabs() {
+  const html = CMD_TABS_V2.map(function(tab) {
+    const liste = cmdCommandesPourOnglet(tab.key);
+    const count = cmdCommandesPeriodeFiltrees(liste, tab.key).length;
+    const actif = cmdFiltreStatut === tab.key;
+    const dotColor = tab.key === 'en_cours' ? null : (CMD_STATUT_V2[tab.key] || {}).dot;
+    const dotHtml = (!actif && dotColor) ? '<span class="cmd-tab-dot" style="background:' + dotColor + ';"></span>' : '';
+    return '<button class="cmd-tab' + (actif ? ' active' : '') + '" onclick="cmdSetOnglet(\'' + tab.key + '\')">' + dotHtml + tab.label + '<span class="cmd-tab-count">' + count + '</span></button>';
   }).join('');
+  const el1 = document.getElementById('cmdTabs');
+  const el2 = document.getElementById('cmdTabsMobile');
+  if (el1) el1.innerHTML = html;
+  if (el2) el2.innerHTML = html;
 }
-function setFiltreCommande(key) {
-  filtreStatutCommande = key;
-  renderFiltresCommandes();
-  renderCommandesListe();
+function cmdSetOnglet(key) {
+  cmdFiltreStatut = key;
+  cmdRenderTabs();
+  cmdRenderTout();
 }
-function filtrerCommandes() { renderCommandesListe(); }
-function renderCommandesListe() {
-  const q = (document.getElementById('commandesRecherche').value || '').trim().toLowerCase();
-  let liste = commandesCache;
-  if (filtreStatutCommande === 'toutes') liste = liste.filter(commandeVisibleDansToutes);
-  else liste = liste.filter(function(c) { return c.statut === filtreStatutCommande; });
-  if (q) liste = liste.filter(function(c) { return (c.client_nom || '').toLowerCase().indexOf(q) !== -1 || (c.client_telephone || '').indexOf(q) !== -1; });
-  const cont = document.getElementById('commandesListe');
-  cont.innerHTML = liste.length ? liste.map(renderCommandeCard).join('') : '<div class="priority-empty"><i class="ti ti-shopping-bag-off"></i>Aucune commande.</div>';
+const CMD_PERIODE_ORDRE = ['aujourdhui', '7jours', 'tout'];
+function cmdRenderPeriodeControl() {
+  return '<div class="cmd-period">' + CMD_PERIODE_ORDRE.map(function(p) {
+    return '<button class="cmd-period-btn' + (cmdPeriode === p ? ' active' : '') + '" onclick="cmdSetPeriode(\'' + p + '\')">' + CMD_PERIODE_LABELS[p] + '</button>';
+  }).join('') + '</div>';
+}
+function cmdSetPeriode(p) {
+  cmdPeriode = p;
+  const menu = document.getElementById('cmdMobilePeriodMenu');
+  if (menu) menu.classList.remove('open');
+  cmdRenderTabs();
+  cmdRenderTout();
+}
+function cmdTogglePeriodeMenu(e) {
+  e.stopPropagation();
+  document.getElementById('cmdMobilePeriodMenu').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#cmdMobilePeriodBtn') && !e.target.closest('#cmdMobilePeriodMenu')) {
+    const m = document.getElementById('cmdMobilePeriodMenu');
+    if (m) m.classList.remove('open');
+  }
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const p = document.getElementById('cmdPanel');
+    if (p && p.classList.contains('open')) cmdFermerPanneau();
+  }
+});
+function cmdRenderToolbar() {
+  const toolbarEl = document.getElementById('cmdToolbar');
+  const mobileBtn = document.getElementById('cmdMobilePeriodBtn');
+  const estLivreeOuEchec = cmdFiltreStatut === 'livree' || cmdFiltreStatut === 'echec';
+  if (!toolbarEl) return;
+  if (estLivreeOuEchec) {
+    toolbarEl.innerHTML = '<div></div>' + cmdRenderPeriodeControl();
+    if (mobileBtn) mobileBtn.classList.remove('hidden');
+    const lbl = document.getElementById('cmdMobilePeriodLabel');
+    if (lbl) lbl.textContent = CMD_PERIODE_LABELS[cmdPeriode];
+  } else {
+    const n = cmdListeFiltree().length;
+    toolbarEl.innerHTML = '<div class="cmd-toolbar-info">' + n + ' commande' + (n > 1 ? 's' : '') + ' en cours</div>';
+    if (mobileBtn) mobileBtn.classList.add('hidden');
+    const menu = document.getElementById('cmdMobilePeriodMenu');
+    if (menu) menu.classList.remove('open');
+  }
+}
+function cmdFiltrer() {
+  const desk = document.getElementById('cmdRecherche');
+  const mob = document.getElementById('cmdRechercheMobile');
+  const actif = document.activeElement;
+  const val = actif === mob ? mob.value : desk.value;
+  if (actif !== desk) desk.value = val;
+  if (actif !== mob) mob.value = val;
+  cmdRenderTout();
+}
+function cmdListeFiltree() {
+  let liste = cmdCommandesPourOnglet(cmdFiltreStatut);
+  liste = cmdCommandesPeriodeFiltrees(liste, cmdFiltreStatut);
+  const q = (document.getElementById('cmdRecherche').value || '').trim().toLowerCase();
+  if (q) {
+    liste = liste.filter(function(c) {
+      return (c.client_nom || '').toLowerCase().indexOf(q) !== -1
+        || (c.numero || '').toLowerCase().indexOf(q) !== -1
+        || (c.client_quartier || '').toLowerCase().indexOf(q) !== -1;
+    });
+  }
+  if (cmdFiltreStatut === 'livree' || cmdFiltreStatut === 'echec') {
+    liste = liste.slice().sort(function(a, b) { return new Date(b.date_livraison || 0) - new Date(a.date_livraison || 0); });
+  } else {
+    liste = liste.slice().sort(comparerPrioriteLivraison);
+  }
+  return liste;
+}
+function cmdEstUrgente(c) {
+  if (c.statut === 'livree' || c.statut === 'echec') return false;
+  const minutes = calculerMinutesRestantes(heureSouhaiteeCourte(c));
+  return minutes !== null && minutes < 20;
+}
+function cmdHeurePillHtml(c) {
+  const heureStr = heureSouhaiteeCourte(c);
+  if (!heureStr) return '<span class="ajr-heure-pill none">Sans heure</span>';
+  const minutes = calculerMinutesRestantes(heureStr);
+  if (cmdEstUrgente(c)) return '<span class="ajr-heure-pill urgent">' + heureStr + ' · ' + (minutes <= 0 ? 'en retard' : minutes + ' min') + '</span>';
+  return '<span class="ajr-heure-pill"><i class="ti ti-clock"></i> ' + heureStr + '</span>';
+}
+function cmdRenderRow(c) {
+  const statutInfo = CMD_STATUT_V2[c.statut] || CMD_STATUT_V2.recue;
+  const avatarStyle = cmdAvatarStyle(c.client_nom);
+  const agent = c.livreur_id ? cmdAgentsMap[c.livreur_id] : null;
+  const livreurTxt = agent ? cmdLivreurCourt(agent.nom) : null;
+  const modeLabel = c.mode_paiement === 'orange_money' ? 'Orange Money' : 'Cash';
+  const paiementStatutHtml = c.paiement_statut === 'paye'
+    ? '<div class="cmd-row-paiement-statut paye">Payé</div>'
+    : '<div class="cmd-row-paiement-statut du">À encaisser</div>';
+  const heureCreation = cmdHeureDe(c.date_creation);
+  return '<div class="cmd-row' + (cmdSelectedId === c.id ? ' selected' : '') + '" onclick="cmdOuvrirPanneau(\'' + c.id + '\')">'
+    + '<div class="cmd-row-client">'
+    + '<div class="ajr-avatar small" style="background:' + avatarStyle.bg + ';color:' + avatarStyle.color + ';">' + esc(initiales(c.client_nom)) + '</div>'
+    + '<div class="cmd-row-client-info">'
+    + '<div class="cmd-row-client-nom">' + esc(c.client_nom) + '</div>'
+    + '<div class="cmd-row-client-meta">#' + esc(cmdNumeroCourt(c.numero)) + (c.client_quartier ? ' · ' + esc(c.client_quartier) : '') + (heureCreation ? ' · reçue à ' + heureCreation : '') + '</div>'
+    + '</div></div>'
+    + '<div>' + cmdHeurePillHtml(c) + '</div>'
+    + '<div class="cmd-row-livreur' + (livreurTxt ? '' : ' none') + '">' + (livreurTxt ? esc(livreurTxt) : '—') + '</div>'
+    + '<div><div class="cmd-row-paiement-mode">' + modeLabel + '</div>' + paiementStatutHtml + '</div>'
+    + '<div class="cmd-row-montant">' + fmtMontant(c.total) + '</div>'
+    + '<div><span class="cmd-row-badge" style="background:' + statutInfo.bg + ';color:' + statutInfo.color + ';">' + statutInfo.label + '</span></div>'
+    + '</div>';
+}
+function cmdRenderMobileCard(c) {
+  const statutInfo = CMD_STATUT_V2[c.statut] || CMD_STATUT_V2.recue;
+  const avatarStyle = cmdAvatarStyle(c.client_nom);
+  const agent = c.livreur_id ? cmdAgentsMap[c.livreur_id] : null;
+  const livreurTxt = agent ? cmdLivreurCourt(agent.nom) : null;
+  const modeLabel = c.mode_paiement === 'orange_money' ? 'Orange Money' : 'Cash';
+  const paiementHtml = c.paiement_statut === 'paye'
+    ? '<span class="cmd-mobile-card-paiement paye">' + modeLabel + ' · payé</span>'
+    : '<span class="cmd-mobile-card-paiement du">' + modeLabel + ' · à encaisser</span>';
+  return '<div class="cmd-mobile-card' + (cmdEstUrgente(c) ? ' urgent' : '') + '" onclick="cmdOuvrirPanneau(\'' + c.id + '\')">'
+    + '<div class="cmd-mobile-card-row1">'
+    + '<div class="ajr-avatar small" style="background:' + avatarStyle.bg + ';color:' + avatarStyle.color + ';">' + esc(initiales(c.client_nom)) + '</div>'
+    + '<div class="cmd-mobile-card-main">'
+    + '<div class="cmd-mobile-card-nom">' + esc(c.client_nom) + '</div>'
+    + '<div class="cmd-mobile-card-meta">#' + esc(cmdNumeroCourt(c.numero)) + (c.client_quartier ? ' · ' + esc(c.client_quartier) : '') + (livreurTxt ? ' · ' + esc(livreurTxt) : '') + '</div>'
+    + '</div>'
+    + '<span class="cmd-row-badge" style="background:' + statutInfo.bg + ';color:' + statutInfo.color + ';">' + statutInfo.label + '</span>'
+    + '</div>'
+    + '<div class="cmd-mobile-card-row2">' + cmdHeurePillHtml(c) + paiementHtml + '<span class="cmd-mobile-card-montant">' + fmtMontant(c.total) + ' GNF</span></div>'
+    + '</div>';
+}
+function cmdRenderTable(liste) {
+  const body = document.getElementById('cmdTableBody');
+  const mobileList = document.getElementById('cmdMobileList');
+  const footer = document.getElementById('cmdTableFooter');
+  if (!body || !mobileList) return;
+  if (!liste.length) {
+    const q = document.getElementById('cmdRecherche').value.trim();
+    let html;
+    if (q) {
+      html = '<div class="cmd-empty"><div class="ajr-empty-icon neutral"><i class="ti ti-search"></i></div><div class="ajr-empty-title">Aucun résultat pour "' + esc(q) + '"</div></div>';
+    } else if (cmdFiltreStatut === 'livree' || cmdFiltreStatut === 'echec') {
+      html = '<div class="cmd-empty"><div class="ajr-empty-icon neutral"><i class="ti ti-calendar-off"></i></div><div class="ajr-empty-title">Aucune commande sur cette période</div></div>';
+    } else {
+      html = '<div class="cmd-empty"><div class="ajr-empty-icon"><i class="ti ti-check"></i></div><div class="ajr-empty-title">Aucune commande en cours</div><button class="ajr-empty-link" onclick="cmdSetOnglet(\'livree\')">Voir les commandes livrées</button></div>';
+    }
+    body.innerHTML = html;
+    mobileList.innerHTML = html;
+    if (footer) footer.innerHTML = '';
+    return;
+  }
+  body.innerHTML = liste.map(cmdRenderRow).join('');
+  mobileList.innerHTML = liste.map(cmdRenderMobileCard).join('');
+  const total = liste.reduce(function(s, c) { return s + Number(c.total || 0); }, 0);
+  const triTxt = (cmdFiltreStatut === 'livree' || cmdFiltreStatut === 'echec') ? 'Les plus récentes d\'abord' : 'Triées par heure souhaitée · les urgentes en premier';
+  if (footer) footer.innerHTML = '<div>' + triTxt + '</div><div class="cmd-table-footer-total">Total : ' + fmtMontant(total) + ' GNF</div>';
+}
+function cmdSuiviMetaHtml(etape) {
+  const parts = [];
+  if (etape.date) parts.push(cmdHeureDe(etape.date));
+  if (etape.auteur) parts.push(etape.auteur);
+  return parts.length ? '<div class="cmd-suivi-meta">' + esc(parts.join(' · ')) + '</div>' : '';
+}
+function cmdRenderPanneauSuivi(c) {
+  const statutActuel = c.statut;
+  const agent = c.livreur_id ? cmdAgentsMap[c.livreur_id] : null;
+  const livreurNom = agent ? agent.nom : null;
+  const rangMap = { recue: 0, preparee: 1, assignee: 2, en_livraison: 3, livree: 4 };
+  const estEchec = statutActuel === 'echec';
+  const rangActuel = estEchec ? 3 : (rangMap.hasOwnProperty(statutActuel) ? rangMap[statutActuel] : -1);
+
+  const etapes = [
+    { key: 'recue', label: 'Reçue', date: c.date_creation, auteur: c.agent_creation },
+    { key: 'preparee', label: 'Préparée', date: null, auteur: null },
+    { key: 'assignee', label: 'Assignée', date: c.date_assignation, auteur: livreurNom },
+    { key: 'en_livraison', label: 'En livraison', date: c.date_debut_livraison, auteur: livreurNom },
+    estEchec
+      ? { key: 'echec', label: 'Échec', date: c.date_livraison, auteur: livreurNom, echec: true }
+      : { key: 'livree', label: 'Livrée', date: c.date_livraison, auteur: livreurNom },
+  ];
+
+  let html = '<div class="cmd-panel-section"><div class="cmd-panel-section-title">Suivi</div><div class="cmd-suivi">';
+  const futurs = [];
+  etapes.forEach(function(etape, idx) {
+    if (idx <= rangActuel || (estEchec && idx === 4)) {
+      const echecRow = !!etape.echec;
+      html += '<div class="cmd-suivi-step"><div class="cmd-suivi-line"></div>'
+        + '<div class="cmd-suivi-dot done"' + (echecRow ? ' style="background:#B42318;border-color:#B42318;"' : '') + '><i class="ti ti-' + (echecRow ? 'x' : 'check') + '"></i></div>'
+        + '<div><div class="cmd-suivi-label">' + etape.label + '</div>' + cmdSuiviMetaHtml(etape) + '</div></div>';
+    } else if (idx === rangActuel + 1 && !estEchec) {
+      html += '<div class="cmd-suivi-step"><div class="cmd-suivi-line"></div><div class="cmd-suivi-dot next"></div><div><div class="cmd-suivi-label next">' + etape.label + '</div></div></div>';
+    } else {
+      futurs.push(etape.label);
+    }
+  });
+  html += '</div>';
+  if (futurs.length) html += '<div class="cmd-suivi-future">' + futurs.join(' · ') + '</div>';
+  if (estEchec && c.notes) html += '<div class="cmd-suivi-echec"><strong>Motif de l\'échec :</strong> ' + esc(c.notes) + '</div>';
+  html += '</div>';
+  return html;
+}
+function cmdRenderPanneauArticles(c) {
+  const lignes = c.lignes || [];
+  const sousTotal = lignes.reduce(function(s, l) { return s + Number(l.qte || 0) * Number(l.prix || 0); }, 0);
+  const frais = Number(c.frais_livraison || 0);
+  const lignesHtml = lignes.map(function(l) {
+    return '<div class="cmd-article-row"><span class="cmd-article-qte">' + esc(l.qte) + ' ×</span>&nbsp;' + esc(l.nom) + '<span style="margin-left:auto;">' + fmtMontant(Number(l.qte || 0) * Number(l.prix || 0)) + '</span></div>';
+  }).join('');
+  const paiementBoxHtml = c.mode_paiement === 'orange_money'
+    ? '<div class="cmd-paiement-box paye">Orange Money · payé</div>'
+    : (c.paiement_statut === 'paye' ? '<div class="cmd-paiement-box paye">Cash · payé</div>' : '<div class="cmd-paiement-box du">Cash · à encaisser à la livraison</div>');
+  return '<div class="cmd-panel-section">'
+    + '<div class="cmd-panel-section-title">Articles</div>'
+    + lignesHtml
+    + '<div class="cmd-totaux-row"><span>Sous-total</span><span>' + fmtMontant(sousTotal) + ' GNF</span></div>'
+    + '<div class="cmd-totaux-row"><span>Frais de livraison</span><span>' + (frais > 0 ? fmtMontant(frais) + ' GNF' : 'Livraison offerte') + '</span></div>'
+    + '<div class="cmd-totaux-row total"><span>Total</span><span>' + fmtMontant(c.total) + '<span class="unit"> GNF</span></span></div>'
+    + paiementBoxHtml
+    + '</div>';
+}
+function cmdRenderPanneauActions(c) {
+  const peutGerer = session.role === 'gerant';
+  const peutPreparerRole = session.role === 'gerant' || session.role === 'agent';
+  let principalHtml = '';
+  if (c.statut === 'recue' && peutPreparerRole) {
+    principalHtml = '<button class="ajr-btn primary" style="width:100%;justify-content:center;" onclick="marquerCommandePreparee(\'' + c.id + '\')"><i class="ti ti-checklist"></i> Marquer comme préparée</button>';
+  } else if (c.statut === 'preparee') {
+    principalHtml = '<div class="cmd-panel-info-box">Visible par les livreurs disponibles</div>';
+  } else if (c.statut === 'assignee' || c.statut === 'en_livraison') {
+    const agent = c.livreur_id ? cmdAgentsMap[c.livreur_id] : null;
+    principalHtml = '<div class="cmd-panel-info-box">Prise en charge par ' + (agent ? esc(agent.nom) : 'un livreur') + '</div>';
+  }
+  let secondaryHtml = '<button class="ajr-btn ghost" onclick="imprimerFactureCommande(\'' + c.id + '\')"><i class="ti ti-file-invoice"></i> Facture</button>';
+  if (peutGerer) {
+    secondaryHtml += '<button class="ajr-btn ghost" onclick="ouvrirModifierCommande(\'' + c.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>';
+  }
+  return principalHtml + '<div class="cmd-panel-secondary-row">' + secondaryHtml + '</div>';
+}
+function cmdRenderPanneau(c) {
+  document.getElementById('cmdPanelNumero').textContent = 'Commande #' + c.numero;
+  document.getElementById('cmdPanelAvatar').textContent = initiales(c.client_nom);
+  document.getElementById('cmdPanelNom').textContent = c.client_nom;
+  document.getElementById('cmdPanelMeta').textContent = [c.client_quartier, c.client_telephone].filter(Boolean).join(' · ');
+  const callBtn = document.getElementById('cmdPanelCall');
+  if (c.client_telephone) { callBtn.href = 'tel:' + c.client_telephone; callBtn.classList.remove('hidden'); }
+  else { callBtn.classList.add('hidden'); }
+
+  const heureStr = heureSouhaiteeCourte(c);
+  const minutes = calculerMinutesRestantes(heureStr);
+  const estUrgent = cmdEstUrgente(c);
+  const statutInfo = CMD_STATUT_V2[c.statut] || CMD_STATUT_V2.recue;
+  let pillsHtml = '';
+  if (heureStr) {
+    pillsHtml += '<span class="cmd-panel-pill' + (estUrgent ? ' urgent' : '') + '">Pour ' + heureStr + (estUrgent ? ' · ' + (minutes <= 0 ? 'en retard' : 'dans ' + minutes + ' min') : '') + '</span>';
+  }
+  pillsHtml += '<span class="cmd-panel-pill" style="background:' + statutInfo.bg + ';color:' + statutInfo.color + ';">' + statutInfo.label + '</span>';
+  document.getElementById('cmdPanelPills').innerHTML = pillsHtml;
+
+  document.getElementById('cmdPanelBody').innerHTML = cmdRenderPanneauArticles(c) + cmdRenderPanneauSuivi(c);
+  document.getElementById('cmdPanelFooter').innerHTML = cmdRenderPanneauActions(c);
+}
+function cmdOuvrirPanneau(id) {
+  cmdSelectedId = id;
+  const c = commandesCache.find(function(x) { return x.id === id; });
+  if (!c) return;
+  cmdRenderPanneau(c);
+  document.getElementById('cmdPanel').classList.add('open');
+  cmdRenderTable(cmdListeFiltree());
+}
+function cmdFermerPanneau() {
+  cmdSelectedId = null;
+  const panel = document.getElementById('cmdPanel');
+  if (panel) panel.classList.remove('open');
+  cmdRenderTable(cmdListeFiltree());
+}
+function cmdRenderTout() {
+  cmdRenderToolbar();
+  const liste = cmdListeFiltree();
+  cmdRenderTable(liste);
+  if (cmdSelectedId) {
+    const c = commandesCache.find(function(x) { return x.id === cmdSelectedId; });
+    if (c) cmdRenderPanneau(c); else cmdFermerPanneau();
+  }
 }
 async function marquerCommandePreparee(id) {
   const { error } = await sb.from('gn_commandes').update({ statut: 'preparee' }).eq('id', id);
