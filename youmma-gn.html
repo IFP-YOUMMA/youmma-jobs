@@ -894,6 +894,7 @@ button.suivi-pastille{cursor:pointer;}
 .cmd-row-paiement-statut{font-size:12px;margin-top:2px;}
 .cmd-row-paiement-statut.paye{color:#1F7A4D;}
 .cmd-row-paiement-statut.du{color:#8A6100;}
+.cmd-row-paiement-statut.rembourse{color:#5F6275;}
 .cmd-row-montant{font-family:'Sora',system-ui,sans-serif;font-size:14px;font-weight:700;color:#1E2247;text-align:right;}
 .cmd-row-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap;justify-self:start;}
 .cmd-table-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-top:1px solid #F1EFEA;font-size:12.5px;color:#5F6275;flex-shrink:0;flex-wrap:wrap;}
@@ -930,6 +931,7 @@ button.suivi-pastille{cursor:pointer;}
 .cmd-paiement-box{border-radius:12px;padding:12px 14px;font-size:13px;font-weight:600;margin-top:12px;}
 .cmd-paiement-box.du{background:#FDF3D7;color:#8A6100;}
 .cmd-paiement-box.paye{background:#E6F2EB;color:#1F7A4D;}
+.cmd-paiement-box.rembourse{background:#F3F2EE;color:#5F6275;}
 .cmd-suivi-step{display:flex;gap:12px;position:relative;padding-bottom:20px;}
 .cmd-suivi-step:last-child{padding-bottom:0;}
 .cmd-suivi-line{position:absolute;left:9px;top:22px;bottom:0;width:2px;background:#E7E5E0;}
@@ -972,6 +974,7 @@ button.suivi-pastille{cursor:pointer;}
 .cmd-mobile-card-paiement{font-size:12px;font-weight:600;}
 .cmd-mobile-card-paiement.du{color:#8A6100;}
 .cmd-mobile-card-paiement.paye{color:#1F7A4D;}
+.cmd-mobile-card-paiement.rembourse{color:#5F6275;}
 .cmd-mobile-card-montant{font-family:'Sora',system-ui,sans-serif;font-size:15px;font-weight:700;color:#1E2247;margin-left:auto;}
 
 @media (max-width:900px){
@@ -2490,7 +2493,9 @@ function construireHtmlFactureCommande(c, numeroFacture) {
   const modeLabel = c.mode_paiement === 'orange_money' ? 'Orange Money' : 'Cash';
   const paiementBadgeHtml = c.paiement_statut === 'paye'
     ? '<span class="paiement-badge-facture" style="background:#EAF3DE;color:#3B6D11;">Payé</span>'
-    : '<span class="paiement-badge-facture" style="background:#FAEEDA;color:#854F0B;">Dû à la livraison</span>';
+    : c.paiement_statut === 'rembourse'
+      ? '<span class="paiement-badge-facture" style="background:#F3F2EE;color:#5F6275;">Remboursé</span>'
+      : '<span class="paiement-badge-facture" style="background:#FAEEDA;color:#854F0B;">Dû à la livraison</span>';
 
   const statutCouleur = STATUT_COULEURS_FACTURE[c.statut] || STATUT_COULEURS_FACTURE.recue;
   const statutLabel = STATUT_LABELS_FACTURE[c.statut] || c.statut;
@@ -2735,7 +2740,9 @@ function cmdRenderRow(c) {
   const modeLabel = c.mode_paiement === 'orange_money' ? 'Orange Money' : 'Cash';
   const paiementStatutHtml = c.paiement_statut === 'paye'
     ? '<div class="cmd-row-paiement-statut paye">Payé</div>'
-    : '<div class="cmd-row-paiement-statut du">À encaisser</div>';
+    : c.paiement_statut === 'rembourse'
+      ? '<div class="cmd-row-paiement-statut rembourse">Remboursé</div>'
+      : '<div class="cmd-row-paiement-statut du">À encaisser</div>';
   const heureCreation = cmdHeureDe(c.date_creation);
   return '<div class="cmd-row' + (cmdSelectedId === c.id ? ' selected' : '') + '" onclick="cmdOuvrirPanneau(\'' + c.id + '\')">'
     + '<div class="cmd-row-client">'
@@ -2759,7 +2766,9 @@ function cmdRenderMobileCard(c) {
   const modeLabel = c.mode_paiement === 'orange_money' ? 'Orange Money' : 'Cash';
   const paiementHtml = c.paiement_statut === 'paye'
     ? '<span class="cmd-mobile-card-paiement paye">' + modeLabel + ' · payé</span>'
-    : '<span class="cmd-mobile-card-paiement du">' + modeLabel + ' · à encaisser</span>';
+    : c.paiement_statut === 'rembourse'
+      ? '<span class="cmd-mobile-card-paiement rembourse">' + modeLabel + ' · remboursé</span>'
+      : '<span class="cmd-mobile-card-paiement du">' + modeLabel + ' · à encaisser</span>';
   return '<div class="cmd-mobile-card' + (cmdEstUrgente(c) ? ' urgent' : '') + '" onclick="cmdOuvrirPanneau(\'' + c.id + '\')">'
     + '<div class="cmd-mobile-card-row1">'
     + '<div class="ajr-avatar small" style="background:' + avatarStyle.bg + ';color:' + avatarStyle.color + ';">' + esc(initiales(c.client_nom)) + '</div>'
@@ -2814,7 +2823,7 @@ function cmdRenderPanneauSuivi(c) {
 
   const etapes = [
     { key: 'recue', label: 'Reçue', date: c.date_creation, auteur: c.agent_creation },
-    { key: 'preparee', label: 'Préparée', date: null, auteur: null },
+    { key: 'preparee', label: 'Préparée', date: c.date_preparation, auteur: null },
     { key: 'assignee', label: 'Assignée', date: c.date_assignation, auteur: livreurNom },
     { key: 'en_livraison', label: 'En livraison', date: c.date_debut_livraison, auteur: livreurNom },
     estEchec
@@ -2849,9 +2858,12 @@ function cmdRenderPanneauArticles(c) {
   const lignesHtml = lignes.map(function(l) {
     return '<div class="cmd-article-row"><span class="cmd-article-qte">' + esc(l.qte) + ' ×</span>&nbsp;' + esc(l.nom) + '<span style="margin-left:auto;">' + fmtMontant(Number(l.qte || 0) * Number(l.prix || 0)) + '</span></div>';
   }).join('');
-  const paiementBoxHtml = c.mode_paiement === 'orange_money'
-    ? '<div class="cmd-paiement-box paye">Orange Money · payé</div>'
-    : (c.paiement_statut === 'paye' ? '<div class="cmd-paiement-box paye">Cash · payé</div>' : '<div class="cmd-paiement-box du">Cash · à encaisser à la livraison</div>');
+  const modeLabelBox = c.mode_paiement === 'orange_money' ? 'Orange Money' : 'Cash';
+  const paiementBoxHtml = c.paiement_statut === 'rembourse'
+    ? '<div class="cmd-paiement-box rembourse">' + modeLabelBox + ' · remboursé</div>'
+    : c.paiement_statut === 'paye'
+      ? '<div class="cmd-paiement-box paye">' + modeLabelBox + ' · payé</div>'
+      : '<div class="cmd-paiement-box du">' + modeLabelBox + ' · à encaisser à la livraison</div>';
   return '<div class="cmd-panel-section">'
     + '<div class="cmd-panel-section-title">Articles</div>'
     + lignesHtml
@@ -2934,7 +2946,7 @@ function cmdRenderTout() {
   }
 }
 async function marquerCommandePreparee(id) {
-  const { error } = await sb.from('gn_commandes').update({ statut: 'preparee' }).eq('id', id);
+  const { error } = await sb.from('gn_commandes').update({ statut: 'preparee', date_preparation: new Date().toISOString() }).eq('id', id);
   if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
   showToast('Commande marquée préparée.');
   fermerMenusTaches();
@@ -2975,13 +2987,14 @@ async function annulerCommande(id) {
   }
 
   const updatePayload = { statut: 'annulee' };
-  if (c.paiement_statut === 'paye' && !rembourser) {
+  if (c.paiement_statut === 'paye' && rembourser) {
+    updatePayload.paiement_statut = 'rembourse';
+  } else if (c.paiement_statut === 'paye' && !rembourser) {
     updatePayload.notes = (c.notes ? c.notes + ' — ' : '') + 'Annulée sans remboursement (montant conservé)';
   }
   const { error } = await sb.from('gn_commandes').update(updatePayload).eq('id', id);
   if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
   if (c.paiement_statut === 'paye' && rembourser) {
-    // paiement_statut reste 'paye' : la contrainte CHECK de gn_commandes n'accepte que ('du','paye'), pas 'rembourse'.
     await sb.from('gn_caisse').insert({
       date: today(), type: 'sortie', montant: c.total, categorie: 'remboursement',
       mode_paiement: c.mode_paiement, commande_id: c.id, agent_nom: session.nom,
