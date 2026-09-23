@@ -495,29 +495,14 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .caisse-meta{font-size:11.5px;color:#9CA3AF;text-transform:capitalize;}
 .caisse-montant{font-weight:800;font-size:14px;}
 
-/* ---- Caisse (redesign) ---- */
+/* ---- Caisse (partagé avec Fournisseurs / Rapports — ne pas retirer) ---- */
 .kpi-icon.red{background:var(--red-bg);color:var(--red);}
 .kpi-icon.orange{background:var(--coral-bg);color:var(--orange);}
 .kpi-sub{font-size:11px;color:var(--text-light);margin-top:2px;}
 .caisse-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
 .rap-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
-.caisse-actions{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
-.caisse-action-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
-.caisse-action-btn.encaisser{background:var(--green-bg);color:#27500A;}
-.caisse-action-btn.depense{background:var(--red-bg);color:#791F1F;}
-.caisse-action-btn.historique{background:#fff;border:1.5px solid var(--border);color:var(--text);}
 .caisse-op-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .caisse-op-header-left{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:500;color:var(--text);}
-.caisse-op-count{background:var(--bg-page);color:var(--text-muted);font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px;}
-.caisse-op-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #F3F4F6;}
-.caisse-op-row:last-child{border-bottom:none;}
-.caisse-op-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-.caisse-op-icon.entree{background:var(--green-bg);color:var(--green);}
-.caisse-op-icon.sortie{background:var(--red-bg);color:var(--red);}
-.caisse-op-texte{flex:1;min-width:0;}
-.caisse-op-libelle{font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.caisse-op-meta{font-size:11.5px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:none;}
-.caisse-op-montant{font-size:13.5px;font-weight:500;flex-shrink:0;}
 #modalEncaisser .modal-header,#modalDepense .modal-header{background:var(--indigo-dark);border-bottom:3px solid var(--orange);}
 #modalEncaisser .modal-header h3,#modalDepense .modal-header h3{color:#fff;}
 #modalEncaisser .modal-header .modal-close,#modalDepense .modal-header .modal-close{color:#fff;}
@@ -525,8 +510,64 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 #modalEncaisser .form-row input,#modalEncaisser .form-row select,#modalDepense .form-row input,#modalDepense .form-row select{border:1.5px solid var(--border);border-radius:8px;}
 @media (max-width:600px){
   .caisse-kpi-grid{grid-template-columns:1fr;}
-  .caisse-actions{display:grid;grid-template-columns:1fr 1fr;}
 }
+
+/* ---- Caisse V2 (redesign) ---- */
+.cai-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap;flex-shrink:0;}
+.cai-header-title{font-family:'Sora',system-ui,sans-serif;font-size:28px;font-weight:600;color:#1E2247;}
+.cai-header-sub{font-size:14px;color:#5F6275;margin-top:4px;}
+.cai-header-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.cai-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:46px;padding:0 18px;border-radius:12px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;}
+.cai-btn.encaisser{background:#E6F2EB;color:#1F7A4D;}
+.cai-btn.depense{background:#FBE9E9;color:#B42318;}
+.cai-datebar{display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:8px 10px;box-shadow:0 1px 2px rgba(30,34,71,.06);margin-bottom:16px;flex-shrink:0;}
+.cai-datebar-arrow{width:36px;height:36px;border-radius:10px;border:1px solid #E7E5E0;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#1E2247;font-size:16px;flex-shrink:0;}
+.cai-datebar-arrow:disabled{opacity:.35;cursor:not-allowed;}
+.cai-datebar-center{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600;color:#1E2247;flex-wrap:wrap;text-align:center;}
+.cai-datebar-center i{color:#E8622C;}
+.cai-datebar-badge{background:#E6F2EB;color:#1F7A4D;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.cai-datebar-histo{display:inline-flex;align-items:center;gap:4px;color:#E8622C;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.cai-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;flex-shrink:0;}
+@media (max-width:900px){
+  .cai-kpi-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  .cai-solde-card{grid-column:1/-1;}
+}
+.cai-kpi-card{background:#fff;border-radius:20px;padding:20px;box-shadow:0 1px 2px rgba(30,34,71,.06);min-width:0;}
+.cai-kpi-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.cai-kpi-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.cai-kpi-icon.green{background:#E6F2EB;color:#1F7A4D;}
+.cai-kpi-icon.red{background:#FBE9E9;color:#B42318;}
+.cai-kpi-nb{font-size:12px;color:#9A9CAB;font-weight:600;}
+.cai-kpi-label{font-size:13px;color:#5F6275;margin-top:12px;}
+.cai-kpi-value{font-family:'Sora',system-ui,sans-serif;font-size:28px;font-weight:600;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cai-kpi-value.green{color:#1F7A4D;}
+.cai-kpi-value.red{color:#B42318;}
+.cai-solde-card{background:#1E2247;color:#fff;border-radius:20px;padding:20px;position:relative;overflow:hidden;box-shadow:0 1px 2px rgba(30,34,71,.06);min-width:0;}
+.cai-solde-card::before{content:'';position:absolute;right:-60px;top:-70px;width:150px;height:150px;border-radius:50%;border:20px solid rgba(232,98,44,.22);}
+.cai-solde-card::after{content:'';position:absolute;right:30px;bottom:-36px;width:70px;height:70px;border-radius:50%;background:rgba(232,98,44,.16);}
+.cai-solde-label{font-size:13px;color:#B9BCD3;position:relative;z-index:1;}
+.cai-solde-value{font-family:'Sora',system-ui,sans-serif;font-size:32px;font-weight:600;margin-top:8px;position:relative;z-index:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cai-ops-card{background:#fff;border-radius:20px;padding:18px 20px;box-shadow:0 1px 2px rgba(30,34,71,.06);flex:1;min-height:0;display:flex;flex-direction:column;}
+.cai-ops-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-shrink:0;}
+.cai-ops-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#1E2247;}
+.cai-ops-count{background:#1E2247;color:#fff;font-size:12px;font-weight:700;padding:3px 11px;border-radius:20px;flex-shrink:0;}
+.cai-ops-list{flex:1;min-height:0;overflow-y:auto;}
+.cai-op-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0EEE9;}
+.cai-op-row:last-child{border-bottom:none;}
+.cai-op-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.cai-op-icon.entree{background:#E6F2EB;color:#1F7A4D;}
+.cai-op-icon.sortie{background:#FBE9E9;color:#B42318;}
+.cai-op-texte{flex:1;min-width:0;}
+.cai-op-libelle{font-size:14px;font-weight:600;color:#1E2247;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cai-op-meta{font-size:12px;color:#9A9CAB;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cai-op-montant{font-family:'Sora',system-ui,sans-serif;font-size:14.5px;font-weight:600;flex-shrink:0;}
+.cai-op-montant.entree{color:#1F7A4D;}
+.cai-op-montant.sortie{color:#B42318;}
+.cai-mobile-header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.cai-mobile-title{font-family:'Sora',system-ui,sans-serif;font-size:22px;font-weight:600;color:#1E2247;}
+.cai-mobile-sub{font-size:13px;color:#5F6275;margin-top:2px;}
+.cai-mobile-actions{display:flex;gap:10px;margin-bottom:12px;}
+.cai-mobile-actions .cai-btn{flex:1;}
 
 .om-header{display:flex;gap:24px;flex-wrap:wrap;}
 .om-label{font-size:11px;color:#9CA3AF;font-weight:600;text-transform:uppercase;}
@@ -745,6 +786,8 @@ button.suivi-pastille{cursor:pointer;}
 .cmd-panel.open{flex-direction:column;}
 .prod-desktop{display:flex;flex-direction:column;}
 .prod-mobile{display:none;}
+.cai-desktop{display:flex;flex-direction:column;}
+.cai-mobile{display:none;}
 
 /* ---- Aujourd'hui V2 : version mobile (redesign) ---- */
 .ajr-mobile-header{background:#1E2247;color:#fff;padding:14px 20px 74px;margin:-16px -16px 0;border-radius:0 0 28px 28px;position:relative;overflow:hidden;}
@@ -807,6 +850,8 @@ button.suivi-pastille{cursor:pointer;}
   .cmd-mobile{display:block;}
   .prod-desktop{display:none;}
   .prod-mobile{display:block;}
+  .cai-desktop{display:none;}
+  .cai-mobile{display:block;}
   #modalProduit .modal-card{position:fixed;inset:0;width:auto;max-width:none;height:100vh;max-height:none;border-radius:0;display:flex;flex-direction:column;}
   #modalProduit .modal-body{flex:1;overflow-y:auto;}
 }
@@ -1581,36 +1626,97 @@ button.suivi-pastille{cursor:pointer;}
 
       <!-- PAGE : CAISSE -->
       <section id="page-caisse" class="page">
-        <div class="taches-header">
-          <div class="taches-header-left">
-            <div class="taches-header-icon" style="width:38px;height:38px;"><i class="ti ti-cash"></i></div>
-            <div><h2>Caisse</h2><div class="taches-header-sub" id="caisseSousTitre">—</div></div>
+        <!-- Bureau -->
+        <div class="cai-desktop">
+          <div class="cai-header">
+            <div>
+              <div class="cai-header-title">Caisse</div>
+              <div class="cai-header-sub">Conakry</div>
+            </div>
+            <div class="cai-header-actions">
+              <button class="cai-btn encaisser" onclick="openModal('modalEncaisser')"><i class="ti ti-plus"></i> Encaisser</button>
+              <button class="cai-btn depense" onclick="openModal('modalDepense')"><i class="ti ti-minus"></i> Dépense</button>
+            </div>
+          </div>
+          <div class="cai-datebar">
+            <button class="cai-datebar-arrow" onclick="caissePrecedent()" aria-label="Jour précédent"><i class="ti ti-chevron-left"></i></button>
+            <div class="cai-datebar-center">
+              <i class="ti ti-calendar"></i>
+              <span id="caisseDateLabel">—</span>
+              <span class="cai-datebar-badge hidden" id="caisseBadgeAuj">Aujourd'hui</span>
+            </div>
+            <button class="cai-datebar-arrow" id="caisseBtnSuivant" onclick="caisseSuivant()" aria-label="Jour suivant"><i class="ti ti-chevron-right"></i></button>
+            <button class="cai-datebar-histo" onclick="navigate('rapports')">Historique complet <i class="ti ti-arrow-right"></i></button>
+          </div>
+          <div class="cai-kpi-grid">
+            <div class="cai-kpi-card">
+              <div class="cai-kpi-top"><div class="cai-kpi-icon green"><i class="ti ti-trending-up"></i></div><span class="cai-kpi-nb" id="caisseEntreesNb"></span></div>
+              <div class="cai-kpi-label">Entrées du jour</div>
+              <div class="cai-kpi-value green" id="caisseEntrees">—</div>
+            </div>
+            <div class="cai-kpi-card">
+              <div class="cai-kpi-top"><div class="cai-kpi-icon red"><i class="ti ti-trending-down"></i></div><span class="cai-kpi-nb" id="caisseSortiesNb"></span></div>
+              <div class="cai-kpi-label">Sorties du jour</div>
+              <div class="cai-kpi-value red" id="caisseSorties">—</div>
+            </div>
+            <div class="cai-solde-card">
+              <div class="cai-solde-label">Solde net</div>
+              <div class="cai-solde-value" id="caisseSolde">—</div>
+            </div>
+          </div>
+          <div class="cai-ops-card">
+            <div class="cai-ops-head">
+              <div class="cai-ops-title"><i class="ti ti-list" style="color:#E8622C;"></i> Opérations</div>
+              <span class="cai-ops-count" id="caisseOpCount">0</span>
+            </div>
+            <div class="cai-ops-list" id="caisseListe"></div>
           </div>
         </div>
-        <div class="caisse-kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-icon green"><i class="ti ti-trending-up"></i></div>
-            <div><div class="kpi-label">Entrées du jour</div><div class="kpi-value" id="caisseEntrees" style="color:var(--green);">—</div><div class="kpi-sub" id="caisseEntreesNb"></div></div>
+
+        <!-- Mobile -->
+        <div class="cai-mobile">
+          <div class="cai-mobile-header">
+            <div>
+              <div class="cai-mobile-title">Caisse</div>
+              <div class="cai-mobile-sub">Conakry</div>
+            </div>
           </div>
-          <div class="kpi-card">
-            <div class="kpi-icon red"><i class="ti ti-trending-down"></i></div>
-            <div><div class="kpi-label">Sorties du jour</div><div class="kpi-value" id="caisseSorties" style="color:var(--red);">—</div><div class="kpi-sub" id="caisseSortiesNb"></div></div>
+          <div class="cai-mobile-actions">
+            <button class="cai-btn encaisser" onclick="openModal('modalEncaisser')"><i class="ti ti-plus"></i> Encaisser</button>
+            <button class="cai-btn depense" onclick="openModal('modalDepense')"><i class="ti ti-minus"></i> Dépense</button>
           </div>
-          <div class="kpi-card" style="border:1.5px solid var(--orange);">
-            <div class="kpi-icon orange"><i class="ti ti-scale"></i></div>
-            <div><div class="kpi-label">Solde net</div><div class="kpi-value" id="caisseSolde" style="color:var(--orange);">—</div></div>
+          <div class="cai-datebar">
+            <button class="cai-datebar-arrow" onclick="caissePrecedent()" aria-label="Jour précédent"><i class="ti ti-chevron-left"></i></button>
+            <div class="cai-datebar-center">
+              <i class="ti ti-calendar"></i>
+              <span id="caisseDateLabelMobile">—</span>
+              <span class="cai-datebar-badge hidden" id="caisseBadgeAujMobile">Aujourd'hui</span>
+            </div>
+            <button class="cai-datebar-arrow" id="caisseBtnSuivantMobile" onclick="caisseSuivant()" aria-label="Jour suivant"><i class="ti ti-chevron-right"></i></button>
           </div>
-        </div>
-        <div class="caisse-actions">
-          <button class="caisse-action-btn encaisser" onclick="openModal('modalEncaisser')"><i class="ti ti-plus"></i> Encaisser</button>
-          <button class="caisse-action-btn depense" onclick="openModal('modalDepense')"><i class="ti ti-minus"></i> Dépense</button>
-        </div>
-        <div class="card">
-          <div class="caisse-op-header">
-            <div class="caisse-op-header-left"><i class="ti ti-list" style="color:var(--orange);"></i> Opérations du jour</div>
-            <span class="caisse-op-count" id="caisseOpCount">0</span>
+          <div class="cai-kpi-grid">
+            <div class="cai-kpi-card">
+              <div class="cai-kpi-top"><div class="cai-kpi-icon green"><i class="ti ti-trending-up"></i></div><span class="cai-kpi-nb" id="caisseEntreesNbMobile"></span></div>
+              <div class="cai-kpi-label">Entrées du jour</div>
+              <div class="cai-kpi-value green" id="caisseEntreesMobile">—</div>
+            </div>
+            <div class="cai-kpi-card">
+              <div class="cai-kpi-top"><div class="cai-kpi-icon red"><i class="ti ti-trending-down"></i></div><span class="cai-kpi-nb" id="caisseSortiesNbMobile"></span></div>
+              <div class="cai-kpi-label">Sorties du jour</div>
+              <div class="cai-kpi-value red" id="caisseSortiesMobile">—</div>
+            </div>
+            <div class="cai-solde-card">
+              <div class="cai-solde-label">Solde net</div>
+              <div class="cai-solde-value" id="caisseSoldeMobile">—</div>
+            </div>
           </div>
-          <div id="caisseListe"></div>
+          <div class="cai-ops-card">
+            <div class="cai-ops-head">
+              <div class="cai-ops-title"><i class="ti ti-list" style="color:#E8622C;"></i> Opérations</div>
+              <span class="cai-ops-count" id="caisseOpCountMobile">0</span>
+            </div>
+            <div class="cai-ops-list" id="caisseListeMobile"></div>
+          </div>
         </div>
       </section>
 
@@ -1956,6 +2062,7 @@ let agentEnEdition = null;
 let agentPourResetPin = null;
 let caisseEntreesJour = 0;
 let caisseSortiesJour = 0;
+let caisseDateSelectionnee = today();
 let perfMoisSelectionne = null;
 let perfCommandesMoisCache = [];
 let perfAgentsRoleMap = {};
@@ -2212,7 +2319,7 @@ function navigate(page) {
   if (pageEl) pageEl.classList.add('active');
   document.querySelectorAll('[data-nav]').forEach(function(n) { n.classList.toggle('active', n.dataset.nav === page); });
   const topbar = document.getElementById('mobileTopbar');
-  const cachePourCettePage = page === 'aujourdhui' || page === 'produits' || (page === 'commandes' && session.role !== 'livreur');
+  const cachePourCettePage = page === 'aujourdhui' || page === 'produits' || page === 'caisse' || (page === 'commandes' && session.role !== 'livreur');
   if (topbar) topbar.style.display = cachePourCettePage ? 'none' : '';
   if (PAGE_LOADERS[page]) PAGE_LOADERS[page]();
 }
@@ -3872,32 +3979,74 @@ async function enregistrerPaiementFournisseur() {
 }
 
 /* ── PAGE CAISSE ── */
+function caisseAjouterJours(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().split('T')[0];
+}
+function caisseFormatDate(dateStr, court) {
+  const d = new Date(dateStr + 'T00:00:00Z');
+  const s = court
+    ? d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
+    : d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+function caissePrecedent() {
+  caisseDateSelectionnee = caisseAjouterJours(caisseDateSelectionnee, -1);
+  loadCaisse();
+}
+function caisseSuivant() {
+  if (caisseDateSelectionnee >= today()) return;
+  caisseDateSelectionnee = caisseAjouterJours(caisseDateSelectionnee, 1);
+  loadCaisse();
+}
+function caisseRenderDateNav() {
+  const estAuj = caisseDateSelectionnee === today();
+  document.getElementById('caisseDateLabel').textContent = caisseFormatDate(caisseDateSelectionnee, false);
+  document.getElementById('caisseDateLabelMobile').textContent = caisseFormatDate(caisseDateSelectionnee, true);
+  document.getElementById('caisseBadgeAuj').classList.toggle('hidden', !estAuj);
+  document.getElementById('caisseBadgeAujMobile').classList.toggle('hidden', !estAuj);
+  document.getElementById('caisseBtnSuivant').disabled = estAuj;
+  document.getElementById('caisseBtnSuivantMobile').disabled = estAuj;
+}
 async function loadCaisse() {
-  const t = today();
+  const t = caisseDateSelectionnee;
   const { data } = await sb.from('gn_caisse').select('*').eq('date', t).order('created_at', { ascending: false });
   const ops = data || [];
   const entrees = ops.filter(function(o) { return o.type === 'entree'; });
   const sorties = ops.filter(function(o) { return o.type === 'sortie'; });
   caisseEntreesJour = entrees.reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
   caisseSortiesJour = sorties.reduce(function(s, o) { return s + Number(o.montant || 0); }, 0);
-  document.getElementById('caisseEntrees').textContent = fmtMontant(caisseEntreesJour) + ' GNF';
-  document.getElementById('caisseSorties').textContent = fmtMontant(caisseSortiesJour) + ' GNF';
-  document.getElementById('caisseSolde').textContent = fmtMontant(caisseEntreesJour - caisseSortiesJour) + ' GNF';
-  document.getElementById('caisseEntreesNb').textContent = entrees.length + ' opération' + (entrees.length > 1 ? 's' : '');
-  document.getElementById('caisseSortiesNb').textContent = sorties.length + ' opération' + (sorties.length > 1 ? 's' : '');
+  const entreesTxt = fmtMontant(caisseEntreesJour) + ' GNF';
+  const sortiesTxt = fmtMontant(caisseSortiesJour) + ' GNF';
+  const soldeTxt = fmtMontant(caisseEntreesJour - caisseSortiesJour) + ' GNF';
+  const entreesNbTxt = entrees.length + ' opération' + (entrees.length > 1 ? 's' : '');
+  const sortiesNbTxt = sorties.length + ' opération' + (sorties.length > 1 ? 's' : '');
+  document.getElementById('caisseEntrees').textContent = entreesTxt;
+  document.getElementById('caisseEntreesMobile').textContent = entreesTxt;
+  document.getElementById('caisseSorties').textContent = sortiesTxt;
+  document.getElementById('caisseSortiesMobile').textContent = sortiesTxt;
+  document.getElementById('caisseSolde').textContent = soldeTxt;
+  document.getElementById('caisseSoldeMobile').textContent = soldeTxt;
+  document.getElementById('caisseEntreesNb').textContent = entreesNbTxt;
+  document.getElementById('caisseEntreesNbMobile').textContent = entreesNbTxt;
+  document.getElementById('caisseSortiesNb').textContent = sortiesNbTxt;
+  document.getElementById('caisseSortiesNbMobile').textContent = sortiesNbTxt;
   document.getElementById('caisseOpCount').textContent = ops.length;
-  document.getElementById('caisseListe').innerHTML = ops.length ? ops.map(renderCaisseOpRow).join('') : '<div class="priority-empty"><i class="ti ti-receipt-off"></i>Aucune opération aujourd\'hui.</div>';
-  const dateBrute = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  document.getElementById('caisseSousTitre').textContent = dateBrute.charAt(0).toUpperCase() + dateBrute.slice(1) + ' · Conakry';
+  document.getElementById('caisseOpCountMobile').textContent = ops.length;
+  const listeHtml = ops.length ? ops.map(renderCaisseOpRow).join('') : '<div class="ajr-empty"><div class="ajr-empty-icon neutral"><i class="ti ti-receipt-off"></i></div><div class="ajr-empty-title">Aucune opération ce jour-là</div></div>';
+  document.getElementById('caisseListe').innerHTML = listeHtml;
+  document.getElementById('caisseListeMobile').innerHTML = listeHtml;
+  caisseRenderDateNav();
 }
 function renderCaisseOpRow(o) {
   const isEntree = o.type === 'entree';
   const heure = o.created_at ? new Date(o.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
   const meta = [o.categorie || '', o.agent_nom || '', heure].filter(Boolean).join(' · ');
-  return '<div class="caisse-op-row">'
-    + '<div class="caisse-op-icon ' + (isEntree ? 'entree' : 'sortie') + '"><i class="ti ti-arrow-' + (isEntree ? 'down' : 'up') + '-circle"></i></div>'
-    + '<div class="caisse-op-texte"><div class="caisse-op-libelle">' + esc(o.libelle) + '</div><div class="caisse-op-meta">' + esc(meta) + '</div></div>'
-    + '<div class="caisse-op-montant" style="color:' + (isEntree ? 'var(--green)' : 'var(--red)') + ';">' + (isEntree ? '+ ' : '− ') + fmtMontant(o.montant) + ' GNF</div>'
+  return '<div class="cai-op-row">'
+    + '<div class="cai-op-icon ' + (isEntree ? 'entree' : 'sortie') + '"><i class="ti ti-arrow-' + (isEntree ? 'down' : 'up') + '-circle"></i></div>'
+    + '<div class="cai-op-texte"><div class="cai-op-libelle">' + esc(o.libelle) + '</div><div class="cai-op-meta">' + esc(meta) + '</div></div>'
+    + '<div class="cai-op-montant ' + (isEntree ? 'entree' : 'sortie') + '">' + (isEntree ? '+ ' : '− ') + fmtMontant(o.montant) + ' GNF</div>'
     + '</div>';
 }
 async function enregistrerEncaissement() {
