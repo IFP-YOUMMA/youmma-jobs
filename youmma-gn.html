@@ -946,6 +946,10 @@ button.suivi-pastille{cursor:pointer;}
 .cmd-panel-info-box{background:#F3F2EE;color:#5F6275;border-radius:10px;padding:12px 14px;font-size:12.5px;text-align:center;}
 .cmd-panel-secondary-row{display:flex;gap:10px;}
 .cmd-panel-secondary-row .ajr-btn{flex:1;justify-content:center;}
+.cmd-panel-tertiary-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:4px;}
+.cmd-panel-text-btn{background:none;border:none;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;cursor:pointer;padding:10px 4px;min-height:44px;}
+.cmd-panel-text-btn.blue{color:#2E5FB0;}
+.cmd-panel-text-btn.red{color:#B42318;}
 
 .cmd-mobile-header{padding:0 0 4px;}
 .cmd-mobile-title{font-family:'Sora',system-ui,sans-serif;font-size:22px;font-weight:700;color:#1E2247;}
@@ -2868,7 +2872,15 @@ function cmdRenderPanneauActions(c) {
   if (peutGerer) {
     secondaryHtml += '<button class="ajr-btn ghost" onclick="ouvrirModifierCommande(\'' + c.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>';
   }
-  return principalHtml + '<div class="cmd-panel-secondary-row">' + secondaryHtml + '</div>';
+  let tertiaryHtml = '';
+  if (peutGerer && (c.statut === 'assignee' || c.statut === 'en_livraison')) {
+    tertiaryHtml += '<button class="cmd-panel-text-btn blue" onclick="remettreDisponible(\'' + c.id + '\')"><i class="ti ti-arrow-back-up"></i> Remettre disponible</button>';
+  }
+  if (peutGerer && c.statut !== 'livree' && c.statut !== 'annulee') {
+    tertiaryHtml += '<button class="cmd-panel-text-btn red" onclick="annulerCommande(\'' + c.id + '\')"><i class="ti ti-x"></i> Annuler la commande</button>';
+  }
+  const tertiaryRow = tertiaryHtml ? '<div class="cmd-panel-tertiary-row">' + tertiaryHtml + '</div>' : '';
+  return principalHtml + '<div class="cmd-panel-secondary-row">' + secondaryHtml + '</div>' + tertiaryRow;
 }
 function cmdRenderPanneau(c) {
   document.getElementById('cmdPanelNumero').textContent = 'Commande #' + c.numero;
@@ -2926,18 +2938,23 @@ async function marquerCommandePreparee(id) {
   updateSidebarBadgeCommandes();
 }
 async function remettreDisponible(id) {
-  if (!confirm('Remettre cette commande disponible pour les livreurs ?')) return;
+  const c = commandesCache.find(function(x) { return x.id === id; });
+  const agent = c && c.livreur_id ? cmdAgentsMap[c.livreur_id] : null;
+  const nomLivreur = agent ? agent.nom : 'ce livreur';
+  if (!confirm('Retirer la commande à ' + nomLivreur + ' et la remettre disponible pour les livreurs ?')) return;
   const { error } = await sb.from('gn_commandes').update({ statut: 'preparee', livreur_id: null, date_assignation: null }).eq('id', id);
   if (error) { showToast('Erreur: ' + error.message, 'error'); return; }
   showToast('Commande remise disponible.');
   fermerMenusTaches();
   loadCommandes();
+  if (document.getElementById('page-aujourdhui').classList.contains('active')) loadAujourdhui();
+  updateSidebarBadgeCommandes();
 }
 async function annulerCommande(id) {
   if (session.role !== 'gerant') return;
-  if (!confirm('Annuler définitivement cette commande ? Le stock sera restauré.')) return;
   const c = commandesCache.find(function(x) { return x.id === id; });
   if (!c) return;
+  if (!confirm('Annuler la commande #' + c.numero + ' ? Cette action est définitive.')) return;
   const lignes = c.lignes || [];
   for (let i = 0; i < lignes.length; i++) {
     const ligne = lignes[i];
@@ -2950,6 +2967,8 @@ async function annulerCommande(id) {
   fermerMenusTaches();
   loadCommandes();
   loadProduits();
+  if (document.getElementById('page-aujourdhui').classList.contains('active')) loadAujourdhui();
+  updateSidebarBadgeCommandes();
 }
 function ouvrirModifierCommande(id) {
   commandeEnEdition = commandesCache.find(function(x) { return x.id === id; });

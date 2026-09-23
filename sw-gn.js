@@ -1,4 +1,4 @@
-const CACHE = 'youmma-gn-v6';
+const CACHE = 'youmma-gn-v7';
 const APP_SHELL = ['/youmma-gn.html', '/manifest-gn.json'];
 
 self.addEventListener('install', (e) => {
