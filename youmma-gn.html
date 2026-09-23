@@ -60,18 +60,20 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .app-shell{display:flex;min-height:100vh;}
 .sidebar{width:240px;flex-shrink:0;background:var(--indigo-dark);color:#fff;display:flex;flex-direction:column;padding:18px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;}
 .sidebar-brand{display:flex;align-items:center;gap:10px;padding:4px 4px 16px;}
-.sidebar-brand-icon{width:36px;height:36px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;color:#fff;}
+.sidebar-brand-icon{width:36px;height:36px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;color:#fff;}
 .sidebar-brand-title{font-size:14px;font-weight:500;line-height:1.2;}
-.sidebar-brand-title .accent{color:var(--orange-light);}
+.sidebar-brand-title .accent{color:#F2875C;}
 .sidebar-brand-sub{font-size:12px;color:#A9A9D0;margin-top:1px;}
 .sidebar-sep{border-top:1px solid rgba(255,255,255,.12);margin:4px 0 14px;}
-.sidebar-menu-label{font-size:11px;color:#7F7FB3;letter-spacing:.08em;font-weight:500;padding:0 10px 8px;}
-.sidebar-nav{display:flex;flex-direction:column;gap:2px;flex:1;}
-.nav-item{display:flex;align-items:center;gap:10px;background:none;border:none;color:#C9C9E6;padding:10px 14px;border-radius:8px;text-align:left;font-weight:400;font-size:13.5px;cursor:pointer;width:100%;}
+.sidebar-section{display:flex;flex-direction:column;gap:2px;margin-bottom:16px;}
+.sidebar-section:last-child{margin-bottom:0;}
+.sidebar-menu-label{font-size:11px;color:#9A9DB8;letter-spacing:.08em;font-weight:500;text-transform:uppercase;padding:0 10px 8px;}
+.sidebar-nav{display:flex;flex-direction:column;flex:1;}
+.nav-item{display:flex;align-items:center;gap:10px;background:none;border:none;color:#C9C9E6;padding:12px 14px;border-radius:8px;text-align:left;font-weight:400;font-size:13.5px;cursor:pointer;width:100%;min-height:44px;box-sizing:border-box;}
 .nav-item i{font-size:16px;flex-shrink:0;}
 .nav-item:hover{background:rgba(255,255,255,.06);}
-.nav-item.active{background:rgba(232,93,4,.18);color:#fff;font-weight:500;border-left:3px solid var(--orange);border-radius:0 8px 8px 0;padding-left:11px;}
-.nav-item.active i{color:var(--orange-light);}
+.nav-item.active{background:rgba(255,255,255,.10);color:#fff;font-weight:700;}
+.nav-item.active i{color:var(--orange);}
 .sidebar-badge{margin-left:auto;background:var(--orange);color:#fff;font-size:10px;font-weight:700;border-radius:20px;padding:1px 7px;min-width:16px;text-align:center;}
 .sidebar-user{border-top:1px solid rgba(255,255,255,.12);padding-top:14px;margin-top:10px;display:flex;align-items:center;gap:10px;}
 .sidebar-user-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--indigo-dark);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:13px;flex-shrink:0;}
@@ -94,22 +96,19 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .hero-sub{font-size:13px;color:rgba(255,255,255,.65);margin-top:4px;text-transform:capitalize;}
 
 /* ---- Aujourd'hui (redesign) ---- */
-.aj-banner{background:var(--indigo);border-radius:14px;padding:24px 28px;color:#fff;margin-bottom:20px;border-bottom:4px solid var(--orange);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;}
-.aj-banner-watermark{position:absolute;right:-20px;top:-24px;font-size:120px;color:rgba(255,255,255,.06);pointer-events:none;line-height:1;z-index:0;}
-.aj-banner-row1{display:flex;align-items:center;gap:14px;position:relative;z-index:1;}
-.aj-banner-avatar{width:48px;height:48px;border-radius:50%;background:var(--gold);color:var(--indigo-dark);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:16px;flex-shrink:0;}
-.aj-banner-title{font-size:22px;font-weight:500;}
-.aj-banner-date{font-size:13px;color:#B9B9E0;margin-top:2px;display:flex;align-items:center;gap:6px;}
-.aj-banner-actions{display:flex;gap:10px;align-items:center;position:relative;z-index:1;flex-shrink:0;}
+.ajr-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
+.ajr-header-date{font-size:13px;color:#5F6275;text-transform:capitalize;}
+.ajr-header-title{font-family:'Sora',system-ui,sans-serif;font-size:28px;font-weight:700;color:#1E2247;margin-top:4px;}
+.ajr-header-actions{display:flex;gap:10px;align-items:center;flex-shrink:0;}
+.ajr-btn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;min-height:44px;box-sizing:border-box;}
+.ajr-btn.primary{background:#C8501E;color:#fff;border:none;}
+.ajr-btn.primary:hover{background:#A8410F;}
+.ajr-btn.ghost{background:#fff;color:#1E2247;border:1px solid #E7E5E0;}
+.ajr-btn.ghost:hover{background:#F7F6F3;}
 @media (max-width: 900px){
-  .aj-banner{flex-wrap:wrap;}
-  .aj-banner-actions{flex-wrap:wrap;}
+  .ajr-header{flex-wrap:wrap;}
+  .ajr-header-actions{flex-wrap:wrap;}
 }
-.aj-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:10px;font-size:13.5px;font-weight:500;cursor:pointer;border:none;color:#fff;}
-.aj-btn.primary{background:var(--orange);}
-.aj-btn.primary:hover{opacity:.92;}
-.aj-btn.ghost{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);}
-.aj-btn.ghost:hover{background:rgba(255,255,255,.2);}
 
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
 .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 1px 2px rgba(31,31,85,.04);display:flex;align-items:flex-start;gap:12px;}
@@ -122,46 +121,79 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .kpi-value{font-size:24px;font-weight:500;color:var(--text);margin-top:2px;}
 .kpi-value small{font-size:12px;font-weight:400;color:var(--text-muted);}
 
-/* ---- Aujourd'hui : cartes stats (redesign) ---- */
-.aj-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
-.aj-stat-card{background:#fff;border:1px solid #EAE6DF;border-radius:18px;padding:20px;min-width:0;}
-.aj-stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;}
-.aj-stat-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.aj-stat-icon.blue{background:#E9F0FC;color:#2E6BD6;}
-.aj-stat-icon.amber{background:#FDF3E3;color:#B9770E;}
-.aj-stat-icon.orange{background:#FDEEE6;color:#E8622C;}
-.aj-stat-icon.green{background:#E7F6ED;color:#1F9254;}
-.aj-stat-badge{font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0;}
-.aj-stat-badge.blue{background:#E9F0FC;color:#2E6BD6;}
-.aj-stat-badge.amber{background:#FDF3E3;color:#B9770E;}
-.aj-stat-badge.orange{background:#FDEEE6;color:#E8622C;}
-.aj-stat-badge.green{background:#E7F6ED;color:#1F9254;}
-.aj-stat-label{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#8A8494;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.aj-stat-value{font-size:32px;font-weight:800;color:#1E2247;font-family:'Sora',system-ui,sans-serif;line-height:1.15;}
-.aj-stat-context{font-size:12px;color:#8A8494;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* ---- Aujourd'hui : bande d'indicateurs (redesign) ---- */
+.ajr-kpi-card{background:#fff;border:1px solid #E7E5E0;border-radius:16px;padding:0;margin-bottom:20px;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 1px 2px rgba(31,31,85,.04);}
+.ajr-kpi-col{padding:18px 22px;border-left:1px solid #E7E5E0;min-width:0;}
+.ajr-kpi-col:first-child{border-left:none;}
+.ajr-kpi-label{font-size:12px;color:#5F6275;}
+.ajr-kpi-value{font-family:'Sora',system-ui,sans-serif;font-size:24px;font-weight:700;color:#1E2247;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ajr-kpi-sub{font-size:12px;color:#5F6275;margin-top:4px;}
+.ajr-kpi-sub.green{color:#1F7A4D;}
 @media (max-width:900px){
-  .aj-stat-grid{grid-template-columns:repeat(2,1fr);}
-}
-@media (max-width:480px){
-  .aj-stat-grid{grid-template-columns:1fr;}
+  .ajr-kpi-card{grid-template-columns:repeat(2,1fr);}
+  .ajr-kpi-col:nth-child(3){border-left:none;}
 }
 
-.priority-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:0 1px 2px rgba(31,31,85,.04);margin-bottom:16px;}
-.priority-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
-.priority-header-left{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:500;color:var(--text);}
-.priority-header-left i{color:var(--orange);}
-.priority-see-all{color:var(--orange);font-size:13px;font-weight:500;background:none;border:none;cursor:pointer;}
-.priority-card-head{display:grid;grid-template-columns:90px 1fr 110px 100px 90px;gap:10px;padding:0 14px 8px;font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:.04em;}
-.priority-row{display:grid;grid-template-columns:90px 1fr 110px 100px 90px;gap:10px;align-items:center;padding:12px 14px;border-left:3px solid transparent;border-bottom:1px solid #EEEFF4;cursor:pointer;}
-.priority-row:last-child{border-bottom:none;}
-.priority-row:hover{background:#FAFAFC;}
-.priority-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;white-space:nowrap;}
-.priority-task-title{font-size:13px;font-weight:500;color:var(--text);}
-.priority-task-client{font-size:12px;color:var(--text-muted);margin-top:2px;}
-.priority-col-montant{text-align:right;font-size:13px;font-weight:500;color:var(--text);}
-.priority-col-delai{font-size:12.5px;font-weight:500;color:var(--text-muted);text-align:right;}
+/* ---- Aujourd'hui : suivi du workflow (redesign) ---- */
+.ajr-tracker-card{background:#fff;border:1px solid #E7E5E0;border-radius:16px;padding:18px 22px;margin-bottom:20px;box-shadow:0 1px 2px rgba(31,31,85,.04);}
+.ajr-tracker-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.ajr-tracker-title{font-size:15px;font-weight:600;color:#1E2247;}
+.ajr-tracker-link{color:#E8622C;font-size:13px;font-weight:500;background:none;border:none;cursor:pointer;}
+.ajr-tracker-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;}
+.ajr-tracker-step{min-width:0;}
+.ajr-tracker-bar{height:6px;border-radius:4px;background:#E7E5E0;margin-bottom:8px;}
+.ajr-tracker-bar.orange{background:#E8622C;}
+.ajr-tracker-bar.green{background:#1F7A4D;}
+.ajr-tracker-label{font-size:12px;color:#5F6275;}
+.ajr-tracker-value{font-family:'Sora',system-ui,sans-serif;font-size:20px;font-weight:700;color:#1E2247;margin-top:2px;}
+.ajr-tracker-value.orange{color:#E8622C;}
+.ajr-tracker-value.green{color:#1F7A4D;}
+@media (max-width:480px){
+  .ajr-tracker-steps{gap:8px;}
+  .ajr-tracker-label{font-size:10.5px;}
+  .ajr-tracker-value{font-size:16px;}
+}
+
 .priority-empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:32px 0;color:var(--text-light);font-size:13px;text-align:center;}
 .priority-empty i{font-size:32px;}
+
+/* ---- Aujourd'hui : colonnes À traiter / Dernières commandes (redesign) ---- */
+.ajr-columns{display:grid;grid-template-columns:3fr 2fr;gap:20px;align-items:start;}
+@media (max-width:1000px){
+  .ajr-columns{grid-template-columns:1fr;}
+}
+.ajr-card{background:#fff;border:1px solid #E7E5E0;border-radius:16px;padding:18px 22px;box-shadow:0 1px 2px rgba(31,31,85,.04);}
+.ajr-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.ajr-card-title{font-size:15px;font-weight:600;color:#1E2247;}
+.ajr-card-subtitle{font-size:12px;color:#5F6275;margin-top:2px;margin-bottom:12px;}
+.ajr-card-link{color:#E8622C;font-size:13px;font-weight:500;background:none;border:none;cursor:pointer;}
+
+.ajr-traiter-row{display:flex;align-items:center;gap:12px;padding:12px 8px;border-bottom:1px solid #EEEFF4;cursor:pointer;border-radius:8px;min-height:44px;box-sizing:border-box;}
+.ajr-traiter-row:last-child{border-bottom:none;}
+.ajr-traiter-row:hover{background:#FAFAFC;}
+.ajr-traiter-row.urgent{background:#FDEEE6;}
+.ajr-traiter-main{flex:1;min-width:0;}
+.ajr-traiter-client{font-size:13.5px;font-weight:600;color:#1E2247;}
+.ajr-traiter-meta{font-size:12px;color:#5F6275;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ajr-traiter-heure{font-size:12.5px;font-weight:600;color:#5F6275;flex-shrink:0;}
+.ajr-traiter-row.urgent .ajr-traiter-heure{color:#C8501E;}
+.ajr-traiter-montant{font-size:13px;font-weight:600;color:#1E2247;flex-shrink:0;text-align:right;min-width:70px;}
+
+.ajr-empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:36px 12px;text-align:center;}
+.ajr-empty-icon{width:44px;height:44px;border-radius:50%;background:#EAF4EE;color:#1F7A4D;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.ajr-empty-title{font-size:14px;font-weight:600;color:#1E2247;}
+.ajr-empty-text{font-size:12.5px;color:#5F6275;max-width:280px;}
+.ajr-empty-link{color:#E8622C;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;margin-top:4px;}
+
+.ajr-recent-row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid #EEEFF4;cursor:pointer;min-height:44px;box-sizing:border-box;}
+.ajr-recent-row:last-child{border-bottom:none;}
+.ajr-recent-row:hover{background:#FAFAFC;}
+.ajr-recent-icon{width:34px;height:34px;border-radius:9px;background:#F7F6F3;color:#5F6275;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ajr-recent-main{flex:1;min-width:0;}
+.ajr-recent-client{font-size:13px;font-weight:600;color:#1E2247;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ajr-recent-meta{font-size:11.5px;color:#5F6275;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ajr-recent-right{text-align:right;flex-shrink:0;}
+.ajr-recent-montant{font-size:13px;font-weight:600;color:#1E2247;}
 
 /* ---- Module Devis & Factures ---- */
 #modalDocument .modal-body{overflow-x:hidden;}
@@ -651,6 +683,34 @@ button.suivi-pastille{cursor:pointer;}
 .mobile-topbar{display:none;}
 .bottom-nav{display:none;}
 .sidebar-overlay{display:none;}
+.ajr-desktop{display:block;}
+.ajr-mobile{display:none;}
+
+/* ---- Aujourd'hui : version mobile (redesign) ---- */
+.ajr-mobile-header{background:#1E2247;color:#fff;padding:16px 16px 20px;margin:-16px -16px 0;border-radius:0 0 18px 18px;}
+.ajr-mobile-header-top{display:flex;align-items:center;justify-content:space-between;}
+.ajr-mobile-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;}
+.ajr-mobile-brand-icon{width:30px;height:30px;border-radius:50%;background:#E8622C;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;color:#fff;}
+.ajr-mobile-avatar{width:32px;height:32px;border-radius:50%;background:var(--gold);color:var(--indigo-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;cursor:pointer;border:none;flex-shrink:0;}
+.ajr-mobile-date{font-size:12px;color:#B9B9E0;margin-top:14px;}
+.ajr-mobile-greeting{font-family:'Sora',system-ui,sans-serif;font-size:19px;font-weight:700;margin-top:2px;}
+.ajr-mobile-ca-label{font-size:12px;color:#B9B9E0;margin-top:14px;}
+.ajr-mobile-ca-value{font-family:'Sora',system-ui,sans-serif;font-size:30px;font-weight:700;margin-top:2px;}
+.ajr-mobile-ca-value .unit{font-size:15px;font-weight:500;color:#B9B9E0;margin-left:4px;}
+
+.ajr-mobile-kpi-card{background:#fff;border:1px solid #E7E5E0;border-radius:14px;display:grid;grid-template-columns:repeat(3,1fr);margin-top:14px;box-shadow:0 1px 2px rgba(31,31,85,.04);}
+.ajr-mobile-kpi-col{padding:14px 10px;text-align:center;border-left:1px solid #E7E5E0;min-width:0;}
+.ajr-mobile-kpi-col:first-child{border-left:none;}
+.ajr-mobile-kpi-value{font-family:'Sora',system-ui,sans-serif;font-size:19px;font-weight:700;color:#1E2247;}
+.ajr-mobile-kpi-label{font-size:11px;color:#5F6275;margin-top:2px;}
+
+.ajr-mobile-tracker-card{background:#fff;border:1px solid #E7E5E0;border-radius:14px;padding:14px 16px;margin-top:14px;}
+.ajr-mobile-tracker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;}
+.ajr-mobile-tracker-title{font-size:13.5px;font-weight:600;color:#1E2247;}
+.ajr-mobile-tracker-livrees{font-size:12.5px;font-weight:700;color:#1F7A4D;flex-shrink:0;}
+
+.ajr-mobile-actions{display:flex;gap:10px;margin-top:14px;}
+.ajr-mobile-actions .ajr-btn{flex:1;justify-content:center;min-height:52px;font-size:14px;}
 
 @media (max-width: 900px){
   .sidebar{position:fixed;left:-260px;top:0;height:100vh;width:240px;transition:left .25s;z-index:1000;}
@@ -660,18 +720,18 @@ button.suivi-pastille{cursor:pointer;}
   .mobile-topbar{display:flex;align-items:center;gap:12px;background:var(--indigo-dark);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:500;}
   .mobile-topbar button{background:rgba(255,255,255,.1);border:none;color:#fff;font-size:18px;padding:6px 10px;border-radius:8px;cursor:pointer;}
   .mobile-topbar-title{font-weight:500;font-size:14px;}
-  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);z-index:900;padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));justify-content:space-around;}
-  .bottom-nav-item{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text-light);cursor:pointer;font-size:9.5px;font-weight:600;}
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);z-index:900;padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));justify-content:space-around;min-height:72px;box-sizing:border-box;}
+  .bottom-nav-item{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text-light);cursor:pointer;font-size:9.5px;font-weight:600;min-height:44px;}
   .bottom-nav-item i{font-size:18px;}
   .bottom-nav-item svg{width:20px;height:20px;}
-  .bottom-nav-item.active{color:var(--orange);}
+  .bottom-nav-item.active{color:#C8501E;}
   .bottom-nav-item span{font-weight:700;}
   .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;}
   .sidebar-overlay.open{display:block;}
   .kpi-grid{grid-template-columns:repeat(2,1fr);}
-  .priority-col-statut,.priority-head-statut{display:none;}
-  .priority-card-head,.priority-row{grid-template-columns:80px 1fr 90px 80px;}
   .rap-cols-grid{grid-template-columns:1fr;}
+  .ajr-desktop{display:none;}
+  .ajr-mobile{display:block;}
 }
 @media (max-width: 768px){
   .rap-kpi-grid{grid-template-columns:repeat(2,1fr);}
@@ -909,20 +969,28 @@ button.suivi-pastille{cursor:pointer;}
       <div class="sidebar-brand-icon"><i class="ti ti-shopping-cart"></i></div>
       <div>
         <div class="sidebar-brand-title">YOUMMA <span class="accent">GN</span></div>
-        <div class="sidebar-brand-sub">Livraison Conakry</div>
+        <div class="sidebar-brand-sub">Votre marché en ligne</div>
       </div>
     </div>
     <div class="sidebar-sep"></div>
-    <div class="sidebar-menu-label">MENU</div>
     <nav class="sidebar-nav">
-      <button class="nav-item" data-nav="aujourdhui" onclick="navigate('aujourdhui')"><i class="ti ti-home"></i> Aujourd'hui</button>
-      <button class="nav-item" data-nav="commandes" onclick="navigate('commandes')"><i class="ti ti-shopping-bag"></i> Commandes<span class="sidebar-badge" id="sidebarBadgeCommandes" style="display:none;">0</span></button>
-      <button class="nav-item gn-restricted" data-nav="produits" onclick="navigate('produits')"><i class="ti ti-package"></i> Produits</button>
-      <button class="nav-item gerant-only" data-nav="fournisseurs" onclick="navigate('fournisseurs')"><i class="ti ti-building-warehouse"></i> Fournisseurs</button>
-      <button class="nav-item gerant-only" data-nav="caisse" onclick="navigate('caisse')"><i class="ti ti-cash"></i> Caisse</button>
-      <button class="nav-item gerant-only" data-nav="rapports" onclick="navigate('rapports')"><i class="ti ti-chart-bar"></i> Rapports</button>
-      <button class="nav-item gerant-only" data-nav="agents" onclick="navigate('agents')"><i class="ti ti-users"></i> Agents</button>
-      <button class="nav-item gerant-only" data-nav="parametres" onclick="navigate('parametres')"><i class="ti ti-settings"></i> Paramètres</button>
+      <div class="sidebar-section" id="sidebarSectionOperations">
+        <div class="sidebar-menu-label">Opérations</div>
+        <button class="nav-item" data-nav="aujourdhui" onclick="navigate('aujourdhui')"><i class="ti ti-home"></i> Aujourd'hui</button>
+        <button class="nav-item" data-nav="commandes" onclick="navigate('commandes')"><i class="ti ti-shopping-bag"></i> Commandes<span class="sidebar-badge" id="sidebarBadgeCommandes" style="display:none;">0</span></button>
+        <button class="nav-item gn-restricted" data-nav="produits" onclick="navigate('produits')"><i class="ti ti-package"></i> Produits</button>
+      </div>
+      <div class="sidebar-section" id="sidebarSectionFinances">
+        <div class="sidebar-menu-label">Finances</div>
+        <button class="nav-item gerant-only" data-nav="caisse" onclick="navigate('caisse')"><i class="ti ti-cash"></i> Caisse</button>
+        <button class="nav-item gerant-only" data-nav="fournisseurs" onclick="navigate('fournisseurs')"><i class="ti ti-building-warehouse"></i> Fournisseurs</button>
+        <button class="nav-item gerant-only" data-nav="rapports" onclick="navigate('rapports')"><i class="ti ti-chart-bar"></i> Rapports</button>
+      </div>
+      <div class="sidebar-section" id="sidebarSectionAdministration">
+        <div class="sidebar-menu-label">Administration</div>
+        <button class="nav-item gerant-only" data-nav="agents" onclick="navigate('agents')"><i class="ti ti-users"></i> Équipe</button>
+        <button class="nav-item gerant-only" data-nav="parametres" onclick="navigate('parametres')"><i class="ti ti-settings"></i> Paramètres</button>
+      </div>
     </nav>
     <div class="sidebar-user">
       <div class="sidebar-user-avatar" id="sidebarAvatar">--</div>
@@ -932,11 +1000,11 @@ button.suivi-pastille{cursor:pointer;}
       </div>
       <button class="sidebar-logout-icon" onclick="logout()" title="Déconnexion"><i class="ti ti-logout"></i></button>
     </div>
-    <button class="sidebar-back" onclick="window.location.href='index.html'"><i class="ti ti-arrow-left"></i> YOUMMA JOBS</button>
+    <button class="sidebar-back" onclick="window.location.href='index.html'"><i class="ti ti-arrow-left"></i> Retour à YOUMMA JOBS</button>
   </aside>
 
   <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
-    <div class="mobile-topbar">
+    <div class="mobile-topbar" id="mobileTopbar">
       <button onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
       <div class="mobile-topbar-title">YOUMMA GN</div>
     </div>
@@ -945,51 +1013,118 @@ button.suivi-pastille{cursor:pointer;}
 
       <!-- PAGE : AUJOURD'HUI -->
       <section id="page-aujourdhui" class="page">
-        <div class="aj-banner">
-          <i class="ti ti-shopping-cart aj-banner-watermark"></i>
-          <div class="aj-banner-row1">
-            <div class="aj-banner-avatar" id="ajAvatar">--</div>
+        <!-- Bureau -->
+        <div class="ajr-desktop">
+          <div class="ajr-header">
             <div>
-              <div class="aj-banner-title" id="ajBonjour">Bonjour</div>
-              <div class="aj-banner-date"><i class="ti ti-calendar"></i> <span id="ajDate">—</span></div>
+              <div class="ajr-header-date" id="ajDate">—</div>
+              <div class="ajr-header-title" id="ajBonjour">Bonjour</div>
+            </div>
+            <div class="ajr-header-actions">
+              <button class="ajr-btn ghost gerant-only" onclick="openModal('modalEncaisser')"><i class="ti ti-cash"></i> Encaisser</button>
+              <button class="ajr-btn primary gn-restricted" onclick="openModalCommande()"><i class="ti ti-plus"></i> Nouvelle commande</button>
             </div>
           </div>
-          <div class="aj-banner-actions">
-            <button class="aj-btn primary gn-restricted" onclick="openModalCommande()"><i class="ti ti-plus"></i> Nouvelle commande</button>
-            <button class="aj-btn ghost gerant-only" onclick="openModal('modalEncaisser')"><i class="ti ti-cash"></i> Encaisser</button>
+
+          <div class="ajr-kpi-card">
+            <div class="ajr-kpi-col">
+              <div class="ajr-kpi-label">Chiffre d'affaires du jour</div>
+              <div class="ajr-kpi-value" id="ajCaJour">—</div>
+              <div class="ajr-kpi-sub green" id="ajCaJourCtx">—</div>
+            </div>
+            <div class="ajr-kpi-col">
+              <div class="ajr-kpi-label">Commandes du jour</div>
+              <div class="ajr-kpi-value" id="ajCommandesJour">—</div>
+              <div class="ajr-kpi-sub" id="ajCommandesJourCtx">—</div>
+            </div>
+            <div class="ajr-kpi-col">
+              <div class="ajr-kpi-label">À traiter</div>
+              <div class="ajr-kpi-value" id="ajEnAttente">—</div>
+              <div class="ajr-kpi-sub" id="ajEnAttenteCtx">—</div>
+            </div>
+            <div class="ajr-kpi-col">
+              <div class="ajr-kpi-label">En livraison</div>
+              <div class="ajr-kpi-value" id="ajEnLivraison">—</div>
+              <div class="ajr-kpi-sub" id="ajEnLivraisonCtx">—</div>
+            </div>
+          </div>
+
+          <div class="ajr-tracker-card">
+            <div class="ajr-tracker-head">
+              <div class="ajr-tracker-title">Suivi des commandes du jour</div>
+              <button class="ajr-tracker-link" onclick="navigate('commandes')">Voir toutes les commandes</button>
+            </div>
+            <div class="ajr-tracker-steps" id="ajTrackerSteps"></div>
+          </div>
+
+          <div class="ajr-columns">
+            <div class="ajr-card">
+              <div class="ajr-card-head">
+                <div>
+                  <div class="ajr-card-title">À traiter</div>
+                  <div class="ajr-card-subtitle">Triées par heure souhaitée</div>
+                </div>
+              </div>
+              <div id="ajATraiterListe"></div>
+            </div>
+            <div class="ajr-card">
+              <div class="ajr-card-head">
+                <div class="ajr-card-title">Dernières commandes</div>
+                <button class="ajr-card-link" onclick="navigate('commandes')">Tout voir</button>
+              </div>
+              <div id="ajDernieresListe" style="margin-top:12px;"></div>
+            </div>
           </div>
         </div>
-        <div class="aj-stat-grid">
-          <div class="aj-stat-card">
-            <div class="aj-stat-top"><div class="aj-stat-icon blue"><i class="ti ti-shopping-bag"></i></div><span class="aj-stat-badge blue">Jour</span></div>
-            <div class="aj-stat-label">Commandes du jour</div>
-            <div class="aj-stat-value" id="ajCommandesJour">—</div>
-            <div class="aj-stat-context" id="ajCommandesJourCtx">—</div>
+
+        <!-- Mobile -->
+        <div class="ajr-mobile">
+          <div class="ajr-mobile-header">
+            <div class="ajr-mobile-header-top">
+              <div class="ajr-mobile-brand"><div class="ajr-mobile-brand-icon"><i class="ti ti-shopping-cart"></i></div> YOUMMA GN</div>
+              <div class="tache-menu">
+                <button class="ajr-mobile-avatar" id="ajMobileAvatar" onclick="toggleTacheMenu(event,'compte')">--</button>
+                <div class="tache-menu-dropdown" id="tacheMenu-compte">
+                  <div style="padding:8px 14px 2px;font-size:12.5px;font-weight:700;color:var(--text);" id="ajMobileNom">—</div>
+                  <div style="padding:0 14px 8px;font-size:11px;color:var(--text-muted);" id="ajMobileRole">—</div>
+                  <button class="tache-menu-item danger" onclick="logout()"><i class="ti ti-logout"></i> Déconnexion</button>
+                </div>
+              </div>
+            </div>
+            <div class="ajr-mobile-date" id="ajDateMobile">—</div>
+            <div class="ajr-mobile-greeting" id="ajBonjourMobile">Bonjour</div>
+            <div class="ajr-mobile-ca-label">Chiffre d'affaires du jour</div>
+            <div class="ajr-mobile-ca-value" id="ajCaJourMobile">—</div>
           </div>
-          <div class="aj-stat-card">
-            <div class="aj-stat-top"><div class="aj-stat-icon amber"><i class="ti ti-clock"></i></div><span class="aj-stat-badge amber">À traiter</span></div>
-            <div class="aj-stat-label">En attente</div>
-            <div class="aj-stat-value" id="ajEnAttente">—</div>
-            <div class="aj-stat-context" id="ajEnAttenteCtx">—</div>
+
+          <div class="ajr-mobile-kpi-card">
+            <div class="ajr-mobile-kpi-col"><div class="ajr-mobile-kpi-value" id="ajCommandesJourMobile">—</div><div class="ajr-mobile-kpi-label">Commandes</div></div>
+            <div class="ajr-mobile-kpi-col"><div class="ajr-mobile-kpi-value" id="ajEnAttenteMobile">—</div><div class="ajr-mobile-kpi-label">À traiter</div></div>
+            <div class="ajr-mobile-kpi-col"><div class="ajr-mobile-kpi-value" id="ajEnLivraisonMobile">—</div><div class="ajr-mobile-kpi-label">En route</div></div>
           </div>
-          <div class="aj-stat-card">
-            <div class="aj-stat-top"><div class="aj-stat-icon orange"><i class="ti ti-truck-delivery"></i></div><span class="aj-stat-badge orange">Route</span></div>
-            <div class="aj-stat-label">En livraison</div>
-            <div class="aj-stat-value" id="ajEnLivraison">—</div>
-            <div class="aj-stat-context" id="ajEnLivraisonCtx">—</div>
+
+          <div class="ajr-mobile-tracker-card">
+            <div class="ajr-mobile-tracker-head">
+              <div class="ajr-mobile-tracker-title">Suivi du jour</div>
+              <div class="ajr-mobile-tracker-livrees" id="ajLivreesMobileLabel">0 livrée</div>
+            </div>
+            <div class="ajr-tracker-steps" id="ajTrackerStepsMobile"></div>
           </div>
-          <div class="aj-stat-card">
-            <div class="aj-stat-top"><div class="aj-stat-icon green"><i class="ti ti-check"></i></div><span class="aj-stat-badge green">Livrées</span></div>
-            <div class="aj-stat-label">Livrées aujourd'hui</div>
-            <div class="aj-stat-value" id="ajLivrees">—</div>
-            <div class="aj-stat-context" id="ajLivreesCtx">—</div>
+
+          <div class="ajr-card" style="margin-top:14px;">
+            <div class="ajr-card-head">
+              <div>
+                <div class="ajr-card-title">À traiter</div>
+                <div class="ajr-card-subtitle">Triées par heure souhaitée</div>
+              </div>
+            </div>
+            <div id="ajATraiterListeMobile"></div>
           </div>
-        </div>
-        <div class="priority-card">
-          <div class="priority-header-row">
-            <div class="priority-header-left"><i class="ti ti-list-details"></i> Commandes à traiter</div>
+
+          <div class="ajr-mobile-actions">
+            <button class="ajr-btn primary gn-restricted" onclick="openModalCommande()"><i class="ti ti-plus"></i> Commande</button>
+            <button class="ajr-btn ghost gerant-only" onclick="openModal('modalEncaisser')"><i class="ti ti-cash"></i> Encaisser</button>
           </div>
-          <div id="ajCommandesListe"></div>
         </div>
       </section>
 
@@ -1227,19 +1362,19 @@ button.suivi-pastille{cursor:pointer;}
   <nav class="bottom-nav" id="bottomNav">
     <button class="bottom-nav-item" data-nav="aujourdhui" onclick="navigate('aujourdhui')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
-      <span>Accueil</span>
+      <span>Aujourd'hui</span>
     </button>
     <button class="bottom-nav-item" data-nav="commandes" onclick="navigate('commandes')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="13" height="9" rx="1.5"/><path d="M16 11h4l3 3v3h-7z"/><circle cx="7.5" cy="19.5" r="1.6"/><circle cx="18.5" cy="19.5" r="1.6"/></svg>
       <span>Commandes</span>
     </button>
-    <button class="bottom-nav-item gn-restricted" data-nav="produits" onclick="navigate('produits')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7l-8-4-8 4 8 4 8-4z"/><path d="M4 7v10l8 4 8-4V7"/><path d="M12 11v10"/></svg>
-      <span>Produits</span>
-    </button>
     <button class="bottom-nav-item gerant-only" data-nav="caisse" onclick="navigate('caisse')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10.3c0-1 1-1.5 2.5-1.5s2.5.6 2.5 1.4-1 1.2-2.5 1.4-2.5.6-2.5 1.5 1 1.4 2.5 1.4 2.5-.4 2.5-1.4"/></svg>
       <span>Caisse</span>
+    </button>
+    <button class="bottom-nav-item" onclick="toggleSidebar()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <span>Menu</span>
     </button>
   </nav>
 </div>
@@ -1650,6 +1785,10 @@ function applyRoleVisibility() {
   const estGerantOuAgent = session.role === 'gerant' || session.role === 'agent';
   document.querySelectorAll('.gn-restricted').forEach(function(el) { el.style.display = estGerantOuAgent ? '' : 'none'; });
   document.querySelectorAll('.gerant-only').forEach(function(el) { el.style.display = session.role === 'gerant' ? '' : 'none'; });
+  document.querySelectorAll('.sidebar-section').forEach(function(section) {
+    const aUnLienVisible = Array.from(section.querySelectorAll('.nav-item')).some(function(item) { return item.style.display !== 'none'; });
+    section.style.display = aUnLienVisible ? '' : 'none';
+  });
 }
 async function updateSidebarBadgeCommandes() {
   const { data } = await sb.from('gn_commandes').select('id').eq('statut', 'recue');
@@ -1693,16 +1832,78 @@ function navigate(page) {
   const pageEl = document.getElementById('page-' + page);
   if (pageEl) pageEl.classList.add('active');
   document.querySelectorAll('[data-nav]').forEach(function(n) { n.classList.toggle('active', n.dataset.nav === page); });
+  const topbar = document.getElementById('mobileTopbar');
+  if (topbar) topbar.style.display = page === 'aujourdhui' ? 'none' : '';
   if (PAGE_LOADERS[page]) PAGE_LOADERS[page]();
 }
 function loadAujourdhuiWrap() { loadAujourdhui(); }
 
 /* ── PAGE AUJOURD'HUI ── */
+const AJR_EMPTY_ATRAITER = '<div class="ajr-empty"><div class="ajr-empty-icon"><i class="ti ti-check"></i></div>'
+  + '<div class="ajr-empty-title">Tout est à jour</div>'
+  + '<div class="ajr-empty-text">Les nouvelles commandes apparaîtront ici, les plus urgentes en premier.</div>'
+  + '<button class="ajr-empty-link" onclick="openModalCommande()">+ Saisir une commande</button>'
+  + '</div>';
+function renderAjrTrackerSteps(counts, court) {
+  const steps = [
+    { key: 'recue', label: court ? 'Reçue' : 'Reçue' },
+    { key: 'preparee', label: court ? 'Prép.' : 'Préparée' },
+    { key: 'assignee', label: court ? 'Assig.' : 'Assignée' },
+    { key: 'en_livraison', label: court ? 'Route' : 'En livraison' },
+    { key: 'livree', label: 'Livrée' },
+  ];
+  return steps.map(function(s, i) {
+    const n = counts[s.key] || 0;
+    const couleur = i === 4 ? 'green' : 'orange';
+    const cls = n > 0 ? ' ' + couleur : '';
+    return '<div class="ajr-tracker-step">'
+      + '<div class="ajr-tracker-bar' + cls + '"></div>'
+      + '<div class="ajr-tracker-label">' + s.label + '</div>'
+      + '<div class="ajr-tracker-value' + cls + '">' + n + '</div>'
+      + '</div>';
+  }).join('');
+}
+function renderAjrTraiterRow(c) {
+  const badge = CMD_STATUT_BADGES[c.statut] || CMD_STATUT_BADGES.recue;
+  const heureStr = heureSouhaiteeCourte(c);
+  const minutes = calculerMinutesRestantes(heureStr);
+  const estUrgent = minutes !== null && minutes < 20;
+  return '<div class="ajr-traiter-row' + (estUrgent ? ' urgent' : '') + '" onclick="ouvrirModifierCommande(\'' + c.id + '\')">'
+    + '<div class="ajr-traiter-main">'
+    + '<div class="ajr-traiter-client">' + esc(c.client_nom) + '</div>'
+    + '<div class="ajr-traiter-meta">#' + esc(c.numero) + (c.client_quartier ? ' · ' + esc(c.client_quartier) : '') + '</div>'
+    + '</div>'
+    + '<div class="ajr-traiter-heure">' + (heureStr || '—') + '</div>'
+    + '<div class="ajr-traiter-montant">' + fmtMontant(c.total) + ' GNF</div>'
+    + '<span class="cmd-badge ' + badge.cls + '">' + badge.label + '</span>'
+    + '</div>';
+}
+function renderAjrRecentRow(c) {
+  const badge = CMD_STATUT_BADGES[c.statut] || CMD_STATUT_BADGES.recue;
+  const heureStr = heureSouhaiteeCourte(c);
+  const badgeHtml = c.statut === 'livree'
+    ? '<span class="cmd-badge" style="background:#EAF4EE;color:#1F7A4D;">' + badge.label + '</span>'
+    : '<span class="cmd-badge ' + badge.cls + '">' + badge.label + '</span>';
+  return '<div class="ajr-recent-row" onclick="ouvrirModifierCommande(\'' + c.id + '\')">'
+    + '<div class="ajr-recent-icon"><i class="ti ti-shopping-bag"></i></div>'
+    + '<div class="ajr-recent-main">'
+    + '<div class="ajr-recent-client">' + esc(c.client_nom) + '</div>'
+    + '<div class="ajr-recent-meta">#' + esc(c.numero) + (c.client_quartier ? ' · ' + esc(c.client_quartier) : '') + (heureStr ? ' · ' + heureStr : '') + '</div>'
+    + '</div>'
+    + '<div class="ajr-recent-right"><div class="ajr-recent-montant">' + fmtMontant(c.total) + ' GNF</div>' + badgeHtml + '</div>'
+    + '</div>';
+}
 async function loadAujourdhui() {
-  document.getElementById('ajAvatar').textContent = initiales(session.nom);
-  document.getElementById('ajBonjour').textContent = 'Bonjour, ' + session.nom.split(' ')[0];
+  const prenom = session.nom.split(' ')[0];
+  document.getElementById('ajBonjour').textContent = 'Bonjour, ' + prenom;
+  document.getElementById('ajBonjourMobile').textContent = 'Bonjour, ' + prenom;
+  document.getElementById('ajMobileAvatar').textContent = initiales(session.nom);
+  document.getElementById('ajMobileNom').textContent = session.nom;
+  document.getElementById('ajMobileRole').textContent = ROLE_LABELS[session.role] || session.role;
   const dateBrute = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  document.getElementById('ajDate').textContent = dateBrute.charAt(0).toUpperCase() + dateBrute.slice(1) + ' · Conakry';
+  const dateTxt = dateBrute.charAt(0).toUpperCase() + dateBrute.slice(1) + ' · Conakry';
+  document.getElementById('ajDate').textContent = dateTxt;
+  document.getElementById('ajDateMobile').textContent = dateTxt;
 
   const t = today();
   const debutJour = t + 'T00:00:00';
@@ -1714,29 +1915,47 @@ async function loadAujourdhui() {
   const enAttente = commandes.filter(function(c) { return c.statut === 'recue' || c.statut === 'preparee'; });
   const enLivraison = commandes.filter(function(c) { return c.statut === 'en_livraison'; });
   const livreesAuj = commandes.filter(function(c) { return c.statut === 'livree' && c.date_livraison && c.date_livraison >= debutJour && c.date_livraison <= finJour; });
+  const caJour = livreesAuj.reduce(function(s, c) { return s + Number(c.total || 0); }, 0);
+  const nbLivreurs = new Set(enLivraison.map(function(c) { return c.livreur_id; }).filter(Boolean)).size;
+
+  document.getElementById('ajCaJour').textContent = fmtMontant(caJour) + ' GNF';
+  document.getElementById('ajCaJourMobile').innerHTML = fmtMontant(caJour) + ' <span class="unit">GNF</span>';
+  document.getElementById('ajCaJourCtx').textContent = 'Sur ' + livreesAuj.length + ' commande' + (livreesAuj.length > 1 ? 's' : '') + ' livrée' + (livreesAuj.length > 1 ? 's' : '');
 
   document.getElementById('ajCommandesJour').textContent = duJour.length;
+  document.getElementById('ajCommandesJourMobile').textContent = duJour.length;
+  document.getElementById('ajCommandesJourCtx').textContent = duJour.length ? duJour.length + ' reçue' + (duJour.length > 1 ? 's' : '') + ' aujourd\'hui' : 'Pas encore de commande';
+
   document.getElementById('ajEnAttente').textContent = enAttente.length;
+  document.getElementById('ajEnAttenteMobile').textContent = enAttente.length;
+  document.getElementById('ajEnAttenteCtx').textContent = 'Reçues ou préparées';
+
   document.getElementById('ajEnLivraison').textContent = enLivraison.length;
-  document.getElementById('ajLivrees').textContent = livreesAuj.length;
+  document.getElementById('ajEnLivraisonMobile').textContent = enLivraison.length;
+  document.getElementById('ajEnLivraisonCtx').textContent = nbLivreurs > 0
+    ? nbLivreurs + ' livreur' + (nbLivreurs > 1 ? 's' : '') + ' en route'
+    : 'Aucun livreur en route';
 
-  document.getElementById('ajCommandesJourCtx').textContent = duJour.length
-    ? duJour.length + ' commande' + (duJour.length > 1 ? 's' : '') + ' reçue' + (duJour.length > 1 ? 's' : '') + ' aujourd\'hui'
-    : 'Pas encore de commande';
-  document.getElementById('ajEnAttenteCtx').textContent = enAttente.length
-    ? enAttente.length + ' en attente de traitement'
-    : 'Aucune commande en file';
-  document.getElementById('ajEnLivraisonCtx').textContent = enLivraison.length
-    ? enLivraison.length + ' commande' + (enLivraison.length > 1 ? 's' : '') + ' en cours de route'
-    : 'Aucun livreur actif';
-  const caJour = livreesAuj.reduce(function(s, c) { return s + Number(c.total || 0); }, 0);
-  document.getElementById('ajLivreesCtx').textContent = 'CA du jour : ' + fmtMontant(caJour) + ' GNF';
+  const counts = {
+    recue: duJour.filter(function(c) { return c.statut === 'recue'; }).length,
+    preparee: duJour.filter(function(c) { return c.statut === 'preparee'; }).length,
+    assignee: duJour.filter(function(c) { return c.statut === 'assignee'; }).length,
+    en_livraison: duJour.filter(function(c) { return c.statut === 'en_livraison'; }).length,
+    livree: livreesAuj.length,
+  };
+  document.getElementById('ajTrackerSteps').innerHTML = renderAjrTrackerSteps(counts, false);
+  document.getElementById('ajTrackerStepsMobile').innerHTML = renderAjrTrackerSteps(counts, true);
+  document.getElementById('ajLivreesMobileLabel').textContent = livreesAuj.length + ' livrée' + (livreesAuj.length > 1 ? 's' : '');
 
-  const ordre = { recue: 1, preparee: 2, assignee: 3, en_livraison: 4, echec: 5 };
   const aTraiter = commandes.filter(function(c) { return c.statut !== 'livree' && c.statut !== 'annulee'; })
-    .sort(function(a, b) { return (ordre[a.statut] || 9) - (ordre[b.statut] || 9) || new Date(b.date_creation) - new Date(a.date_creation); });
-  document.getElementById('ajCommandesListe').innerHTML = aTraiter.length ? aTraiter.map(renderCommandeCard).join('')
-    : '<div class="priority-empty"><i class="ti ti-shopping-bag-off"></i>Aucune commande à traiter.</div>';
+    .sort(comparerPrioriteLivraison);
+  const aTraiterHtml = aTraiter.length ? aTraiter.map(renderAjrTraiterRow).join('') : AJR_EMPTY_ATRAITER;
+  document.getElementById('ajATraiterListe').innerHTML = aTraiterHtml;
+  document.getElementById('ajATraiterListeMobile').innerHTML = aTraiterHtml;
+
+  const dernieres = duJour.slice().sort(function(a, b) { return new Date(b.date_creation) - new Date(a.date_creation); }).slice(0, 5);
+  document.getElementById('ajDernieresListe').innerHTML = dernieres.length ? dernieres.map(renderAjrRecentRow).join('')
+    : '<div class="priority-empty"><i class="ti ti-shopping-bag-off"></i>Aucune commande aujourd\'hui.</div>';
 }
 
 /* ── COMMANDES : PARTAGÉ ── */
