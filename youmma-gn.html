@@ -69,7 +69,11 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .sidebar-section:last-child{margin-bottom:0;}
 .sidebar-menu-label{font-size:11px;color:#8E91AE;letter-spacing:1.2px;font-weight:700;text-transform:uppercase;padding:18px 12px 8px;}
 .sidebar-nav > .sidebar-section:first-child .sidebar-menu-label{padding-top:6px;}
-.sidebar-nav{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;}
+.sidebar-nav{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent;}
+.sidebar-nav::-webkit-scrollbar{width:6px;}
+.sidebar-nav::-webkit-scrollbar-track{background:transparent;}
+.sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:3px;}
+.sidebar-nav::-webkit-scrollbar-button{display:none;}
 .nav-item{display:flex;align-items:center;gap:10px;background:none;border:none;color:#D5D7E6;padding:0 12px;border-radius:12px;text-align:left;font-weight:400;font-size:15px;cursor:pointer;width:100%;height:44px;flex-shrink:0;box-sizing:border-box;}
 .nav-item i{font-size:16px;flex-shrink:0;}
 .nav-item:hover{background:rgba(255,255,255,.06);}
@@ -84,6 +88,11 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .sidebar-logout-icon:hover{background:rgba(255,255,255,.16);color:#fff;}
 .sidebar-back{background:none;border:none;color:#B9BCD3;font-size:12px;font-weight:400;cursor:pointer;margin-top:10px;padding:6px 4px;text-align:left;display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .sidebar-back:hover{color:#fff;}
+@media (max-height:700px){
+  .nav-item{height:40px;}
+  .sidebar-menu-label{padding:12px 12px 6px;}
+  .sidebar-nav > .sidebar-section:first-child .sidebar-menu-label{padding-top:6px;}
+}
 
 .main{flex:1;padding:26px 30px 60px;overflow-y:auto;min-width:0;}
 .page{display:none;}
@@ -132,8 +141,8 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
   .ajr-ca-card{grid-column:1/-1;}
 }
 .ajr-ca-card{background:#1E2247;color:#fff;border-radius:20px;padding:22px 24px;position:relative;overflow:hidden;box-shadow:0 1px 2px rgba(30,34,71,.06);}
-.ajr-ca-card::before{content:'';position:absolute;right:-60px;top:-70px;width:190px;height:190px;border-radius:50%;border:22px solid rgba(232,98,44,.22);}
-.ajr-ca-card::after{content:'';position:absolute;right:70px;bottom:-40px;width:90px;height:90px;border-radius:50%;background:rgba(232,98,44,.16);}
+.ajr-ca-card::before{content:'';position:absolute;right:-70px;top:-80px;width:170px;height:170px;border-radius:50%;border:22px solid rgba(232,98,44,.22);}
+.ajr-ca-card::after{content:'';position:absolute;right:40px;bottom:-40px;width:80px;height:80px;border-radius:50%;background:rgba(232,98,44,.16);}
 .ajr-ca-label{display:flex;align-items:center;gap:6px;color:#B9BCD3;font-size:13px;position:relative;z-index:1;}
 .ajr-ca-label i{color:#E8622C;}
 .ajr-ca-value{font-family:'Sora',system-ui,sans-serif;font-size:34px;font-weight:700;margin-top:8px;position:relative;z-index:1;}
@@ -1119,7 +1128,7 @@ button.suivi-pastille{cursor:pointer;}
           <div class="ajr-row3">
             <div class="ajr-card ajr-traiter-card">
               <div class="ajr-card-head">
-                <div class="ajr-card-title-row"><div class="ajr-card-title">À traiter</div><span class="ajr-card-badge" id="ajTraiterBadge">0</span></div>
+                <div class="ajr-card-title-row"><div class="ajr-card-title">À traiter</div><span class="ajr-card-badge hidden" id="ajTraiterBadge">0</span></div>
                 <div class="ajr-card-subtitle" style="margin:0;">Par heure souhaitée</div>
               </div>
               <div class="ajr-traiter-list" id="ajATraiterListe"></div>
@@ -1179,7 +1188,7 @@ button.suivi-pastille{cursor:pointer;}
 
           <div class="ajr-card" style="margin-top:14px;">
             <div class="ajr-card-head">
-              <div class="ajr-card-title-row"><div class="ajr-card-title">À traiter</div><span class="ajr-card-badge" id="ajTraiterBadgeMobile">0</span></div>
+              <div class="ajr-card-title-row"><div class="ajr-card-title">À traiter</div><span class="ajr-card-badge hidden" id="ajTraiterBadgeMobile">0</span></div>
               <button class="ajr-card-link" onclick="navigate('commandes')">Tout voir</button>
             </div>
             <div id="ajATraiterListeMobile" style="margin-top:10px;"></div>
@@ -2046,8 +2055,10 @@ async function loadAujourdhui() {
   const aTraiterHtml = aTraiter.length ? aTraiter.map(renderAjrTraiterRow).join('') : AJR_EMPTY_ATRAITER;
   document.getElementById('ajATraiterListe').innerHTML = aTraiterHtml;
   document.getElementById('ajATraiterListeMobile').innerHTML = aTraiterHtml;
-  document.getElementById('ajTraiterBadge').textContent = aTraiter.length;
-  document.getElementById('ajTraiterBadgeMobile').textContent = aTraiter.length;
+  document.querySelectorAll('#ajTraiterBadge, #ajTraiterBadgeMobile').forEach(function(el) {
+    el.textContent = aTraiter.length;
+    el.classList.toggle('hidden', aTraiter.length === 0);
+  });
 
   const estGerant = session.role === 'gerant';
   if (estGerant) {
