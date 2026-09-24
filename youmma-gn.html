@@ -604,9 +604,24 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .four-list-vendus{font-size:12.5px;color:#5F6275;}
 .four-badge{font-size:11.5px;font-weight:700;padding:4px 11px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
 .four-modal-solde{background:#F4F3EF;border-radius:10px;padding:10px 14px;font-size:13px;color:#1E2247;margin-bottom:14px;}
+.four-tabs{display:flex;gap:8px;margin-bottom:4px;}
+.four-tab{background:#fff;border:1px solid #E7E5E0;color:#1E2247;font-size:13px;font-weight:600;padding:9px 16px;border-radius:20px;cursor:pointer;}
+.four-tab.active{background:#1E2247;color:#fff;border-color:#1E2247;}
+.four-vue{display:flex;flex-direction:column;gap:16px;}
+.four-solde-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;position:relative;z-index:1;}
+.four-btn-depot{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3);padding:12px 18px;border-radius:12px;font-size:13.5px;font-weight:600;cursor:pointer;}
+.four-rapport-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.four-kpi-card-navy{background:#1E2247;}
+.four-kpi-card-navy .four-kpi-value{color:#fff;}
+.four-kpi-card-navy .four-kpi-label{color:#B9BCD3;}
+.four-depot-ligne{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.four-depot-ligne select{flex:1;min-width:0;height:42px;padding:0 10px;border:1.5px solid #E7E5E0;border-radius:10px;font-size:13px;background:#fff;}
+.four-depot-ligne input[type="number"]{width:72px;height:42px;padding:0 8px;border:1.5px solid #E7E5E0;border-radius:10px;font-size:13px;text-align:center;flex-shrink:0;}
+.four-depot-ligne-remove{width:42px;height:42px;border-radius:10px;border:1px solid #FBE9E9;background:#FBE9E9;color:#B42318;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
 @media (max-width:480px){
   .four-kpi-grid{grid-template-columns:1fr 1fr;}
-  .four-kpi-card:nth-child(3){grid-column:1/-1;}
+  .four-kpi-grid .four-kpi-card:nth-child(3){grid-column:1/-1;}
+  .four-rapport-kpi-grid{grid-template-columns:1fr 1fr;}
   .four-topbar-brand-sub{display:block;margin-left:0;padding-left:0;border-left:none;}
 }
 
@@ -1324,7 +1339,7 @@ button.suivi-pastille{cursor:pointer;}
       <div class="sidebar-section" id="sidebarSectionFinances">
         <div class="sidebar-menu-label">Finances</div>
         <button class="nav-item gerant-only" data-nav="caisse" onclick="navigate('caisse')"><i class="ti ti-cash"></i> Caisse</button>
-        <button class="nav-item gerant-only" data-nav="fournisseurs" onclick="navigate('fournisseurs')"><i class="ti ti-building-warehouse"></i> Fournisseurs</button>
+        <button class="nav-item gn-restricted" data-nav="fournisseurs" onclick="navigate('fournisseurs')"><i class="ti ti-building-warehouse"></i> Fournisseurs</button>
         <button class="nav-item gerant-only" data-nav="rapports" onclick="navigate('rapports')"><i class="ti ti-chart-bar"></i> Rapports</button>
       </div>
       <div class="sidebar-section" id="sidebarSectionAdministration">
@@ -1620,7 +1635,7 @@ button.suivi-pastille{cursor:pointer;}
               <div><h2>Fournisseurs</h2><div class="taches-header-sub" id="fournisseursSousTitre">—</div></div>
             </div>
             <div class="taches-header-right">
-              <button class="btn btn-primary" onclick="openModalFournisseur()"><i class="ti ti-plus"></i> Nouveau fournisseur</button>
+              <button class="btn btn-primary gerant-only" onclick="openModalFournisseur()"><i class="ti ti-plus"></i> Nouveau fournisseur</button>
             </div>
           </div>
           <div id="fournisseursListe"></div>
@@ -1635,8 +1650,8 @@ button.suivi-pastille{cursor:pointer;}
               <div style="margin-top:4px;" id="fdAccesBadge"></div>
             </div>
             <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
-              <button class="btn btn-ghost" id="fdBtnAcces" onclick="ouvrirAccesFournisseur()"><i class="ti ti-key"></i> Créer un accès</button>
-              <button class="btn btn-primary" onclick="openModalPaiementFournisseur()"><i class="ti ti-cash"></i> Payer</button>
+              <button class="btn btn-ghost gerant-only" id="fdBtnAcces" onclick="ouvrirAccesFournisseur()"><i class="ti ti-key"></i> Créer un accès</button>
+              <button class="btn btn-primary gerant-only" onclick="openModalPaiementFournisseur()"><i class="ti ti-cash"></i> Payer</button>
             </div>
           </div>
           <div class="caisse-kpi-grid">
@@ -1662,9 +1677,13 @@ button.suivi-pastille{cursor:pointer;}
               </table>
             </div>
           </div>
-          <div class="card" id="fdRetraitsCard">
+          <div class="card gerant-only" id="fdRetraitsCard">
             <h3>Demandes de retrait en attente</h3>
             <div id="fdRetraitsListe"></div>
+          </div>
+          <div class="card" id="fdDepotsCard">
+            <h3>Dépôts en attente</h3>
+            <div id="fdDepotsListe"></div>
           </div>
           <div class="card">
             <h3>Historique des paiements</h3>
@@ -1878,38 +1897,77 @@ button.suivi-pastille{cursor:pointer;}
     </div>
   </div>
   <div class="four-content">
-    <div class="four-solde-card">
-      <div class="four-solde-label"><i class="ti ti-wallet"></i> Solde à recevoir</div>
-      <div class="four-solde-value" id="fourSolde">—</div>
-      <button class="four-btn-retrait" onclick="ouvrirModalRetrait()"><i class="ti ti-arrow-down-circle"></i> Demander un retrait</button>
+    <div class="four-tabs">
+      <button class="four-tab active" data-four-tab="dashboard" onclick="naviguerPortailFournisseur('dashboard')">Tableau de bord</button>
+      <button class="four-tab" data-four-tab="rapport" onclick="naviguerPortailFournisseur('rapport')">Rapport</button>
     </div>
 
-    <div class="four-kpi-grid">
-      <div class="four-kpi-card">
-        <div class="four-kpi-icon navy"><i class="ti ti-package"></i></div>
-        <div class="four-kpi-value" id="fourNbProduits">—</div>
-        <div class="four-kpi-label">Produits en dépôt</div>
+    <div id="fourVueDashboard" class="four-vue">
+      <div class="four-solde-card">
+        <div class="four-solde-label"><i class="ti ti-wallet"></i> Solde à recevoir</div>
+        <div class="four-solde-value" id="fourSolde">—</div>
+        <div class="four-solde-actions">
+          <button class="four-btn-retrait" onclick="ouvrirModalRetrait()"><i class="ti ti-arrow-down-circle"></i> Demander un retrait</button>
+          <button class="four-btn-depot" onclick="ouvrirModalDepot()"><i class="ti ti-package-import"></i> Déposer des articles</button>
+        </div>
       </div>
-      <div class="four-kpi-card">
-        <div class="four-kpi-icon green"><i class="ti ti-shopping-cart"></i></div>
-        <div class="four-kpi-value" id="fourNbVendus">—</div>
-        <div class="four-kpi-label">Unités vendues</div>
+
+      <div class="four-kpi-grid">
+        <div class="four-kpi-card">
+          <div class="four-kpi-icon navy"><i class="ti ti-package"></i></div>
+          <div class="four-kpi-value" id="fourNbProduits">—</div>
+          <div class="four-kpi-label">Produits en dépôt</div>
+        </div>
+        <div class="four-kpi-card">
+          <div class="four-kpi-icon green"><i class="ti ti-shopping-cart"></i></div>
+          <div class="four-kpi-value" id="fourNbVendus">—</div>
+          <div class="four-kpi-label">Unités vendues</div>
+        </div>
+        <div class="four-kpi-card">
+          <div class="four-kpi-icon orange"><i class="ti ti-boxes"></i></div>
+          <div class="four-kpi-value" id="fourNbRestants">—</div>
+          <div class="four-kpi-label">Unités restantes</div>
+        </div>
       </div>
-      <div class="four-kpi-card">
-        <div class="four-kpi-icon orange"><i class="ti ti-boxes"></i></div>
-        <div class="four-kpi-value" id="fourNbRestants">—</div>
-        <div class="four-kpi-label">Unités restantes</div>
+
+      <div class="four-card">
+        <div class="four-card-title">Mes produits en dépôt-vente</div>
+        <div id="fourProduitsListe"></div>
+      </div>
+
+      <div class="four-card">
+        <div class="four-card-title">Mes demandes de retrait</div>
+        <div id="fourRetraitsListe"></div>
       </div>
     </div>
 
-    <div class="four-card">
-      <div class="four-card-title">Mes produits en dépôt-vente</div>
-      <div id="fourProduitsListe"></div>
-    </div>
+    <div id="fourVueRapport" class="four-vue hidden">
+      <div class="four-rapport-kpi-grid">
+        <div class="four-kpi-card">
+          <div class="four-kpi-icon navy"><i class="ti ti-package-export"></i></div>
+          <div class="four-kpi-value" id="fourRapDepose">—</div>
+          <div class="four-kpi-label">Total déposé</div>
+        </div>
+        <div class="four-kpi-card">
+          <div class="four-kpi-icon green"><i class="ti ti-shopping-cart"></i></div>
+          <div class="four-kpi-value" id="fourRapVendu">—</div>
+          <div class="four-kpi-label">Total vendu</div>
+        </div>
+        <div class="four-kpi-card">
+          <div class="four-kpi-icon orange"><i class="ti ti-cash"></i></div>
+          <div class="four-kpi-value" id="fourRapRecu">—</div>
+          <div class="four-kpi-label">Total reçu</div>
+        </div>
+        <div class="four-kpi-card four-kpi-card-navy">
+          <div class="four-kpi-value" id="fourRapSolde">—</div>
+          <div class="four-kpi-label">Solde actuel</div>
+        </div>
+      </div>
 
-    <div class="four-card">
-      <div class="four-card-title">Mes demandes de retrait</div>
-      <div id="fourRetraitsListe"></div>
+      <div class="four-card">
+        <div class="four-card-title">Historique</div>
+        <div id="fourHistoriqueListe"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -2093,6 +2151,23 @@ button.suivi-pastille{cursor:pointer;}
   </div>
 </div>
 
+<div id="modalDepotFournisseur" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Déposer des articles</h3><button class="modal-close" onclick="closeModal('modalDepotFournisseur')">×</button></div>
+    <div class="modal-body">
+      <div id="depotAucunProduit" class="four-modal-solde hidden" style="background:#FDF3D7;color:#8A6100;">Aucun produit actif en dépôt-vente associé à votre compte — contactez le gérant.</div>
+      <div id="depotLignesWrap">
+        <div id="depotLignesListe"></div>
+        <button type="button" class="ajr-btn ghost" style="margin-top:8px;width:100%;justify-content:center;" onclick="ajouterLigneDepot()"><i class="ti ti-plus"></i> Ajouter un autre produit</button>
+      </div>
+      <div class="form-row" style="margin-top:14px;"><label>Note (optionnel)</label><textarea id="depotNote" rows="2" placeholder="Ex: Livré ce matin par le camion…"></textarea></div>
+      <div class="four-modal-solde" id="depotRecap">Aucun article renseigné pour le moment.</div>
+      <div id="depotErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalDepotFournisseur')">Annuler</button><button class="btn btn-primary" id="depotBtnEnvoyer" onclick="envoyerDepot()">Envoyer le dépôt</button></div>
+  </div>
+</div>
+
 <div id="modalEncaisser" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-header"><h3>Encaisser</h3><button class="modal-close" onclick="closeModal('modalEncaisser')">×</button></div>
@@ -2164,6 +2239,8 @@ const FOUR_SESSION_KEY = 'gn_fournisseur_session';
 let fournisseurSession = null;
 let _loginFournisseur = null;
 let fdRetraitsCache = [];
+let fdDepotsCache = [];
+let depotLignes = [];
 let fourProduitsCache = [];
 let fourRetraitsCache = [];
 let fourSoldeInfo = null;
@@ -2451,7 +2528,14 @@ function showFournisseurPortal() {
   document.getElementById('appShell').classList.add('hidden');
   document.getElementById('fournisseurShell').classList.remove('hidden');
   document.getElementById('fourPortailNom').textContent = fournisseurSession.nom;
+  naviguerPortailFournisseur('dashboard');
   loadPortailFournisseur();
+}
+function naviguerPortailFournisseur(vue) {
+  document.querySelectorAll('.four-tab').forEach(function(t) { t.classList.toggle('active', t.dataset.fourTab === vue); });
+  document.getElementById('fourVueDashboard').classList.toggle('hidden', vue !== 'dashboard');
+  document.getElementById('fourVueRapport').classList.toggle('hidden', vue !== 'rapport');
+  if (vue === 'rapport') loadPortailRapport();
 }
 function applyRoleVisibility() {
   const estGerantOuAgent = session.role === 'gerant' || session.role === 'agent';
@@ -2480,7 +2564,7 @@ async function chargerParametres() {
 /* ── NAVIGATION ── */
 const PAGE_ROLES = {
   produits: ['gerant', 'agent'],
-  fournisseurs: ['gerant'],
+  fournisseurs: ['gerant', 'agent'],
   caisse: ['gerant'],
   rapports: ['gerant'],
   agents: ['gerant'],
@@ -4111,11 +4195,12 @@ async function chargerDetailFournisseur() {
     ? '<i class="ti ti-key"></i> Réinitialiser le PIN'
     : '<i class="ti ti-key"></i> Créer un accès';
 
-  const [{ data: produits }, { data: commandes }, { data: paiements }, { data: retraitsEnAttente }] = await Promise.all([
+  const [{ data: produits }, { data: commandes }, { data: paiements }, { data: retraitsEnAttente }, { data: depotsEnAttente }] = await Promise.all([
     sb.from('gn_produits').select('*').eq('fournisseur_id', f.id),
     sb.from('gn_commandes').select('lignes,statut'),
     sb.from('gn_fournisseur_paiements').select('*').eq('fournisseur_id', f.id).order('created_at', { ascending: false }),
     sb.from('gn_fournisseur_retraits').select('*').eq('fournisseur_id', f.id).eq('statut', 'en_attente').order('date_demande'),
+    sb.from('gn_fournisseur_depots').select('*').eq('fournisseur_id', f.id).eq('statut', 'en_attente').order('date_demande'),
   ]);
 
   const ventes = calculerVentesFournisseur(f.id, commandes);
@@ -4160,6 +4245,13 @@ async function chargerDetailFournisseur() {
   document.getElementById('fdRetraitsListe').innerHTML = fdRetraitsCache.length
     ? fdRetraitsCache.map(renderRetraitEnAttenteRow).join('')
     : '<div class="empty">Aucune demande en attente.</div>';
+
+  const produitsParId = {};
+  produitsListe.forEach(function(p) { produitsParId[p.id] = p; });
+  fdDepotsCache = depotsEnAttente || [];
+  document.getElementById('fdDepotsListe').innerHTML = fdDepotsCache.length
+    ? fdDepotsCache.map(function(d) { return renderDepotEnAttenteRow(d, produitsParId); }).join('')
+    : '<div class="empty">Aucun dépôt en attente.</div>';
 
   document.getElementById('fdPaiementsListe').innerHTML = (paiements && paiements.length) ? paiements.map(renderPaiementFournisseurRow).join('') : '<div class="empty">Aucun paiement enregistré.</div>';
 }
@@ -4219,6 +4311,41 @@ async function refuserRetrait(id) {
     .eq('id', id);
   if (error) { showToast('Erreur : ' + error.message, 'error'); return; }
   showToast('Demande refusée.');
+  await chargerDetailFournisseur();
+}
+function renderDepotEnAttenteRow(d, produitsParId) {
+  const date = d.date_demande ? new Date(d.date_demande).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const lignesTxt = (d.lignes || []).map(function(l) {
+    const p = produitsParId[l.produit_id];
+    return esc(p ? p.nom : 'Produit #' + l.produit_id) + ' × ' + Number(l.qte || 0);
+  }).join('<br>') || '—';
+  return '<div class="fournisseur-paiement-row" style="align-items:flex-start;flex-wrap:wrap;">'
+    + '<div><div style="font-weight:500;color:var(--text);">' + lignesTxt + '</div>'
+    + '<div style="color:var(--text-muted);font-size:11.5px;margin-top:2px;">' + date + (d.note ? ' · ' + esc(d.note) : '') + '</div></div>'
+    + '<div style="display:flex;align-items:center;gap:6px;">'
+    + '<button class="btn btn-sm btn-ghost" onclick="refuserDepot(' + d.id + ')">Refuser</button>'
+    + '<button class="btn btn-sm btn-primary" onclick="validerDepot(' + d.id + ')">Vérifier &amp; valider</button>'
+    + '</div></div>';
+}
+async function validerDepot(id) {
+  if (!confirm('Confirmer la réception physique et valider ce dépôt ? Le stock sera mis à jour automatiquement.')) return;
+  // Le trigger base gn_depot_appliquer_stock incrémente gn_produits.stock quand statut
+  // passe à 'valide' — cette fonction ne fait que l'UPDATE, elle ne touche jamais au stock.
+  const { error } = await sb.from('gn_fournisseur_depots')
+    .update({ statut: 'valide', traite_par: session.nom, traite_par_role: session.role, date_traitement: new Date().toISOString() })
+    .eq('id', id);
+  if (error) { showToast('Erreur : ' + error.message, 'error'); return; }
+  showToast('Dépôt validé, stock mis à jour.');
+  await chargerDetailFournisseur();
+}
+async function refuserDepot(id) {
+  if (!confirm('Refuser ce dépôt ?')) return;
+  const note = prompt('Motif du refus (optionnel) :') || null;
+  const { error } = await sb.from('gn_fournisseur_depots')
+    .update({ statut: 'refuse', note_traitement: note, traite_par: session.nom, traite_par_role: session.role, date_traitement: new Date().toISOString() })
+    .eq('id', id);
+  if (error) { showToast('Erreur : ' + error.message, 'error'); return; }
+  showToast('Dépôt refusé.');
   await chargerDetailFournisseur();
 }
 function ouvrirAccesFournisseur() {
@@ -4296,7 +4423,7 @@ async function loadPortailFournisseur() {
   const fid = fournisseurSession.id;
 
   const [{ data: produits }, soldeInfo, { data: retraits }] = await Promise.all([
-    sb.from('gn_produits').select('*').eq('fournisseur_id', fid),
+    sb.from('gn_produits').select('*').eq('fournisseur_id', fid).eq('depot_vente', true).eq('actif', true),
     calculerSoldeInfoFournisseur(fid),
     sb.from('gn_fournisseur_retraits').select('*').eq('fournisseur_id', fid).order('date_demande', { ascending: false }),
   ]);
@@ -4381,6 +4508,145 @@ async function envoyerDemandeRetrait() {
   closeModal('modalDemandeRetrait');
   showToast('Demande de retrait envoyée.');
   await loadPortailFournisseur();
+}
+
+/* ── Dépôt de stock (portail fournisseur) ── */
+function ouvrirModalDepot() {
+  const aDesProduits = fourProduitsCache.length > 0;
+  document.getElementById('depotAucunProduit').classList.toggle('hidden', aDesProduits);
+  document.getElementById('depotLignesWrap').classList.toggle('hidden', !aDesProduits);
+  depotLignes = aDesProduits ? [{ produit_id: null, qte: 1 }] : [];
+  document.getElementById('depotNote').value = '';
+  document.getElementById('depotErreur').classList.add('hidden');
+  renderDepotLignes();
+  openModal('modalDepotFournisseur');
+}
+function ajouterLigneDepot() {
+  depotLignes.push({ produit_id: null, qte: 1 });
+  renderDepotLignes();
+}
+function supprimerLigneDepot(i) {
+  depotLignes.splice(i, 1);
+  renderDepotLignes();
+}
+function majProduitLigneDepot(i, valeur) {
+  if (!depotLignes[i]) return;
+  depotLignes[i].produit_id = valeur ? Number(valeur) : null;
+  renderDepotLignes();
+}
+function majQteLigneDepot(i, valeur) {
+  if (!depotLignes[i]) return;
+  let qte = Math.round(Number(valeur) || 0);
+  if (qte < 1) qte = 1;
+  depotLignes[i].qte = qte;
+  renderDepotLignes();
+}
+// Anti-doublon : un produit déjà choisi sur une autre ligne disparaît des <select> des
+// autres lignes (plutôt que de fusionner silencieusement les quantités si le fournisseur
+// choisit deux fois le même produit — évite toute ambiguïté sur la quantité résultante).
+function renderDepotLignes() {
+  const dejaChoisis = depotLignes.map(function(l) { return l.produit_id; });
+  document.getElementById('depotLignesListe').innerHTML = depotLignes.map(function(l, i) {
+    const options = fourProduitsCache
+      .filter(function(p) { return p.id === l.produit_id || dejaChoisis.indexOf(p.id) === -1; })
+      .map(function(p) { return '<option value="' + p.id + '"' + (p.id === l.produit_id ? ' selected' : '') + '>' + esc(p.nom) + '</option>'; })
+      .join('');
+    return '<div class="four-depot-ligne">'
+      + '<select onchange="majProduitLigneDepot(' + i + ', this.value)"><option value="">Choisir un produit…</option>' + options + '</select>'
+      + '<input type="number" min="1" value="' + l.qte + '" onchange="majQteLigneDepot(' + i + ', this.value)">'
+      + '<button type="button" class="four-depot-ligne-remove" onclick="supprimerLigneDepot(' + i + ')" aria-label="Retirer"><i class="ti ti-trash"></i></button>'
+      + '</div>';
+  }).join('');
+  const lignesValides = depotLignes.filter(function(l) { return l.produit_id && l.qte >= 1; });
+  const totalArticles = lignesValides.reduce(function(s, l) { return s + l.qte; }, 0);
+  const recapEl = document.getElementById('depotRecap');
+  recapEl.innerHTML = lignesValides.length
+    ? lignesValides.map(function(l) {
+        const p = fourProduitsCache.find(function(x) { return x.id === l.produit_id; });
+        return esc(p ? p.nom : '?') + ' × ' + l.qte;
+      }).join('<br>') + '<br><strong>' + totalArticles + ' article' + (totalArticles > 1 ? 's' : '') + ' au total</strong>'
+    : 'Aucun article renseigné pour le moment.';
+  const btn = document.getElementById('depotBtnEnvoyer');
+  if (btn) btn.disabled = !lignesValides.length;
+}
+async function envoyerDepot() {
+  const errEl = document.getElementById('depotErreur');
+  const lignesValides = depotLignes.filter(function(l) { return l.produit_id && l.qte >= 1; });
+  if (!lignesValides.length) { errEl.textContent = 'Ajoutez au moins un produit avec une quantité.'; errEl.classList.remove('hidden'); return; }
+  const note = document.getElementById('depotNote').value.trim();
+  const payload = {
+    fournisseur_id: fournisseurSession.id,
+    lignes: lignesValides.map(function(l) { return { produit_id: l.produit_id, qte: l.qte }; }),
+    note: note || null,
+  };
+  const { error } = await sb.from('gn_fournisseur_depots').insert(payload);
+  if (error) { errEl.textContent = 'Erreur : ' + error.message; errEl.classList.remove('hidden'); return; }
+  closeModal('modalDepotFournisseur');
+  showToast('Dépôt envoyé, en attente de vérification.');
+  await loadPortailFournisseur();
+}
+
+/* ── Rapport (portail fournisseur) ── */
+async function loadPortailRapport() {
+  const fid = fournisseurSession.id;
+  const [{ data: venteTotale }, { data: soldeActuel }, { data: paiements }, { data: retraits }, { data: depots }] = await Promise.all([
+    sb.rpc('gn_fournisseur_ventes_totales', { p_fournisseur_id: fid }),
+    sb.rpc('gn_fournisseur_solde_du', { p_fournisseur_id: fid }),
+    sb.from('gn_fournisseur_paiements').select('montant').eq('fournisseur_id', fid),
+    sb.from('gn_fournisseur_retraits').select('*').eq('fournisseur_id', fid),
+    sb.from('gn_fournisseur_depots').select('*').eq('fournisseur_id', fid),
+  ]);
+
+  const totalRecu = (paiements || []).reduce(function(s, p) { return s + Number(p.montant || 0); }, 0);
+  const depotsListe = depots || [];
+  const totalDepose = depotsListe
+    .filter(function(d) { return d.statut === 'valide'; })
+    .reduce(function(s, d) { return s + (d.lignes || []).reduce(function(ss, l) { return ss + Number(l.qte || 0); }, 0); }, 0);
+
+  document.getElementById('fourRapDepose').textContent = totalDepose;
+  document.getElementById('fourRapVendu').textContent = fmtMontant(venteTotale || 0) + ' GNF';
+  document.getElementById('fourRapRecu').textContent = fmtMontant(totalRecu) + ' GNF';
+  document.getElementById('fourRapSolde').textContent = fmtMontant(soldeActuel || 0) + ' GNF';
+
+  const evenements = [];
+  (retraits || []).forEach(function(r) { evenements.push({ type: 'retrait', date: r.date_demande, data: r }); });
+  depotsListe.forEach(function(d) { evenements.push({ type: 'depot', date: d.date_demande, data: d }); });
+  evenements.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+
+  document.getElementById('fourHistoriqueListe').innerHTML = evenements.length
+    ? evenements.map(renderEvenementHistorique).join('')
+    : '<div class="empty">Aucune activité pour le moment.</div>';
+}
+function renderEvenementHistorique(e) {
+  const date = e.date ? new Date(e.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  if (e.type === 'retrait') {
+    const r = e.data;
+    let libelle, badge;
+    if (r.statut === 'validee') { libelle = 'Retrait payé'; badge = { label: 'Payé', bg: '#E6F2EB', color: '#1F7A4D' }; }
+    else if (r.statut === 'refusee') { libelle = 'Retrait refusé'; badge = { label: 'Refusé', bg: '#FBE9E9', color: '#B42318' }; }
+    else { libelle = 'Demande de retrait envoyée'; badge = { label: 'En attente', bg: '#FDF3D7', color: '#8A6100' }; }
+    const montantTxt = r.statut === 'validee' ? fmtMontant(r.montant_verse) + ' GNF versés' : fmtMontant(r.montant_demande) + ' GNF demandés';
+    return '<div class="four-list-row"><div class="four-list-main"><div class="four-list-nom">' + esc(libelle) + '</div>'
+      + '<div class="four-list-meta">' + date + ' · ' + montantTxt + '</div></div>'
+      + '<span class="four-badge" style="background:' + badge.bg + ';color:' + badge.color + ';">' + badge.label + '</span></div>';
+  }
+  const d = e.data;
+  const lignes = d.lignes || [];
+  let libelleDepot;
+  if (lignes.length === 1) {
+    const p = fourProduitsCache.find(function(x) { return x.id === lignes[0].produit_id; });
+    const qte = Number(lignes[0].qte || 0);
+    libelleDepot = 'Dépôt de ' + qte + ' ' + (p ? esc(p.nom) : ('article' + (qte > 1 ? 's' : '')));
+  } else {
+    libelleDepot = 'Dépôt de ' + lignes.length + ' articles';
+  }
+  let badge, metaSuffix = '';
+  if (d.statut === 'valide') { badge = { label: 'Validé', bg: '#E6F2EB', color: '#1F7A4D' }; metaSuffix = ' · vérifié par ' + esc(d.traite_par || '—'); }
+  else if (d.statut === 'refuse') { badge = { label: 'Refusé', bg: '#FBE9E9', color: '#B42318' }; }
+  else { badge = { label: 'À vérifier', bg: '#FDF3D7', color: '#8A6100' }; }
+  return '<div class="four-list-row"><div class="four-list-main"><div class="four-list-nom">' + esc(libelleDepot) + '</div>'
+    + '<div class="four-list-meta">' + date + metaSuffix + '</div></div>'
+    + '<span class="four-badge" style="background:' + badge.bg + ';color:' + badge.color + ';">' + badge.label + '</span></div>';
 }
 
 /* ── PAGE CAISSE ── */
