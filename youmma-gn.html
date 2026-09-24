@@ -569,6 +569,47 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .cai-mobile-actions{display:flex;gap:10px;margin-bottom:12px;}
 .cai-mobile-actions .cai-btn{flex:1;}
 
+/* ---- Portail fournisseur (route séparée, hors navigate()/appShell) ---- */
+.four-shell{min-height:100vh;background:#F4F3EF;}
+.four-topbar{background:#1E2247;color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.four-topbar-brand{display:flex;align-items:center;gap:8px;font-family:'Sora',system-ui,sans-serif;font-weight:700;font-size:15px;}
+.four-topbar-brand-sub{font-family:'Work Sans',system-ui,sans-serif;font-weight:400;font-size:12px;color:#B9BCD3;margin-left:8px;padding-left:8px;border-left:1px solid rgba(255,255,255,.2);}
+.four-topbar-right{display:flex;align-items:center;gap:12px;}
+.four-topbar-nom{font-size:13.5px;font-weight:600;}
+.four-logout-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.12);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;}
+.four-content{max-width:900px;margin:0 auto;padding:24px 20px 60px;display:flex;flex-direction:column;gap:16px;box-sizing:border-box;}
+.four-solde-card{background:#1E2247;color:#fff;border-radius:20px;padding:24px;position:relative;overflow:hidden;box-shadow:0 1px 2px rgba(30,34,71,.06);}
+.four-solde-card::before{content:'';position:absolute;right:-70px;top:-80px;width:170px;height:170px;border-radius:50%;border:22px solid rgba(232,98,44,.22);}
+.four-solde-card::after{content:'';position:absolute;right:40px;bottom:-40px;width:80px;height:80px;border-radius:50%;background:rgba(232,98,44,.16);}
+.four-solde-label{display:flex;align-items:center;gap:6px;color:#B9BCD3;font-size:13px;position:relative;z-index:1;}
+.four-solde-label i{color:#E8622C;}
+.four-solde-value{font-family:'Sora',system-ui,sans-serif;font-size:34px;font-weight:700;margin-top:8px;position:relative;z-index:1;}
+.four-btn-retrait{display:inline-flex;align-items:center;gap:7px;margin-top:16px;background:#C8501E;color:#fff;border:none;padding:12px 18px;border-radius:12px;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px rgba(200,80,30,.30);position:relative;z-index:1;}
+.four-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.four-kpi-card{background:#fff;border-radius:20px;padding:16px 10px;text-align:center;box-shadow:0 1px 2px rgba(30,34,71,.06);min-width:0;}
+.four-kpi-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;margin:0 auto 10px;}
+.four-kpi-icon.navy{background:#ECEDF5;color:#1E2247;}
+.four-kpi-icon.green{background:#E6F2EB;color:#1F7A4D;}
+.four-kpi-icon.orange{background:#FCEBE3;color:#C8501E;}
+.four-kpi-value{font-family:'Sora',system-ui,sans-serif;font-size:22px;font-weight:700;color:#1E2247;}
+.four-kpi-label{font-size:11.5px;color:#5F6275;margin-top:4px;}
+.four-card{background:#fff;border-radius:20px;padding:18px 20px;box-shadow:0 1px 2px rgba(30,34,71,.06);}
+.four-card-title{font-size:15px;font-weight:600;color:#1E2247;font-family:'Sora',system-ui,sans-serif;margin-bottom:10px;}
+.four-list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #F0EEE9;flex-wrap:wrap;}
+.four-list-row:last-child{border-bottom:none;}
+.four-list-main{min-width:0;}
+.four-list-nom{font-size:14px;font-weight:600;color:#1E2247;}
+.four-list-meta{font-size:12px;color:#9A9CAB;margin-top:2px;}
+.four-list-right{text-align:right;flex-shrink:0;}
+.four-list-vendus{font-size:12.5px;color:#5F6275;}
+.four-badge{font-size:11.5px;font-weight:700;padding:4px 11px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.four-modal-solde{background:#F4F3EF;border-radius:10px;padding:10px 14px;font-size:13px;color:#1E2247;margin-bottom:14px;}
+@media (max-width:480px){
+  .four-kpi-grid{grid-template-columns:1fr 1fr;}
+  .four-kpi-card:nth-child(3){grid-column:1/-1;}
+  .four-topbar-brand-sub{display:block;margin-left:0;padding-left:0;border-left:none;}
+}
+
 .om-header{display:flex;gap:24px;flex-wrap:wrap;}
 .om-label{font-size:11px;color:#9CA3AF;font-weight:600;text-transform:uppercase;}
 .om-value{font-size:14px;font-weight:800;color:#1A1A4E;margin-top:2px;}
@@ -1591,8 +1632,12 @@ button.suivi-pastille{cursor:pointer;}
             <div>
               <div class="tache-card-nom" style="font-size:16px;" id="fdNom">—</div>
               <div class="tache-card-tel" id="fdMeta">—</div>
+              <div style="margin-top:4px;" id="fdAccesBadge"></div>
             </div>
-            <button class="btn btn-primary" style="margin-left:auto;" onclick="openModalPaiementFournisseur()"><i class="ti ti-cash"></i> Payer</button>
+            <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-ghost" id="fdBtnAcces" onclick="ouvrirAccesFournisseur()"><i class="ti ti-key"></i> Créer un accès</button>
+              <button class="btn btn-primary" onclick="openModalPaiementFournisseur()"><i class="ti ti-cash"></i> Payer</button>
+            </div>
           </div>
           <div class="caisse-kpi-grid">
             <div class="kpi-card">
@@ -1616,6 +1661,10 @@ button.suivi-pastille{cursor:pointer;}
                 <tbody id="fdProduitsBody"></tbody>
               </table>
             </div>
+          </div>
+          <div class="card" id="fdRetraitsCard">
+            <h3>Demandes de retrait en attente</h3>
+            <div id="fdRetraitsListe"></div>
           </div>
           <div class="card">
             <h3>Historique des paiements</h3>
@@ -1819,6 +1868,52 @@ button.suivi-pastille{cursor:pointer;}
   </nav>
 </div>
 
+<!-- ═══ PORTAIL FOURNISSEUR (route séparée, aucun lien avec navigate()/PAGE_ROLES/appShell) ═══ -->
+<div id="fournisseurShell" class="four-shell hidden">
+  <div class="four-topbar">
+    <div class="four-topbar-brand"><i class="ti ti-building-warehouse"></i> YOUMMA GN<span class="four-topbar-brand-sub">Espace fournisseur</span></div>
+    <div class="four-topbar-right">
+      <span class="four-topbar-nom" id="fourPortailNom">—</span>
+      <button class="four-logout-btn" onclick="logoutFournisseur()" title="Déconnexion"><i class="ti ti-logout"></i></button>
+    </div>
+  </div>
+  <div class="four-content">
+    <div class="four-solde-card">
+      <div class="four-solde-label"><i class="ti ti-wallet"></i> Solde à recevoir</div>
+      <div class="four-solde-value" id="fourSolde">—</div>
+      <button class="four-btn-retrait" onclick="ouvrirModalRetrait()"><i class="ti ti-arrow-down-circle"></i> Demander un retrait</button>
+    </div>
+
+    <div class="four-kpi-grid">
+      <div class="four-kpi-card">
+        <div class="four-kpi-icon navy"><i class="ti ti-package"></i></div>
+        <div class="four-kpi-value" id="fourNbProduits">—</div>
+        <div class="four-kpi-label">Produits en dépôt</div>
+      </div>
+      <div class="four-kpi-card">
+        <div class="four-kpi-icon green"><i class="ti ti-shopping-cart"></i></div>
+        <div class="four-kpi-value" id="fourNbVendus">—</div>
+        <div class="four-kpi-label">Unités vendues</div>
+      </div>
+      <div class="four-kpi-card">
+        <div class="four-kpi-icon orange"><i class="ti ti-boxes"></i></div>
+        <div class="four-kpi-value" id="fourNbRestants">—</div>
+        <div class="four-kpi-label">Unités restantes</div>
+      </div>
+    </div>
+
+    <div class="four-card">
+      <div class="four-card-title">Mes produits en dépôt-vente</div>
+      <div id="fourProduitsListe"></div>
+    </div>
+
+    <div class="four-card">
+      <div class="four-card-title">Mes demandes de retrait</div>
+      <div id="fourRetraitsListe"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ MODALES ═══ -->
 
 <div id="modalCommande" class="modal-overlay">
@@ -1973,6 +2068,31 @@ button.suivi-pastille{cursor:pointer;}
   </div>
 </div>
 
+<div id="modalResetPinFournisseur" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3 id="rpfTitre">Créer l'accès fournisseur</h3><button class="modal-close" onclick="closeModal('modalResetPinFournisseur')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Téléphone *</label><input type="tel" id="rpfTelephone"></div>
+      <div class="form-row"><label>PIN (4 chiffres) *</label><input type="password" id="rpfNouveauPin" maxlength="4" inputmode="numeric"></div>
+      <div id="rpfErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalResetPinFournisseur')">Annuler</button><button class="btn btn-primary" onclick="confirmerResetPinFournisseur()">Enregistrer</button></div>
+  </div>
+</div>
+
+<div id="modalDemandeRetrait" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Demander un retrait</h3><button class="modal-close" onclick="closeModal('modalDemandeRetrait')">×</button></div>
+    <div class="modal-body">
+      <div class="four-modal-solde">Solde disponible : <strong id="drSoldeDisponible">—</strong></div>
+      <div class="form-row"><label>Montant (GNF) *</label><input type="number" id="drMontant" min="0"></div>
+      <div class="form-row"><label>Note (optionnel)</label><input type="text" id="drNote" placeholder="Ex: Retrait mensuel"></div>
+      <div id="drErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalDemandeRetrait')">Annuler</button><button class="btn btn-primary" onclick="envoyerDemandeRetrait()">Envoyer la demande</button></div>
+  </div>
+</div>
+
 <div id="modalEncaisser" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-header"><h3>Encaisser</h3><button class="modal-close" onclick="closeModal('modalEncaisser')">×</button></div>
@@ -2040,6 +2160,13 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let session = null;
 let _loginAgent = null;
+const FOUR_SESSION_KEY = 'gn_fournisseur_session';
+let fournisseurSession = null;
+let _loginFournisseur = null;
+let fdRetraitsCache = [];
+let fourProduitsCache = [];
+let fourRetraitsCache = [];
+let fourSoldeInfo = null;
 let PARAMS = {};
 let produitsCache = [];
 let produitEnEdition = null;
@@ -2180,19 +2307,42 @@ document.addEventListener('click', function(e) {
 });
 
 /* ── AUTH ── */
+// Deux sessions strictement séparées, jamais mélangées dans le même objet ni
+// la même clé sessionStorage : `session` (gn_session, forme {id,nom,role,
+// telephone}) pour gérant/agent/livreur, routée par navigate()/PAGE_ROLES ;
+// `fournisseurSession` (gn_fournisseur_session, forme {type:'fournisseur',
+// id,nom,telephone}) pour un fournisseur, qui n'entre JAMAIS dans navigate()
+// — son shell (#fournisseurShell) et son chargement de données sont un code
+// path entièrement différent, sans aucun point de croisement avec l'un ou
+// l'autre système de rôles internes.
 async function initApp() {
   const raw = sessionStorage.getItem('gn_session');
   if (raw) { try { session = JSON.parse(raw); } catch (e) { session = null; } }
-  if (session) { showApp(); } else { showLoginEcranTel(); }
+  if (session) { showApp(); return; }
+  const rawFour = sessionStorage.getItem(FOUR_SESSION_KEY);
+  if (rawFour) { try { fournisseurSession = JSON.parse(rawFour); } catch (e) { fournisseurSession = null; } }
+  if (fournisseurSession && fournisseurSession.type === 'fournisseur') { showFournisseurPortal(); return; }
+  showLoginEcranTel();
 }
 function showLoginEcranTel() {
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('appShell').classList.add('hidden');
+  document.getElementById('fournisseurShell').classList.add('hidden');
   _loginAgent = null;
+  _loginFournisseur = null;
   document.getElementById('loginTel').style.display = 'block';
   document.getElementById('loginPin').style.display = 'none';
   document.getElementById('loginTelInput').value = '';
   document.getElementById('loginTelErreur').style.display = 'none';
+}
+function afficherEcranPinLogin(nom, roleLabel) {
+  document.getElementById('loginAgentNom').textContent = nom;
+  document.getElementById('loginAgentRole').textContent = roleLabel;
+  document.getElementById('loginTel').style.display = 'none';
+  document.getElementById('loginPin').style.display = 'block';
+  document.getElementById('loginPinInput').value = '';
+  document.getElementById('loginPinErreur').style.display = 'none';
+  setTimeout(function() { document.getElementById('loginPinInput').focus(); }, 100);
 }
 async function loginVerifierTel() {
   const tel = (document.getElementById('loginTelInput').value || '').replace(/\D/g, '').replace(/^224/, '');
@@ -2208,20 +2358,29 @@ async function loginVerifierTel() {
     .eq('actif', true)
     .or('telephone.eq.' + tel + ',telephone.eq.224' + tel)
     .maybeSingle();
-  console.log('DEBUG login — tel recherché:', tel, '| data:', data, '| error:', error);
-  if (error || !data) {
-    errDiv.textContent = 'Numéro non reconnu. Contactez le gérant.';
-    errDiv.style.display = 'block';
+  if (!error && data) {
+    _loginAgent = data;
+    _loginFournisseur = null;
+    afficherEcranPinLogin(data.nom, ROLE_LABELS[data.role] || data.role);
     return;
   }
-  _loginAgent = data;
-  document.getElementById('loginAgentNom').textContent = data.nom;
-  document.getElementById('loginAgentRole').textContent = ROLE_LABELS[data.role] || data.role;
-  document.getElementById('loginTel').style.display = 'none';
-  document.getElementById('loginPin').style.display = 'block';
-  document.getElementById('loginPinInput').value = '';
-  document.getElementById('loginPinErreur').style.display = 'none';
-  setTimeout(function() { document.getElementById('loginPinInput').focus(); }, 100);
+  // Pas d'agent trouvé pour ce numéro : on cherche aussi côté fournisseurs
+  // (compte activé uniquement, pin_hash non null — un fournisseur sans PIN
+  // défini par le gérant n'a simplement pas encore accès au portail).
+  const { data: fourData, error: fourError } = await sb.from('gn_fournisseurs')
+    .select('*')
+    .eq('actif', true)
+    .not('pin_hash', 'is', null)
+    .or('telephone.eq.' + tel + ',telephone.eq.224' + tel)
+    .maybeSingle();
+  if (!fourError && fourData) {
+    _loginFournisseur = fourData;
+    _loginAgent = null;
+    afficherEcranPinLogin(fourData.nom, 'Fournisseur');
+    return;
+  }
+  errDiv.textContent = 'Numéro non reconnu. Contactez le gérant.';
+  errDiv.style.display = 'block';
 }
 async function loginVerifierPin() {
   const pin = (document.getElementById('loginPinInput').value || '').trim();
@@ -2232,6 +2391,18 @@ async function loginVerifierPin() {
     return;
   }
   const hash = await hashPin(pin);
+  if (_loginFournisseur) {
+    if (hash !== _loginFournisseur.pin_hash) {
+      errDiv.textContent = 'PIN incorrect. Réessayez.';
+      errDiv.style.display = 'block';
+      document.getElementById('loginPinInput').value = '';
+      return;
+    }
+    fournisseurSession = { type: 'fournisseur', id: _loginFournisseur.id, nom: _loginFournisseur.nom, telephone: _loginFournisseur.telephone };
+    sessionStorage.setItem(FOUR_SESSION_KEY, JSON.stringify(fournisseurSession));
+    showFournisseurPortal();
+    return;
+  }
   if (hash !== _loginAgent.pin_hash) {
     errDiv.textContent = 'PIN incorrect. Réessayez.';
     errDiv.style.display = 'block';
@@ -2244,6 +2415,7 @@ async function loginVerifierPin() {
 }
 function loginRetour() {
   _loginAgent = null;
+  _loginFournisseur = null;
   document.getElementById('loginPin').style.display = 'none';
   document.getElementById('loginTel').style.display = 'block';
   document.getElementById('loginPinInput').value = '';
@@ -2256,8 +2428,15 @@ function logout() {
   document.getElementById('appShell').classList.add('hidden');
   showLoginEcranTel();
 }
+function logoutFournisseur() {
+  sessionStorage.removeItem(FOUR_SESSION_KEY);
+  fournisseurSession = null;
+  document.getElementById('fournisseurShell').classList.add('hidden');
+  showLoginEcranTel();
+}
 function showApp() {
   document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('fournisseurShell').classList.add('hidden');
   document.getElementById('appShell').classList.remove('hidden');
   document.getElementById('sidebarNom').textContent = session.nom;
   document.getElementById('sidebarRole').textContent = ROLE_LABELS[session.role] || session.role;
@@ -2266,6 +2445,13 @@ function showApp() {
   chargerParametres();
   navigate('aujourdhui');
   updateSidebarBadgeCommandes();
+}
+function showFournisseurPortal() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appShell').classList.add('hidden');
+  document.getElementById('fournisseurShell').classList.remove('hidden');
+  document.getElementById('fourPortailNom').textContent = fournisseurSession.nom;
+  loadPortailFournisseur();
 }
 function applyRoleVisibility() {
   const estGerantOuAgent = session.role === 'gerant' || session.role === 'agent';
@@ -2311,6 +2497,9 @@ const PAGE_LOADERS = {
   parametres: chargerParametresPage,
 };
 function navigate(page) {
+  // Garde-fou d'isolation : sans session interne (ex. portail fournisseur actif, ou appel
+  // direct hors contexte), navigate() ne doit jamais planter ni afficher de page interne.
+  if (!session) return;
   if (PAGE_ROLES[page] && PAGE_ROLES[page].indexOf(session.role) === -1) page = 'aujourdhui';
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarOverlay').classList.remove('open');
@@ -3837,6 +4026,11 @@ async function loadFournisseurs() {
   document.getElementById('fournisseursListe').innerHTML = fournisseursCache.length ? fournisseursCache.map(renderFournisseurCard).join('')
     : '<div class="priority-empty"><i class="ti ti-building-warehouse"></i>Aucun fournisseur.</div>';
 }
+function renderCompteFournisseurBadge(f) {
+  return f.pin_hash
+    ? '<span style="background:var(--green-bg);color:var(--green);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;">Compte actif</span>'
+    : '<span style="background:var(--gray-bg);color:var(--text-muted);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;">Compte non activé</span>';
+}
 function renderFournisseurCard(f) {
   const bordureCouleur = f.reste > 0 ? 'var(--red)' : (f.reste < 0 ? 'var(--blue)' : 'var(--green)');
   const resteCouleur = bordureCouleur;
@@ -3845,6 +4039,7 @@ function renderFournisseurCard(f) {
     + '<div class="tache-card-top">'
     + '<div class="tache-card-identite"><div class="tache-avatar">' + initiales(f.nom) + '</div>'
     + '<div class="tache-card-nom-wrap"><div class="tache-card-nom">' + esc(f.nom) + '</div><div class="tache-card-tel">' + esc(f.telephone || '') + (f.categorie ? ' · ' + esc(f.categorie) : '') + '</div></div></div>'
+    + renderCompteFournisseurBadge(f)
     + '</div>'
     + '<div class="fournisseur-solde-row"><span>Vendu : <strong>' + fmtMontant(f.vendu) + ' GNF</strong></span><span>Payé : <strong>' + fmtMontant(f.paye) + ' GNF</strong></span><span style="color:' + resteCouleur + ';font-weight:600;">' + resteTexte + '</span></div>'
     + '</div>';
@@ -3890,24 +4085,13 @@ function retourListeFournisseurs() {
   fournisseurCourant = null;
   loadFournisseurs();
 }
-async function chargerDetailFournisseur() {
-  const f = fournisseurCourant;
-  document.getElementById('fdAvatar').textContent = initiales(f.nom);
-  document.getElementById('fdNom').textContent = f.nom;
-  document.getElementById('fdMeta').textContent = [f.telephone, f.categorie].filter(Boolean).join(' · ') || '—';
-
-  const [{ data: produits }, { data: commandes }, { data: paiements }] = await Promise.all([
-    sb.from('gn_produits').select('*').eq('fournisseur_id', f.id),
-    sb.from('gn_commandes').select('lignes,statut'),
-    sb.from('gn_fournisseur_paiements').select('*').eq('fournisseur_id', f.id).order('created_at', { ascending: false }),
-  ]);
-
+function calculerVentesFournisseur(fournisseurId, commandes) {
   const commandesValides = (commandes || []).filter(function(c) { return c.statut !== 'annulee' && c.statut !== 'echec'; });
   const venduParProduit = {};
   let totalVendu = 0;
   commandesValides.forEach(function(c) {
     (c.lignes || []).forEach(function(l) {
-      if (l.fournisseur_id !== f.id) return;
+      if (l.fournisseur_id !== fournisseurId) return;
       const montant = Number(l.prix_fournisseur || 0) * Number(l.qte || 0);
       totalVendu += montant;
       if (!venduParProduit[l.produit_id]) venduParProduit[l.produit_id] = { qte: 0, du: 0 };
@@ -3915,6 +4099,28 @@ async function chargerDetailFournisseur() {
       venduParProduit[l.produit_id].du += montant;
     });
   });
+  return { totalVendu: totalVendu, venduParProduit: venduParProduit };
+}
+async function chargerDetailFournisseur() {
+  const f = fournisseurCourant;
+  document.getElementById('fdAvatar').textContent = initiales(f.nom);
+  document.getElementById('fdNom').textContent = f.nom;
+  document.getElementById('fdMeta').textContent = [f.telephone, f.categorie].filter(Boolean).join(' · ') || '—';
+  document.getElementById('fdAccesBadge').innerHTML = renderCompteFournisseurBadge(f);
+  document.getElementById('fdBtnAcces').innerHTML = f.pin_hash
+    ? '<i class="ti ti-key"></i> Réinitialiser le PIN'
+    : '<i class="ti ti-key"></i> Créer un accès';
+
+  const [{ data: produits }, { data: commandes }, { data: paiements }, { data: retraitsEnAttente }] = await Promise.all([
+    sb.from('gn_produits').select('*').eq('fournisseur_id', f.id),
+    sb.from('gn_commandes').select('lignes,statut'),
+    sb.from('gn_fournisseur_paiements').select('*').eq('fournisseur_id', f.id).order('created_at', { ascending: false }),
+    sb.from('gn_fournisseur_retraits').select('*').eq('fournisseur_id', f.id).eq('statut', 'en_attente').order('date_demande'),
+  ]);
+
+  const ventes = calculerVentesFournisseur(f.id, commandes);
+  const totalVendu = ventes.totalVendu;
+  const venduParProduit = ventes.venduParProduit;
   const totalPaye = (paiements || []).reduce(function(s, p) { return s + Number(p.montant || 0); }, 0);
   const reste = totalVendu - totalPaye;
 
@@ -3950,7 +4156,96 @@ async function chargerDetailFournisseur() {
     return '<tr><td>' + esc(p.nom) + '</td><td>' + Number(p.stock || 0) + '</td><td>' + v.qte + '</td><td>' + fmtMontant(v.du) + ' GNF</td></tr>';
   }).join('') : '<tr><td colspan="4" class="empty">Aucun produit en dépôt pour ce fournisseur.</td></tr>';
 
+  fdRetraitsCache = retraitsEnAttente || [];
+  document.getElementById('fdRetraitsListe').innerHTML = fdRetraitsCache.length
+    ? fdRetraitsCache.map(renderRetraitEnAttenteRow).join('')
+    : '<div class="empty">Aucune demande en attente.</div>';
+
   document.getElementById('fdPaiementsListe').innerHTML = (paiements && paiements.length) ? paiements.map(renderPaiementFournisseurRow).join('') : '<div class="empty">Aucun paiement enregistré.</div>';
+}
+function renderRetraitEnAttenteRow(r) {
+  const date = r.date_demande ? new Date(r.date_demande).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  return '<div class="fournisseur-paiement-row" style="align-items:center;flex-wrap:wrap;">'
+    + '<div><div style="font-weight:500;color:var(--text);">' + fmtMontant(r.montant_demande) + ' GNF demandés</div>'
+    + '<div style="color:var(--text-muted);font-size:11.5px;">' + date + (r.note ? ' · ' + esc(r.note) : '') + '</div></div>'
+    + '<div style="display:flex;align-items:center;gap:6px;">'
+    + '<input type="number" min="0" value="' + Math.round(r.montant_demande) + '" id="retraitMontant-' + r.id + '" style="width:120px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12.5px;">'
+    + '<button class="btn btn-sm btn-ghost" onclick="refuserRetrait(' + r.id + ')">Refuser</button>'
+    + '<button class="btn btn-sm btn-primary" onclick="validerRetrait(' + r.id + ')">Valider &amp; payer</button>'
+    + '</div></div>';
+}
+async function validerRetrait(id) {
+  const montantInput = document.getElementById('retraitMontant-' + id);
+  const montant = Number((montantInput && montantInput.value) || 0);
+  if (!montant || montant <= 0) { showToast('Montant invalide.', 'error'); return; }
+  const f = fournisseurCourant;
+  if (!f) return;
+  if (!confirm('Valider ce retrait pour ' + fmtMontant(montant) + ' GNF ?')) return;
+
+  const { data: paiement, error: errPaiement } = await sb.from('gn_fournisseur_paiements')
+    .insert({ fournisseur_id: f.id, montant: montant, note: 'Retrait validé — ' + f.nom, agent_nom: session.nom, retrait_id: id })
+    .select().single();
+  if (errPaiement) { showToast('Erreur : ' + errPaiement.message, 'error'); return; }
+
+  const { data: caisseRow, error: errCaisse } = await sb.from('gn_caisse')
+    .insert({ date: today(), libelle: 'Retrait fournisseur — ' + f.nom, type: 'sortie', montant: montant, categorie: 'fournisseur', agent_nom: session.nom })
+    .select().single();
+  if (errCaisse) {
+    // Rollback : on ne laisse jamais un paiement orphelin sans écriture de caisse ni retrait mis à jour.
+    await sb.from('gn_fournisseur_paiements').delete().eq('id', paiement.id);
+    showToast('Erreur : ' + errCaisse.message, 'error');
+    return;
+  }
+
+  const { error: errUpdate } = await sb.from('gn_fournisseur_retraits')
+    .update({ statut: 'validee', montant_verse: montant, date_traitement: new Date().toISOString(), traite_par: session.nom, caisse_id: caisseRow.id })
+    .eq('id', id);
+  if (errUpdate) {
+    // Rollback complet des deux insertions précédentes : la demande reste 'en_attente', aucun état à moitié fait.
+    await sb.from('gn_caisse').delete().eq('id', caisseRow.id);
+    await sb.from('gn_fournisseur_paiements').delete().eq('id', paiement.id);
+    showToast('Erreur : ' + errUpdate.message, 'error');
+    return;
+  }
+
+  showToast('Retrait validé et payé.');
+  await chargerDetailFournisseur();
+}
+async function refuserRetrait(id) {
+  if (!confirm('Refuser cette demande de retrait ?')) return;
+  const note = prompt('Motif du refus (optionnel) :') || null;
+  const { error } = await sb.from('gn_fournisseur_retraits')
+    .update({ statut: 'refusee', note_traitement: note, date_traitement: new Date().toISOString(), traite_par: session.nom })
+    .eq('id', id);
+  if (error) { showToast('Erreur : ' + error.message, 'error'); return; }
+  showToast('Demande refusée.');
+  await chargerDetailFournisseur();
+}
+function ouvrirAccesFournisseur() {
+  const f = fournisseurCourant;
+  if (!f) return;
+  document.getElementById('rpfTitre').textContent = f.pin_hash ? 'Réinitialiser le PIN' : 'Créer l\'accès fournisseur';
+  document.getElementById('rpfTelephone').value = f.telephone || '';
+  document.getElementById('rpfNouveauPin').value = '';
+  document.getElementById('rpfErreur').classList.add('hidden');
+  openModal('modalResetPinFournisseur');
+}
+async function confirmerResetPinFournisseur() {
+  const f = fournisseurCourant;
+  if (!f) return;
+  const tel = document.getElementById('rpfTelephone').value.trim();
+  const pin = document.getElementById('rpfNouveauPin').value.trim();
+  const errEl = document.getElementById('rpfErreur');
+  if (!tel) { errEl.textContent = 'Téléphone requis pour la connexion.'; errEl.classList.remove('hidden'); return; }
+  if (pin.length !== 4 || !/^\d{4}$/.test(pin)) { errEl.textContent = 'PIN à 4 chiffres requis.'; errEl.classList.remove('hidden'); return; }
+  const pinHash = await hashPin(pin);
+  const { error } = await sb.from('gn_fournisseurs').update({ telephone: tel, pin_hash: pinHash }).eq('id', f.id);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  f.telephone = tel;
+  f.pin_hash = pinHash;
+  closeModal('modalResetPinFournisseur');
+  showToast('Accès fournisseur enregistré.');
+  await chargerDetailFournisseur();
 }
 function renderPaiementFournisseurRow(p) {
   const libelle = p.note ? esc(p.note) : 'Paiement — ' + esc(p.agent_nom || '—');
@@ -3976,6 +4271,116 @@ async function enregistrerPaiementFournisseur() {
   closeModal('modalPaiementFournisseur');
   showToast('Paiement enregistré.');
   await chargerDetailFournisseur();
+}
+
+/* ── PORTAIL FOURNISSEUR ── */
+const FOUR_RETRAIT_STATUT = {
+  en_attente: { label: 'En attente', bg: '#FDF3D7', color: '#8A6100' },
+  validee: { label: 'Payé', bg: '#E6F2EB', color: '#1F7A4D' },
+  refusee: { label: 'Refusée', bg: '#FBE9E9', color: '#B42318' },
+};
+async function calculerSoldeInfoFournisseur(fournisseurId) {
+  const [{ data: commandes }, { data: paiements }, { data: enAttente }] = await Promise.all([
+    sb.from('gn_commandes').select('lignes,statut'),
+    sb.from('gn_fournisseur_paiements').select('montant').eq('fournisseur_id', fournisseurId),
+    sb.from('gn_fournisseur_retraits').select('montant_demande').eq('fournisseur_id', fournisseurId).eq('statut', 'en_attente'),
+  ]);
+  const ventes = calculerVentesFournisseur(fournisseurId, commandes);
+  const totalPaye = (paiements || []).reduce(function(s, p) { return s + Number(p.montant || 0); }, 0);
+  const totalEnAttente = (enAttente || []).reduce(function(s, r) { return s + Number(r.montant_demande || 0); }, 0);
+  const solde = ventes.totalVendu - totalPaye;
+  const disponible = solde - totalEnAttente;
+  return { solde: solde, disponible: disponible, totalEnAttente: totalEnAttente, venduParProduit: ventes.venduParProduit };
+}
+async function loadPortailFournisseur() {
+  const fid = fournisseurSession.id;
+
+  const [{ data: produits }, soldeInfo, { data: retraits }] = await Promise.all([
+    sb.from('gn_produits').select('*').eq('fournisseur_id', fid),
+    calculerSoldeInfoFournisseur(fid),
+    sb.from('gn_fournisseur_retraits').select('*').eq('fournisseur_id', fid).order('date_demande', { ascending: false }),
+  ]);
+  fourProduitsCache = produits || [];
+  fourSoldeInfo = soldeInfo;
+
+  document.getElementById('fourSolde').textContent = fmtMontant(soldeInfo.solde) + ' GNF';
+
+  let totalVendues = 0, totalRestantes = 0;
+  fourProduitsCache.forEach(function(p) {
+    const v = soldeInfo.venduParProduit[p.id] || { qte: 0, du: 0 };
+    totalVendues += v.qte;
+    totalRestantes += Number(p.stock || 0);
+  });
+  document.getElementById('fourNbProduits').textContent = fourProduitsCache.length;
+  document.getElementById('fourNbVendus').textContent = totalVendues;
+  document.getElementById('fourNbRestants').textContent = totalRestantes;
+
+  document.getElementById('fourProduitsListe').innerHTML = fourProduitsCache.length
+    ? fourProduitsCache.map(function(p) { return renderPortailProduitRow(p, soldeInfo.venduParProduit[p.id] || { qte: 0, du: 0 }); }).join('')
+    : '<div class="empty">Aucun produit en dépôt-vente pour le moment.</div>';
+
+  fourRetraitsCache = retraits || [];
+  document.getElementById('fourRetraitsListe').innerHTML = fourRetraitsCache.length
+    ? fourRetraitsCache.map(renderPortailRetraitRow).join('')
+    : '<div class="empty">Aucune demande de retrait pour le moment.</div>';
+}
+function renderPortailProduitRow(p, v) {
+  const stock = Number(p.stock || 0);
+  const stockTxt = stock === 0 ? 'Rupture' : (stock + ' restant' + (stock > 1 ? 's' : ''));
+  const stockColor = stock === 0 ? '#B42318' : '#1F7A4D';
+  return '<div class="four-list-row">'
+    + '<div class="four-list-main"><div class="four-list-nom">' + esc(p.nom) + '</div>'
+    + '<div class="four-list-meta">Prix fournisseur : ' + fmtMontant(p.prix_fournisseur) + ' GNF</div></div>'
+    + '<div class="four-list-right">'
+    + '<div class="four-list-vendus">' + v.qte + ' vendu' + (v.qte > 1 ? 's' : '') + '</div>'
+    + '<div style="color:' + stockColor + ';font-weight:600;font-size:12.5px;">' + stockTxt + '</div>'
+    + '</div></div>';
+}
+function renderPortailRetraitRow(r) {
+  const st = FOUR_RETRAIT_STATUT[r.statut] || FOUR_RETRAIT_STATUT.en_attente;
+  const date = r.date_demande ? new Date(r.date_demande).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const montantVerseTxt = (r.statut === 'validee' && r.montant_verse != null && Number(r.montant_verse) !== Number(r.montant_demande))
+    ? '<div class="four-list-meta">Versé : ' + fmtMontant(r.montant_verse) + ' GNF</div>' : '';
+  return '<div class="four-list-row">'
+    + '<div class="four-list-main"><div class="four-list-nom">' + fmtMontant(r.montant_demande) + ' GNF demandés</div>'
+    + '<div class="four-list-meta">' + date + (r.note ? ' · ' + esc(r.note) : '') + '</div>'
+    + montantVerseTxt
+    + '</div>'
+    + '<span class="four-badge" style="background:' + st.bg + ';color:' + st.color + ';">' + st.label + '</span>'
+    + '</div>';
+}
+async function ouvrirModalRetrait() {
+  document.getElementById('drMontant').value = '';
+  document.getElementById('drNote').value = '';
+  document.getElementById('drErreur').classList.add('hidden');
+  const info = await calculerSoldeInfoFournisseur(fournisseurSession.id);
+  fourSoldeInfo = info;
+  document.getElementById('drSoldeDisponible').textContent = fmtMontant(info.disponible) + ' GNF';
+  openModal('modalDemandeRetrait');
+}
+async function envoyerDemandeRetrait() {
+  const montant = Number(document.getElementById('drMontant').value || 0);
+  const note = document.getElementById('drNote').value.trim();
+  const errEl = document.getElementById('drErreur');
+  if (!montant || montant <= 0) { errEl.textContent = 'Montant requis.'; errEl.classList.remove('hidden'); return; }
+  // Revérifié juste avant l'envoi (pas seulement à l'ouverture de la modale) pour éviter une
+  // validation client basée sur un solde périmé ; le trigger côté base reste le filet de
+  // sécurité final si ce contrôle est contourné ou incohérent (ex. appel direct à Supabase).
+  const infoActuel = await calculerSoldeInfoFournisseur(fournisseurSession.id);
+  fourSoldeInfo = infoActuel;
+  if (montant > infoActuel.disponible) {
+    errEl.textContent = 'Montant supérieur au solde disponible (' + fmtMontant(infoActuel.disponible) + ' GNF).';
+    errEl.classList.remove('hidden');
+    document.getElementById('drSoldeDisponible').textContent = fmtMontant(infoActuel.disponible) + ' GNF';
+    return;
+  }
+  const { error } = await sb.from('gn_fournisseur_retraits').insert({
+    fournisseur_id: fournisseurSession.id, montant_demande: montant, note: note || null, statut: 'en_attente',
+  });
+  if (error) { errEl.textContent = 'Erreur : ' + error.message; errEl.classList.remove('hidden'); return; }
+  closeModal('modalDemandeRetrait');
+  showToast('Demande de retrait envoyée.');
+  await loadPortailFournisseur();
 }
 
 /* ── PAGE CAISSE ── */
