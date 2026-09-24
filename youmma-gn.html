@@ -618,11 +618,47 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .four-depot-ligne select{flex:1;min-width:0;height:42px;padding:0 10px;border:1.5px solid #E7E5E0;border-radius:10px;font-size:13px;background:#fff;}
 .four-depot-ligne input[type="number"]{width:72px;height:42px;padding:0 8px;border:1.5px solid #E7E5E0;border-radius:10px;font-size:13px;text-align:center;flex-shrink:0;}
 .four-depot-ligne-remove{width:42px;height:42px;border-radius:10px;border:1px solid #FBE9E9;background:#FBE9E9;color:#B42318;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.four-btn-label-short{display:none;}
+.four-mobile-nav{display:none;}
 @media (max-width:480px){
   .four-kpi-grid{grid-template-columns:1fr 1fr;}
   .four-kpi-grid .four-kpi-card:nth-child(3){grid-column:1/-1;}
   .four-rapport-kpi-grid{grid-template-columns:1fr 1fr;}
   .four-topbar-brand-sub{display:block;margin-left:0;padding-left:0;border-left:none;}
+
+  /* ---- Restyling mobile du portail fournisseur (≤480px uniquement) : header type
+     "Aujourd'hui" agent, carte solde blanche qui chevauche le header, cartes indicateurs
+     et navigation basse avec bouton central. FournisseurPortailBureau (>480px) inchangé :
+     aucune des règles ci-dessous n'existe hors de cette media query. ---- */
+  .four-topbar{position:relative;overflow:hidden;flex-direction:column;align-items:flex-start;padding:16px 20px 64px;border-radius:0 0 28px 28px;}
+  .four-topbar::before{content:'';position:absolute;right:-50px;top:-50px;width:170px;height:170px;border-radius:50%;border:20px solid rgba(232,98,44,.20);pointer-events:none;}
+  .four-topbar-brand{position:relative;z-index:1;}
+  .four-topbar-right{position:relative;z-index:1;display:block;width:100%;margin-top:18px;}
+  .four-logout-btn{position:absolute;top:16px;right:20px;z-index:2;}
+  .four-topbar-nom{display:block;font-family:'Sora',system-ui,sans-serif;font-size:22px;font-weight:700;color:#fff;}
+  .four-topbar-nom::before{content:'Bonjour, ';}
+
+  .four-content{padding-top:0;padding-bottom:110px;}
+  .four-solde-card{background:#fff;color:#1E2247;margin:-46px 0 16px;box-shadow:0 10px 28px rgba(30,34,71,.14);}
+  .four-solde-card::before,.four-solde-card::after{display:none;}
+  .four-solde-label{color:#5F6275;}
+  .four-solde-value{font-size:28px;}
+  .four-solde-actions .four-btn-retrait,.four-solde-actions .four-btn-depot{flex:1;justify-content:center;}
+  .four-btn-depot{background:#fff;color:#C8501E;border:1.5px solid #C8501E;}
+  .four-btn-label-full{display:none;}
+  .four-btn-label-short{display:inline;}
+
+  .four-kpi-card{border-radius:16px;padding:12px 8px;}
+  .four-kpi-icon{width:32px;height:32px;border-radius:10px;margin:0 auto 8px;}
+  .four-card{border-radius:16px;}
+
+  .four-tabs{display:none;}
+  .four-mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -4px 16px rgba(30,34,71,.10);z-index:900;padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));justify-content:space-around;align-items:center;min-height:76px;box-sizing:border-box;}
+  .four-mobile-nav .four-tab{flex:1;background:none;border:none;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9A94A6;cursor:pointer;font-size:9.5px;font-weight:600;min-height:44px;padding:0;}
+  .four-mobile-nav .four-tab i{font-size:18px;}
+  .four-mobile-nav .four-tab span{font-weight:700;}
+  .four-mobile-nav .four-tab.active{background:none;border-color:transparent;color:#C8501E;}
+  .four-mobile-nav-fab{width:58px;height:58px;border-radius:50%;background:#C8501E;color:#fff;border:5px solid #F4F3EF;display:flex;align-items:center;justify-content:center;margin-top:-34px;box-shadow:0 8px 18px rgba(200,80,30,.35);cursor:pointer;flex-shrink:0;}
 }
 
 .om-header{display:flex;gap:24px;flex-wrap:wrap;}
@@ -1907,8 +1943,8 @@ button.suivi-pastille{cursor:pointer;}
         <div class="four-solde-label"><i class="ti ti-wallet"></i> Solde à recevoir</div>
         <div class="four-solde-value" id="fourSolde">—</div>
         <div class="four-solde-actions">
-          <button class="four-btn-retrait" onclick="ouvrirModalRetrait()"><i class="ti ti-arrow-down-circle"></i> Demander un retrait</button>
-          <button class="four-btn-depot" onclick="ouvrirModalDepot()"><i class="ti ti-package-import"></i> Déposer des articles</button>
+          <button class="four-btn-retrait" onclick="ouvrirModalRetrait()"><i class="ti ti-arrow-down-circle"></i> <span class="four-btn-label-full">Demander un retrait</span><span class="four-btn-label-short">Retrait</span></button>
+          <button class="four-btn-depot" onclick="ouvrirModalDepot()"><i class="ti ti-package-import"></i> <span class="four-btn-label-full">Déposer des articles</span><span class="four-btn-label-short">Déposer</span></button>
         </div>
       </div>
 
@@ -1970,6 +2006,16 @@ button.suivi-pastille{cursor:pointer;}
       </div>
     </div>
   </div>
+
+  <!-- Navigation basse (mobile ≤480px uniquement, cf. CSS) : réutilise naviguerPortailFournisseur()
+       et ouvrirModalDepot() déjà existantes — mêmes boutons .four-tab que ceux du haut (desktop),
+       juste stylés différemment, donc aucun changement JS n'est nécessaire pour que l'état actif
+       reste correctement synchronisé. -->
+  <nav class="four-mobile-nav">
+    <button class="four-tab" data-four-tab="dashboard" onclick="naviguerPortailFournisseur('dashboard')"><i class="ti ti-home"></i><span>Accueil</span></button>
+    <button class="four-mobile-nav-fab" onclick="ouvrirModalDepot()" aria-label="Déposer des articles"><i class="ti ti-plus"></i></button>
+    <button class="four-tab" data-four-tab="rapport" onclick="naviguerPortailFournisseur('rapport')"><i class="ti ti-chart-bar"></i><span>Rapport</span></button>
+  </nav>
 </div>
 
 <!-- ═══ MODALES ═══ -->
