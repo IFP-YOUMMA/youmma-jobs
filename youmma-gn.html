@@ -1179,6 +1179,22 @@ button.suivi-pastille{cursor:pointer;}
 .prod-header-title{font-family:'Sora',system-ui,sans-serif;font-size:26px;font-weight:700;color:#1E2247;}
 .prod-header-sub{font-size:14px;color:#5F6275;margin-top:4px;}
 
+.prod-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px;flex-shrink:0;}
+.prod-kpi-card{background:#fff;border-radius:20px;padding:18px 20px;box-shadow:0 1px 2px rgba(30,34,71,.06);min-width:0;}
+.prod-kpi-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;}
+.prod-kpi-icon.navy{background:#ECEDF5;color:#1E2247;}
+.prod-kpi-icon.orange{background:#FCEBE3;color:#C8501E;}
+.prod-kpi-icon.green{background:#E6F2EB;color:#1F7A4D;}
+.prod-kpi-value{font-family:'Sora',system-ui,sans-serif;font-size:22px;font-weight:700;color:#1E2247;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.prod-kpi-label{font-size:12.5px;color:#5F6275;margin-top:4px;}
+.prod-kpi-sub{font-size:11.5px;color:#9A9CAB;margin-top:4px;}
+.prod-kpi-card-navy{background:#1E2247;}
+.prod-kpi-card-navy .prod-kpi-value{color:#fff;}
+.prod-kpi-card-navy .prod-kpi-label{color:#B9BCD3;}
+@media (max-width:1200px){
+  .prod-kpi-grid{grid-template-columns:repeat(2,1fr);}
+}
+
 .prod-toolbar{display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap;flex-shrink:0;}
 .prod-checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;color:#1E2247;font-weight:600;white-space:nowrap;cursor:pointer;}
 .prod-checkbox-row input{width:18px;height:18px;accent-color:#C8501E;cursor:pointer;flex-shrink:0;}
@@ -1627,6 +1643,28 @@ button.suivi-pastille{cursor:pointer;}
               <div class="prod-header-sub" id="produitsSousTitre">—</div>
             </div>
             <button class="ajr-btn primary gerant-only" onclick="openModalProduit()"><i class="ti ti-plus"></i> Nouveau produit</button>
+          </div>
+          <div class="prod-kpi-grid gerant-only">
+            <div class="prod-kpi-card">
+              <div class="prod-kpi-icon navy"><i class="ti ti-boxes"></i></div>
+              <div class="prod-kpi-value" id="prodKpiUnitesStock">—</div>
+              <div class="prod-kpi-label">Unités en stock</div>
+            </div>
+            <div class="prod-kpi-card">
+              <div class="prod-kpi-icon orange"><i class="ti ti-receipt"></i></div>
+              <div class="prod-kpi-value" id="prodKpiValeurAchat">—</div>
+              <div class="prod-kpi-label">Valeur d'achat du stock</div>
+            </div>
+            <div class="prod-kpi-card">
+              <div class="prod-kpi-icon green"><i class="ti ti-trending-up"></i></div>
+              <div class="prod-kpi-value" id="prodKpiValeurPotentielle">—</div>
+              <div class="prod-kpi-label">Valeur potentielle après vente</div>
+              <div class="prod-kpi-sub" id="prodKpiValeurPotentielleDepot"></div>
+            </div>
+            <div class="prod-kpi-card prod-kpi-card-navy">
+              <div class="prod-kpi-value" id="prodKpiMarchandisePropre">—</div>
+              <div class="prod-kpi-label">Marchandise qui vous appartient</div>
+            </div>
           </div>
           <div class="prod-toolbar">
             <div class="cmd-search" style="max-width:360px;width:100%;">
@@ -2123,6 +2161,7 @@ button.suivi-pastille{cursor:pointer;}
     <div class="modal-body">
       <div class="form-row"><label>Nom *</label><input type="text" id="prodNom"></div>
       <div class="form-row"><label>Prix de vente (GNF) *</label><input type="number" id="prodPrix" min="0" oninput="calculerMargeEstimee()"></div>
+      <div class="form-row" id="prodPrixAchatRow"><label>Prix d'achat (GNF) *</label><input type="number" id="prodPrixAchat" min="0"></div>
       <div class="form-row"><label>Stock initial *</label><input type="number" id="prodStock" min="0"></div>
       <div class="form-row gerant-only" id="prodDepotVenteRow">
         <label style="display:flex;align-items:center;gap:8px;font-weight:400;text-transform:none;letter-spacing:normal;font-size:13.5px;"><input type="checkbox" id="prodDepotVente" style="width:auto;accent-color:#C8501E;" onchange="toggleDepotVenteChamps()"> Marchandise en dépôt-vente</label>
@@ -3919,8 +3958,30 @@ async function loadProduits() {
   document.getElementById('produitsSousTitre').textContent = subTxt;
   document.getElementById('produitsSousTitreMobile').textContent = subTxt;
 
+  prodRenderKpis();
   prodRenderTabs();
   renderProduitsListe();
+}
+function prodRenderKpis() {
+  const actifs = produitsCache.filter(function(p) { return p.actif !== false; });
+  let unitesStock = 0, valeurAchat = 0, valeurPotentielle = 0, valeurPotentielleDepot = 0, marchandisePropre = 0;
+  actifs.forEach(function(p) {
+    const stock = Number(p.stock || 0);
+    unitesStock += stock;
+    if (p.prix_achat != null) {
+      valeurAchat += stock * Number(p.prix_achat);
+    } else if (p.depot_vente && p.prix_fournisseur != null) {
+      valeurAchat += stock * Number(p.prix_fournisseur);
+    }
+    const valeurVente = stock * Number(p.prix || 0);
+    valeurPotentielle += valeurVente;
+    if (p.depot_vente) { valeurPotentielleDepot += valeurVente; } else { marchandisePropre += valeurVente; }
+  });
+  document.getElementById('prodKpiUnitesStock').textContent = unitesStock;
+  document.getElementById('prodKpiValeurAchat').textContent = fmtMontant(valeurAchat) + ' GNF';
+  document.getElementById('prodKpiValeurPotentielle').textContent = fmtMontant(valeurPotentielle) + ' GNF';
+  document.getElementById('prodKpiValeurPotentielleDepot').textContent = valeurPotentielleDepot > 0 ? ('dont ' + fmtMontant(valeurPotentielleDepot) + ' GNF en dépôt-vente') : '';
+  document.getElementById('prodKpiMarchandisePropre').textContent = fmtMontant(marchandisePropre) + ' GNF';
 }
 function prodRenderTabs() {
   const tabsEl = document.getElementById('produitsTabs');
@@ -4037,6 +4098,7 @@ function calculerMargeEstimee() {
 function toggleDepotVenteChamps() {
   const coche = document.getElementById('prodDepotVente').checked;
   document.getElementById('prodDepotVenteChamps').classList.toggle('hidden', !coche);
+  document.getElementById('prodPrixAchatRow').classList.toggle('hidden', coche);
   calculerMargeEstimee();
 }
 async function chargerFournisseursSelect() {
@@ -4057,6 +4119,7 @@ async function openModalProduit() {
   document.getElementById('prodBtnSubmit').textContent = 'Ajouter le produit';
   document.getElementById('prodNom').value = '';
   document.getElementById('prodPrix').value = '';
+  document.getElementById('prodPrixAchat').value = '';
   document.getElementById('prodStock').value = '';
   document.getElementById('prodDepotVente').checked = false;
   document.getElementById('prodPrixFournisseur').value = '';
@@ -4073,6 +4136,7 @@ async function openModalProduitEdit(id) {
   document.getElementById('prodBtnSubmit').textContent = 'Enregistrer';
   document.getElementById('prodNom').value = p.nom || '';
   document.getElementById('prodPrix').value = p.prix || '';
+  document.getElementById('prodPrixAchat').value = p.prix_achat || '';
   document.getElementById('prodStock').value = p.stock || 0;
   document.getElementById('prodDepotVente').checked = !!p.depot_vente;
   document.getElementById('prodPrixFournisseur').value = p.prix_fournisseur || '';
@@ -4095,22 +4159,47 @@ async function enregistrerProduit() {
     errEl.classList.remove('hidden');
     return;
   }
+  if (depotVente && prix <= prixFournisseur) {
+    errEl.textContent = 'Le prix de vente doit être supérieur au prix fournisseur (' + fmtMontant(prixFournisseur) + ' GNF).';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  const prixAchatSaisi = document.getElementById('prodPrixAchat').value;
+  const prixAchat = depotVente ? null : (prixAchatSaisi === '' ? null : Number(prixAchatSaisi));
+  if (!depotVente) {
+    if (prixAchat == null) {
+      errEl.textContent = 'Prix d\'achat requis.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    if (prix <= prixAchat) {
+      errEl.textContent = 'Le prix de vente doit être supérieur au prix d\'achat (' + fmtMontant(prixAchat) + ' GNF).';
+      errEl.classList.remove('hidden');
+      return;
+    }
+  }
   const categorie = produitEnEdition ? produitEnEdition.categorie : null;
   const photoUrl = produitEnEdition ? produitEnEdition.photo_url : null;
   if (produitEnEdition) {
-    const { error } = await sb.from('gn_produits').update({ nom: nom, categorie: categorie, prix: prix, stock: stock, photo_url: photoUrl, depot_vente: depotVente, fournisseur_id: fournisseurId, prix_fournisseur: prixFournisseur }).eq('id', produitEnEdition.id);
-    if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+    const { error } = await sb.from('gn_produits').update({ nom: nom, categorie: categorie, prix: prix, stock: stock, photo_url: photoUrl, depot_vente: depotVente, fournisseur_id: fournisseurId, prix_fournisseur: prixFournisseur, prix_achat: prixAchat }).eq('id', produitEnEdition.id);
+    if (error) { errEl.textContent = messageErreurProduit(error); errEl.classList.remove('hidden'); return; }
     closeModal('modalProduit');
     showToast('Produit modifié.');
     produitEnEdition = null;
     loadProduits();
     return;
   }
-  const { error } = await sb.from('gn_produits').insert({ nom: nom, categorie: categorie, prix: prix, stock: stock, photo_url: photoUrl, actif: true, depot_vente: depotVente, fournisseur_id: fournisseurId, prix_fournisseur: prixFournisseur });
-  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+  const { error } = await sb.from('gn_produits').insert({ nom: nom, categorie: categorie, prix: prix, stock: stock, photo_url: photoUrl, actif: true, depot_vente: depotVente, fournisseur_id: fournisseurId, prix_fournisseur: prixFournisseur, prix_achat: prixAchat });
+  if (error) { errEl.textContent = messageErreurProduit(error); errEl.classList.remove('hidden'); return; }
   closeModal('modalProduit');
   showToast('Produit ajouté.');
   loadProduits();
+}
+function messageErreurProduit(error) {
+  // 23514 = violation de contrainte CHECK Postgres (filet de sécurité base, ex. course
+  // entre deux onglets) : message générique plutôt que l'erreur technique brute.
+  if (error && error.code === '23514') return 'Marge invalide : le prix de vente doit être strictement supérieur au prix d\'achat (ou au prix fournisseur pour un dépôt-vente).';
+  return 'Erreur: ' + (error && error.message ? error.message : '');
 }
 async function supprimerProduit(id) {
   if (!confirm('Supprimer définitivement ce produit ?')) return;
