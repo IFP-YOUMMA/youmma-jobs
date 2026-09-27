@@ -892,6 +892,11 @@ button.suivi-pastille{cursor:pointer;}
 .mp-readonly-row{display:flex;align-items:center;gap:8px;}
 .mp-readonly-row input{background:#F3F4F6;color:#9CA3AF;flex:1;}
 .mp-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--navy-secondary);margin:18px 0 10px;}
+.crop-viewport{position:relative;width:280px;height:280px;max-width:100%;margin:0 auto;overflow:hidden;border-radius:50%;background:#111;cursor:grab;touch-action:none;box-shadow:0 0 0 4px #F3F4F6;}
+.crop-viewport:active{cursor:grabbing;}
+.crop-viewport img{position:absolute;left:0;top:0;max-width:none;user-select:none;-webkit-user-drag:none;pointer-events:none;}
+.crop-zoom-row{display:flex;align-items:center;gap:10px;margin-top:16px;color:var(--text-muted);font-size:16px;}
+.crop-zoom-row input[type=range]{flex:1;}
 
 /* ---- Modals ---- */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(13,13,46,.55);z-index:9000;align-items:center;justify-content:center;padding:16px;}
@@ -2475,7 +2480,7 @@ button.suivi-pastille{cursor:pointer;}
       <div class="mp-avatar-wrap">
         <div class="mp-avatar" id="mpAvatar">--</div>
         <button type="button" class="mp-avatar-camera-btn" onclick="document.getElementById('mpPhotoInput').click()" aria-label="Changer la photo"><i class="ti ti-camera"></i></button>
-        <input type="file" id="mpPhotoInput" accept="image/*" style="display:none;" onchange="changerPhotoProfil(this)">
+        <input type="file" id="mpPhotoInput" accept="image/*" style="display:none;" onchange="ouvrirRecadragePhoto(this)">
       </div>
       <div class="form-row"><label>Nom complet *</label><input type="text" id="mpNom"></div>
       <div class="form-row">
@@ -2492,6 +2497,23 @@ button.suivi-pastille{cursor:pointer;}
       <div id="mpErreur" class="form-error hidden"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalMonProfil')">Annuler</button><button class="btn btn-primary" onclick="enregistrerMonProfil()">Enregistrer les modifications</button></div>
+  </div>
+</div>
+
+<div id="modalCropPhoto" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Recadrer la photo</h3><button class="modal-close" onclick="annulerCadragePhoto()">×</button></div>
+    <div class="modal-body">
+      <div class="crop-viewport" id="cropViewport" onmousedown="cropPointerDown(event)" onmousemove="cropPointerMove(event)" onmouseup="cropPointerUp()" onmouseleave="cropPointerUp()" ontouchstart="cropPointerDown(event)" ontouchmove="cropPointerMove(event)" ontouchend="cropPointerUp()">
+        <img id="cropImg" alt="">
+      </div>
+      <div class="crop-zoom-row">
+        <i class="ti ti-zoom-out"></i>
+        <input type="range" id="cropZoom" min="1" max="3" step="0.01" value="1" oninput="cropOnZoomInput(this.value)">
+        <i class="ti ti-zoom-in"></i>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="annulerCadragePhoto()">Annuler</button><button class="btn btn-primary" onclick="validerCadragePhoto()">Valider le cadrage</button></div>
   </div>
 </div>
 <script>
@@ -2619,6 +2641,11 @@ function initiales(nom) {
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
+function avatarInnerHtml(nom, photoUrl, radius) {
+  return photoUrl
+    ? '<img src="' + esc(photoUrl) + '" style="width:100%;height:100%;object-fit:cover;border-radius:' + radius + ';">'
+    : esc(initiales(nom));
+}
 function showToast(msg, type) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -2637,24 +2664,15 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 function renderSidebarAvatar() {
   const el = document.getElementById('sidebarAvatar');
   if (!el || !session) return;
-  if (session.photo_url) {
-    el.innerHTML = '<img src="' + esc(session.photo_url) + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
-  } else {
-    el.textContent = initiales(session.nom);
-  }
+  el.innerHTML = avatarInnerHtml(session.nom, session.photo_url, '50%');
 }
 function mpRenderAvatar() {
   const el = document.getElementById('mpAvatar');
   if (!el || !session) return;
   const style = EQ_ROLE_STYLES[session.role] || EQ_ROLE_STYLES.agent;
-  if (session.photo_url) {
-    el.style.background = 'transparent';
-    el.innerHTML = '<img src="' + esc(session.photo_url) + '">';
-  } else {
-    el.style.background = style.bg;
-    el.style.color = style.color;
-    el.textContent = initiales(session.nom);
-  }
+  el.style.background = session.photo_url ? 'transparent' : style.bg;
+  el.style.color = style.color;
+  el.innerHTML = avatarInnerHtml(session.nom, session.photo_url, '50%');
 }
 function ouvrirMonProfil() {
   if (!session) return;
@@ -2667,15 +2685,125 @@ function ouvrirMonProfil() {
   mpRenderAvatar();
   openModal('modalMonProfil');
 }
-async function changerPhotoProfil(input) {
+const CROP_VIEWPORT = 280;
+const CROP_OUTPUT = 400;
+let cropState = {};
+function ouvrirRecadragePhoto(input) {
   const file = input.files[0];
+  input.value = '';
   if (!file) return;
-  if (!file.type.startsWith('image/')) { showToast('Le fichier doit être une image.', 'error'); input.value = ''; return; }
-  if (file.size > 2 * 1024 * 1024) { showToast('La photo doit faire moins de 2 Mo.', 'error'); input.value = ''; return; }
-  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-  const chemin = 'agents/' + session.id + '.' + ext;
+  if (!file.type.startsWith('image/')) { showToast('Le fichier doit être une image.', 'error'); return; }
+  if (file.size > 2 * 1024 * 1024) { showToast('La photo doit faire moins de 2 Mo.', 'error'); return; }
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = function() {
+    cropState = { img: img, naturalW: img.naturalWidth, naturalH: img.naturalHeight, objectUrl: url, zoom: 1, dragging: false };
+    cropInitPosition();
+    document.getElementById('cropZoom').value = '1';
+    cropRender();
+    openModal('modalCropPhoto');
+  };
+  img.onerror = function() { showToast('Image illisible.', 'error'); URL.revokeObjectURL(url); };
+  img.src = url;
+}
+function cropInitPosition() {
+  const cs = cropState;
+  cs.baseScale = Math.max(CROP_VIEWPORT / cs.naturalW, CROP_VIEWPORT / cs.naturalH);
+  cs.zoom = 1;
+  const dispW = cs.naturalW * cs.baseScale;
+  const dispH = cs.naturalH * cs.baseScale;
+  cs.offsetX = (CROP_VIEWPORT - dispW) / 2;
+  cs.offsetY = (CROP_VIEWPORT - dispH) / 2;
+}
+function cropCurrentScale() { return cropState.baseScale * cropState.zoom; }
+function cropClamp() {
+  const cs = cropState;
+  const scale = cropCurrentScale();
+  const dispW = cs.naturalW * scale;
+  const dispH = cs.naturalH * scale;
+  const minX = Math.min(0, CROP_VIEWPORT - dispW);
+  const minY = Math.min(0, CROP_VIEWPORT - dispH);
+  cs.offsetX = Math.max(minX, Math.min(0, cs.offsetX));
+  cs.offsetY = Math.max(minY, Math.min(0, cs.offsetY));
+}
+function cropRender() {
+  const cs = cropState;
+  if (!cs.img) return;
+  const scale = cropCurrentScale();
+  const img = document.getElementById('cropImg');
+  img.src = cs.objectUrl;
+  img.style.width = (cs.naturalW * scale) + 'px';
+  img.style.height = (cs.naturalH * scale) + 'px';
+  img.style.left = cs.offsetX + 'px';
+  img.style.top = cs.offsetY + 'px';
+}
+function cropOnZoomInput(val) {
+  const cs = cropState;
+  if (!cs.img) return;
+  const oldScale = cropCurrentScale();
+  const centre = CROP_VIEWPORT / 2;
+  const relX = (centre - cs.offsetX) / oldScale;
+  const relY = (centre - cs.offsetY) / oldScale;
+  cs.zoom = Number(val);
+  const newScale = cropCurrentScale();
+  cs.offsetX = centre - relX * newScale;
+  cs.offsetY = centre - relY * newScale;
+  cropClamp();
+  cropRender();
+}
+function cropEventPoint(e) {
+  const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]) || e;
+  return { x: t.clientX, y: t.clientY };
+}
+function cropPointerDown(e) {
+  if (!cropState.img) return;
+  cropState.dragging = true;
+  const p = cropEventPoint(e);
+  cropState.startX = p.x;
+  cropState.startY = p.y;
+  cropState.startOffsetX = cropState.offsetX;
+  cropState.startOffsetY = cropState.offsetY;
+  e.preventDefault();
+}
+function cropPointerMove(e) {
+  if (!cropState.dragging) return;
+  const p = cropEventPoint(e);
+  cropState.offsetX = cropState.startOffsetX + (p.x - cropState.startX);
+  cropState.offsetY = cropState.startOffsetY + (p.y - cropState.startY);
+  cropClamp();
+  cropRender();
+  e.preventDefault();
+}
+function cropPointerUp() { cropState.dragging = false; }
+function annulerCadragePhoto() {
+  if (cropState.objectUrl) URL.revokeObjectURL(cropState.objectUrl);
+  cropState = {};
+  closeModal('modalCropPhoto');
+}
+function validerCadragePhoto() {
+  const cs = cropState;
+  if (!cs.img) return;
+  const scale = cropCurrentScale();
+  const canvas = document.createElement('canvas');
+  canvas.width = CROP_OUTPUT;
+  canvas.height = CROP_OUTPUT;
+  const ctx = canvas.getContext('2d');
+  const sx = -cs.offsetX / scale;
+  const sy = -cs.offsetY / scale;
+  const sSize = CROP_VIEWPORT / scale;
+  ctx.drawImage(cs.img, sx, sy, sSize, sSize, 0, 0, CROP_OUTPUT, CROP_OUTPUT);
+  canvas.toBlob(async function(blob) {
+    if (!blob) { showToast('Erreur de recadrage.', 'error'); return; }
+    await uploaderPhotoProfil(blob);
+    if (cs.objectUrl) URL.revokeObjectURL(cs.objectUrl);
+    cropState = {};
+    closeModal('modalCropPhoto');
+  }, 'image/jpeg', 0.85);
+}
+async function uploaderPhotoProfil(blob) {
+  const chemin = 'agents/' + session.id + '.jpg';
   try {
-    const { error } = await sb.storage.from('gn-assets').upload(chemin, file, { upsert: true });
+    const { error } = await sb.storage.from('gn-assets').upload(chemin, blob, { upsert: true, contentType: 'image/jpeg' });
     if (error) throw error;
     const { data: urlData } = sb.storage.from('gn-assets').getPublicUrl(chemin);
     const url = urlData.publicUrl + '?t=' + Date.now();
@@ -2683,13 +2811,20 @@ async function changerPhotoProfil(input) {
     if (errUpdate) throw errUpdate;
     session.photo_url = url;
     sessionStorage.setItem('gn_session', JSON.stringify(session));
-    mpRenderAvatar();
-    renderSidebarAvatar();
+    refreshAllAvatarsUI();
     showToast('Photo de profil mise à jour.');
   } catch (e) {
     showToast('Erreur upload photo: ' + e.message, 'error');
   }
-  input.value = '';
+}
+function refreshAllAvatarsUI() {
+  renderSidebarAvatar();
+  mpRenderAvatar();
+  const mobileAvatarEl = document.getElementById('ajMobileAvatar');
+  if (mobileAvatarEl) mobileAvatarEl.innerHTML = avatarInnerHtml(session.nom, session.photo_url, '50%');
+  const livreurAvatarEl = document.getElementById('ajLivreurAvatar');
+  if (livreurAvatarEl) livreurAvatarEl.innerHTML = avatarInnerHtml(session.nom, session.photo_url, '50%');
+  if (agentsCache.length) loadAgents();
 }
 async function enregistrerMonProfil() {
   const nom = document.getElementById('mpNom').value.trim();
@@ -3057,7 +3192,7 @@ async function loadAujourdhui() {
   const prenom = session.nom.split(' ')[0];
   document.getElementById('ajBonjour').textContent = 'Bonjour, ' + prenom;
   document.getElementById('ajBonjourMobile').textContent = 'Bonjour, ' + prenom;
-  document.getElementById('ajMobileAvatar').textContent = initiales(session.nom);
+  document.getElementById('ajMobileAvatar').innerHTML = avatarInnerHtml(session.nom, session.photo_url, '50%');
   document.getElementById('ajMobileNom').textContent = session.nom;
   document.getElementById('ajMobileRole').textContent = ROLE_LABELS[session.role] || session.role;
   const dateBrute = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -3175,7 +3310,7 @@ async function loadAujourdhui() {
 /* ── AUJOURD'HUI : ACCUEIL LIVREUR (tableau de bord personnel, remplace le CA entreprise) ── */
 async function chargerAccueilLivreur() {
   document.getElementById('ajLivreurSalut').textContent = 'Salut, ' + session.nom.split(' ')[0];
-  document.getElementById('ajLivreurAvatar').textContent = initiales(session.nom);
+  document.getElementById('ajLivreurAvatar').innerHTML = avatarInnerHtml(session.nom, session.photo_url, '50%');
 
   const { data } = await sb.from('gn_commandes').select('*');
   const commandes = data || [];
@@ -5479,7 +5614,7 @@ function renderAgentRow(a) {
       + btnToggle;
   }
   return '<div class="eq-member-card' + (actif ? '' : ' inactif') + '">'
-    + '<div class="eq-avatar" style="background:' + style.bg + ';color:' + style.color + ';">' + esc(initiales(a.nom)) + '</div>'
+    + '<div class="eq-avatar" style="background:' + style.bg + ';color:' + style.color + ';">' + avatarInnerHtml(a.nom, a.photo_url, '14px') + '</div>'
     + '<div class="eq-member-info">'
     + '<div class="eq-member-nom">' + esc(a.nom) + '</div>'
     + '<div class="eq-member-badges">'
