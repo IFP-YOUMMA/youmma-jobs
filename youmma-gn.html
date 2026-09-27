@@ -850,6 +850,47 @@ button.suivi-pastille{cursor:pointer;}
 .agent-nom{font-weight:700;font-size:14px;color:#1A1A4E;}
 .agent-meta{font-size:12px;color:#9CA3AF;text-transform:capitalize;margin-top:2px;}
 
+/* ---- Équipe ---- */
+.eq-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px;}
+.eq-kpi-card{background:#fff;border-radius:20px;padding:18px 20px;box-shadow:0 1px 2px rgba(30,34,71,.06);min-width:0;}
+.eq-kpi-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;}
+.eq-kpi-icon.navy{background:#ECEDF5;color:#1E2247;}
+.eq-kpi-icon.orange{background:#FCEBE3;color:#C8501E;}
+.eq-kpi-icon.blue{background:#E8F0FC;color:#2E5FB0;}
+.eq-kpi-icon.green{background:#E6F2EB;color:#1F7A4D;}
+.eq-kpi-value{font-family:'Sora',system-ui,sans-serif;font-size:28px;font-weight:700;color:#1E2247;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.eq-kpi-label{font-size:12.5px;color:#5F6275;margin-top:4px;}
+@media (max-width:900px){.eq-kpi-grid{grid-template-columns:repeat(2,1fr);}}
+.eq-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.eq-toolbar .cmd-tabs{margin-bottom:0;}
+.eq-member-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.04);display:flex;align-items:center;gap:14px;}
+.eq-member-card.inactif{opacity:.6;}
+.eq-avatar{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;font-family:'Sora',system-ui,sans-serif;}
+.eq-member-info{flex:1;min-width:0;}
+.eq-member-nom{font-weight:700;font-size:14.5px;color:#1A1A4E;}
+.eq-member-badges{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.eq-role-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.eq-status-badge{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:#5F6275;white-space:nowrap;}
+.eq-status-dot{width:7px;height:7px;border-radius:50%;background:#1F7A4D;flex-shrink:0;}
+.eq-status-dot.off{background:#9CA3AF;}
+.eq-member-phone{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#9CA3AF;margin-top:6px;}
+.eq-member-actions{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;}
+.eq-action-btn{height:40px;border-radius:10px;padding:0 14px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+.eq-btn-reactiver{background:#E6F2EB;color:#1F7A4D;border:1.5px solid transparent;}
+@media (max-width:700px){
+  .eq-member-card{flex-wrap:wrap;}
+  .eq-member-actions{width:100%;justify-content:flex-start;}
+}
+
+/* ---- Mon profil ---- */
+.mp-avatar-wrap{position:relative;width:96px;height:96px;margin:0 auto 18px;}
+.mp-avatar{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:28px;font-family:'Sora',system-ui,sans-serif;overflow:hidden;}
+.mp-avatar img{width:100%;height:100%;object-fit:cover;}
+.mp-avatar-camera-btn{position:absolute;bottom:-2px;right:-2px;width:32px;height:32px;border-radius:50%;background:#E8622A;color:#fff;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;padding:0;}
+.mp-readonly-row{display:flex;align-items:center;gap:8px;}
+.mp-readonly-row input{background:#F3F4F6;color:#9CA3AF;flex:1;}
+.mp-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--navy-secondary);margin:18px 0 10px;}
+
 /* ---- Modals ---- */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(13,13,46,.55);z-index:9000;align-items:center;justify-content:center;padding:16px;}
 .modal-overlay.open{display:flex;}
@@ -1429,13 +1470,13 @@ button.suivi-pastille{cursor:pointer;}
         <button class="nav-item gerant-only" data-nav="parametres" onclick="navigate('parametres')"><i class="ti ti-settings"></i> Paramètres</button>
       </div>
     </nav>
-    <div class="sidebar-user">
+    <div class="sidebar-user" onclick="ouvrirMonProfil()" style="cursor:pointer;" title="Mon profil">
       <div class="sidebar-user-avatar" id="sidebarAvatar">--</div>
       <div class="sidebar-user-info">
         <div class="sidebar-user-nom" id="sidebarNom">—</div>
         <div class="sidebar-user-role" id="sidebarRole">—</div>
       </div>
-      <button class="sidebar-logout-icon" onclick="logout()" title="Déconnexion"><i class="ti ti-logout"></i></button>
+      <button class="sidebar-logout-icon" onclick="event.stopPropagation();logout()" title="Déconnexion"><i class="ti ti-logout"></i></button>
     </div>
     <button class="sidebar-back" onclick="window.location.href='index.html'"><i class="ti ti-arrow-left"></i> Retour à YOUMMA JOBS</button>
   </aside>
@@ -1969,11 +2010,40 @@ button.suivi-pastille{cursor:pointer;}
         </div>
       </section>
 
-      <!-- PAGE : AGENTS -->
+      <!-- PAGE : AGENTS (Équipe) -->
       <section id="page-agents" class="page">
         <div class="page-header">
-          <h2><i class="ti ti-users"></i> Agents</h2>
+          <h2><i class="ti ti-users"></i> Équipe</h2>
           <button class="btn btn-primary" onclick="openModalAgent()"><i class="ti ti-plus"></i> Ajouter agent</button>
+        </div>
+        <div class="eq-kpi-grid">
+          <div class="eq-kpi-card">
+            <div class="eq-kpi-icon navy"><i class="ti ti-users"></i></div>
+            <div class="eq-kpi-value" id="eqKpiTotal">—</div>
+            <div class="eq-kpi-label">Membres au total</div>
+          </div>
+          <div class="eq-kpi-card">
+            <div class="eq-kpi-icon orange"><i class="ti ti-star"></i></div>
+            <div class="eq-kpi-value" id="eqKpiGerants">—</div>
+            <div class="eq-kpi-label">Gérant(s)</div>
+          </div>
+          <div class="eq-kpi-card">
+            <div class="eq-kpi-icon blue"><i class="ti ti-headset"></i></div>
+            <div class="eq-kpi-value" id="eqKpiAgents">—</div>
+            <div class="eq-kpi-label">Agents</div>
+          </div>
+          <div class="eq-kpi-card">
+            <div class="eq-kpi-icon green"><i class="ti ti-truck-delivery"></i></div>
+            <div class="eq-kpi-value" id="eqKpiLivreurs">—</div>
+            <div class="eq-kpi-label">Livreurs</div>
+          </div>
+        </div>
+        <div class="eq-toolbar">
+          <div class="cmd-search" style="width:280px;">
+            <i class="ti ti-search"></i>
+            <input type="text" id="eqRecherche" placeholder="Rechercher un membre…" oninput="filtrerAgents()">
+          </div>
+          <div class="cmd-tabs" id="eqTabs"></div>
         </div>
         <div id="agentsListe"></div>
       </section>
@@ -2382,6 +2452,33 @@ button.suivi-pastille{cursor:pointer;}
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalResetPin')">Annuler</button><button class="btn btn-primary" onclick="confirmerResetPin()">Réinitialiser</button></div>
   </div>
 </div>
+
+<div id="modalMonProfil" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Mon profil</h3><button class="modal-close" onclick="closeModal('modalMonProfil')">×</button></div>
+    <div class="modal-body">
+      <div class="mp-avatar-wrap">
+        <div class="mp-avatar" id="mpAvatar">--</div>
+        <button type="button" class="mp-avatar-camera-btn" onclick="document.getElementById('mpPhotoInput').click()" aria-label="Changer la photo"><i class="ti ti-camera"></i></button>
+        <input type="file" id="mpPhotoInput" accept="image/*" style="display:none;" onchange="changerPhotoProfil(this)">
+      </div>
+      <div class="form-row"><label>Nom complet *</label><input type="text" id="mpNom"></div>
+      <div class="form-row">
+        <label>Téléphone</label>
+        <div class="mp-readonly-row">
+          <input type="tel" id="mpTelephone" readonly>
+          <span class="badge badge-muted">Non modifiable</span>
+        </div>
+      </div>
+      <div class="mp-section-title">Changer mon code PIN</div>
+      <div class="form-row"><label>PIN actuel</label><input type="password" id="mpPinActuel" maxlength="4" inputmode="numeric"></div>
+      <div class="form-row"><label>Nouveau PIN</label><input type="password" id="mpPinNouveau" maxlength="4" inputmode="numeric"></div>
+      <div class="form-row"><label>Confirmer le nouveau PIN</label><input type="password" id="mpPinConfirmer" maxlength="4" inputmode="numeric"></div>
+      <div id="mpErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalMonProfil')">Annuler</button><button class="btn btn-primary" onclick="enregistrerMonProfil()">Enregistrer les modifications</button></div>
+  </div>
+</div>
 <script>
 const SUPABASE_URL = 'https://slawwbhlakilnviwzyrb.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsYXd3YmhsYWtpbG52aXd6eXJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MjQxODAsImV4cCI6MjA5NjAwMDE4MH0.XgZRkUrkjCUzSlB0Nyp0QdJf4xZjMcTO5V1bKSDUHNg';
@@ -2417,6 +2514,12 @@ let cmdFiltreStatut = 'en_cours';
 let cmdPeriode = 'aujourdhui';
 let cmdSelectedId = null;
 let agentsCache = [];
+let eqFiltreRole = '';
+const EQ_ROLE_STYLES = {
+  gerant: { bg: '#FCEBE3', color: '#C8501E' },
+  agent: { bg: '#E8F0FC', color: '#2E5FB0' },
+  livreur: { bg: '#E6F2EB', color: '#1F7A4D' },
+};
 let agentEnEdition = null;
 let agentPourResetPin = null;
 let caisseEntreesJour = 0;
@@ -2514,6 +2617,97 @@ async function hashPin(pin) {
 }
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function renderSidebarAvatar() {
+  const el = document.getElementById('sidebarAvatar');
+  if (!el || !session) return;
+  if (session.photo_url) {
+    el.innerHTML = '<img src="' + esc(session.photo_url) + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">';
+  } else {
+    el.textContent = initiales(session.nom);
+  }
+}
+function mpRenderAvatar() {
+  const el = document.getElementById('mpAvatar');
+  if (!el || !session) return;
+  const style = EQ_ROLE_STYLES[session.role] || EQ_ROLE_STYLES.agent;
+  if (session.photo_url) {
+    el.style.background = 'transparent';
+    el.innerHTML = '<img src="' + esc(session.photo_url) + '">';
+  } else {
+    el.style.background = style.bg;
+    el.style.color = style.color;
+    el.textContent = initiales(session.nom);
+  }
+}
+function ouvrirMonProfil() {
+  if (!session) return;
+  document.getElementById('mpNom').value = session.nom || '';
+  document.getElementById('mpTelephone').value = session.telephone || '';
+  document.getElementById('mpPinActuel').value = '';
+  document.getElementById('mpPinNouveau').value = '';
+  document.getElementById('mpPinConfirmer').value = '';
+  document.getElementById('mpErreur').classList.add('hidden');
+  mpRenderAvatar();
+  openModal('modalMonProfil');
+}
+async function changerPhotoProfil(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('Le fichier doit être une image.', 'error'); input.value = ''; return; }
+  if (file.size > 2 * 1024 * 1024) { showToast('La photo doit faire moins de 2 Mo.', 'error'); input.value = ''; return; }
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const chemin = 'agents/' + session.id + '.' + ext;
+  try {
+    const { error } = await sb.storage.from('gn-assets').upload(chemin, file, { upsert: true });
+    if (error) throw error;
+    const { data: urlData } = sb.storage.from('gn-assets').getPublicUrl(chemin);
+    const url = urlData.publicUrl + '?t=' + Date.now();
+    const { error: errUpdate } = await sb.from('gn_agents').update({ photo_url: url }).eq('id', session.id);
+    if (errUpdate) throw errUpdate;
+    session.photo_url = url;
+    sessionStorage.setItem('gn_session', JSON.stringify(session));
+    mpRenderAvatar();
+    renderSidebarAvatar();
+    showToast('Photo de profil mise à jour.');
+  } catch (e) {
+    showToast('Erreur upload photo: ' + e.message, 'error');
+  }
+  input.value = '';
+}
+async function enregistrerMonProfil() {
+  const nom = document.getElementById('mpNom').value.trim();
+  const pinActuel = document.getElementById('mpPinActuel').value.trim();
+  const pinNouveau = document.getElementById('mpPinNouveau').value.trim();
+  const pinConfirmer = document.getElementById('mpPinConfirmer').value.trim();
+  const errEl = document.getElementById('mpErreur');
+  errEl.classList.add('hidden');
+
+  if (!nom) { errEl.textContent = 'Nom requis.'; errEl.classList.remove('hidden'); return; }
+
+  const changePin = pinActuel !== '' || pinNouveau !== '' || pinConfirmer !== '';
+  const updateObj = { nom: nom };
+
+  if (changePin) {
+    if (pinActuel.length !== 4 || !/^\d{4}$/.test(pinActuel)) { errEl.textContent = 'PIN actuel à 4 chiffres requis.'; errEl.classList.remove('hidden'); return; }
+    if (pinNouveau.length !== 4 || !/^\d{4}$/.test(pinNouveau)) { errEl.textContent = 'Nouveau PIN à 4 chiffres requis.'; errEl.classList.remove('hidden'); return; }
+    if (pinNouveau !== pinConfirmer) { errEl.textContent = 'Les deux PIN ne correspondent pas.'; errEl.classList.remove('hidden'); return; }
+    const { data: agentRow, error: errFetch } = await sb.from('gn_agents').select('pin_hash').eq('id', session.id).maybeSingle();
+    if (errFetch || !agentRow) { errEl.textContent = 'Erreur de vérification du PIN.'; errEl.classList.remove('hidden'); return; }
+    const hashActuel = await hashPin(pinActuel);
+    if (hashActuel !== agentRow.pin_hash) { errEl.textContent = 'PIN actuel incorrect.'; errEl.classList.remove('hidden'); return; }
+    updateObj.pin_hash = await hashPin(pinNouveau);
+  }
+
+  const { error } = await sb.from('gn_agents').update(updateObj).eq('id', session.id);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+
+  session.nom = nom;
+  sessionStorage.setItem('gn_session', JSON.stringify(session));
+  document.getElementById('sidebarNom').textContent = nom;
+  if (agentsCache.length) loadAgents();
+  closeModal('modalMonProfil');
+  showToast('Profil mis à jour.');
+}
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('sidebarOverlay').classList.toggle('open');
@@ -2641,7 +2835,7 @@ async function loginVerifierPin() {
     document.getElementById('loginPinInput').value = '';
     return;
   }
-  session = { id: _loginAgent.id, nom: _loginAgent.nom, role: _loginAgent.role, telephone: _loginAgent.telephone };
+  session = { id: _loginAgent.id, nom: _loginAgent.nom, role: _loginAgent.role, telephone: _loginAgent.telephone, photo_url: _loginAgent.photo_url || null };
   sessionStorage.setItem('gn_session', JSON.stringify(session));
   showApp();
 }
@@ -2672,7 +2866,7 @@ function showApp() {
   document.getElementById('appShell').classList.remove('hidden');
   document.getElementById('sidebarNom').textContent = session.nom;
   document.getElementById('sidebarRole').textContent = ROLE_LABELS[session.role] || session.role;
-  document.getElementById('sidebarAvatar').textContent = initiales(session.nom);
+  renderSidebarAvatar();
   applyRoleVisibility();
   chargerParametres();
   navigate('aujourdhui');
@@ -5195,21 +5389,68 @@ function retourClassementLivreurs() {
   document.getElementById('rapportsVuePrincipale').classList.remove('hidden');
 }
 
-/* ── PAGE AGENTS ── */
+/* ── PAGE AGENTS (Équipe) ── */
 async function loadAgents() {
   const { data } = await sb.from('gn_agents').select('*').order('nom');
   agentsCache = data || [];
-  document.getElementById('agentsListe').innerHTML = agentsCache.length ? agentsCache.map(renderAgentRow).join('') : '<div class="empty">Aucun agent.</div>';
+  eqRenderKpis();
+  eqRenderTabs();
+  eqRenderListe();
+}
+function eqRenderKpis() {
+  document.getElementById('eqKpiTotal').textContent = agentsCache.length;
+  document.getElementById('eqKpiGerants').textContent = agentsCache.filter(function(a) { return a.role === 'gerant'; }).length;
+  document.getElementById('eqKpiAgents').textContent = agentsCache.filter(function(a) { return a.role === 'agent'; }).length;
+  document.getElementById('eqKpiLivreurs').textContent = agentsCache.filter(function(a) { return a.role === 'livreur'; }).length;
+}
+const EQ_TABS = [
+  { key: '', label: 'Tous' },
+  { key: 'agent', label: 'Agents' },
+  { key: 'livreur', label: 'Livreurs' },
+];
+function eqRenderTabs() {
+  const tabsEl = document.getElementById('eqTabs');
+  if (!tabsEl) return;
+  tabsEl.innerHTML = EQ_TABS.map(function(t) {
+    const count = t.key ? agentsCache.filter(function(a) { return a.role === t.key; }).length : agentsCache.length;
+    const actif = eqFiltreRole === t.key;
+    return '<button class="cmd-tab' + (actif ? ' active' : '') + '" onclick="eqSetFiltreRole(\'' + t.key + '\')">' + t.label + '<span class="cmd-tab-count">' + count + '</span></button>';
+  }).join('');
+}
+function eqSetFiltreRole(role) {
+  eqFiltreRole = role;
+  eqRenderTabs();
+  eqRenderListe();
+}
+function filtrerAgents() { eqRenderListe(); }
+function eqRenderListe() {
+  const q = (document.getElementById('eqRecherche').value || '').trim().toLowerCase();
+  let liste = agentsCache;
+  if (eqFiltreRole) liste = liste.filter(function(a) { return a.role === eqFiltreRole; });
+  if (q) liste = liste.filter(function(a) { return (a.nom || '').toLowerCase().indexOf(q) !== -1; });
+  document.getElementById('agentsListe').innerHTML = liste.length ? liste.map(renderAgentRow).join('') : '<div class="empty">Aucun membre trouvé.</div>';
 }
 function renderAgentRow(a) {
-  const inactifBadge = a.actif === false ? '<span class="badge badge-muted">Inactif</span>' : '';
-  const btnDesactiver = a.actif !== false ? '<button class="btn btn-sm btn-danger-outline" onclick="desactiverAgent(\'' + a.id + '\')">Désactiver</button>' : '';
-  return '<div class="card agent-row"><div><div class="agent-nom">' + esc(a.nom) + ' ' + inactifBadge + '</div>'
-    + '<div class="agent-meta">' + esc(ROLE_LABELS[a.role] || a.role) + ' · ' + esc(a.telephone || '') + '</div></div>'
-    + '<div style="display:flex;gap:6px;flex-wrap:wrap;">'
-    + '<button class="btn btn-sm btn-ghost" onclick="openModalAgentEdit(\'' + a.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>'
-    + '<button class="btn btn-sm btn-ghost" onclick="ouvrirResetPin(\'' + a.id + '\')"><i class="ti ti-key"></i> Réinitialiser PIN</button>'
-    + btnDesactiver + '</div></div>';
+  const style = EQ_ROLE_STYLES[a.role] || EQ_ROLE_STYLES.agent;
+  const actif = a.actif !== false;
+  const btnToggle = actif
+    ? '<button class="btn eq-action-btn btn-danger-outline" onclick="desactiverAgent(\'' + a.id + '\')"><i class="ti ti-user-off"></i> Désactiver</button>'
+    : '<button class="btn eq-action-btn eq-btn-reactiver" onclick="reactiverAgent(\'' + a.id + '\')"><i class="ti ti-user-check"></i> Réactiver</button>';
+  return '<div class="eq-member-card' + (actif ? '' : ' inactif') + '">'
+    + '<div class="eq-avatar" style="background:' + style.bg + ';color:' + style.color + ';">' + esc(initiales(a.nom)) + '</div>'
+    + '<div class="eq-member-info">'
+    + '<div class="eq-member-nom">' + esc(a.nom) + '</div>'
+    + '<div class="eq-member-badges">'
+    + '<span class="eq-role-pill" style="background:' + style.bg + ';color:' + style.color + ';">' + esc(ROLE_LABELS[a.role] || a.role) + '</span>'
+    + '<span class="eq-status-badge"><span class="eq-status-dot' + (actif ? '' : ' off') + '"></span>' + (actif ? 'Actif' : 'Désactivé') + '</span>'
+    + '</div>'
+    + '<div class="eq-member-phone"><i class="ti ti-phone"></i> ' + esc(a.telephone || '—') + '</div>'
+    + '</div>'
+    + '<div class="eq-member-actions">'
+    + '<button class="btn eq-action-btn btn-ghost" onclick="openModalAgentEdit(\'' + a.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>'
+    + '<button class="btn eq-action-btn btn-ghost" onclick="ouvrirResetPin(\'' + a.id + '\')"><i class="ti ti-key"></i> Réinitialiser PIN</button>'
+    + btnToggle
+    + '</div></div>';
 }
 function openModalAgent() {
   agentEnEdition = null;
@@ -5264,6 +5505,11 @@ async function desactiverAgent(id) {
   if (!confirm('Désactiver cet agent ?')) return;
   await sb.from('gn_agents').update({ actif: false }).eq('id', id);
   showToast('Agent désactivé.');
+  loadAgents();
+}
+async function reactiverAgent(id) {
+  await sb.from('gn_agents').update({ actif: true }).eq('id', id);
+  showToast('Agent réactivé.');
   loadAgents();
 }
 function ouvrirResetPin(id) {
