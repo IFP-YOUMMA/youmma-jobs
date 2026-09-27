@@ -586,6 +586,8 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .four-topbar-brand{display:flex;align-items:center;gap:8px;font-family:'Sora',system-ui,sans-serif;font-weight:700;font-size:15px;}
 .four-topbar-brand-sub{font-family:'Work Sans',system-ui,sans-serif;font-weight:400;font-size:12px;color:#B9BCD3;margin-left:8px;padding-left:8px;border-left:1px solid rgba(255,255,255,.2);}
 .four-topbar-right{display:flex;align-items:center;gap:12px;}
+.four-user-compte{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.four-avatar{width:32px;height:32px;border-radius:50%;background:#F1E8FC;color:#7B3FA0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;font-family:'Sora',system-ui,sans-serif;overflow:hidden;}
 .four-topbar-nom{font-size:13.5px;font-weight:600;}
 .four-logout-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.12);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;}
 .four-content{max-width:900px;margin:0 auto;padding:24px 20px 60px;display:flex;flex-direction:column;gap:16px;box-sizing:border-box;}
@@ -631,6 +633,14 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .four-depot-ligne-remove{width:42px;height:42px;border-radius:10px;border:1px solid #FBE9E9;background:#FBE9E9;color:#B42318;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
 .four-btn-label-short{display:none;}
 .four-mobile-nav{display:none;}
+.four-histo-solde{font-size:11px;color:#9A9CAB;margin-top:3px;}
+.four-histo-montant{font-family:'Sora',system-ui,sans-serif;font-size:14.5px;font-weight:700;white-space:nowrap;flex-shrink:0;}
+.four-histo-montant.positif{color:#1F7A4D;}
+.four-histo-montant.negatif{color:#2E5FB0;}
+.four-histo-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0;}
+.four-btn-recu{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid #E7E5E0;color:#1E2247;font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:20px;cursor:pointer;white-space:nowrap;}
+.four-historique-plus{display:block;width:100%;margin-top:14px;background:#fff;border:1.5px solid #E7E5E0;color:#1E2247;font-size:13px;font-weight:600;padding:11px;border-radius:12px;cursor:pointer;}
+.four-footer{text-align:center;font-size:11px;color:#9A9CAB;line-height:1.6;padding:8px 0 0;}
 @media (max-width:480px){
   .four-kpi-grid{grid-template-columns:1fr 1fr;}
   .four-kpi-grid .four-kpi-card:nth-child(3){grid-column:1/-1;}
@@ -644,8 +654,9 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
   .four-topbar{position:relative;overflow:hidden;flex-direction:column;align-items:flex-start;padding:16px 20px 64px;border-radius:0 0 28px 28px;}
   .four-topbar::before{content:'';position:absolute;right:-50px;top:-50px;width:170px;height:170px;border-radius:50%;border:20px solid rgba(232,98,44,.20);pointer-events:none;}
   .four-topbar-brand{position:relative;z-index:1;}
-  .four-topbar-right{position:relative;z-index:1;display:block;width:100%;margin-top:18px;}
+  .four-topbar-right{position:relative;z-index:1;display:flex;width:100%;margin-top:18px;}
   .four-logout-btn{position:absolute;top:16px;right:20px;z-index:2;}
+  .four-avatar{width:44px;height:44px;font-size:16px;}
   .four-topbar-nom{display:block;font-family:'Sora',system-ui,sans-serif;font-size:22px;font-weight:700;color:#fff;}
   .four-topbar-nom::before{content:'Bonjour, ';}
 
@@ -2126,8 +2137,11 @@ button.suivi-pastille{cursor:pointer;}
   <div class="four-topbar">
     <div class="four-topbar-brand"><i class="ti ti-building-warehouse"></i> YOUMMA GN<span class="four-topbar-brand-sub">Espace fournisseur</span></div>
     <div class="four-topbar-right">
-      <span class="four-topbar-nom" id="fourPortailNom">—</span>
-      <button class="four-logout-btn" onclick="logoutFournisseur()" title="Déconnexion"><i class="ti ti-logout"></i></button>
+      <div class="four-user-compte" onclick="ouvrirMonProfilFournisseur()" title="Mon profil">
+        <div class="four-avatar" id="fourAvatar">--</div>
+        <span class="four-topbar-nom" id="fourPortailNom">—</span>
+      </div>
+      <button class="four-logout-btn" onclick="event.stopPropagation();logoutFournisseur()" title="Déconnexion"><i class="ti ti-logout"></i></button>
     </div>
   </div>
   <div class="four-content">
@@ -2203,6 +2217,8 @@ button.suivi-pastille{cursor:pointer;}
         <div id="fourHistoriqueListe"></div>
       </div>
     </div>
+
+    <div class="four-footer" id="fourFooterLegal"></div>
   </div>
 
   <!-- Navigation basse (mobile ≤480px uniquement, cf. CSS) : réutilise naviguerPortailFournisseur()
@@ -2396,6 +2412,33 @@ button.suivi-pastille{cursor:pointer;}
   </div>
 </div>
 
+<div id="modalMonProfilFournisseur" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><h3>Mon profil</h3><button class="modal-close" onclick="closeModal('modalMonProfilFournisseur')">×</button></div>
+    <div class="modal-body">
+      <div class="mp-avatar-wrap">
+        <div class="mp-avatar" id="fmpAvatar">--</div>
+        <button type="button" class="mp-avatar-camera-btn" onclick="document.getElementById('fmpPhotoInput').click()" aria-label="Changer la photo"><i class="ti ti-camera"></i></button>
+        <input type="file" id="fmpPhotoInput" accept="image/*" style="display:none;" onchange="ouvrirRecadragePhoto(this, uploaderPhotoProfilFournisseur)">
+      </div>
+      <div class="form-row"><label>Nom complet *</label><input type="text" id="fmpNom"></div>
+      <div class="form-row">
+        <label>Téléphone</label>
+        <div class="mp-readonly-row">
+          <input type="tel" id="fmpTelephone" readonly>
+          <span class="badge badge-muted">Non modifiable</span>
+        </div>
+      </div>
+      <div class="mp-section-title">Changer mon code PIN</div>
+      <div class="form-row"><label>PIN actuel</label><input type="password" id="fmpPinActuel" maxlength="4" inputmode="numeric"></div>
+      <div class="form-row"><label>Nouveau PIN</label><input type="password" id="fmpPinNouveau" maxlength="4" inputmode="numeric"></div>
+      <div class="form-row"><label>Confirmer le nouveau PIN</label><input type="password" id="fmpPinConfirmer" maxlength="4" inputmode="numeric"></div>
+      <div id="fmpErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalMonProfilFournisseur')">Annuler</button><button class="btn btn-primary" onclick="enregistrerMonProfilFournisseur()">Enregistrer les modifications</button></div>
+  </div>
+</div>
+
 <div id="modalDepotFournisseur" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-header"><h3>Déposer des articles</h3><button class="modal-close" onclick="closeModal('modalDepotFournisseur')">×</button></div>
@@ -2480,7 +2523,7 @@ button.suivi-pastille{cursor:pointer;}
       <div class="mp-avatar-wrap">
         <div class="mp-avatar" id="mpAvatar">--</div>
         <button type="button" class="mp-avatar-camera-btn" onclick="document.getElementById('mpPhotoInput').click()" aria-label="Changer la photo"><i class="ti ti-camera"></i></button>
-        <input type="file" id="mpPhotoInput" accept="image/*" style="display:none;" onchange="ouvrirRecadragePhoto(this)">
+        <input type="file" id="mpPhotoInput" accept="image/*" style="display:none;" onchange="ouvrirRecadragePhoto(this, uploaderPhotoProfil)">
       </div>
       <div class="form-row"><label>Nom complet *</label><input type="text" id="mpNom"></div>
       <div class="form-row">
@@ -2688,7 +2731,7 @@ function ouvrirMonProfil() {
 const CROP_VIEWPORT = 280;
 const CROP_OUTPUT = 400;
 let cropState = {};
-function ouvrirRecadragePhoto(input) {
+function ouvrirRecadragePhoto(input, onValide) {
   const file = input.files[0];
   input.value = '';
   if (!file) return;
@@ -2697,7 +2740,7 @@ function ouvrirRecadragePhoto(input) {
   const url = URL.createObjectURL(file);
   const img = new Image();
   img.onload = function() {
-    cropState = { img: img, naturalW: img.naturalWidth, naturalH: img.naturalHeight, objectUrl: url, zoom: 1, dragging: false };
+    cropState = { img: img, naturalW: img.naturalWidth, naturalH: img.naturalHeight, objectUrl: url, zoom: 1, dragging: false, onValide: onValide };
     cropInitPosition();
     document.getElementById('cropZoom').value = '1';
     cropRender();
@@ -2792,9 +2835,10 @@ function validerCadragePhoto() {
   const sy = -cs.offsetY / scale;
   const sSize = CROP_VIEWPORT / scale;
   ctx.drawImage(cs.img, sx, sy, sSize, sSize, 0, 0, CROP_OUTPUT, CROP_OUTPUT);
+  const onValide = cs.onValide;
   canvas.toBlob(async function(blob) {
     if (!blob) { showToast('Erreur de recadrage.', 'error'); return; }
-    await uploaderPhotoProfil(blob);
+    await onValide(blob);
     if (cs.objectUrl) URL.revokeObjectURL(cs.objectUrl);
     cropState = {};
     closeModal('modalCropPhoto');
@@ -2858,6 +2902,76 @@ async function enregistrerMonProfil() {
   document.getElementById('sidebarNom').textContent = nom;
   if (agentsCache.length) loadAgents();
   closeModal('modalMonProfil');
+  showToast('Profil mis à jour.');
+}
+function ouvrirMonProfilFournisseur() {
+  if (!fournisseurSession) return;
+  document.getElementById('fmpNom').value = fournisseurSession.nom || '';
+  document.getElementById('fmpTelephone').value = fournisseurSession.telephone || '';
+  document.getElementById('fmpPinActuel').value = '';
+  document.getElementById('fmpPinNouveau').value = '';
+  document.getElementById('fmpPinConfirmer').value = '';
+  document.getElementById('fmpErreur').classList.add('hidden');
+  fmpRenderAvatar();
+  openModal('modalMonProfilFournisseur');
+}
+function fmpRenderAvatar() {
+  const el = document.getElementById('fmpAvatar');
+  if (!el || !fournisseurSession) return;
+  const style = EQ_ROLE_STYLES.fournisseur;
+  el.style.background = fournisseurSession.photo_url ? 'transparent' : style.bg;
+  el.style.color = style.color;
+  el.innerHTML = avatarInnerHtml(fournisseurSession.nom, fournisseurSession.photo_url, '50%');
+}
+async function uploaderPhotoProfilFournisseur(blob) {
+  const chemin = 'fournisseurs/' + fournisseurSession.id + '.jpg';
+  try {
+    const { error } = await sb.storage.from('gn-assets').upload(chemin, blob, { upsert: true, contentType: 'image/jpeg' });
+    if (error) throw error;
+    const { data: urlData } = sb.storage.from('gn-assets').getPublicUrl(chemin);
+    const url = urlData.publicUrl + '?t=' + Date.now();
+    const { error: errUpdate } = await sb.from('gn_fournisseurs').update({ photo_url: url }).eq('id', fournisseurSession.id);
+    if (errUpdate) throw errUpdate;
+    fournisseurSession.photo_url = url;
+    sessionStorage.setItem(FOUR_SESSION_KEY, JSON.stringify(fournisseurSession));
+    fmpRenderAvatar();
+    renderFourAvatar();
+    showToast('Photo de profil mise à jour.');
+  } catch (e) {
+    showToast('Erreur upload photo: ' + e.message, 'error');
+  }
+}
+async function enregistrerMonProfilFournisseur() {
+  const nom = document.getElementById('fmpNom').value.trim();
+  const pinActuel = document.getElementById('fmpPinActuel').value.trim();
+  const pinNouveau = document.getElementById('fmpPinNouveau').value.trim();
+  const pinConfirmer = document.getElementById('fmpPinConfirmer').value.trim();
+  const errEl = document.getElementById('fmpErreur');
+  errEl.classList.add('hidden');
+
+  if (!nom) { errEl.textContent = 'Nom requis.'; errEl.classList.remove('hidden'); return; }
+
+  const changePin = pinActuel !== '' || pinNouveau !== '' || pinConfirmer !== '';
+  const updateObj = { nom: nom };
+
+  if (changePin) {
+    if (pinActuel.length !== 4 || !/^\d{4}$/.test(pinActuel)) { errEl.textContent = 'PIN actuel à 4 chiffres requis.'; errEl.classList.remove('hidden'); return; }
+    if (pinNouveau.length !== 4 || !/^\d{4}$/.test(pinNouveau)) { errEl.textContent = 'Nouveau PIN à 4 chiffres requis.'; errEl.classList.remove('hidden'); return; }
+    if (pinNouveau !== pinConfirmer) { errEl.textContent = 'Les deux PIN ne correspondent pas.'; errEl.classList.remove('hidden'); return; }
+    const { data: fRow, error: errFetch } = await sb.from('gn_fournisseurs').select('pin_hash').eq('id', fournisseurSession.id).maybeSingle();
+    if (errFetch || !fRow) { errEl.textContent = 'Erreur de vérification du PIN.'; errEl.classList.remove('hidden'); return; }
+    const hashActuel = await hashPin(pinActuel);
+    if (hashActuel !== fRow.pin_hash) { errEl.textContent = 'PIN actuel incorrect.'; errEl.classList.remove('hidden'); return; }
+    updateObj.pin_hash = await hashPin(pinNouveau);
+  }
+
+  const { error } = await sb.from('gn_fournisseurs').update(updateObj).eq('id', fournisseurSession.id);
+  if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
+
+  fournisseurSession.nom = nom;
+  sessionStorage.setItem(FOUR_SESSION_KEY, JSON.stringify(fournisseurSession));
+  document.getElementById('fourPortailNom').textContent = nom;
+  closeModal('modalMonProfilFournisseur');
   showToast('Profil mis à jour.');
 }
 function toggleSidebar() {
@@ -2976,7 +3090,7 @@ async function loginVerifierPin() {
       document.getElementById('loginPinInput').value = '';
       return;
     }
-    fournisseurSession = { type: 'fournisseur', id: _loginFournisseur.id, nom: _loginFournisseur.nom, telephone: _loginFournisseur.telephone };
+    fournisseurSession = { type: 'fournisseur', id: _loginFournisseur.id, nom: _loginFournisseur.nom, telephone: _loginFournisseur.telephone, photo_url: _loginFournisseur.photo_url || null };
     sessionStorage.setItem(FOUR_SESSION_KEY, JSON.stringify(fournisseurSession));
     showFournisseurPortal();
     return;
@@ -3024,13 +3138,34 @@ function showApp() {
   navigate('aujourdhui');
   updateSidebarBadgeCommandes();
 }
-function showFournisseurPortal() {
+async function showFournisseurPortal() {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appShell').classList.add('hidden');
   document.getElementById('fournisseurShell').classList.remove('hidden');
   document.getElementById('fourPortailNom').textContent = fournisseurSession.nom;
+  renderFourAvatar();
+  await chargerParametres();
+  afficherPiedPageFournisseur();
   naviguerPortailFournisseur('dashboard');
   loadPortailFournisseur();
+}
+function afficherPiedPageFournisseur() {
+  const el = document.getElementById('fourFooterLegal');
+  if (!el) return;
+  const ligne1 = 'YOUMMA SARLU · RCCM : ' + esc(PARAMS.rccm || '') + ' · NIF : ' + esc(PARAMS.nif || '');
+  const parties = [];
+  if (PARAMS.adresse) parties.push(esc(PARAMS.adresse));
+  if (PARAMS.telephone) parties.push('Tél. : ' + esc(PARAMS.telephone));
+  if (PARAMS.email) parties.push(esc(PARAMS.email));
+  el.innerHTML = '<div>' + ligne1 + '</div>' + (parties.length ? '<div>' + parties.join(' · ') + '</div>' : '');
+}
+function renderFourAvatar() {
+  const el = document.getElementById('fourAvatar');
+  if (!el || !fournisseurSession) return;
+  const style = EQ_ROLE_STYLES.fournisseur;
+  el.style.background = fournisseurSession.photo_url ? 'transparent' : style.bg;
+  el.style.color = style.color;
+  el.innerHTML = avatarInnerHtml(fournisseurSession.nom, fournisseurSession.photo_url, '50%');
 }
 function naviguerPortailFournisseur(vue) {
   document.querySelectorAll('.four-tab').forEach(function(t) { t.classList.toggle('active', t.dataset.fourTab === vue); });
@@ -3582,6 +3717,70 @@ async function imprimerFactureCommande(commandeId) {
   const win = window.open('', '_blank');
   if (!win) { showToast('Le navigateur a bloqué l\'ouverture de la facture.', 'error'); return; }
   const html = construireHtmlFactureCommande(c, numeroFacture);
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+}
+
+function construireHtmlRecuRetrait(r, fournisseurNom, fournisseurTel) {
+  const P = PARAMS;
+  const adresse = P.adresse || '';
+  const telephone = P.telephone || '';
+  const email = P.email || '';
+  const rccm = P.rccm || '';
+  const nif = P.nif || '';
+  const couleurPrincipale = P.couleur_principale || '#2D2D6B';
+  const couleurAccent = P.couleur_accent || '#E85D04';
+  const dateTraitement = new Date(r.date_traitement || r.date_demande);
+  const dateAffichee = dateTraitement.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const numeroRecu = 'REC-GN-' + dateTraitement.getFullYear() + '-' + String(r.id).padStart(6, '0');
+
+  const logoHtml = P.logo_url
+    ? '<div class="logo-gn"><img src="' + esc(P.logo_url) + '"></div>'
+    : '<div class="logo-gn" style="background:' + couleurAccent + ';"><i class="ti ti-shopping-cart"></i></div>';
+
+  const piedLigne1 = 'YOUMMA SARLU · RCCM : ' + esc(rccm) + ' · NIF : ' + esc(nif);
+  const piedLigne2Parties = [];
+  if (telephone) piedLigne2Parties.push('Tél. : ' + esc(telephone));
+  if (email) piedLigne2Parties.push(esc(email));
+  const piedLigne2 = piedLigne2Parties.join(' · ');
+  const piedBas = '<div>' + piedLigne1 + '</div>' + (piedLigne2 ? '<div>' + piedLigne2 + '</div>' : '');
+
+  return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Reçu ' + esc(numeroRecu) + '</title>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">'
+    + '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">'
+    + '<style>' + STYLE_IMPRESSION_FACTURE_GN + BARRE_IMPRESSION_STYLE_GN + '</style></head><body>'
+    + BARRE_IMPRESSION_HTML_GN
+    + '<div class="feuille">'
+    + '<div class="entete">'
+    + '<div class="entete-gauche">' + logoHtml + '<div><div class="enseigne" style="font-size:24px;"><span style="color:' + couleurPrincipale + ';">YOUMMA</span> <span style="color:' + couleurAccent + ';">GN</span></div>'
+    + (adresse ? '<div class="souslabel">' + esc(adresse) + '</div>' : '')
+    + (telephone ? '<div class="souslabel">Tél. : ' + esc(telephone) + '</div>' : '')
+    + '</div></div>'
+    + '<div class="entete-droite"><div class="titre-doc" style="color:' + couleurPrincipale + ';">REÇU DE PAIEMENT</div>'
+    + '<div><strong>N° :</strong> ' + esc(numeroRecu) + '</div><div><strong>Date :</strong> ' + dateAffichee + '</div></div>'
+    + '</div>'
+    + '<div class="filet" style="border-color:' + couleurAccent + ';"></div>'
+    + '<div class="client-objet-box">'
+    + '<div><div class="section-titre" style="color:' + couleurAccent + ';">FOURNISSEUR</div><div><strong>' + esc(fournisseurNom) + '</strong></div>'
+    + '<div>Téléphone : ' + esc(fournisseurTel || '') + '</div></div>'
+    + '<div><div class="section-titre" style="color:' + couleurAccent + ';">RÉFÉRENCE</div><div>Retrait ' + esc(numeroRecu) + '</div>'
+    + '<div>Traité par : ' + esc(r.traite_par || '—') + '</div></div>'
+    + '</div>'
+    + '<div class="totaux">'
+    + '<div class="tot-row tot-total-row"><span class="tot-total-label" style="color:' + couleurPrincipale + ';">MONTANT VERSÉ</span><span class="tot-total-value" style="background:' + couleurAccent + ';">' + fmtMontantInsecable(r.montant_verse) + ' GNF</span></div>'
+    + '</div>'
+    + '<div class="en-lettres">Arrêté le présent reçu à la somme de : <strong>' + nombreEnLettres(r.montant_verse) + '</strong>.</div>'
+    + '<div class="pied">' + piedBas + '</div>'
+    + '</div>'
+    + '</body></html>';
+}
+async function genererRecuRetrait(id) {
+  const r = fourRetraitsCache.find(function(x) { return x.id === id; });
+  if (!r || r.statut !== 'validee') { showToast('Reçu indisponible pour ce retrait.', 'error'); return; }
+  const win = window.open('', '_blank');
+  if (!win) { showToast('Le navigateur a bloqué l\'ouverture du reçu.', 'error'); return; }
+  const html = construireHtmlRecuRetrait(r, fournisseurSession.nom, fournisseurSession.telephone);
   win.document.open();
   win.document.write(html);
   win.document.close();
@@ -5194,17 +5393,22 @@ async function envoyerDepot() {
 }
 
 /* ── Rapport (portail fournisseur) ── */
+const PORTAIL_HISTORIQUE_PAGE = 15;
+let portailHistoriqueEvenements = [];
+let portailHistoriqueAffiches = 0;
 async function loadPortailRapport() {
   const fid = fournisseurSession.id;
-  const [{ data: venteTotale }, { data: soldeActuel }, { data: paiements }, { data: retraits }, { data: depots }] = await Promise.all([
+  const [{ data: venteTotale }, { data: soldeActuel }, { data: paiements }, { data: retraits }, { data: depots }, { data: commandes }] = await Promise.all([
     sb.rpc('gn_fournisseur_ventes_totales', { p_fournisseur_id: fid }),
     sb.rpc('gn_fournisseur_solde_du', { p_fournisseur_id: fid }),
-    sb.from('gn_fournisseur_paiements').select('montant').eq('fournisseur_id', fid),
+    sb.from('gn_fournisseur_paiements').select('*').eq('fournisseur_id', fid),
     sb.from('gn_fournisseur_retraits').select('*').eq('fournisseur_id', fid),
     sb.from('gn_fournisseur_depots').select('*').eq('fournisseur_id', fid),
+    sb.from('gn_commandes').select('numero,lignes,statut,date_creation,date_livraison'),
   ]);
 
-  const totalRecu = (paiements || []).reduce(function(s, p) { return s + Number(p.montant || 0); }, 0);
+  const paiementsListe = paiements || [];
+  const totalRecu = paiementsListe.reduce(function(s, p) { return s + Number(p.montant || 0); }, 0);
   const depotsListe = depots || [];
   const totalDepose = depotsListe
     .filter(function(d) { return d.statut === 'valide'; })
@@ -5215,17 +5419,71 @@ async function loadPortailRapport() {
   document.getElementById('fourRapRecu').textContent = fmtMontant(totalRecu) + ' GNF';
   document.getElementById('fourRapSolde').textContent = fmtMontant(soldeActuel || 0) + ' GNF';
 
-  const evenements = [];
-  (retraits || []).forEach(function(r) { evenements.push({ type: 'retrait', date: r.date_demande, data: r }); });
-  depotsListe.forEach(function(d) { evenements.push({ type: 'depot', date: d.date_demande, data: d }); });
-  evenements.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+  fourRetraitsCache = retraits || [];
 
-  document.getElementById('fourHistoriqueListe').innerHTML = evenements.length
-    ? evenements.map(renderEvenementHistorique).join('')
-    : '<div class="empty">Aucune activité pour le moment.</div>';
+  // Historique détaillé et transparent : une ligne par vente (produit par produit) ET par
+  // paiement/retrait reçu, pour que le fournisseur puisse reconstituer lui-même son solde.
+  // Un retrait validé génère à la fois une ligne gn_fournisseur_retraits ET une ligne
+  // gn_fournisseur_paiements liée (retrait_id) — on n'affiche que la première pour ce cas,
+  // sinon le même versement apparaîtrait deux fois.
+  const evenements = [];
+  const commandesValides = (commandes || []).filter(function(c) { return c.statut !== 'annulee' && c.statut !== 'echec'; });
+  commandesValides.forEach(function(c) {
+    const date = c.date_livraison || c.date_creation;
+    (c.lignes || []).forEach(function(l) {
+      if (l.fournisseur_id !== fid) return;
+      const montant = Number(l.qte || 0) * Number(l.prix_fournisseur || 0);
+      evenements.push({ type: 'vente', date: date, montant: montant, data: { nom: l.nom, qte: l.qte, numero: c.numero } });
+    });
+  });
+  paiementsListe.filter(function(p) { return !p.retrait_id; }).forEach(function(p) {
+    evenements.push({ type: 'paiement', date: p.created_at, montant: -Number(p.montant || 0), data: p });
+  });
+  fourRetraitsCache.forEach(function(r) {
+    const montant = r.statut === 'validee' ? -Number(r.montant_verse || 0) : 0;
+    evenements.push({ type: 'retrait', date: r.date_traitement || r.date_demande, montant: montant, data: r });
+  });
+  depotsListe.forEach(function(d) {
+    evenements.push({ type: 'depot', date: d.date_demande, montant: 0, data: d });
+  });
+
+  // Solde courant calculé en ordre chronologique croissant, puis affiché du plus récent au
+  // plus ancien — chaque ligne porte donc le solde tel qu'il était juste après elle.
+  evenements.sort(function(a, b) { return new Date(a.date) - new Date(b.date); });
+  let solde = 0;
+  evenements.forEach(function(e) { solde += e.montant; e.soldeApres = solde; });
+  evenements.reverse();
+
+  portailHistoriqueEvenements = evenements;
+  fourRenderHistorique(true);
+}
+function fourRenderHistorique(reinit) {
+  const conteneur = document.getElementById('fourHistoriqueListe');
+  if (reinit) portailHistoriqueAffiches = 0;
+  portailHistoriqueAffiches += PORTAIL_HISTORIQUE_PAGE;
+  const aAfficher = portailHistoriqueEvenements.slice(0, portailHistoriqueAffiches);
+  if (!aAfficher.length) { conteneur.innerHTML = '<div class="empty">Aucune activité pour le moment.</div>'; return; }
+  const suite = portailHistoriqueEvenements.length > portailHistoriqueAffiches
+    ? '<button class="four-historique-plus" onclick="fourRenderHistorique(false)">Charger plus</button>' : '';
+  conteneur.innerHTML = aAfficher.map(renderEvenementHistorique).join('') + suite;
 }
 function renderEvenementHistorique(e) {
   const date = e.date ? new Date(e.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const soldeHtml = '<div class="four-histo-solde">Solde après cette opération : ' + fmtMontant(e.soldeApres) + ' GNF</div>';
+
+  if (e.type === 'vente') {
+    const l = e.data;
+    return '<div class="four-list-row"><div class="four-list-main"><div class="four-list-nom">Vente — ' + esc(l.nom) + ' × ' + Number(l.qte || 0) + '</div>'
+      + '<div class="four-list-meta">' + date + (l.numero ? ' · ' + esc(l.numero) : '') + '</div>' + soldeHtml + '</div>'
+      + '<span class="four-histo-montant positif">+' + fmtMontant(e.montant) + ' GNF</span></div>';
+  }
+  if (e.type === 'paiement') {
+    const p = e.data;
+    const libelle = p.note ? esc(p.note) : 'Paiement reçu';
+    return '<div class="four-list-row"><div class="four-list-main"><div class="four-list-nom">' + libelle + '</div>'
+      + '<div class="four-list-meta">' + date + '</div>' + soldeHtml + '</div>'
+      + '<span class="four-histo-montant negatif">' + fmtMontant(e.montant) + ' GNF</span></div>';
+  }
   if (e.type === 'retrait') {
     const r = e.data;
     let libelle, badge;
@@ -5233,9 +5491,10 @@ function renderEvenementHistorique(e) {
     else if (r.statut === 'refusee') { libelle = 'Retrait refusé'; badge = { label: 'Refusé', bg: '#FBE9E9', color: '#B42318' }; }
     else { libelle = 'Demande de retrait envoyée'; badge = { label: 'En attente', bg: '#FDF3D7', color: '#8A6100' }; }
     const montantTxt = r.statut === 'validee' ? fmtMontant(r.montant_verse) + ' GNF versés' : fmtMontant(r.montant_demande) + ' GNF demandés';
+    const recuBtn = r.statut === 'validee' ? '<button class="four-btn-recu" onclick="genererRecuRetrait(' + r.id + ')"><i class="ti ti-file-download"></i> Reçu PDF</button>' : '';
     return '<div class="four-list-row"><div class="four-list-main"><div class="four-list-nom">' + esc(libelle) + '</div>'
-      + '<div class="four-list-meta">' + date + ' · ' + montantTxt + '</div></div>'
-      + '<span class="four-badge" style="background:' + badge.bg + ';color:' + badge.color + ';">' + badge.label + '</span></div>';
+      + '<div class="four-list-meta">' + date + ' · ' + montantTxt + '</div>' + (r.statut === 'validee' ? soldeHtml : '') + '</div>'
+      + '<div class="four-histo-actions"><span class="four-badge" style="background:' + badge.bg + ';color:' + badge.color + ';">' + badge.label + '</span>' + recuBtn + '</div></div>';
   }
   const d = e.data;
   const lignes = d.lignes || [];
