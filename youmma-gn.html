@@ -151,29 +151,29 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
   .ajr-row1{grid-template-columns:1fr 1fr;}
   .ajr-ca-card{grid-column:1/-1;}
 }
-.ajr-ca-card{background:#1E2247;color:#fff;border-radius:20px;padding:22px 24px;position:relative;overflow:hidden;box-shadow:0 1px 2px rgba(30,34,71,.06);}
+.ajr-ca-card{background:#1E2247;color:#fff;border-radius:20px;padding:16px 20px;position:relative;overflow:hidden;box-shadow:0 1px 2px rgba(30,34,71,.06);}
 .ajr-ca-card::before{content:'';position:absolute;right:-70px;top:-80px;width:170px;height:170px;border-radius:50%;border:22px solid rgba(232,98,44,.22);}
 .ajr-ca-card::after{content:'';position:absolute;right:40px;bottom:-40px;width:80px;height:80px;border-radius:50%;background:rgba(232,98,44,.16);}
-.ajr-ca-label{display:flex;align-items:center;gap:6px;color:#B9BCD3;font-size:13px;position:relative;z-index:1;}
+.ajr-ca-label{display:flex;align-items:center;gap:6px;color:#B9BCD3;font-size:12px;position:relative;z-index:1;}
 .ajr-ca-label i{color:#E8622C;}
-.ajr-ca-value{font-family:'Sora',system-ui,sans-serif;font-size:34px;font-weight:700;margin-top:8px;position:relative;z-index:1;}
-.ajr-ca-value .unit{font-size:16px;font-weight:500;color:#B9BCD3;margin-left:4px;}
-.ajr-ca-pills{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;position:relative;z-index:1;}
-.ajr-ca-pill{font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;}
+.ajr-ca-value{font-family:'Sora',system-ui,sans-serif;font-size:27px;font-weight:700;margin-top:6px;position:relative;z-index:1;}
+.ajr-ca-value .unit{font-size:13px;font-weight:500;color:#B9BCD3;margin-left:4px;}
+.ajr-ca-pills{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;position:relative;z-index:1;}
+.ajr-ca-pill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;}
 .ajr-ca-pill.green{background:rgba(76,190,130,.18);color:#8FE0B3;}
 .ajr-ca-pill.neutral{background:rgba(255,255,255,.10);color:#D5D7E6;}
 .ajr-ca-pill.muted{background:rgba(255,255,255,.08);color:#9A9DB8;}
 
-.ajr-stat-card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 1px 2px rgba(30,34,71,.06);min-width:0;}
-.ajr-stat-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px;}
-.ajr-stat-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.ajr-stat-card{background:#fff;border-radius:20px;padding:14px;box-shadow:0 1px 2px rgba(30,34,71,.06);min-width:0;}
+.ajr-stat-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;}
+.ajr-stat-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
 .ajr-stat-icon.navy{background:#ECEDF5;color:#1E2247;}
 .ajr-stat-icon.amber{background:#FDF3D7;color:#8A6100;}
 .ajr-stat-icon.orange{background:#FCEBE3;color:#C8501E;}
 .ajr-stat-tag{font-size:11px;font-weight:600;color:#5F6275;white-space:nowrap;}
 .ajr-stat-tag.urgent{background:#FCEBE3;color:#C8501E;padding:4px 10px;border-radius:20px;}
-.ajr-stat-value{font-family:'Sora',system-ui,sans-serif;font-size:30px;font-weight:700;color:#1E2247;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ajr-stat-label{font-size:14px;color:#5F6275;margin-top:2px;}
+.ajr-stat-value{font-family:'Sora',system-ui,sans-serif;font-size:24px;font-weight:700;color:#1E2247;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ajr-stat-label{font-size:12.5px;color:#5F6275;margin-top:2px;}
 
 /* ---- Aujourd'hui V2 : ligne 2 — parcours des commandes ---- */
 .ajr-steps-card{background:#fff;border-radius:20px;padding:18px 22px;margin-bottom:16px;box-shadow:0 1px 2px rgba(30,34,71,.06);flex-shrink:0;}
@@ -3462,6 +3462,8 @@ const BARRE_IMPRESSION_STYLE_GN = '.barre-impression{position:sticky;top:0;backg
   + '@media print{.barre-impression{display:none;}}';
 const BARRE_IMPRESSION_HTML_GN = '<div class="barre-impression"><button onclick="window.print()">Imprimer / PDF</button>'
   + '<span>Astuce : décochez « En-têtes et pieds de page » dans les options d\'impression.</span></div>';
+// Bloc signature retiré à la demande du gérant (repasser à true pour le réafficher sur la facture).
+const AFFICHER_SIGNATURE_FACTURE_GN = false;
 
 function construireHtmlFactureCommande(c, numeroFacture) {
   const P = PARAMS;
@@ -3515,7 +3517,9 @@ function construireHtmlFactureCommande(c, numeroFacture) {
   const remerciementHtml = messageRemerciement
     ? '<div style="font-size:13px;font-style:italic;color:' + couleurAccent + ';text-align:center;margin-bottom:12px;">' + esc(messageRemerciement) + '</div>'
     : '';
-  const signatureHtml = '<div class="signature-bloc"><div class="signature-espace"></div><div class="signature-nom">' + esc(P.signataire_nom || '') + '</div><div class="signature-titre">' + esc(P.signataire_titre || '') + '</div></div>';
+  const signatureHtml = AFFICHER_SIGNATURE_FACTURE_GN
+    ? '<div class="signature-bloc"><div class="signature-espace"></div><div class="signature-nom">' + esc(P.signataire_nom || '') + '</div><div class="signature-titre">' + esc(P.signataire_titre || '') + '</div></div>'
+    : '';
 
   return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Facture ' + esc(numeroFacture) + ' — ' + esc(enseigne) + '</title>'
     + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">'
@@ -4985,6 +4989,16 @@ async function enregistrerPaiementFournisseur() {
   if (!montant || montant <= 0) { errEl.textContent = 'Montant requis.'; errEl.classList.remove('hidden'); return; }
   const f = fournisseurCourant;
   if (!f) return;
+  errEl.classList.add('hidden');
+  // Revérifié juste avant l'envoi (solde toujours à jour, pas celui affiché à l'ouverture de la
+  // modale) : on avertit sans bloquer, car verser une avance à un fournisseur avant vente est un
+  // usage volontaire déjà pris en charge ailleurs (état « Avance » sur sa fiche).
+  const infoSolde = await calculerSoldeInfoFournisseur(f.id);
+  if (montant > infoSolde.solde) {
+    const avance = montant - infoSolde.solde;
+    const confirme = confirm('Ce montant dépasse le reste dû (' + fmtMontant(infoSolde.solde) + ' GNF). Cela créera une avance de ' + fmtMontant(avance) + ' GNF pour ce fournisseur. Continuer ?');
+    if (!confirme) return;
+  }
   const { error } = await sb.from('gn_fournisseur_paiements').insert({ fournisseur_id: f.id, montant: montant, note: note || null, agent_nom: session.nom });
   if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
   await sb.from('gn_caisse').insert({ date: today(), libelle: 'Paiement fournisseur — ' + f.nom, type: 'sortie', montant: montant, categorie: 'fournisseur', agent_nom: session.nom });
