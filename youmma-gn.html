@@ -622,6 +622,8 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .four-tab.active{background:#1E2247;color:#fff;border-color:#1E2247;}
 .four-vue{display:flex;flex-direction:column;gap:16px;}
 .four-solde-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;position:relative;z-index:1;}
+.four-btn-historique{display:inline-flex;align-items:center;gap:7px;margin-top:12px;background:none;border:none;color:#B9BCD3;font-size:12.5px;font-weight:600;cursor:pointer;padding:0;position:relative;z-index:1;}
+.four-btn-historique:hover{color:#fff;}
 .four-btn-depot{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3);padding:12px 18px;border-radius:12px;font-size:13.5px;font-weight:600;cursor:pointer;}
 .four-rapport-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
 .four-kpi-card-navy{background:#1E2247;}
@@ -667,6 +669,8 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
   .four-solde-value{font-size:28px;}
   .four-solde-actions .four-btn-retrait,.four-solde-actions .four-btn-depot{flex:1;justify-content:center;}
   .four-btn-depot{background:#fff;color:#C8501E;border:1.5px solid #C8501E;}
+  .four-btn-historique{color:#9A9CAB;}
+  .four-btn-historique:hover{color:#1E2247;}
   .four-btn-label-full{display:none;}
   .four-btn-label-short{display:inline;}
 
@@ -1831,6 +1835,7 @@ button.suivi-pastille{cursor:pointer;}
             </div>
             <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
               <button class="btn btn-ghost gerant-only" id="fdBtnAcces" onclick="ouvrirAccesFournisseur()"><i class="ti ti-key"></i> Créer un accès</button>
+              <button class="btn btn-ghost gerant-only" onclick="ouvrirHistoriquePaiementsFournisseur()"><i class="ti ti-receipt"></i> Historique des paiements</button>
               <button class="btn btn-primary gerant-only" onclick="openModalPaiementFournisseur()"><i class="ti ti-cash"></i> Payer</button>
             </div>
           </div>
@@ -2158,6 +2163,7 @@ button.suivi-pastille{cursor:pointer;}
           <button class="four-btn-retrait" onclick="ouvrirModalRetrait()"><i class="ti ti-arrow-down-circle"></i> <span class="four-btn-label-full">Demander un retrait</span><span class="four-btn-label-short">Retrait</span></button>
           <button class="four-btn-depot" onclick="ouvrirModalDepot()"><i class="ti ti-package-import"></i> <span class="four-btn-label-full">Déposer des articles</span><span class="four-btn-label-short">Déposer</span></button>
         </div>
+        <button class="four-btn-historique" onclick="ouvrirMesPaiementsFournisseur()"><i class="ti ti-receipt"></i> Mes paiements</button>
       </div>
 
       <div class="four-kpi-grid">
@@ -2387,6 +2393,16 @@ button.suivi-pastille{cursor:pointer;}
   </div>
 </div>
 
+<div id="modalHistoriquePaiements" class="modal-overlay">
+  <div class="modal-card modal-card-lg">
+    <div class="modal-header"><h3>Historique des paiements — <span id="hpFournisseurNom"></span></h3><button class="modal-close" onclick="closeModal('modalHistoriquePaiements')">×</button></div>
+    <div class="modal-body">
+      <div id="hpListe"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalHistoriquePaiements')">Fermer</button></div>
+  </div>
+</div>
+
 <div id="modalResetPinFournisseur" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-header"><h3 id="rpfTitre">Créer l'accès fournisseur</h3><button class="modal-close" onclick="closeModal('modalResetPinFournisseur')">×</button></div>
@@ -2436,6 +2452,16 @@ button.suivi-pastille{cursor:pointer;}
       <div id="fmpErreur" class="form-error hidden"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalMonProfilFournisseur')">Annuler</button><button class="btn btn-primary" onclick="enregistrerMonProfilFournisseur()">Enregistrer les modifications</button></div>
+  </div>
+</div>
+
+<div id="modalMesPaiements" class="modal-overlay">
+  <div class="modal-card modal-card-lg">
+    <div class="modal-header"><h3>Mes paiements</h3><button class="modal-close" onclick="closeModal('modalMesPaiements')">×</button></div>
+    <div class="modal-body">
+      <div id="mesPaiementsListe"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalMesPaiements')">Fermer</button></div>
   </div>
 </div>
 
@@ -2575,6 +2601,7 @@ let fdDepotsCache = [];
 let depotLignes = [];
 let fourProduitsCache = [];
 let fourRetraitsCache = [];
+let fourPaiementsCache = [];
 let fourSoldeInfo = null;
 let PARAMS = {};
 let produitsCache = [];
@@ -3722,7 +3749,10 @@ async function imprimerFactureCommande(commandeId) {
   win.document.close();
 }
 
-function construireHtmlRecuRetrait(r, fournisseurNom, fournisseurTel) {
+// Gabarit de reçu générique — donnees = { id, montant, date, traitePar, fournisseurNom,
+// fournisseurTel }. Partagé par un paiement manuel et un retrait validé, des deux côtés
+// (gérant ou portail fournisseur) : seuls les champs normalisés changent, jamais le gabarit.
+function construireHtmlRecu(donnees) {
   const P = PARAMS;
   const adresse = P.adresse || '';
   const telephone = P.telephone || '';
@@ -3731,9 +3761,9 @@ function construireHtmlRecuRetrait(r, fournisseurNom, fournisseurTel) {
   const nif = P.nif || '';
   const couleurPrincipale = P.couleur_principale || '#2D2D6B';
   const couleurAccent = P.couleur_accent || '#E85D04';
-  const dateTraitement = new Date(r.date_traitement || r.date_demande);
-  const dateAffichee = dateTraitement.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-  const numeroRecu = 'REC-GN-' + dateTraitement.getFullYear() + '-' + String(r.id).padStart(6, '0');
+  const dateDoc = new Date(donnees.date);
+  const dateAffichee = dateDoc.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const numeroRecu = 'REC-GN-' + dateDoc.getFullYear() + '-' + String(donnees.id).padStart(6, '0');
 
   const logoHtml = P.logo_url
     ? '<div class="logo-gn"><img src="' + esc(P.logo_url) + '"></div>'
@@ -3762,28 +3792,46 @@ function construireHtmlRecuRetrait(r, fournisseurNom, fournisseurTel) {
     + '</div>'
     + '<div class="filet" style="border-color:' + couleurAccent + ';"></div>'
     + '<div class="client-objet-box">'
-    + '<div><div class="section-titre" style="color:' + couleurAccent + ';">FOURNISSEUR</div><div><strong>' + esc(fournisseurNom) + '</strong></div>'
-    + '<div>Téléphone : ' + esc(fournisseurTel || '') + '</div></div>'
-    + '<div><div class="section-titre" style="color:' + couleurAccent + ';">RÉFÉRENCE</div><div>Retrait ' + esc(numeroRecu) + '</div>'
-    + '<div>Traité par : ' + esc(r.traite_par || '—') + '</div></div>'
+    + '<div><div class="section-titre" style="color:' + couleurAccent + ';">FOURNISSEUR</div><div><strong>' + esc(donnees.fournisseurNom) + '</strong></div>'
+    + '<div>Téléphone : ' + esc(donnees.fournisseurTel || '') + '</div></div>'
+    + '<div><div class="section-titre" style="color:' + couleurAccent + ';">RÉFÉRENCE</div><div>' + esc(numeroRecu) + '</div>'
+    + '<div>Traité par : ' + esc(donnees.traitePar || '—') + '</div></div>'
     + '</div>'
     + '<div class="totaux">'
-    + '<div class="tot-row tot-total-row"><span class="tot-total-label" style="color:' + couleurPrincipale + ';">MONTANT VERSÉ</span><span class="tot-total-value" style="background:' + couleurAccent + ';">' + fmtMontantInsecable(r.montant_verse) + ' GNF</span></div>'
+    + '<div class="tot-row tot-total-row"><span class="tot-total-label" style="color:' + couleurPrincipale + ';">MONTANT VERSÉ</span><span class="tot-total-value" style="background:' + couleurAccent + ';">' + fmtMontantInsecable(donnees.montant) + ' GNF</span></div>'
     + '</div>'
-    + '<div class="en-lettres">Arrêté le présent reçu à la somme de : <strong>' + nombreEnLettres(r.montant_verse) + '</strong>.</div>'
+    + '<div class="en-lettres">Arrêté le présent reçu à la somme de : <strong>' + nombreEnLettres(donnees.montant) + '</strong>.</div>'
     + '<div class="pied">' + piedBas + '</div>'
     + '</div>'
     + '</body></html>';
 }
-async function genererRecuRetrait(id) {
-  const r = fourRetraitsCache.find(function(x) { return x.id === id; });
-  if (!r || r.statut !== 'validee') { showToast('Reçu indisponible pour ce retrait.', 'error'); return; }
+function ouvrirRecu(donnees) {
   const win = window.open('', '_blank');
   if (!win) { showToast('Le navigateur a bloqué l\'ouverture du reçu.', 'error'); return; }
-  const html = construireHtmlRecuRetrait(r, fournisseurSession.nom, fournisseurSession.telephone);
+  const html = construireHtmlRecu(donnees);
   win.document.open();
   win.document.write(html);
   win.document.close();
+}
+// Nom/téléphone du fournisseur concerné, quel que soit le côté d'où le reçu est demandé :
+// le fournisseur lui-même (fournisseurSession, portail) ou le gérant consultant une fiche
+// (fournisseurCourant, page Fournisseurs).
+function fournisseurPourRecu() {
+  if (fournisseurSession) return { nom: fournisseurSession.nom, tel: fournisseurSession.telephone };
+  if (fournisseurCourant) return { nom: fournisseurCourant.nom, tel: fournisseurCourant.telephone };
+  return { nom: '', tel: '' };
+}
+function genererRecuRetrait(id) {
+  const r = fourRetraitsCache.find(function(x) { return x.id === id; });
+  if (!r || r.statut !== 'validee') { showToast('Reçu indisponible pour ce retrait.', 'error'); return; }
+  const f = fournisseurPourRecu();
+  ouvrirRecu({ id: r.id, montant: r.montant_verse, date: r.date_traitement || r.date_demande, traitePar: r.traite_par, fournisseurNom: f.nom, fournisseurTel: f.tel });
+}
+function genererRecuPaiement(id) {
+  const p = fourPaiementsCache.find(function(x) { return x.id === id; });
+  if (!p) { showToast('Reçu indisponible pour ce paiement.', 'error'); return; }
+  const f = fournisseurPourRecu();
+  ouvrirRecu({ id: p.id, montant: p.montant, date: p.created_at, traitePar: p.agent_nom, fournisseurNom: f.nom, fournisseurTel: f.tel });
 }
 
 /* ── PAGE COMMANDES (gérant/agent) ── */
@@ -5198,12 +5246,29 @@ async function enregistrerPaiementFournisseur() {
     const confirme = confirm('Ce montant dépasse le reste dû (' + fmtMontant(infoSolde.solde) + ' GNF). Cela créera une avance de ' + fmtMontant(avance) + ' GNF pour ce fournisseur. Continuer ?');
     if (!confirme) return;
   }
-  const { error } = await sb.from('gn_fournisseur_paiements').insert({ fournisseur_id: f.id, montant: montant, note: note || null, agent_nom: session.nom });
+  const { data: paiementInsere, error } = await sb.from('gn_fournisseur_paiements')
+    .insert({ fournisseur_id: f.id, montant: montant, note: note || null, agent_nom: session.nom })
+    .select().single();
   if (error) { errEl.textContent = 'Erreur: ' + error.message; errEl.classList.remove('hidden'); return; }
   await sb.from('gn_caisse').insert({ date: today(), libelle: 'Paiement fournisseur — ' + f.nom, type: 'sortie', montant: montant, categorie: 'fournisseur', agent_nom: session.nom });
   closeModal('modalPaiementFournisseur');
   showToast('Paiement enregistré.');
   await chargerDetailFournisseur();
+  ouvrirRecu({ id: paiementInsere.id, montant: paiementInsere.montant, date: paiementInsere.created_at, traitePar: paiementInsere.agent_nom, fournisseurNom: f.nom, fournisseurTel: f.telephone });
+}
+async function ouvrirHistoriquePaiementsFournisseur() {
+  const f = fournisseurCourant;
+  if (!f) return;
+  document.getElementById('hpFournisseurNom').textContent = f.nom;
+  document.getElementById('hpListe').innerHTML = '<div class="empty">Chargement…</div>';
+  openModal('modalHistoriquePaiements');
+  const histo = await construireEvenementsHistoriqueFournisseur(f.id);
+  fourRetraitsCache = histo.retraits;
+  fourPaiementsCache = histo.paiements;
+  const lignes = histo.evenements.filter(function(e) { return e.type === 'paiement' || e.type === 'retrait'; });
+  document.getElementById('hpListe').innerHTML = lignes.length
+    ? lignes.map(renderEvenementHistorique).join('')
+    : '<div class="empty">Aucun paiement pour le moment.</div>';
 }
 
 /* ── PORTAIL FOURNISSEUR ── */
@@ -5396,36 +5461,25 @@ async function envoyerDepot() {
 const PORTAIL_HISTORIQUE_PAGE = 15;
 let portailHistoriqueEvenements = [];
 let portailHistoriqueAffiches = 0;
-async function loadPortailRapport() {
-  const fid = fournisseurSession.id;
-  const [{ data: venteTotale }, { data: soldeActuel }, { data: paiements }, { data: retraits }, { data: depots }, { data: commandes }] = await Promise.all([
-    sb.rpc('gn_fournisseur_ventes_totales', { p_fournisseur_id: fid }),
-    sb.rpc('gn_fournisseur_solde_du', { p_fournisseur_id: fid }),
+// Construction des événements chronologiques d'un fournisseur (ventes, paiements manuels,
+// retraits, dépôts), partagée entre le Rapport du portail (vue complète), "Mes paiements"
+// (paiements/retraits uniquement) et "Historique des paiements" côté gérant — pour ne jamais
+// dupliquer cette logique de dédoublonnage/tri/solde courant.
+async function construireEvenementsHistoriqueFournisseur(fid) {
+  const [{ data: paiements }, { data: retraits }, { data: depots }, { data: commandes }] = await Promise.all([
     sb.from('gn_fournisseur_paiements').select('*').eq('fournisseur_id', fid),
     sb.from('gn_fournisseur_retraits').select('*').eq('fournisseur_id', fid),
     sb.from('gn_fournisseur_depots').select('*').eq('fournisseur_id', fid),
     sb.from('gn_commandes').select('numero,lignes,statut,date_creation,date_livraison'),
   ]);
-
   const paiementsListe = paiements || [];
-  const totalRecu = paiementsListe.reduce(function(s, p) { return s + Number(p.montant || 0); }, 0);
+  const retraitsListe = retraits || [];
   const depotsListe = depots || [];
-  const totalDepose = depotsListe
-    .filter(function(d) { return d.statut === 'valide'; })
-    .reduce(function(s, d) { return s + (d.lignes || []).reduce(function(ss, l) { return ss + Number(l.qte || 0); }, 0); }, 0);
 
-  document.getElementById('fourRapDepose').textContent = totalDepose;
-  document.getElementById('fourRapVendu').textContent = fmtMontant(venteTotale || 0) + ' GNF';
-  document.getElementById('fourRapRecu').textContent = fmtMontant(totalRecu) + ' GNF';
-  document.getElementById('fourRapSolde').textContent = fmtMontant(soldeActuel || 0) + ' GNF';
-
-  fourRetraitsCache = retraits || [];
-
-  // Historique détaillé et transparent : une ligne par vente (produit par produit) ET par
-  // paiement/retrait reçu, pour que le fournisseur puisse reconstituer lui-même son solde.
-  // Un retrait validé génère à la fois une ligne gn_fournisseur_retraits ET une ligne
-  // gn_fournisseur_paiements liée (retrait_id) — on n'affiche que la première pour ce cas,
-  // sinon le même versement apparaîtrait deux fois.
+  // Une ligne par vente (produit par produit) ET par paiement/retrait reçu, pour que le
+  // fournisseur puisse reconstituer lui-même son solde. Un retrait validé génère à la fois une
+  // ligne gn_fournisseur_retraits ET une ligne gn_fournisseur_paiements liée (retrait_id) — on
+  // n'affiche que la première pour ce cas, sinon le même versement apparaîtrait deux fois.
   const evenements = [];
   const commandesValides = (commandes || []).filter(function(c) { return c.statut !== 'annulee' && c.statut !== 'echec'; });
   commandesValides.forEach(function(c) {
@@ -5439,7 +5493,7 @@ async function loadPortailRapport() {
   paiementsListe.filter(function(p) { return !p.retrait_id; }).forEach(function(p) {
     evenements.push({ type: 'paiement', date: p.created_at, montant: -Number(p.montant || 0), data: p });
   });
-  fourRetraitsCache.forEach(function(r) {
+  retraitsListe.forEach(function(r) {
     const montant = r.statut === 'validee' ? -Number(r.montant_verse || 0) : 0;
     evenements.push({ type: 'retrait', date: r.date_traitement || r.date_demande, montant: montant, data: r });
   });
@@ -5454,8 +5508,40 @@ async function loadPortailRapport() {
   evenements.forEach(function(e) { solde += e.montant; e.soldeApres = solde; });
   evenements.reverse();
 
-  portailHistoriqueEvenements = evenements;
+  return { evenements: evenements, paiements: paiementsListe, retraits: retraitsListe, depots: depotsListe };
+}
+async function loadPortailRapport() {
+  const fid = fournisseurSession.id;
+  const [{ data: venteTotale }, { data: soldeActuel }, histo] = await Promise.all([
+    sb.rpc('gn_fournisseur_ventes_totales', { p_fournisseur_id: fid }),
+    sb.rpc('gn_fournisseur_solde_du', { p_fournisseur_id: fid }),
+    construireEvenementsHistoriqueFournisseur(fid),
+  ]);
+
+  const totalRecu = histo.paiements.reduce(function(s, p) { return s + Number(p.montant || 0); }, 0);
+  const totalDepose = histo.depots
+    .filter(function(d) { return d.statut === 'valide'; })
+    .reduce(function(s, d) { return s + (d.lignes || []).reduce(function(ss, l) { return ss + Number(l.qte || 0); }, 0); }, 0);
+
+  document.getElementById('fourRapDepose').textContent = totalDepose;
+  document.getElementById('fourRapVendu').textContent = fmtMontant(venteTotale || 0) + ' GNF';
+  document.getElementById('fourRapRecu').textContent = fmtMontant(totalRecu) + ' GNF';
+  document.getElementById('fourRapSolde').textContent = fmtMontant(soldeActuel || 0) + ' GNF';
+
+  fourRetraitsCache = histo.retraits;
+  fourPaiementsCache = histo.paiements;
+  portailHistoriqueEvenements = histo.evenements;
   fourRenderHistorique(true);
+}
+async function ouvrirMesPaiementsFournisseur() {
+  const histo = await construireEvenementsHistoriqueFournisseur(fournisseurSession.id);
+  fourRetraitsCache = histo.retraits;
+  fourPaiementsCache = histo.paiements;
+  const lignes = histo.evenements.filter(function(e) { return e.type === 'paiement' || e.type === 'retrait'; });
+  document.getElementById('mesPaiementsListe').innerHTML = lignes.length
+    ? lignes.map(renderEvenementHistorique).join('')
+    : '<div class="empty">Aucun paiement pour le moment.</div>';
+  openModal('modalMesPaiements');
 }
 function fourRenderHistorique(reinit) {
   const conteneur = document.getElementById('fourHistoriqueListe');
@@ -5480,9 +5566,10 @@ function renderEvenementHistorique(e) {
   if (e.type === 'paiement') {
     const p = e.data;
     const libelle = p.note ? esc(p.note) : 'Paiement reçu';
+    const recuBtn = '<button class="four-btn-recu" onclick="genererRecuPaiement(' + p.id + ')"><i class="ti ti-file-download"></i> Reçu PDF</button>';
     return '<div class="four-list-row"><div class="four-list-main"><div class="four-list-nom">' + libelle + '</div>'
       + '<div class="four-list-meta">' + date + '</div>' + soldeHtml + '</div>'
-      + '<span class="four-histo-montant negatif">' + fmtMontant(e.montant) + ' GNF</span></div>';
+      + '<div class="four-histo-actions"><span class="four-histo-montant negatif">' + fmtMontant(e.montant) + ' GNF</span>' + recuBtn + '</div></div>';
   }
   if (e.type === 'retrait') {
     const r = e.data;
