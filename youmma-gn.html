@@ -70,7 +70,8 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .app-shell{display:flex;min-height:100vh;}
 .sidebar{width:248px;flex-shrink:0;background:var(--indigo-dark);color:#fff;display:flex;flex-direction:column;padding:18px 14px;position:sticky;top:0;height:100vh;overflow:hidden;}
 .sidebar-brand{display:flex;align-items:center;gap:10px;padding:4px 4px 16px;flex-shrink:0;}
-.sidebar-brand-icon{width:42px;height:42px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;color:#fff;box-shadow:0 0 0 4px rgba(232,98,44,.22);}
+.sidebar-brand-icon{width:42px;height:42px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;color:#fff;box-shadow:0 0 0 4px rgba(232,98,44,.22);overflow:hidden;}
+.sidebar-brand-icon img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 .sidebar-brand-title{font-size:14px;font-weight:500;line-height:1.2;}
 .sidebar-brand-title .accent{color:#F2875C;}
 .sidebar-brand-sub{font-size:12px;color:#B9BCD3;margin-top:1px;}
@@ -851,13 +852,14 @@ button.suivi-pastille{cursor:pointer;}
 .agent-meta{font-size:12px;color:#9CA3AF;text-transform:capitalize;margin-top:2px;}
 
 /* ---- Équipe ---- */
-.eq-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px;}
+.eq-kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:16px;}
 .eq-kpi-card{background:#fff;border-radius:20px;padding:18px 20px;box-shadow:0 1px 2px rgba(30,34,71,.06);min-width:0;}
 .eq-kpi-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;}
 .eq-kpi-icon.navy{background:#ECEDF5;color:#1E2247;}
 .eq-kpi-icon.orange{background:#FCEBE3;color:#C8501E;}
 .eq-kpi-icon.blue{background:#E8F0FC;color:#2E5FB0;}
 .eq-kpi-icon.green{background:#E6F2EB;color:#1F7A4D;}
+.eq-kpi-icon.purple{background:#F1E8FC;color:#7B3FA0;}
 .eq-kpi-value{font-family:'Sora',system-ui,sans-serif;font-size:28px;font-weight:700;color:#1E2247;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .eq-kpi-label{font-size:12.5px;color:#5F6275;margin-top:4px;}
 @media (max-width:900px){.eq-kpi-grid{grid-template-columns:repeat(2,1fr);}}
@@ -937,7 +939,8 @@ button.suivi-pastille{cursor:pointer;}
 .ajr-mobile-header::before{content:'';position:absolute;right:-50px;top:-50px;width:170px;height:170px;border-radius:50%;border:20px solid rgba(232,98,44,.20);}
 .ajr-mobile-header-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}
 .ajr-mobile-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;}
-.ajr-mobile-brand-icon{width:30px;height:30px;border-radius:50%;background:#E8622C;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;color:#fff;}
+.ajr-mobile-brand-icon{width:30px;height:30px;border-radius:50%;background:#E8622C;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;color:#fff;overflow:hidden;}
+.ajr-mobile-brand-icon img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 .ajr-mobile-avatar{width:32px;height:32px;border-radius:50%;background:#F4C542;color:var(--indigo-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;cursor:pointer;border:none;flex-shrink:0;}
 .ajr-mobile-date{font-size:12px;color:#B9BCD3;margin-top:14px;position:relative;z-index:1;}
 .ajr-mobile-greeting{font-family:'Sora',system-ui,sans-serif;font-size:22px;font-weight:700;margin-top:2px;position:relative;z-index:1;}
@@ -1216,7 +1219,7 @@ button.suivi-pastille{cursor:pointer;}
 .livreur-hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .livreur-hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--orange-light);}
 .livreur-hero-titre{font-size:19px;font-weight:700;color:#fff;margin-top:2px;}
-.livreur-hero-avatar{width:38px;height:38px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;font-family:'Sora',sans-serif;flex-shrink:0;}
+.livreur-hero-avatar{width:38px;height:38px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;font-family:'Sora',sans-serif;flex-shrink:0;border:none;padding:0;cursor:pointer;}
 .livreur-hero-stats{display:flex;gap:10px;}
 .livreur-hero-stat{flex:1;min-width:0;background:rgba(255,255,255,.09);border-radius:14px;padding:12px 10px;}
 .livreur-hero-stat-label{font-size:10px;font-weight:600;color:#B9BEE0;text-transform:uppercase;letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -1444,7 +1447,7 @@ button.suivi-pastille{cursor:pointer;}
 
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <div class="sidebar-brand-icon"><i class="ti ti-shopping-cart"></i></div>
+      <div class="sidebar-brand-icon"><img src="icons/gn-192.png" alt="YOUMMA GN"></div>
       <div>
         <div class="sidebar-brand-title">YOUMMA <span class="accent">GN</span></div>
         <div class="sidebar-brand-sub">Votre marché en ligne</div>
@@ -1564,12 +1567,13 @@ button.suivi-pastille{cursor:pointer;}
         <div class="ajr-mobile">
           <div class="ajr-mobile-header">
             <div class="ajr-mobile-header-top">
-              <div class="ajr-mobile-brand"><div class="ajr-mobile-brand-icon"><i class="ti ti-shopping-cart"></i></div> YOUMMA GN</div>
+              <div class="ajr-mobile-brand"><div class="ajr-mobile-brand-icon"><img src="icons/gn-192.png" alt="YOUMMA GN"></div> YOUMMA GN</div>
               <div class="tache-menu">
                 <button class="ajr-mobile-avatar" id="ajMobileAvatar" onclick="toggleTacheMenu(event,'compte')">--</button>
                 <div class="tache-menu-dropdown" id="tacheMenu-compte">
                   <div style="padding:8px 14px 2px;font-size:12.5px;font-weight:700;color:var(--text);" id="ajMobileNom">—</div>
                   <div style="padding:0 14px 8px;font-size:11px;color:var(--text-muted);" id="ajMobileRole">—</div>
+                  <button class="tache-menu-item" onclick="ouvrirMonProfil()"><i class="ti ti-user-circle"></i> Mon profil</button>
                   <button class="tache-menu-item danger" onclick="logout()"><i class="ti ti-logout"></i> Déconnexion</button>
                 </div>
               </div>
@@ -1614,7 +1618,13 @@ button.suivi-pastille{cursor:pointer;}
                 <div class="livreur-hero-eyebrow">Livreur</div>
                 <h1 class="livreur-hero-titre" id="ajLivreurSalut">Salut</h1>
               </div>
-              <div class="livreur-hero-avatar" id="ajLivreurAvatar">--</div>
+              <div class="tache-menu">
+                <button class="livreur-hero-avatar" id="ajLivreurAvatar" onclick="toggleTacheMenu(event,'livreurCompte')">--</button>
+                <div class="tache-menu-dropdown" id="tacheMenu-livreurCompte">
+                  <button class="tache-menu-item" onclick="ouvrirMonProfil()"><i class="ti ti-user-circle"></i> Mon profil</button>
+                  <button class="tache-menu-item danger" onclick="logout()"><i class="ti ti-logout"></i> Déconnexion</button>
+                </div>
+              </div>
             </div>
             <div class="ajr-livreur-gains-label">Gains du jour</div>
             <div class="ajr-livreur-gains-value" id="ajLivreurGains">0 <span class="unit">GNF</span></div>
@@ -2036,6 +2046,11 @@ button.suivi-pastille{cursor:pointer;}
             <div class="eq-kpi-icon green"><i class="ti ti-truck-delivery"></i></div>
             <div class="eq-kpi-value" id="eqKpiLivreurs">—</div>
             <div class="eq-kpi-label">Livreurs</div>
+          </div>
+          <div class="eq-kpi-card">
+            <div class="eq-kpi-icon purple"><i class="ti ti-building-warehouse"></i></div>
+            <div class="eq-kpi-value" id="eqKpiFournisseurs">—</div>
+            <div class="eq-kpi-label">Fournisseurs avec accès</div>
           </div>
         </div>
         <div class="eq-toolbar">
@@ -2514,11 +2529,13 @@ let cmdFiltreStatut = 'en_cours';
 let cmdPeriode = 'aujourdhui';
 let cmdSelectedId = null;
 let agentsCache = [];
+let fournisseursAvecAccesCache = [];
 let eqFiltreRole = '';
 const EQ_ROLE_STYLES = {
   gerant: { bg: '#FCEBE3', color: '#C8501E' },
   agent: { bg: '#E8F0FC', color: '#2E5FB0' },
   livreur: { bg: '#E6F2EB', color: '#1F7A4D' },
+  fournisseur: { bg: '#F1E8FC', color: '#7B3FA0' },
 };
 let agentEnEdition = null;
 let agentPourResetPin = null;
@@ -5391,28 +5408,41 @@ function retourClassementLivreurs() {
 
 /* ── PAGE AGENTS (Équipe) ── */
 async function loadAgents() {
-  const { data } = await sb.from('gn_agents').select('*').order('nom');
-  agentsCache = data || [];
+  const [{ data: agents }, { data: fournisseurs }] = await Promise.all([
+    sb.from('gn_agents').select('*').order('nom'),
+    sb.from('gn_fournisseurs').select('*').order('nom'),
+  ]);
+  agentsCache = agents || [];
+  // Seuls les fournisseurs ayant un accès créé (pin_hash renseigné, cf. audit) figurent
+  // dans l'Équipe — les autres restent une simple fiche gérée depuis la page Fournisseurs.
+  fournisseursAvecAccesCache = (fournisseurs || []).filter(function(f) { return !!f.pin_hash; });
   eqRenderKpis();
   eqRenderTabs();
   eqRenderListe();
 }
+function eqMembresTous() {
+  return agentsCache.map(function(a) { return Object.assign({}, a, { _source: 'agent' }); })
+    .concat(fournisseursAvecAccesCache.map(function(f) { return Object.assign({}, f, { _source: 'fournisseur', role: 'fournisseur' }); }));
+}
 function eqRenderKpis() {
-  document.getElementById('eqKpiTotal').textContent = agentsCache.length;
+  document.getElementById('eqKpiTotal').textContent = agentsCache.length + fournisseursAvecAccesCache.length;
   document.getElementById('eqKpiGerants').textContent = agentsCache.filter(function(a) { return a.role === 'gerant'; }).length;
   document.getElementById('eqKpiAgents').textContent = agentsCache.filter(function(a) { return a.role === 'agent'; }).length;
   document.getElementById('eqKpiLivreurs').textContent = agentsCache.filter(function(a) { return a.role === 'livreur'; }).length;
+  document.getElementById('eqKpiFournisseurs').textContent = fournisseursAvecAccesCache.length;
 }
 const EQ_TABS = [
   { key: '', label: 'Tous' },
   { key: 'agent', label: 'Agents' },
   { key: 'livreur', label: 'Livreurs' },
+  { key: 'fournisseur', label: 'Fournisseurs' },
 ];
 function eqRenderTabs() {
   const tabsEl = document.getElementById('eqTabs');
   if (!tabsEl) return;
+  const tous = eqMembresTous();
   tabsEl.innerHTML = EQ_TABS.map(function(t) {
-    const count = t.key ? agentsCache.filter(function(a) { return a.role === t.key; }).length : agentsCache.length;
+    const count = t.key ? tous.filter(function(a) { return a.role === t.key; }).length : tous.length;
     const actif = eqFiltreRole === t.key;
     return '<button class="cmd-tab' + (actif ? ' active' : '') + '" onclick="eqSetFiltreRole(\'' + t.key + '\')">' + t.label + '<span class="cmd-tab-count">' + count + '</span></button>';
   }).join('');
@@ -5425,32 +5455,56 @@ function eqSetFiltreRole(role) {
 function filtrerAgents() { eqRenderListe(); }
 function eqRenderListe() {
   const q = (document.getElementById('eqRecherche').value || '').trim().toLowerCase();
-  let liste = agentsCache;
+  let liste = eqMembresTous();
   if (eqFiltreRole) liste = liste.filter(function(a) { return a.role === eqFiltreRole; });
   if (q) liste = liste.filter(function(a) { return (a.nom || '').toLowerCase().indexOf(q) !== -1; });
   document.getElementById('agentsListe').innerHTML = liste.length ? liste.map(renderAgentRow).join('') : '<div class="empty">Aucun membre trouvé.</div>';
 }
 function renderAgentRow(a) {
+  const estFournisseur = a._source === 'fournisseur';
   const style = EQ_ROLE_STYLES[a.role] || EQ_ROLE_STYLES.agent;
   const actif = a.actif !== false;
-  const btnToggle = actif
-    ? '<button class="btn eq-action-btn btn-danger-outline" onclick="desactiverAgent(\'' + a.id + '\')"><i class="ti ti-user-off"></i> Désactiver</button>'
-    : '<button class="btn eq-action-btn eq-btn-reactiver" onclick="reactiverAgent(\'' + a.id + '\')"><i class="ti ti-user-check"></i> Réactiver</button>';
+  let actionsHtml;
+  if (estFournisseur) {
+    const btnToggle = actif
+      ? '<button class="btn eq-action-btn btn-danger-outline" onclick="desactiverFournisseurEquipe(\'' + a.id + '\')"><i class="ti ti-user-off"></i> Désactiver</button>'
+      : '<button class="btn eq-action-btn eq-btn-reactiver" onclick="reactiverFournisseurEquipe(\'' + a.id + '\')"><i class="ti ti-user-check"></i> Réactiver</button>';
+    actionsHtml = '<button class="btn eq-action-btn btn-ghost" onclick="eqOuvrirResetPinFournisseur(\'' + a.id + '\')"><i class="ti ti-key"></i> Réinitialiser PIN</button>' + btnToggle;
+  } else {
+    const btnToggle = actif
+      ? '<button class="btn eq-action-btn btn-danger-outline" onclick="desactiverAgent(\'' + a.id + '\')"><i class="ti ti-user-off"></i> Désactiver</button>'
+      : '<button class="btn eq-action-btn eq-btn-reactiver" onclick="reactiverAgent(\'' + a.id + '\')"><i class="ti ti-user-check"></i> Réactiver</button>';
+    actionsHtml = '<button class="btn eq-action-btn btn-ghost" onclick="openModalAgentEdit(\'' + a.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>'
+      + '<button class="btn eq-action-btn btn-ghost" onclick="ouvrirResetPin(\'' + a.id + '\')"><i class="ti ti-key"></i> Réinitialiser PIN</button>'
+      + btnToggle;
+  }
   return '<div class="eq-member-card' + (actif ? '' : ' inactif') + '">'
     + '<div class="eq-avatar" style="background:' + style.bg + ';color:' + style.color + ';">' + esc(initiales(a.nom)) + '</div>'
     + '<div class="eq-member-info">'
     + '<div class="eq-member-nom">' + esc(a.nom) + '</div>'
     + '<div class="eq-member-badges">'
-    + '<span class="eq-role-pill" style="background:' + style.bg + ';color:' + style.color + ';">' + esc(ROLE_LABELS[a.role] || a.role) + '</span>'
+    + '<span class="eq-role-pill" style="background:' + style.bg + ';color:' + style.color + ';">' + esc(estFournisseur ? 'Fournisseur' : (ROLE_LABELS[a.role] || a.role)) + '</span>'
     + '<span class="eq-status-badge"><span class="eq-status-dot' + (actif ? '' : ' off') + '"></span>' + (actif ? 'Actif' : 'Désactivé') + '</span>'
     + '</div>'
     + '<div class="eq-member-phone"><i class="ti ti-phone"></i> ' + esc(a.telephone || '—') + '</div>'
     + '</div>'
-    + '<div class="eq-member-actions">'
-    + '<button class="btn eq-action-btn btn-ghost" onclick="openModalAgentEdit(\'' + a.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>'
-    + '<button class="btn eq-action-btn btn-ghost" onclick="ouvrirResetPin(\'' + a.id + '\')"><i class="ti ti-key"></i> Réinitialiser PIN</button>'
-    + btnToggle
-    + '</div></div>';
+    + '<div class="eq-member-actions">' + actionsHtml + '</div></div>';
+}
+function eqOuvrirResetPinFournisseur(id) {
+  fournisseurCourant = fournisseursAvecAccesCache.find(function(f) { return f.id === id; });
+  if (!fournisseurCourant) return;
+  ouvrirAccesFournisseur();
+}
+async function desactiverFournisseurEquipe(id) {
+  if (!confirm('Désactiver ce fournisseur ?')) return;
+  await sb.from('gn_fournisseurs').update({ actif: false }).eq('id', id);
+  showToast('Fournisseur désactivé.');
+  loadAgents();
+}
+async function reactiverFournisseurEquipe(id) {
+  await sb.from('gn_fournisseurs').update({ actif: true }).eq('id', id);
+  showToast('Fournisseur réactivé.');
+  loadAgents();
 }
 function openModalAgent() {
   agentEnEdition = null;
