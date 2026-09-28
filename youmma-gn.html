@@ -6344,7 +6344,7 @@ async function envoyerMessageComposeur() {
   btn.disabled = true;
   const destinataires = cmContactsCibles.map(function(c) { return { telephone: c.telephone, message: cmPersonnaliserMessage(texte, c) }; });
   try {
-    const res = await fetch('https://yoummajobs.com/api/send-gn-sms', {
+    const res = await fetch('/api/send-gn-sms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ destinataires: destinataires }),
