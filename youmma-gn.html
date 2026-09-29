@@ -899,6 +899,24 @@ button.suivi-pastille{cursor:pointer;}
   .eq-member-actions{width:100%;justify-content:flex-start;}
 }
 
+/* ---- Stock livreur (chargement gérant + "Mon stock" livreur) ---- */
+.sl-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--navy-secondary);margin:18px 0 10px;}
+.sl-section-title:first-child{margin-top:0;}
+.sl-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #F0EEE9;flex-wrap:wrap;}
+.sl-row:last-child{border-bottom:none;}
+.sl-row-nom{font-size:13.5px;font-weight:600;color:#1E2247;min-width:0;flex:1;}
+.sl-row-dispo{font-size:11.5px;color:#9A9CAB;font-weight:400;margin-top:2px;}
+.sl-qte-input{width:70px;height:36px;padding:0 10px;border:1.5px solid #E7E5E0;border-radius:8px;font-size:13px;text-align:center;}
+.sl-stepper{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.sl-stepper button{width:32px;height:32px;border-radius:8px;border:1.5px solid #E7E5E0;background:#fff;color:#1E2247;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.sl-stepper span{min-width:24px;text-align:center;font-weight:700;font-size:14px;color:#1E2247;}
+.ms-intro{background:#F4F3EF;border-radius:12px;padding:14px 16px;font-size:13px;color:#5F6275;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.ms-total{font-family:'Sora',system-ui,sans-serif;font-size:22px;font-weight:700;color:#1E2247;margin-bottom:14px;}
+.ms-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.ms-row-nom{font-weight:600;font-size:14px;color:#1A1A4E;}
+.ms-row-qte{background:#E8F0FC;color:#2E5FB0;font-size:13px;font-weight:700;padding:5px 14px;border-radius:20px;flex-shrink:0;}
+.badge-stock-livreur{display:inline-flex;align-items:center;gap:6px;background:#E6F2EB;color:#1F7A4D;font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:20px;margin:8px 0;}
+
 /* ---- Contacts ---- */
 .cnt-kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;}
 .cnt-kpi-card{background:#fff;border-radius:20px;padding:18px 20px;box-shadow:0 1px 2px rgba(30,34,71,.06);min-width:0;}
@@ -1519,6 +1537,7 @@ button.suivi-pastille{cursor:pointer;}
         <button class="nav-item" data-nav="aujourdhui" onclick="navigate('aujourdhui')"><i class="ti ti-home"></i> Aujourd'hui</button>
         <button class="nav-item" data-nav="commandes" onclick="navigate('commandes')"><i class="ti ti-shopping-bag"></i> Commandes<span class="sidebar-badge" id="sidebarBadgeCommandes" style="display:none;">0</span></button>
         <button class="nav-item gn-restricted" data-nav="produits" onclick="navigate('produits')"><i class="ti ti-package"></i> Produits</button>
+        <button class="nav-item livreur-only" data-nav="monstock" onclick="navigate('monstock')"><i class="ti ti-truck-delivery"></i> Mon stock</button>
       </div>
       <div class="sidebar-section" id="sidebarSectionFinances">
         <div class="sidebar-menu-label">Finances</div>
@@ -1781,6 +1800,16 @@ button.suivi-pastille{cursor:pointer;}
           <div class="livreur-section-titre"><i class="ti ti-history"></i> Historique du jour</div>
           <div class="card"><div id="livreurHistorique"></div></div>
         </div>
+      </section>
+
+      <!-- PAGE : MON STOCK (livreur) -->
+      <section id="page-monstock" class="page">
+        <div class="page-header">
+          <h2><i class="ti ti-truck-delivery"></i> Mon stock</h2>
+        </div>
+        <div class="ms-intro"><i class="ti ti-info-circle"></i> Ces produits sont déjà chargés avec vous : vous pouvez les livrer directement à un client, sans repasser par le dépôt.</div>
+        <div class="ms-total" id="msTotal">—</div>
+        <div id="msListe"></div>
       </section>
 
       <!-- PAGE : PRODUITS -->
@@ -2200,6 +2229,10 @@ button.suivi-pastille{cursor:pointer;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="13" height="9" rx="1.5"/><path d="M16 11h4l3 3v3h-7z"/><circle cx="7.5" cy="19.5" r="1.6"/><circle cx="18.5" cy="19.5" r="1.6"/></svg>
       <span>Commandes</span>
     </button>
+    <button class="bottom-nav-item livreur-only" data-nav="monstock" onclick="navigate('monstock')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2"/><circle cx="18.5" cy="18.5" r="2"/></svg>
+      <span>Mon stock</span>
+    </button>
     <button class="bottom-nav-fab gn-restricted" onclick="openModalCommande()" aria-label="Nouvelle commande">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
     </button>
@@ -2616,6 +2649,24 @@ button.suivi-pastille{cursor:pointer;}
       <div id="rpErreur" class="form-error hidden"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalResetPin')">Annuler</button><button class="btn btn-primary" onclick="confirmerResetPin()">Réinitialiser</button></div>
+  </div>
+</div>
+
+<div id="modalStockLivreur" class="modal-overlay">
+  <div class="modal-card modal-card-lg">
+    <div class="modal-header"><h3>Stock de <span id="slLivreurNom"></span></h3><button class="modal-close" onclick="closeModal('modalStockLivreur')">×</button></div>
+    <div class="modal-body">
+      <div class="sl-section-title">Déjà chargé sur ce livreur</div>
+      <div id="slDejaCharge"></div>
+      <div class="sl-section-title">Charger des produits depuis le dépôt</div>
+      <div class="cmd-search full" style="margin-bottom:12px;">
+        <i class="ti ti-search"></i>
+        <input type="text" id="slRecherche" placeholder="Rechercher un produit…" oninput="slRenderCatalogue()">
+      </div>
+      <div id="slCatalogue"></div>
+      <div id="slErreur" class="form-error hidden"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalStockLivreur')">Fermer</button><button class="btn btn-primary" onclick="validerChargementStock()">Charger la sélection</button></div>
   </div>
 </div>
 
@@ -3305,6 +3356,7 @@ function applyRoleVisibility() {
   const estGerantOuAgent = session.role === 'gerant' || session.role === 'agent';
   document.querySelectorAll('.gn-restricted').forEach(function(el) { el.style.display = estGerantOuAgent ? '' : 'none'; });
   document.querySelectorAll('.gerant-only').forEach(function(el) { el.style.display = session.role === 'gerant' ? '' : 'none'; });
+  document.querySelectorAll('.livreur-only').forEach(function(el) { el.style.display = session.role === 'livreur' ? '' : 'none'; });
   document.querySelectorAll('.sidebar-section').forEach(function(section) {
     const aUnLienVisible = Array.from(section.querySelectorAll('.nav-item')).some(function(item) { return item.style.display !== 'none'; });
     section.style.display = aUnLienVisible ? '' : 'none';
@@ -3336,6 +3388,7 @@ const PAGE_ROLES = {
   rapports: ['gerant'],
   agents: ['gerant'],
   contacts: ['gerant'],
+  monstock: ['livreur'],
   parametres: ['gerant'],
 };
 const PAGE_LOADERS = {
@@ -3347,6 +3400,7 @@ const PAGE_LOADERS = {
   rapports: loadRapports,
   agents: loadAgents,
   contacts: loadContacts,
+  monstock: loadMonStock,
   parametres: chargerParametresPage,
 };
 function navigate(page) {
@@ -4108,7 +4162,7 @@ function cmdRenderRow(c) {
     + '<div class="cmd-row-client-meta">#' + esc(cmdNumeroCourt(c.numero)) + (c.client_quartier ? ' · ' + esc(c.client_quartier) : '') + (heureCreation ? ' · reçue à ' + heureCreation : '') + '</div>'
     + '</div></div>'
     + '<div>' + cmdHeurePillHtml(c) + '</div>'
-    + '<div class="cmd-row-livreur' + (livreurTxt ? '' : ' none') + '">' + (livreurTxt ? esc(livreurTxt) : '—') + '</div>'
+    + '<div class="cmd-row-livreur' + (livreurTxt ? '' : ' none') + '">' + (livreurTxt ? esc(livreurTxt) : '—') + (c.depuis_stock_livreur ? ' <i class="ti ti-truck-delivery" style="color:#1F7A4D;" title="Déjà sur toi — livraison directe"></i>' : '') + '</div>'
     + '<div><div class="cmd-row-paiement-mode">' + modeLabel + '</div>' + paiementStatutHtml + '</div>'
     + '<div class="cmd-row-montant">' + fmtMontant(c.total) + '</div>'
     + '<div><span class="cmd-row-badge" style="background:' + statutInfo.bg + ';color:' + statutInfo.color + ';">' + statutInfo.label + '</span></div>'
@@ -4273,6 +4327,9 @@ function cmdRenderPanneau(c) {
     pillsHtml += '<span class="cmd-panel-pill' + (estUrgent ? ' urgent' : '') + '">Pour ' + heureStr + (estUrgent ? ' · ' + (minutes <= 0 ? 'en retard' : 'dans ' + minutes + ' min') : '') + '</span>';
   }
   pillsHtml += '<span class="cmd-panel-pill" style="background:' + statutInfo.bg + ';color:' + statutInfo.color + ';">' + statutInfo.label + '</span>';
+  if (c.depuis_stock_livreur) {
+    pillsHtml += '<span class="cmd-panel-pill" style="background:#E6F2EB;color:#1F7A4D;"><i class="ti ti-truck-delivery"></i> Déjà sur toi — livraison directe</span>';
+  }
   document.getElementById('cmdPanelPills').innerHTML = pillsHtml;
 
   document.getElementById('cmdPanelBody').innerHTML = cmdRenderPanneauArticles(c) + cmdRenderPanneauSuivi(c);
@@ -4340,6 +4397,19 @@ async function annulerCommande(id) {
     const ligne = lignes[i];
     const { data: prod } = await sb.from('gn_produits').select('stock').eq('id', ligne.produit_id).maybeSingle();
     if (prod) await sb.from('gn_produits').update({ stock: Number(prod.stock || 0) + Number(ligne.qte || 0) }).eq('id', ligne.produit_id);
+  }
+
+  // Si cette commande avait été fournie depuis le stock personnel du livreur, restaure la
+  // quantité correspondante dans gn_livreur_stock, EN PLUS de la restauration ci-dessus sur
+  // gn_produits.stock (qui, elle, ne change pas de logique).
+  if (c.depuis_stock_livreur && c.livreur_id) {
+    for (let i = 0; i < lignes.length; i++) {
+      const ligne = lignes[i];
+      const { data: ligneStock } = await sb.from('gn_livreur_stock').select('quantite').eq('livreur_id', c.livreur_id).eq('produit_id', ligne.produit_id).maybeSingle();
+      const nouvelleQte = (ligneStock ? Number(ligneStock.quantite || 0) : 0) + Number(ligne.qte || 0);
+      await sb.from('gn_livreur_stock')
+        .upsert([{ livreur_id: c.livreur_id, produit_id: ligne.produit_id, quantite: nouvelleQte, updated_at: new Date().toISOString() }], { onConflict: 'livreur_id,produit_id' });
+    }
   }
 
   const updatePayload = { statut: 'annulee' };
@@ -4474,8 +4544,10 @@ function renderMaLivraison(c) {
   }
   const appelBtn = c.client_telephone ? '<a class="livreur-btn-appeler" href="tel:' + esc(c.client_telephone) + '"><i class="ti ti-phone"></i> Appeler</a>' : '';
   const badge = CMD_STATUT_BADGES[c.statut] || {};
+  const badgeStockLivreur = c.depuis_stock_livreur ? '<div class="badge-stock-livreur"><i class="ti ti-truck-delivery"></i> Déjà sur toi — livraison directe</div>' : '';
   return '<div class="cmd-card bar-' + c.statut + '">'
     + '<div class="cmd-card-head"><div><div class="cmd-card-numero">' + esc(c.numero) + '</div><div class="cmd-card-client">' + esc(c.client_nom) + '</div></div><div class="cmd-card-badges"><span class="cmd-badge ' + badge.cls + '">' + badge.label + '</span></div></div>'
+    + badgeStockLivreur
     + '<div class="cmd-card-adresse"><i class="ti ti-map-pin"></i> ' + esc(c.client_adresse) + (c.client_quartier ? ' · ' + esc(c.client_quartier) : '') + '</div>'
     + '<div class="cmd-card-articles">' + esc(articlesResume(c.lignes)) + '</div>'
     + '<div class="cmd-card-montant" style="margin-bottom:10px;">' + fmtMontant(c.total) + ' GNF</div>'
@@ -4488,6 +4560,33 @@ function renderHistoriqueLivreurRow(c) {
   const badge = CMD_STATUT_BADGES[c.statut] || {};
   return '<div class="livreur-hist-row"><div><span class="livreur-hist-client">' + esc(c.client_nom) + '</span> · ' + fmtMontant(c.total) + ' GNF</div><span class="cmd-badge ' + badge.cls + '">' + badge.label + '</span></div>';
 }
+// Si le livreur a, dans son propre gn_livreur_stock, une quantité suffisante pour CHAQUE ligne
+// de la commande, la déduit de son stock personnel et marque la commande depuis_stock_livreur.
+// Ne touche jamais gn_produits.stock (déjà décrémenté à la création de la commande). Si le stock
+// est insuffisant pour au moins une ligne, ne modifie rien du tout — comportement actuel inchangé.
+async function essayerFournirDepuisStockLivreur(commande) {
+  const lignes = commande.lignes || [];
+  if (!lignes.length) return;
+  const { data: stockLivreur } = await sb.from('gn_livreur_stock').select('*').eq('livreur_id', session.id);
+  const stockParProduit = {};
+  (stockLivreur || []).forEach(function(l) { stockParProduit[l.produit_id] = l; });
+  const suffisantPourTout = lignes.every(function(ligne) {
+    const l = stockParProduit[ligne.produit_id];
+    return l && Number(l.quantite || 0) >= Number(ligne.qte || 0);
+  });
+  if (!suffisantPourTout) return;
+  for (let i = 0; i < lignes.length; i++) {
+    const ligne = lignes[i];
+    const l = stockParProduit[ligne.produit_id];
+    const nouvelleQte = Number(l.quantite || 0) - Number(ligne.qte || 0);
+    if (nouvelleQte <= 0) {
+      await sb.from('gn_livreur_stock').delete().eq('livreur_id', session.id).eq('produit_id', ligne.produit_id);
+    } else {
+      await sb.from('gn_livreur_stock').update({ quantite: nouvelleQte, updated_at: new Date().toISOString() }).eq('livreur_id', session.id).eq('produit_id', ligne.produit_id);
+    }
+  }
+  await sb.from('gn_commandes').update({ depuis_stock_livreur: true }).eq('id', commande.id);
+}
 async function prendreEnCharge(id) {
   const { data, error } = await sb.from('gn_commandes')
     .update({ livreur_id: session.id, statut: 'assignee', date_assignation: new Date().toISOString() })
@@ -4498,6 +4597,7 @@ async function prendreEnCharge(id) {
     chargerVueLivreur();
     return;
   }
+  await essayerFournirDepuisStockLivreur(data[0]);
   showToast('Commande prise en charge.');
   chargerVueLivreur();
   updateSidebarBadgeCommandes();
@@ -6072,7 +6172,9 @@ function renderAgentRow(a) {
     const btnToggle = actif
       ? '<button class="btn eq-action-btn btn-danger-outline" onclick="desactiverAgent(\'' + a.id + '\')"><i class="ti ti-user-off"></i> Désactiver</button>'
       : '<button class="btn eq-action-btn eq-btn-reactiver" onclick="reactiverAgent(\'' + a.id + '\')"><i class="ti ti-user-check"></i> Réactiver</button>';
-    actionsHtml = '<button class="btn eq-action-btn btn-ghost" onclick="openModalAgentEdit(\'' + a.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>'
+    const btnStock = a.role === 'livreur' ? '<button class="btn eq-action-btn btn-ghost" onclick="ouvrirStockLivreur(\'' + a.id + '\')"><i class="ti ti-truck-delivery"></i> Charger le stock</button>' : '';
+    actionsHtml = btnStock
+      + '<button class="btn eq-action-btn btn-ghost" onclick="openModalAgentEdit(\'' + a.id + '\')"><i class="ti ti-pencil"></i> Modifier</button>'
       + '<button class="btn eq-action-btn btn-ghost" onclick="ouvrirResetPin(\'' + a.id + '\')"><i class="ti ti-key"></i> Réinitialiser PIN</button>'
       + btnToggle;
   }
@@ -6163,6 +6265,135 @@ async function reactiverAgent(id) {
   await sb.from('gn_agents').update({ actif: true }).eq('id', id);
   showToast('Agent réactivé.');
   loadAgents();
+}
+
+/* ── Stock personnel des livreurs (gn_livreur_stock) — suivi logistique pur, ne touche jamais
+   gn_produits.stock ni les fournisseurs. Le garde-fou de disponibilité est aussi vérifié côté
+   base (trigger gn_livreur_stock_verifier_disponible) — la vérification ici n'est qu'un confort
+   d'UI immédiat, pas la seule protection. ── */
+let stockLivreurCourant = null;
+let slCatalogueCache = [];
+let slDejaChargeCache = [];
+let slAjouts = {};
+function ouvrirStockLivreur(livreurId) {
+  const livreur = agentsCache.find(function(a) { return a.id === livreurId; });
+  if (!livreur) return;
+  stockLivreurCourant = livreur;
+  document.getElementById('slLivreurNom').textContent = livreur.nom;
+  document.getElementById('slRecherche').value = '';
+  document.getElementById('slErreur').classList.add('hidden');
+  slAjouts = {};
+  slChargerDonnees();
+  openModal('modalStockLivreur');
+}
+async function slChargerDonnees() {
+  const [{ data: produits }, { data: tousLivreurStock }] = await Promise.all([
+    sb.from('gn_produits').select('*').eq('actif', true).order('nom'),
+    sb.from('gn_livreur_stock').select('*'),
+  ]);
+  const produitsListe = produits || [];
+  const tousStock = tousLivreurStock || [];
+  const chargeParProduit = {};
+  tousStock.forEach(function(l) { chargeParProduit[l.produit_id] = (chargeParProduit[l.produit_id] || 0) + Number(l.quantite || 0); });
+  slCatalogueCache = produitsListe.map(function(p) {
+    return { id: p.id, nom: p.nom, disponible: Number(p.stock || 0) - (chargeParProduit[p.id] || 0) };
+  });
+  slDejaChargeCache = tousStock.filter(function(l) { return l.livreur_id === stockLivreurCourant.id && Number(l.quantite || 0) > 0; })
+    .map(function(l) {
+      const p = produitsListe.find(function(x) { return x.id === l.produit_id; });
+      return { produit_id: l.produit_id, nom: p ? p.nom : ('Produit #' + l.produit_id + ' (introuvable)'), quantite: l.quantite };
+    });
+  slRenderDejaCharge();
+  slRenderCatalogue();
+}
+function slRenderDejaCharge() {
+  const el = document.getElementById('slDejaCharge');
+  el.innerHTML = slDejaChargeCache.length
+    ? slDejaChargeCache.map(function(l) {
+        return '<div class="sl-row"><div class="sl-row-nom">' + esc(l.nom) + '</div>'
+          + '<div style="display:flex;align-items:center;gap:8px;">'
+          + '<input type="number" min="0" value="' + l.quantite + '" class="sl-qte-input" id="slQte-' + l.produit_id + '">'
+          + '<button type="button" class="btn btn-sm btn-ghost" onclick="ajusterStockLivreur(' + l.produit_id + ')">Mettre à jour</button>'
+          + '</div></div>';
+      }).join('')
+    : '<div class="empty">Ce livreur ne transporte rien actuellement.</div>';
+}
+function slRenderCatalogue() {
+  const q = (document.getElementById('slRecherche').value || '').trim().toLowerCase();
+  const el = document.getElementById('slCatalogue');
+  let liste = slCatalogueCache;
+  if (q) liste = liste.filter(function(p) { return p.nom.toLowerCase().indexOf(q) !== -1; });
+  el.innerHTML = liste.length ? liste.map(function(p) {
+    const ajout = slAjouts[p.id] || 0;
+    return '<div class="sl-row"><div class="sl-row-nom">' + esc(p.nom) + '<div class="sl-row-dispo">Disponible au dépôt : ' + p.disponible + '</div></div>'
+      + '<div class="sl-stepper">'
+      + '<button type="button" onclick="slAjusterAjout(' + p.id + ', -1)">−</button>'
+      + '<span id="slAjoutQte-' + p.id + '">' + ajout + '</span>'
+      + '<button type="button" onclick="slAjusterAjout(' + p.id + ', 1)">+</button>'
+      + '</div></div>';
+  }).join('') : '<div class="empty">Aucun produit trouvé.</div>';
+}
+function slAjusterAjout(produitId, delta) {
+  const produit = slCatalogueCache.find(function(p) { return p.id === produitId; });
+  if (!produit) return;
+  const actuel = slAjouts[produitId] || 0;
+  const nouveau = actuel + delta;
+  if (nouveau < 0) return;
+  if (delta > 0 && nouveau > produit.disponible) { showToast('Disponible au dépôt : ' + produit.disponible + ' seulement.', 'error'); return; }
+  slAjouts[produitId] = nouveau;
+  const span = document.getElementById('slAjoutQte-' + produitId);
+  if (span) span.textContent = nouveau;
+}
+async function validerChargementStock() {
+  const errEl = document.getElementById('slErreur');
+  errEl.classList.add('hidden');
+  const entrees = Object.keys(slAjouts).filter(function(k) { return slAjouts[k] > 0; });
+  if (!entrees.length) { errEl.textContent = 'Choisissez au moins une quantité à charger.'; errEl.classList.remove('hidden'); return; }
+  for (let i = 0; i < entrees.length; i++) {
+    const produitId = Number(entrees[i]);
+    const delta = slAjouts[produitId];
+    const { data: existant } = await sb.from('gn_livreur_stock').select('quantite').eq('livreur_id', stockLivreurCourant.id).eq('produit_id', produitId).maybeSingle();
+    const nouvelleQte = (existant ? Number(existant.quantite || 0) : 0) + delta;
+    const { error } = await sb.from('gn_livreur_stock')
+      .upsert([{ livreur_id: stockLivreurCourant.id, produit_id: produitId, quantite: nouvelleQte, updated_at: new Date().toISOString() }], { onConflict: 'livreur_id,produit_id' });
+    if (error) { errEl.textContent = 'Erreur : ' + error.message; errEl.classList.remove('hidden'); return; }
+  }
+  slAjouts = {};
+  showToast('Stock chargé.');
+  await slChargerDonnees();
+}
+async function ajusterStockLivreur(produitId) {
+  const input = document.getElementById('slQte-' + produitId);
+  const nouvelleQte = Math.max(0, Math.round(Number(input.value) || 0));
+  let error;
+  if (nouvelleQte === 0) {
+    ({ error } = await sb.from('gn_livreur_stock').delete().eq('livreur_id', stockLivreurCourant.id).eq('produit_id', produitId));
+  } else {
+    ({ error } = await sb.from('gn_livreur_stock').update({ quantite: nouvelleQte, updated_at: new Date().toISOString() }).eq('livreur_id', stockLivreurCourant.id).eq('produit_id', produitId));
+  }
+  if (error) { showToast('Erreur : ' + error.message, 'error'); return; }
+  showToast('Stock mis à jour.');
+  await slChargerDonnees();
+}
+/* ── "Mon stock" (page livreur) ── */
+async function loadMonStock() {
+  const { data } = await sb.from('gn_livreur_stock').select('*').eq('livreur_id', session.id);
+  const lignes = (data || []).filter(function(l) { return Number(l.quantite || 0) > 0; });
+  if (!lignes.length) {
+    document.getElementById('msTotal').textContent = '0 article';
+    document.getElementById('msListe').innerHTML = '<div class="empty">Vous ne transportez aucun produit actuellement.</div>';
+    return;
+  }
+  const produitIds = lignes.map(function(l) { return l.produit_id; });
+  const { data: produits } = await sb.from('gn_produits').select('id,nom').in('id', produitIds);
+  const produitsParId = {};
+  (produits || []).forEach(function(p) { produitsParId[p.id] = p; });
+  const total = lignes.reduce(function(s, l) { return s + Number(l.quantite || 0); }, 0);
+  document.getElementById('msTotal').textContent = total + ' article' + (total > 1 ? 's' : '');
+  document.getElementById('msListe').innerHTML = lignes.map(function(l) {
+    const p = produitsParId[l.produit_id];
+    return '<div class="ms-row"><div class="ms-row-nom">' + esc(p ? p.nom : 'Produit introuvable') + '</div><span class="ms-row-qte">' + l.quantite + ' unité' + (l.quantite > 1 ? 's' : '') + '</span></div>';
+  }).join('');
 }
 function ouvrirResetPin(id) {
   agentPourResetPin = agentsCache.find(function(a) { return a.id === id; });
