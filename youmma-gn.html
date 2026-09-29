@@ -622,8 +622,8 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
 .four-tab.active{background:#1E2247;color:#fff;border-color:#1E2247;}
 .four-vue{display:flex;flex-direction:column;gap:16px;}
 .four-solde-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;position:relative;z-index:1;}
-.four-btn-historique{display:inline-flex;align-items:center;gap:7px;margin-top:12px;background:none;border:none;color:#B9BCD3;font-size:12.5px;font-weight:600;cursor:pointer;padding:0;position:relative;z-index:1;}
-.four-btn-historique:hover{color:#fff;}
+.four-btn-historique{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:10px;width:100%;box-sizing:border-box;background:rgba(255,255,255,.08);color:#fff;border:1.5px solid rgba(255,255,255,.25);padding:12px 18px;border-radius:12px;font-size:13.5px;font-weight:600;cursor:pointer;position:relative;z-index:1;}
+.four-btn-historique:hover{background:rgba(255,255,255,.16);}
 .four-btn-depot{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.3);padding:12px 18px;border-radius:12px;font-size:13.5px;font-weight:600;cursor:pointer;}
 .four-rapport-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
 .four-kpi-card-navy{background:#1E2247;}
@@ -669,8 +669,8 @@ h1,h2,h3{margin:0;font-family:'Sora',system-ui,sans-serif;}
   .four-solde-value{font-size:28px;}
   .four-solde-actions .four-btn-retrait,.four-solde-actions .four-btn-depot{flex:1;justify-content:center;}
   .four-btn-depot{background:#fff;color:#C8501E;border:1.5px solid #C8501E;}
-  .four-btn-historique{color:#9A9CAB;}
-  .four-btn-historique:hover{color:#1E2247;}
+  .four-btn-historique{background:#fff;color:#1E2247;border:1.5px solid #E7E5E0;}
+  .four-btn-historique:hover{background:#F4F3EF;}
   .four-btn-label-full{display:none;}
   .four-btn-label-short{display:inline;}
 
@@ -1938,10 +1938,6 @@ button.suivi-pastille{cursor:pointer;}
           <div class="card" id="fdDepotsCard">
             <h3>Dépôts en attente</h3>
             <div id="fdDepotsListe"></div>
-          </div>
-          <div class="card">
-            <h3>Historique des paiements</h3>
-            <div id="fdPaiementsListe"></div>
           </div>
         </div>
       </section>
@@ -5300,7 +5296,6 @@ async function chargerDetailFournisseur() {
     ? fdDepotsCache.map(function(d) { return renderDepotEnAttenteRow(d, produitsParId); }).join('')
     : '<div class="empty">Aucun dépôt en attente.</div>';
 
-  document.getElementById('fdPaiementsListe').innerHTML = (paiements && paiements.length) ? paiements.map(renderPaiementFournisseurRow).join('') : '<div class="empty">Aucun paiement enregistré.</div>';
 }
 function renderRetraitEnAttenteRow(r) {
   const date = r.date_demande ? new Date(r.date_demande).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
@@ -5420,11 +5415,6 @@ async function confirmerResetPinFournisseur() {
   closeModal('modalResetPinFournisseur');
   showToast('Accès fournisseur enregistré.');
   await chargerDetailFournisseur();
-}
-function renderPaiementFournisseurRow(p) {
-  const libelle = p.note ? esc(p.note) : 'Paiement — ' + esc(p.agent_nom || '—');
-  const date = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-  return '<div class="fournisseur-paiement-row"><div><div style="font-weight:500;color:var(--text);">' + libelle + '</div><div style="color:var(--text-muted);font-size:11.5px;">' + date + '</div></div><div style="color:var(--green);font-weight:600;">' + fmtMontant(p.montant) + ' GNF</div></div>';
 }
 function openModalPaiementFournisseur() {
   document.getElementById('fpMontant').value = '';
@@ -5726,7 +5716,7 @@ async function loadPortailRapport() {
     .filter(function(d) { return d.statut === 'valide'; })
     .reduce(function(s, d) { return s + (d.lignes || []).reduce(function(ss, l) { return ss + Number(l.qte || 0); }, 0); }, 0);
 
-  document.getElementById('fourRapDepose').textContent = totalDepose;
+  document.getElementById('fourRapDepose').textContent = totalDepose + ' article' + (totalDepose > 1 ? 's' : '');
   document.getElementById('fourRapVendu').textContent = fmtMontant(venteTotale || 0) + ' GNF';
   document.getElementById('fourRapRecu').textContent = fmtMontant(totalRecu) + ' GNF';
   document.getElementById('fourRapSolde').textContent = fmtMontant(soldeActuel || 0) + ' GNF';
