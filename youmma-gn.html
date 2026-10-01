@@ -4651,7 +4651,7 @@ async function finaliserLivraison(encaisse) {
 }
 
 /* ── MODALE NOUVELLE COMMANDE ── */
-function openModalCommande() {
+async function openModalCommande() {
   commandeEnEdition = null;
   ligneCommandeArticles = [];
   document.getElementById('cmdModalTitre').textContent = 'Nouvelle commande';
@@ -4671,6 +4671,11 @@ function openModalCommande() {
   document.getElementById('cBtnSubmit').textContent = 'Enregistrer la commande';
   renderLignesCommande();
   document.getElementById('cErreur').classList.add('hidden');
+  // Le catalogue n'est chargé que par la page Produits (ou après certaines mutations) —
+  // sans ce rechargement, produitsCache peut être vide si on ouvre cette modale avant
+  // d'avoir jamais visité Produits (ex: depuis "Aujourd'hui" juste après connexion),
+  // ce qui rend la recherche d'articles silencieusement infructueuse.
+  await loadProduits();
   openModal('modalCommande');
 }
 function setModePaiementCommande(mode) {
